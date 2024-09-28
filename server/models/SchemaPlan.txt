@@ -48,6 +48,7 @@ category
 tags
 special discounts
 is booking open
+duration
 
 -- Itinerary
 activities
@@ -67,3 +68,10 @@ location
 opening hours
 ticket prices
 
+--Products
+picture
+price
+description
+Seller (Foreign Key)
+ratings
+reviews

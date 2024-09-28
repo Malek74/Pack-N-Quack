@@ -1,9 +1,20 @@
 // Import necessary modules
 import mongoose from 'mongoose';
-import admin from './models/AdminSchema.js'; // Adjust the path to your admin model file
+import admins from './routes/admins.js';
+import express from 'express';
 
-// MongoDB connection URI
-const mongoURI = 'mongodb+srv://captianquackerss:elbataaa@stillpacking.zfrig.mongodb.net/PackNQuack?retryWrites=true&w=majority&appName=StillPacking';
+const app = express();
+const port = 8000;
+const mongoURI = 'mongodb+srv://captianquackerss:elbataaa@stillpacking.zfrig.mongodb.net/PackNQuack?retryWrites=true&w=majority&appName=StillPacking'
+
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+})
+// Middleware to parse JSON
+app.use(express.json());
+
+// Middleware to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: false }));
 
 // Connect to MongoDB
 mongoose.connect(mongoURI)
@@ -14,25 +25,5 @@ mongoose.connect(mongoURI)
         console.error("MongoDB connection error:", err);
     });
 
-// Function to create and save a new admin
-async function createAdmin(username, password) {
-    try {
-        // Create a new admin instance
-        const newAdmin = new admin({
-            username: username,
-            password: password,
-        });
-
-        // Save the admin to the database
-        await newAdmin.save();
-        console.log("Admin saved successfully:", newAdmin);
-    } catch (error) {
-        console.error("Error saving admin:", error.message);
-    } finally {
-        // Close the MongoDB connection (optional in some use cases)
-        mongoose.connection.close();
-    }
-}
-
-// Sample usage
-createAdmin("Malek", "password"); // Replace with actual username and password
+// Define Endpoints
+app.use('/api/admins', admins);
