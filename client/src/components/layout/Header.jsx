@@ -6,6 +6,7 @@ export default function Header() {
       <Link className="text-xl">Pack n' Quack</Link>
       <nav className="container">
         <h1>Rooma bel double o</h1>
+        <h1>Rooma bel double o</h1>
         <ul className="flex justify-end gap-2">
           <li>
             <Link to="/">Home</Link>
