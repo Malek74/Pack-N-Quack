@@ -1,6 +1,8 @@
 // Import necessary modules
 import mongoose from 'mongoose';
 import admins from './routes/admins.js';
+import advertisers from './routes/advertisers.js';
+import activity from './routes/activity.js';
 import express from 'express';
 
 const app = express();
@@ -27,3 +29,5 @@ mongoose.connect(mongoURI)
 
 // Define Endpoints
 app.use('/api/admins', admins);
+app.use('/api/advertisers', advertisers);
+app.use('/api/activity', activity)
