@@ -11,8 +11,8 @@
 
 export default function activityCard(props) {
     return (
-        <div className="container rounded-lg max-w-96 p-3 min-w-32 shadow-md gap-3 m-3 mx-10 self-center">
-            <img className="h-1/2 w-max rounded-lg mb-4" src={props.img} alt={props.alt} />
+        <div className="container rounded-lg w-[25rem] h-[22rem] shadow-md">
+            <img className=" w-[25rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
             <div className="flex flex-col gap-2">
                 <h1 className=" flex"> <span className="font-semibold text-xl mr-auto">{props.name} </span><span className="text-primary drop-shadow">{props.category}</span></h1>
                 <h4 className="text-base">{props.time}</h4>

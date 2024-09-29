@@ -4,18 +4,21 @@ import background from "../images/Background.jpg"
 import lege from "../images/lege-cy.jpg"
 import memo from "../images/memo.png"
 import amy from "../images/amy.jpeg"
+import Banner from "@/components/Banner"
+
 export default function Activities() {
     return (
 
-        <div className="flex flex-col items-center">
-            <div className="flex justify-center items-center m-10 mb-36">
-                <img className="rounded-3xl w-auto h-[440px] " src={background} alt="Activities Background" />
-                <h1 className=" text-white text-8xl font-bold absolute">ACTIVITIES</h1>
-            </div>
+        <div className="flex flex-col items-center w-screen p-14">
+            <Banner 
+            background={background}
+            alt="Activities Background"
+            name="ACTIVITIES"
+            />
 
             <h1 className="text-5xl text-primary font-bold mb-24">Upcoming Actvities</h1>
 
-            <grid className="grid grid-cols-3">
+            <grid className="grid grid-cols-3 justify-stretch w-screen " >
                 <ActivityCard
                     img={lege}
                     alt="Lege-cy concert adv"
