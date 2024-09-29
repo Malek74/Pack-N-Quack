@@ -13,15 +13,14 @@ import mongoose from 'mongoose';
 import activities from './activitiesSchema.js';
 
 const itinerarySchema = new mongoose.Schema({
+
+    //covers the activities, duration & locations  
     activities: {
         type: [activities],
         required: true
     },
 
-    durations: {
-        type: [Number],
-        required: true
-    },
+
     language: {
         type: String,
         required: true
@@ -44,6 +43,13 @@ const itinerarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    bookings: {
+        type: Number,
+        default: 0
+    },
+
+    //todo: add a field for accessibility
+
 
 });
 
