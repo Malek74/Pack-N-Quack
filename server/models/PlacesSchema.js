@@ -18,7 +18,15 @@ const placesSchema = new Schema({
         type: String, // we can use Date to specify time with a date format
         required: true,
     },
-    ticket_price: {
+    ticket_price_native: {
+        type: Number, 
+        required: true,
+    },
+    ticket_price_foreigner: {
+        type: Number, 
+        required: true,
+    },
+    ticket_price_student: {
         type: Number, 
         required: true,
     },
