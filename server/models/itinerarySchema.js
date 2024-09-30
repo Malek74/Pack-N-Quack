@@ -10,16 +10,42 @@
 // pickup drop off locations
 
 import mongoose from 'mongoose';
-import activities from './activitiesSchema.js';
+import { Schema, model } from "mongoose";
 
-const itinerarySchema = new mongoose.Schema({
 
-    //covers the activities, duration & locations  
-    activities: {
-        type: [activities],
+const itineraryActivity = new mongoose.Schema({
+    name: {
+        type: String,
         required: true
     },
 
+    location: {
+        type: String,
+        required: true
+    },
+    duration: {
+        startTime: {
+            type: Date
+        },
+
+        endTime: {
+            type: Date,
+        }
+    },
+});
+const itinerarySchema = new mongoose.Schema({
+
+    tourGuideID: {
+        type: Schema.Types.ObjectId,
+        ref: 'TourGuide', // Reference the tourguide model
+        required: true,
+    },
+
+    //covers the activities, duration & locations  
+    activities: {
+        type: [itineraryActivity],
+        required: true
+    },
 
     language: {
         type: String,
@@ -48,6 +74,11 @@ const itinerarySchema = new mongoose.Schema({
         default: 0
     },
 
+    accessibility: {
+        type: [String],
+        required: true
+    }
+
     //todo: add a field for accessibility
 
 
@@ -55,3 +86,4 @@ const itinerarySchema = new mongoose.Schema({
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 export default Itinerary;
+
