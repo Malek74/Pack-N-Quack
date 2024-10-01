@@ -1,5 +1,5 @@
 import express from "express";
-import { getActivities, addActivity } from "../controllers/activityController.js";
+import { getActivities, addActivity, updateActivity, deleteActivity } from "../controllers/activityController.js";
 
 const router = express.Router();
 
@@ -8,5 +8,11 @@ router.get("/", getActivities);
 
 // Add an activity
 router.post("/", addActivity);
+
+// Edit an activity
+router.put("/update/:id", updateActivity);
+
+// Delete an activity
+router.delete("/delete/:id", deleteActivity);
 
 export default router;

@@ -51,6 +51,10 @@ const activitySchema = new Schema({
         type: Number,
         required: true
     },
+    name: {
+        type: String,
+        required: true
+    },
 })
 
 const activity = model("Activity", activitySchema);
