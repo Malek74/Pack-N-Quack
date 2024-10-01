@@ -7,7 +7,7 @@ const placesSchema = new Schema({
         required: true,
     },
     pictures: {
-        type: [String], // Array of strings for URLs or paths to pictures & see if we want to change it 
+        type: [String], // Array of strings for URLs or paths to pictures
         required: true,
     },
     location: {
@@ -15,7 +15,7 @@ const placesSchema = new Schema({
         required: true,
     },
     opening_hour: {
-        type: String, // we can use Date to specify time with a date format
+        type: String, // Can change to Date if specific times are needed
         required: true,
     },
     ticket_price_native: {
@@ -30,6 +30,7 @@ const placesSchema = new Schema({
         type: Number, 
         required: true,
     },
+    tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }], // Reference to Tag schema
 });
 
 const Places = mongoose.model("Places", placesSchema);

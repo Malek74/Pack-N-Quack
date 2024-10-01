@@ -4,7 +4,11 @@ import TouristGovernor from "../models/touristGovernor.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/AdminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
+import Places from '../models/PlacesSchema.js';
+import Tag from '../models/tagSchema.js';
 
+
+//Tourism Governer Sign-in
 export const createTouristGovernor = async (req, res) => {
     const { username, password} = req.body; 
 
@@ -27,4 +31,8 @@ export const createTouristGovernor = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+
+
+
 

@@ -13,3 +13,7 @@ export const getAdmins = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+
+
+
