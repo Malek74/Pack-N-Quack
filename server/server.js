@@ -4,10 +4,13 @@ import admins from './routes/admins.js';
 import advertisers from './routes/advertisers.js';
 import activity from './routes/activity.js';
 import express from 'express';
+import logger from './middleware/logger.js';
+import { config } from 'dotenv';
 
+config();
 const app = express();
-const port = 8000;
-const mongoURI = 'mongodb+srv://captianquackerss:elbataaa@stillpacking.zfrig.mongodb.net/PackNQuack?retryWrites=true&w=majority&appName=StillPacking'
+const port = process.env.PORT || 8000;
+const mongoURI = process.env.MONGO_URI;
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
@@ -18,6 +21,7 @@ app.use(express.json());
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: false }));
 
+app.use(logger);
 // Connect to MongoDB
 mongoose.connect(mongoURI)
     .then(() => {

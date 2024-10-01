@@ -3,6 +3,7 @@ import { Schema, model } from "mongoose";
 const advertiserSchema = new Schema({
     company_name: {
         type: String,
+        default: ""
     },
     email: {
         type: String,
@@ -19,15 +20,19 @@ const advertiserSchema = new Schema({
     },
     website: {
         type: String,
+        default: ""
     },
     hotline: {
         type: Number,
+        default: 0
     },
     establishment_date: {
         type: Date,
+        default: new Date()
     },
     description: {
         type: String,
+        default: ""
     },
     isAccepted: {
         type: Boolean,

@@ -2,6 +2,18 @@ import advertiser from "../models/AdvertiserSchema.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;
+    const advertiserExists = await advertiser.findOne({ email });
+
+    if (advertiserExists) {
+        return res.status(400).json({ message: "Advertiser already exists" });
+    }
+
+    const usernameExists = await advertiser.findOne({ username });
+
+    if (usernameExists) {
+        return res.status(400).json({ message: "Username already taken" });
+    }
+
     const newAdvertiser = new advertiser({ email, username, password });
     try {
         const a = await newAdvertiser.save();

@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.post("/", addAdvertiser);
 router.get("/", getAdvertisers);
+
 export default router;
