@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-
+//jhgj
 const touristGovernerSchema = new Schema({
     username: {
         type: String,
