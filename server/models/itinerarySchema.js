@@ -42,10 +42,24 @@ const itinerarySchema = new mongoose.Schema({
     },
 
     //covers the activities, duration & locations  
-    activities: {
-        type: [itineraryActivity],
-        required: true
-    },
+    activities: [{
+        name: {
+            type: String,
+            required: true
+        },
+        location: {
+            type: String,
+            required: true
+        },
+        duration: {
+            startTime: {
+                type: Date
+            },
+            endTime: {
+                type: Date,
+            },
+        }
+    }],
 
     language: {
         type: String,

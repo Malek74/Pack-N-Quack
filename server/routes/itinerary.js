@@ -1,5 +1,5 @@
 import express from "express";
-import { addItinerary, deleteItinerary, getItinerary, viewAllItineraries } from "../controllers/itineraryController.js";
+import { addItinerary, deleteItinerary, getItinerary, viewAllItineraries, updateItinerary } from "../controllers/itineraryController.js";
 
 const router = express.Router();
 

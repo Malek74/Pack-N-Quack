@@ -2,7 +2,9 @@
 import mongoose from 'mongoose';
 import admins from './routes/admins.js';
 import itinerary from './routes/itinerary.js'
+import tourGuide from './routes/tourGuide.js'
 import express from 'express';
+import touristGoverner from './models/touristGovernor.js';
 
 const app = express();
 const port = 8000;
@@ -29,3 +31,5 @@ mongoose.connect(mongoURI)
 // Define Endpoints
 app.use('/api/admins', admins);
 app.use('/api/itinerary', itinerary);
+app.use('/api/tourGuide', tourGuide);
+app.use('/api/touristGovernor', touristGoverner);
