@@ -2,7 +2,7 @@ import Tourist from "../models/touristSchema.js";
 import TourGuide from "../models/tourGuideSchema.js";
 import TouristGovernor from "../models/touristGovernor.js"; 
 import Seller from "../models/sellerSchema.js";
-import Admin from "../models/adminSchema.js";
+import Admin from "../models/AdminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 
 // Creating Tourist for Registration
@@ -16,7 +16,7 @@ export const createTourist = async (req, res) => {
             TourGuide.findOne({ $or: [{ email }, { username }] }),
             TouristGovernor.findOne({ username }),
             Seller.findOne({ $or: [{ email }, { username }] }),
-            Admin.findOne({ $or: [{ email }, { username }] }),
+            Admin.findOne( { username }),
             Advertiser.findOne({ $or: [{ email }, { username }] }),
         ]);
 
@@ -61,7 +61,6 @@ export const updateTourist = async (req, res) => {
                 Tourist.findOne({ email: newEmail }),
                 TourGuide.findOne({ email: newEmail }),
                 Seller.findOne({ email: newEmail }),
-                Admin.findOne({ email: newEmail }),
                 Advertiser.findOne({ email: newEmail }),
             ]);
 
