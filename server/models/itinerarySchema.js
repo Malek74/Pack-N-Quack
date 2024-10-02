@@ -35,6 +35,10 @@ const itineraryActivity = new mongoose.Schema({
 });
 const itinerarySchema = new mongoose.Schema({
 
+    name: {
+        type: String,
+        required: true,
+    },
     tourGuideID: {
         type: Schema.Types.ObjectId,
         ref: 'TourGuide', // Reference the tourguide model
@@ -65,6 +69,12 @@ const itinerarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    rating: {
+        type: Number,
+        default: 0
+    },
+
     price: {
         type: Number,
         required: true
@@ -88,12 +98,20 @@ const itinerarySchema = new mongoose.Schema({
         default: 0
     },
 
+    tags:
+        [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'ItineraryTag'
+            }
+        ]
+    ,
+
     accessibility: {
         type: [String],
         required: true
     }
 
-    //todo: add a field for accessibility
 
 
 });

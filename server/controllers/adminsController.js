@@ -1,8 +1,8 @@
-import admin from "../models/AdminSchema.js";
+import admin from "../models/adminSchema.js";
 import tourGuide from "../models/tourGuideSchema.js";
 import seller from "../models/sellerSchema.js";
 import advertiser from "../models/advertiserSchema.js";
-import touristGoverner from "../models/touristGovernor.js";
+import touristGoverner from "../models/touristGovernorScehma.js";
 
 export const getAdmins = async (req, res) => {
     try {
@@ -14,7 +14,7 @@ export const getAdmins = async (req, res) => {
 }
 
 
-export const deletUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     const role = req.body.role;
 
 
