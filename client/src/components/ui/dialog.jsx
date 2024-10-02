@@ -4,6 +4,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger
@@ -79,8 +80,6 @@ const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
     {...props} />
 ))
 DialogDescription.displayName = DialogPrimitive.Description.displayName
-
-
 
 export {
   Dialog,
