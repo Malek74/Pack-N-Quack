@@ -36,10 +36,12 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }) {
         day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+
         day_hidden: "invisible",
         ...classNames,
       }}
       components={{
+
         Dropdown: ({ value, onChange, children }) => {
           const options = React.Children.toArray(children);
           const selected = options.find((child) => child.props.value === value);
