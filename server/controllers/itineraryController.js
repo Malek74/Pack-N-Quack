@@ -1,6 +1,5 @@
 import Itinerary from '../models/itinerarySchema.js';
 import itineraryTags from '../models/itineraryTagsSchema.js';
-import ItineraryTag from '../models/itineraryTagsSchema.js';
 
 //@desc create a new itinerary
 //@route POST api/itinerary
@@ -11,15 +10,27 @@ export const addItinerary = async (req, res) => {
     const { name, tourGuideID, activities, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags } = req.body;
 
     //validate that all fields are present
-    if (!tourGuideID || !name || !activities || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation, !accessibility) {
+    if (!tourGuideID || !name || !activities || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
         return res.status(400).json({ "message": "Error data isn't complete" });
 
     }
 
     const tagsToInsert = [];
     for (let i = 0; i < tags.length; i++) {
-        const tag = await ItineraryTag.findOne({ tag: tags[i] });
-        tagsToInsert.push(tag._id)
+
+        //search for tag in the database
+        const tagExists = await itineraryTags.findOne({ tag: tags[i] });
+        if (tagExists) {
+            tagsToInsert.push(tagExists._id)
+        }
+        else {
+            const newTag = new itineraryTags({
+                tag: tags[i]
+            });
+
+            const createdTag = await itineraryTags.create(newTag);
+            tagsToInsert.push(createdTag._id)
+        }
     }
 
     try {
@@ -47,72 +58,79 @@ export const addItinerary = async (req, res) => {
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
 export const getItinerary = async (req, res) => {
-
-    //get query inputs    
     const name = req.query.name;
     const tag = req.query.tag;
     const maxBudget = req.query.maxBudget;
     const minBudget = req.query.minBudget;
-    const date = req.query.date;
+    const minDate = req.query.minDate;
+    const maxDate = req.query.maxDate;
     const language = req.query.language;
 
     const sortBy = req.query.sortBy;
     const order = req.query.order;
 
-
+    let query = {}; // Create an object to build your query
     let sortOptions = {};
+
     try {
-        let query = {}; // Create an object to build your query
-
+        // Build query based on input parameters
         if (name) {
-            query.name = name; // Filter by ID if provided
+            query.name = name; // Filter by name if provided
         }
+
         if (tag) {
-            query.accessibility = tag; // Assuming 'tag' maps to the accessibility field
+            const tagID = await itineraryTags.findOne({ tag }).select('_id');
+            if (tagID) {
+                // Use $elemMatch properly to filter tags
+                query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
+            }
         }
 
-        if (maxBudget && minBudget) {
-            query.price = { $gte: minBudget, $lte: maxBudget }; // Filter by price range if provided
+        if (minBudget || maxBudget) {
+            query.price = {};
+            if (minBudget) {
+                query.price.$gte = minBudget;
+            }
+            if (maxBudget) {
+                query.price.$lte = maxBudget;
+            }
         }
 
-
-
-        if (date) {
-            query.available_dates = { $gte: date }; // Filter by date if provided
+        if (minDate || maxDate) {
+            query.available_dates = { $elemMatch: {} };
+            if (minDate) {
+                query.available_dates.$elemMatch.$gte = new Date(minDate); // Convert to Date object
+            }
+            if (maxDate) {
+                query.available_dates.$elemMatch.$lte = new Date(maxDate); // Convert to Date object
+            }
         }
 
         if (language) {
             query.language = language; // Filter by language if provided
         }
 
-        console.log(query);
         // Set sorting options if provided
         if (sortBy && order) {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
 
-        console.log(sortOptions);
+        console.log('Query:', query);
+        console.log('Sort Options:', sortOptions);
 
         // Fetch the itinerary using the built query
-        const itinerary = await Itinerary.find(query).sort(sortOptions);
+        let itinerary = await Itinerary.find(query).populate('tags').sort(sortOptions);
 
-        if (itinerary.length == 0) {
+        if (itinerary.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
         }
 
-        // itinerary.sort(sortOptions);
-
         return res.status(200).json(itinerary);
     } catch (error) {
-        res.status(401).json({ message: error.message });
+        res.status(500).json({ message: error.message }); // Handle server errors
     }
 };
 
-//@desc get upcoming itineraries
-//@route GET api/itineraries/upcoming
-export const upcomingIternaries = async (req, res) => {
-    res.send("Upcoming itineraries");
-}
 
 //@desc get all itineraries
 //@route GET api/itinerary
@@ -159,7 +177,6 @@ export const deleteItinerary = async (req, res) => {
         if (itineraryToDelete.bookings != 0) {
             return res.status(404).json({ message: "Cannot delete itinerary with bookings" })
         }
-
 
         itineraryToDelete = await Itinerary.findByIdAndDelete(req.params.id);
 

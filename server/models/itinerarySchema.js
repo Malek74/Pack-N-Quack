@@ -13,8 +13,14 @@ import mongoose from 'mongoose';
 import { Schema, model } from "mongoose";
 
 
+
 const itineraryActivity = new mongoose.Schema({
     name: {
+        type: String,
+        required: true
+    },
+
+    description: {
         type: String,
         required: true
     },
@@ -102,17 +108,20 @@ const itinerarySchema = new mongoose.Schema({
         [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'ItineraryTag'
+                ref: 'itineraryTags'
             }
         ]
     ,
+
+    subscribers: [{
+        type: [Schema.Types.ObjectId],
+        ref: 'Tourist'
+    }],
 
     accessibility: {
         type: [String],
         required: true
     }
-
-
 
 });
 

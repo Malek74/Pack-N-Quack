@@ -43,3 +43,27 @@ export const getTouristGovernor = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const updateTouristGovernor = async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username, and password are required." });
+    }
+
+    try {
+        const updatedTouristGovernor = await touristGoverner.findOneAndUpdate({}, { username, password }, { new: true });
+        res.status(200).json(updatedTouristGovernor);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+export const deleteTouristGovernor = async (req, res) => {
+    try {
+        await touristGoverner.findOneAndDelete({});
+        res.status(200).json({ message: "Tourist Governor deleted successfully" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}

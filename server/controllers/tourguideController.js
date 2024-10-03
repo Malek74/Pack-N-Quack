@@ -14,8 +14,6 @@ export const createTourGuide = async (req, res) => {
         return res.status(400).json({ message: "Email, username, and password are required." });
     }
 
-
-
     //check user name is unique across all users
     if (await usernameExists(username)) {
         return res.status(400).json({ message: "Username already exists" });
@@ -26,9 +24,9 @@ export const createTourGuide = async (req, res) => {
         return res.status(400).json({ message: "Email already exists" });
     }
 
-
     try {
         const newTourGuide = await tourGuide.create({ email: email, username, password, mobile, experienceYears, previousWork });
+
         res.status(201).json(newTourGuide);
     } catch (error) {
         res.status(409).json({ message: error.message });
@@ -48,7 +46,7 @@ export const getTourGuides = async (req, res) => {
 
 export const getTourGuideById = async (req, res) => {
     const id = req.params.id;
-
+    console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
     }
@@ -59,7 +57,7 @@ export const getTourGuideById = async (req, res) => {
         if (!tourGuideExists) {
             return res.status(404).json({ message: "Tour Guide not found." });
         }
-        return res.status(200).json(tourGuideExists.name);
+        return res.status(200).json(tourGuideExists);
 
     } catch (error) {
         res.status(404).json({ message: error.message });
