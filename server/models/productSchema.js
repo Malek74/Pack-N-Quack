@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
-const advertiserSchema = new Schema({
+const productSchema = new Schema({
     picture: {
         type: String,
         required: true,
@@ -28,6 +28,6 @@ const advertiserSchema = new Schema({
     }
 });
 
-const Product = mongoose.model("Product", advertiserSchema);
+const Product = mongoose.model("Product", productSchema);
 
 export default Product;
