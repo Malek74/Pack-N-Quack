@@ -81,6 +81,16 @@ export default function Edit(props) {
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="mapsSource" className="text-right">
+                            Google Maps Link:
+                        </Label>
+                        <Input
+                            id="maps"
+                            defaultValue={props.googlemaps}
+                            className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="price" className="text-right">
                             Price:
                         </Label>
@@ -97,7 +107,7 @@ export default function Edit(props) {
                             Category:
                         </Label>
                         <Select>
-                            <SelectTrigger className="w-auto">
+                            <SelectTrigger className="w-max">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -112,23 +122,6 @@ export default function Edit(props) {
 
                     </div>
 
-
-                    {/* <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category" className="text-right">
-                            Category:
-                        </Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="w-auto">{props.category}</DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuLabel>Category</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {categories.map((category) => (
-                                    <DropdownMenuItem key={category._id}>{category.name}</DropdownMenuItem>
-                                ))}
-
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div> */}
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="tags" className="text-right">
                             Tags:
@@ -147,10 +140,26 @@ export default function Edit(props) {
                             ]}
                         />
                     </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="booking" className="text-right">
+                            Booking:
+                        </Label>
+                        <Select>
+                            <SelectTrigger className="w-max">
+                                <SelectValue placeholder="Is booking open?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Open">Open</SelectItem>
+                                <SelectItem value="Closed">Closed</SelectItem>
+
+                            </SelectContent>
+                        </Select>
+
+                    </div>
                 </div>
                 <DialogFooter>
                     <DialogClose>
-                        <Button type="submit" className="w-min bg-[#E7B008] hover:bg-[#b89319]">Save changes</Button>
+                        <Button type="submit" className="w-min bg-gold hover:bg-goldhover">Save changes</Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>
