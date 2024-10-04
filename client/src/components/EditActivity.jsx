@@ -99,9 +99,9 @@ export default function Edit(props) {
                             <DropdownMenuContent>
                                 <DropdownMenuLabel>Category</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {categories.map((category) => {
-                                    <DropdownMenuItem>{category.name}</DropdownMenuItem>
-                                })}
+                                {categories.map((category) => (
+                                    <DropdownMenuItem key={category._id}>{category.name}</DropdownMenuItem>
+                                ))}
                                 {/* <DropdownMenuItem>Food</DropdownMenuItem>
                                 <DropdownMenuItem>StandUp Comedy</DropdownMenuItem>
                                 <DropdownMenuItem>Concert</DropdownMenuItem>

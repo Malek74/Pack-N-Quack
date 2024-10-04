@@ -10,7 +10,7 @@
 // import Button from "./ui/button"
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
-import Edit from "./Edit";
+import EditActivity from "./EditActivity";
 
 export default function activityCard(props) {
     return (
@@ -19,9 +19,9 @@ export default function activityCard(props) {
             <img className=" w-[25rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
             
             <Button className="w-14 absolute "><Trash2/></Button>
-            <Button className="w-14 mx-10 absolute "><Edit name={props.name} time={props.time} 
+            <Button className="w-14 mx-10 absolute "><EditActivity name={props.name} time={props.time} 
             location={props.location} category={props.category} price ={props.price} 
-            tags={props.tags}></Edit>
+            tags={props.tags}></EditActivity>
             </Button> </div>
             <div className="flex flex-col gap-2">
                 <h1 className=" flex"> <span className="font-semibold text-xl mr-auto">{props.name} </span><span className="text-[#E7B008] drop-shadow">{props.category}</span></h1>
