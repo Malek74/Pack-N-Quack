@@ -1,5 +1,5 @@
 import express from "express";
-import { getActivities, addActivity, updateActivity, deleteActivity } from "../controllers/activityController.js";
+import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities } from "../controllers/activityController.js";
 
 const router = express.Router();
 
@@ -15,4 +15,9 @@ router.put("/update/:id", updateActivity);
 // Delete an activity
 router.delete("/delete/:id", deleteActivity);
 
+// Search for an activity based on Name ,Category or Tag
+router.get("/search", searchActivity);
+
+// Get upcoming activities
+router.get("/upcoming", getUpcomingActivities);
 export default router;

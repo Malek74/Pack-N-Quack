@@ -3,9 +3,12 @@ import mongoose from 'mongoose';
 import admins from './routes/admins.js';
 import advertisers from './routes/advertisers.js';
 import activity from './routes/activity.js';
+import activityCategory from './routes/activityCategory.js';
+import activityTag from './routes/activityTag.js';
 import express from 'express';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
+import cors from 'cors';
 
 config();
 const app = express();
@@ -21,6 +24,9 @@ app.use(express.json());
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: false }));
 
+// Middleware to enable CORS
+app.use(cors());
+
 app.use(logger);
 // Connect to MongoDB
 mongoose.connect(mongoURI)
@@ -35,3 +41,5 @@ mongoose.connect(mongoURI)
 app.use('/api/admins', admins);
 app.use('/api/advertisers', advertisers);
 app.use('/api/activity', activity)
+app.use('/api/activity/category', activityCategory)
+app.use('/api/activity/tag', activityTag)

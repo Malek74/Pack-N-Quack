@@ -6,6 +6,11 @@ const activitySchema = new Schema({
         ref: 'Advertiser', // Reference the Advertiser model
         required: true,
     },
+    categoryID: {
+        type: Schema.Types.ObjectId,
+        ref: 'ActivityCategory', // Reference the ActivityCategory model
+        required: true,
+    },
     date: {
         type: Date,
         required: true
@@ -18,9 +23,9 @@ const activitySchema = new Schema({
         type: String,
         enum: ['fixed', 'range'],
         required: true
-    }, price: {
+    },
+    price: {
         type: Number,
-        required: true
     },
     minPrice: {
         type: Number,
@@ -28,12 +33,11 @@ const activitySchema = new Schema({
     maxPrice: {
         type: Number,
     },
-    category: {
-        type: String,
-        required: true
-    },
     tags: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'ActivityTag',
+        }],
         default: [],
         required: true
     },
