@@ -18,8 +18,11 @@ const DropDownMenuComponent = () => {
       case '/itineraries':
         setLabel('Itineraries');
         break;
-      case '/':
-        setLabel('Home');
+      case '/activities':
+        setLabel('Activities');
+        break;
+      case '/historical':
+        setLabel('Historical');
         break;
       default:
         setLabel('What to do?');
@@ -32,7 +35,8 @@ const DropDownMenuComponent = () => {
     <DropdownMenuLabel>What to do?</DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuItem><Link to="/itineraries">Itineraries</Link></DropdownMenuItem>
-    <DropdownMenuItem><Link to="/">Home</Link></DropdownMenuItem>
+    <DropdownMenuItem><Link to="/activities">Activities</Link></DropdownMenuItem>
+    <DropdownMenuItem><Link to="/historical">Historical</Link></DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
 

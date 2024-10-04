@@ -49,7 +49,7 @@ export default function Header() {
           </Button>
 
           <Button asChild variant="link" >
-          <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/") ? "text-yellow-500" : ""}>
+          <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/activities") ? "text-yellow-500" : isActive("/historical") ? "text-yellow-500" : ""}>
             <DropDownMenuComponent location = {location} />
           </li>
           </Button>

@@ -182,7 +182,7 @@ const ItinerariesPage = () => {
             <input 
               type="text" 
               name="language" 
-              value={formData.point1} 
+              value={formData.language} 
               onChange={handleInputChange} 
               placeholder="Language" 
               className="mb-2 p-2 border rounded w-full"
