@@ -9,44 +9,28 @@ import {
     DialogTrigger,
     DialogClose
 } from "@/components/ui/dialog"
-
-import Multiselect from "multiselect-react-dropdown"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Pencil } from "lucide-react"
-import axios from "axios"
-import { useEffect, useState } from "react"
-
-
-
-export default function Edit(props) {
-    const [categories, setCategories] = useState([]);
-
-    useEffect(() => {
-        axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
-            setCategories(response.data);
-        }).catch((error) => {
-            console.error(error);
-        })
-    }, []);
-
+import Multiselect from "multiselect-react-dropdown"
+export default function Create(props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button ><Pencil /></Button>
+                <Button variant="outline" className="w-min bg-[#E7B008] text-white  hover:bg-[#b89319] hover:text-white">Create a new Place</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{props.task}</DialogTitle>
+                    <DialogTitle>Create a new Place</DialogTitle>
+
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Historical Place Name:
+                            Historical Place:
                         </Label>
                         <Input
                             id="name"
-                            defaultValue={props.name}
+                            defaultValue="Pedro Duarte"
                             className="col-span-3"
                         />
                     </div>
@@ -56,18 +40,17 @@ export default function Edit(props) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue={props.description}
+                            defaultValue="A brief about the place"
                             className="col-span-3"
                         />
                     </div>
-                    {/* <Button className="bg-color-red" onclick={getCategories()}>getCategories</Button> */}
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="time" className="text-right">
                             Opening Hours:
                         </Label>
                         <Input
-                            id="openingHours"
-                            defaultValue={props.hours}
+                            id="OpeningHours"
+                            defaultValue="7:00 am - 6:00 pm every day"
                             className="col-span-3"
                         />
                     </div>
@@ -77,7 +60,7 @@ export default function Edit(props) {
                         </Label>
                         <Input
                             id="location"
-                            defaultValue={props.location}
+                            defaultValue="Cairo"
                             className="col-span-3"
                         />
                     </div>
@@ -86,8 +69,8 @@ export default function Edit(props) {
                             Price for Egyptians:
                         </Label>
                         <Input
-                            id="priceForEgyptians"
-                            defaultValue={props.Eprice}
+                            id="price"
+                            defaultValue="Adult: EGP 60, Student: EGP 30"
                             className="col-span-3"
                         />
                     </div>
@@ -96,11 +79,12 @@ export default function Edit(props) {
                             Price for Foreigners:
                         </Label>
                         <Input
-                            id="priceForForeigners"
-                            defaultValue={props.Fprice}
+                            id="price"
+                            defaultValue="Adult: €10 , Student: €5"
                             className="col-span-3"
                         />
                     </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="tags" className="text-right">
                             Tags:
@@ -121,24 +105,7 @@ export default function Edit(props) {
                             ]}
                         />
                     </div>
-                    {/* <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="tags" className="text-right">
-                            Tags:
-                        </Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="w-auto">{props.tags}</DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuLabel>Tags</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Monuments</DropdownMenuItem>
-                                <DropdownMenuItem>Museums</DropdownMenuItem>
-                                <DropdownMenuItem>Religious Sites</DropdownMenuItem>
-                                <DropdownMenuItem>Palaces</DropdownMenuItem>
-                                <DropdownMenuItem>Castles</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
 
-                    </div> */}
                 </div>
                 <DialogFooter>
                     <DialogClose>
@@ -146,6 +113,6 @@ export default function Edit(props) {
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

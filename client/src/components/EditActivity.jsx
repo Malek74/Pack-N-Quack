@@ -10,13 +10,13 @@ import {
     DialogClose
 } from "@/components/ui/dialog"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import Multiselect from "multiselect-react-dropdown"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Pencil } from "lucide-react"
@@ -28,7 +28,7 @@ import { useEffect, useState } from "react"
 export default function Edit(props) {
     const [categories, setCategories] = useState([]);
 
-    useEffect(()=> {
+    useEffect(() => {
         axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
             setCategories(response.data);
         }).catch((error) => {
@@ -90,7 +90,30 @@ export default function Edit(props) {
                             className="col-span-3"
                         />
                     </div>
+
+
                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="category" className="text-right">
+                            Category:
+                        </Label>
+                        <Select>
+                            <SelectTrigger className="w-auto">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories.map((category) => (
+                                    <SelectItem value={category.name} key={category._id}>{category.name}</SelectItem>
+                                ))}
+                                <SelectItem value="Concert">Concert</SelectItem>
+                                <SelectItem value="Theatre">Theatre</SelectItem>
+
+                            </SelectContent>
+                        </Select>
+
+                    </div>
+
+
+                    {/* <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="category" className="text-right">
                             Category:
                         </Label>
@@ -102,21 +125,26 @@ export default function Edit(props) {
                                 {categories.map((category) => (
                                     <DropdownMenuItem key={category._id}>{category.name}</DropdownMenuItem>
                                 ))}
-                                {/* <DropdownMenuItem>Food</DropdownMenuItem>
-                                <DropdownMenuItem>StandUp Comedy</DropdownMenuItem>
-                                <DropdownMenuItem>Concert</DropdownMenuItem>
-                                <DropdownMenuItem>Theatre</DropdownMenuItem> */}
+
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
+                    </div> */}
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="tags" className="text-right">
                             Tags:
                         </Label>
-                        <Input
-                            id="tags"
-                            defaultValue={props.tags}
-                            className="col-span-3"
+                        <Multiselect className="w-min"
+                            isObject={false}
+                            onKeyPressFn={function noRefCheck() { }}
+                            onRemove={function noRefCheck() { }}
+                            onSearch={function noRefCheck() { }}
+                            onSelect={function noRefCheck() { }}
+                            options={[
+                                'Concert',
+                                'Entertainment',
+                                'Theatre',
+
+                            ]}
                         />
                     </div>
                 </div>

@@ -11,26 +11,34 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Multiselect from "multiselect-react-dropdown"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import axios from "axios"
+import { useEffect, useState } from "react"
 export default function Create(props) {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
+            setCategories(response.data);
+        }).catch((error) => {
+            console.error(error);
+        })
+    }, []);
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-min bg-[#E7B008] text-white">{props.task}</Button>
+                <Button variant="outline" className="w-min bg-[#E7B008] text-white">Create a new Activity</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{props.task}</DialogTitle>
-                    <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
-                    </DialogDescription>
+                    <DialogTitle>Create a new Activity</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -39,7 +47,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Pedro Duarte"
+                            defaultValue="Activity Name"
                             className="col-span-3"
                         />
                     </div>
@@ -64,7 +72,7 @@ export default function Create(props) {
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="pricw" className="text-right">
+                        <Label htmlFor="price" className="text-right">
                             Price:
                         </Label>
                         <Input
@@ -77,31 +85,37 @@ export default function Create(props) {
                         <Label htmlFor="category" className="text-right">
                             Category:
                         </Label>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category" className="text-right">
-                            Category:
-                        </Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="w-auto">{props.category}</DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuLabel>Category</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Food</DropdownMenuItem>
-                                <DropdownMenuItem>StandUp Comedy</DropdownMenuItem>
-                                <DropdownMenuItem>Concert</DropdownMenuItem>
-                                <DropdownMenuItem>Theatre</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                        <Select>
+                            <SelectTrigger className="w-auto">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {/* {categories.map((category) => (
+                                    <SelectItem value={category.name} key={category._id}>{category.name}</SelectItem>
+                                ))} */}
+                                <SelectItem value="Concert">Concert</SelectItem>
+                                <SelectItem value="Theatre">Theatre</SelectItem>
+
+                            </SelectContent>
+                        </Select>
+
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="tags" className="text-right">
                             Tags:
                         </Label>
-                        <Input
-                            id="tags"
-                            defaultValue="#Entertainment #Rap"
-                            className="col-span-3"
+                        <Multiselect className="w-min"
+                            isObject={false}
+                            onKeyPressFn={function noRefCheck() { }}
+                            onRemove={function noRefCheck() { }}
+                            onSearch={function noRefCheck() { }}
+                            onSelect={function noRefCheck() { }}
+                            options={[
+                                'Concert',
+                                'Entertainment',
+                                'Theatre',
+
+                            ]}
                         />
                     </div>
                 </div>

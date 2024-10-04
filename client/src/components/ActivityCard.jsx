@@ -11,6 +11,7 @@
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
 import EditActivity from "./EditActivity";
+import Maps from "./Maps";
 
 export default function activityCard(props) {
     return (
@@ -26,24 +27,7 @@ export default function activityCard(props) {
             <div className="flex flex-col gap-2">
                 <h1 className=" flex"> <span className="font-semibold text-xl mr-auto">{props.name} </span><span className="text-[#E7B008] drop-shadow">{props.category}</span></h1>
                 <h4 className="text-base">{props.time}</h4>
-                <h4 className="text-base">{props.location} <br />
-                    {/* <Dialog>
-                        <DialogTrigger>Open in Maps</DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogDescription>
-                                    MAPS POPUP SHOULD BE HERE!
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter className="sm:justify-start">
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                        Close
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog> */}
+                <h4 className="text-base">{props.location} <span className="ml-3"> <Maps></Maps> </span><br />
                 </h4>
                 <h4 className="flex"> <span className="text-base text-[#71BCD6] drop-shadow mr-auto">{props.price} </span><span className="text-gray-500 ml-auto">{props.tags}</span></h4>
             </div>
