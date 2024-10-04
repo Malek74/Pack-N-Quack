@@ -72,6 +72,12 @@ export default function Header() {
             </li>
           </Button>
           
+          <li>
+            <Link to="/profile">MyProfile</Link>
+          </li>
+          <li>
+            <Link to="/admin">Admin</Link>
+          </li>
         </ul>
       </nav>
     </header>

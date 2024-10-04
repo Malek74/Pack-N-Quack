@@ -14,13 +14,13 @@ import EditPlace from "./EditPlace";
 
 export default function HistoricalCard(props) {
     return (
-        <div className="container rounded-lg w-[30rem] h-[30rem] shadow-md">
+        <div className="container rounded-lg w-[30rem] h-auto shadow-md">
             <div className="flex place-content-end ">
-            <img className=" w-[25rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
+            <img className=" w-[25rem] h-[15rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
             
             <Button className="w-14 absolute "><Trash2/></Button>
             <Button className="w-14 mx-10 absolute "><EditPlace name={props.name} description={props.description} 
-            location={props.location} hours={props.hours} price ={props.price} 
+            location={props.location} hours={props.hours} Eprice ={props.Eprice} Fprice={props.Fprice} 
             tags={props.tags}></EditPlace>
             </Button> </div>
             <div className="flex flex-col gap-2">
@@ -46,7 +46,9 @@ export default function HistoricalCard(props) {
                         </DialogContent>
                     </Dialog> */}
                 </h4>
-                <h4 className="flex"> <span className="text-base w-max "><b>Price: </b>{props.price} </span><span className="text-gray-500 self-end text-right">{props.tags}</span></h4>
+                <h4 className="flex"> <span className="text-base w-max "><b>Price for Egyptians: </b>{props.Eprice} </span></h4>
+                <h4 className="flex"> <span className="text-base w-max "><b>Price for Foreigners: </b>{props.Fprice} </span></h4>
+                <h4 className="flex mb-3  text-gray-500 self-end text-right">{props.tags}</h4>
             </div>
         </div >
     )

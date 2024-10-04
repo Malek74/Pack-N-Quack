@@ -5,7 +5,7 @@ import lege from "../images/lege-cy.jpg"
 import memo from "../images/memo.png"
 import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
-import Create from "@/components/Create"
+import CreateActivity from "@/components/CreateActivity"
 import { Button } from "@/components/ui/button"
 
 export default function Activities() {
@@ -19,12 +19,12 @@ export default function Activities() {
                 name="ACTIVITIES"
             />
             <div className="flex place-content-end mr-8">
-                <Create task="Create a new Activity" />
+                <CreateActivity  />
             </div>
 
             <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
 
-            <grid className="grid grid-cols-3 justify-stretch w-screen self-center" >
+            <grid className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
                 <ActivityCard
                     img={lege}
                     alt="Lege-cy concert adv"
