@@ -5,7 +5,7 @@ import Seller from "../models/sellerSchema.js";
 import Admin from "../models/AdminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 
-export const createAdvertisor = async (req, res) => {
+export const createAdvertiser = async (req, res) => {
     const { email, username, password} = req.body; 
 
     try {

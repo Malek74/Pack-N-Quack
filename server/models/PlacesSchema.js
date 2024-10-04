@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
 const placesSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
     description: {
         type: String,
         required: true,

@@ -4,7 +4,7 @@ import admins from './routes/admins.js';
 import express from 'express';
 import tagRoutes from './routes/tagRoutes.js';
 import placeRoutes from './routes/placeRoutes.js';
-import touristRoutes from '.routes/touristRoutes.js'
+import touristRoutes from './routes/touristRoutes.js'
 import tourismgovernerRoutes from './routes/tourismgovernerRoutes.js';
 import sellerRoutes from './routes/sellerRoutes.js';
 import advertiserRoutes from './routes/advertiserRoutes.js';
@@ -40,8 +40,8 @@ mongoose.connect(mongoURI)
 
 // Define Endpoints
 app.use('/api/admins', admins);
-app.use('/api', tagRoutes);
-app.use('/api', placeRoutes);
+app.use('/api/tags', tagRoutes);
+app.use('/api/places', placeRoutes);
 
 app.use('/api', tourguideRoutes);
 app.use('/api', touristRoutes);

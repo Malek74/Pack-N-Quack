@@ -9,8 +9,8 @@ import {
 const router = express.Router();
 
 router.post('/tourist', createTourist); // Create
-router.get('/tourist/:touristemail', getTourist); // Read 
-router.put('/tourist/:touristusername', updateTourist); // Update 
+router.get('/tourist/:email', getTourist); // Read 
+router.put('/tourist/:username', updateTourist); // Update 
 
 
 export default router;

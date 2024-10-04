@@ -48,14 +48,16 @@ export const getTourist = async (req, res) => {
     }
 };
 
-// Tourist update data
+// Tourist update data by username
 export const updateTourist = async (req, res) => {
-// DOB, Username, Wallet are not changable
-    const { username, password, mobile, nationality, job } = req.body;
-    const newEmail = req.body.email; 
+    // DOB, Username, Wallet are not changable
+    const { password, mobile, nationality, job } = req.body;
+    const { username } = req.params; 
 
     try {
-        // If a new email is req. to update check if new email is already taken 
+        // If a new email is being passed for update, check if it's already taken
+        const newEmail = req.body.email; 
+
         if (newEmail) {
             const isEmailTaken = await Promise.all([
                 Tourist.findOne({ email: newEmail }),
@@ -70,14 +72,17 @@ export const updateTourist = async (req, res) => {
             }
         }
 
-        // Update the tourist's data based on the username
+        
         const updatedTourist = await Tourist.findOneAndUpdate(
-            { username },   { email: newEmail, password, mobile, nationality, job },   { new: true }  
+            { username }, 
+            { email: newEmail, password, mobile, nationality, job }, 
+            { new: true } 
         );
 
-        res.status(200).json(updatedTourist);
+        res.status(200).json(updatedTourist); 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
