@@ -76,15 +76,42 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
 
-    rating: {
-        type: Number,
-        default: 0
+    ratings: {
+        averageRating: {
+            type: Number,
+            default: 0, // Default to 0 for activities with no ratings
+            min: 0,
+            max: 5
+        },
+        reviews: [{
+            userID: {
+                type: Schema.Types.ObjectId,
+                ref: 'User', // Reference to the User model
+                required: true
+            },
+            rating: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            },
+            review: {
+                type: String,
+                default: '' // Optional text review
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }]
     },
 
     price: {
         type: Number,
         required: true
     },
+
+
 
     available_dates: {
         type: [Date],
@@ -127,4 +154,5 @@ const itinerarySchema = new mongoose.Schema({
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 export default Itinerary;
+
 

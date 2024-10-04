@@ -6,12 +6,49 @@ import itineraryTags from '../models/itineraryTagsSchema.js';
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
 
+
     //fetch data from request body
-    const { name, tourGuideID, activities, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags } = req.body;
+    const { ratings, name, tourGuideID, activities, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags } = req.body;
 
     //validate that all fields are present
-    if (!tourGuideID || !name || !activities || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
-        return res.status(400).json({ "message": "Error data isn't complete" });
+    if (!ratings || !tourGuideID || !name || !activities || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
+
+        //write missing fields
+        if (!ratings) {
+            return res.status(400).json({ "message": "Rating is missing" });
+        }
+        if (!name) {
+            return res.status(400).json({ "message": "Name is missing" });
+        }
+        if (!tourGuideID) {
+            return res.status(400).json({ "message": "TourGuideID is missing" });
+        }
+        if (!activities) {
+            return res.status(400).json({ "message": "Activities is missing" });
+        }
+        if (!language) {
+            return res.status(400).json({ "message": "Language is missing" });
+        }
+        if (!price) {
+            return res.status(400).json({ "message": "Price is missing" });
+        }
+        if (!available_dates) {
+            return res.status(400).json({ "message": "Available dates is missing" });
+        }
+        if (!pickUpLocation) {
+            return res.status(400).json({ "message": "Pick up location is missing" });
+        }
+        if (!dropOffLocation) {
+            return res.status(400).json({ "message": "Drop off location is missing" });
+        }
+        if (!accessibility) {
+            return res.status(400).json({ "message": "Accessibility is missing" });
+        }
+        if (!tags) {
+            return res.status(400).json({ "message": "Tags is missing" });
+        }
+
+
 
     }
 
@@ -35,6 +72,7 @@ export const addItinerary = async (req, res) => {
 
     try {
         const itinerary = new Itinerary({
+            ratings: ratings,
             name: name,
             tourGuideID: tourGuideID,
             activities: activities,
@@ -65,6 +103,7 @@ export const getItinerary = async (req, res) => {
     const minDate = req.query.minDate;
     const maxDate = req.query.maxDate;
     const language = req.query.language;
+
 
     const sortBy = req.query.sortBy;
     const order = req.query.order;
@@ -109,7 +148,7 @@ export const getItinerary = async (req, res) => {
         if (language) {
             query.language = language; // Filter by language if provided
         }
-
+        console.log(sortBy);
         // Set sorting options if provided
         if (sortBy && order) {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
