@@ -1,0 +1,43 @@
+import React from 'react'
+import ItineraryCard from './components/itineraryCard'
+import Banner from './components/Banner'
+import BannerImage from '../assets/romanBanner.jpg'
+
+const ItinerariesPage = () => {
+  return (
+    <div className='flex flex-col gap-y-10 ml-11 p-8'>
+      <Banner background = {BannerImage} name = "Itineraries"/>
+      <ItineraryCard  title = "Discover France" description = "Explore Rome with our exciting itinerary! Visit the iconic Colosseum and stroll through Trastevere. Discover Vatican City, featuring St. Peter’s Basilica and the Sistine Chapel. Enjoy delicious Italian cuisine and gelato at local trattorias. Toss a coin into the Trevi Fountain and take in a sunset over the Roman Forum. Experience the rich history and vibrant culture of the Eternal City. Book your adventure now!" 
+      price = "1200"
+      point1 = "safe" 
+      point2 = "safe" 
+      point3 = "safe"/>
+
+      <ItineraryCard direction = "flex-row-reverse" title = "Discover France" description = "Explore Rome with our exciting itinerary! Visit the iconic Colosseum and stroll through Trastevere. Discover Vatican City, featuring St. Peter’s Basilica and the Sistine Chapel. Enjoy delicious Italian cuisine and gelato at local trattorias. Toss a coin into the Trevi Fountain and take in a sunset over the Roman Forum. Experience the rich history and vibrant culture of the Eternal City. Book your adventure now!" 
+            price = "1246"
+            point1 = "safe" 
+            point2 = "safe" 
+            point3 = "safe"/>
+
+      <ItineraryCard  title = "Discover France" description = "Explore Rome with our exciting itinerary! Visit the iconic Colosseum and stroll through Trastevere. Discover Vatican City, featuring St. Peter’s Basilica and the Sistine Chapel. Enjoy delicious Italian cuisine and gelato at local trattorias. Toss a coin into the Trevi Fountain and take in a sunset over the Roman Forum. Experience the rich history and vibrant culture of the Eternal City. Book your adventure now!" 
+            price = "1100"
+            point1 = "safe" 
+            point2 = "safe" 
+            point3 = "safe"/>
+
+      <ItineraryCard direction = "flex-row-reverse" title = "Discover France" description = "Explore Rome with our exciting itinerary! Visit the iconic Colosseum and stroll through Trastevere. Discover Vatican City, featuring St. Peter’s Basilica and the Sistine Chapel. Enjoy delicious Italian cuisine and gelato at local trattorias. Toss a coin into the Trevi Fountain and take in a sunset over the Roman Forum. Experience the rich history and vibrant culture of the Eternal City. Book your adventure now!" 
+            price = "1200"
+            point1 = "safe" 
+            point2 = "safe" 
+            point3 = "safe"/>
+
+      <ItineraryCard  title = "Discover France" description = "Explore Rome with our exciting itinerary! Visit the iconic Colosseum and stroll through Trastevere. Discover Vatican City, featuring St. Peter’s Basilica and the Sistine Chapel. Enjoy delicious Italian cuisine and gelato at local trattorias. Toss a coin into the Trevi Fountain and take in a sunset over the Roman Forum. Experience the rich history and vibrant culture of the Eternal City. Book your adventure now!" 
+            price = "1200"
+            point1 = "safe" 
+            point2 = "safe" 
+            point3 = "safe"/>
+          </div>
+        )
+}
+
+export default ItinerariesPage
