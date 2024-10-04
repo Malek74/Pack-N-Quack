@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
 import Activities from "@/pages/Activities";
+import Historical from "@/pages/Historical";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -13,6 +14,8 @@ const routes = createRoutesFromElements(
     <Route path="profile" element={<MyProfilePage />} />
     <Route path="admin" element={<AdminPage />} />
     <Route path="activities" element={<Activities/>}/>
+    <Route path="historical" element={<Historical/>}/>
+    
   </Route>,
 );
 
