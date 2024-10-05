@@ -13,32 +13,7 @@ import mongoose from 'mongoose';
 import { Schema, model } from "mongoose";
 
 
-
-const itineraryActivity = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-
-    description: {
-        type: String,
-        required: true
-    },
-
-    location: {
-        type: String,
-        required: true
-    },
-    duration: {
-        startTime: {
-            type: Date
-        },
-
-        endTime: {
-            type: Date,
-        }
-    },
-});
+// Schema for the Itinerary model
 const itinerarySchema = new mongoose.Schema({
 
     name: {
@@ -51,24 +26,31 @@ const itinerarySchema = new mongoose.Schema({
         required: true,
     },
 
-    //covers the activities, duration & locations  
-    activities: [{
-        name: {
-            type: String,
-            required: true
+    //covers the days and activities of the itinerary 
+    days: [{
+        day: {
+            type: Number,
+            required: true,
         },
-        location: {
-            type: String,
-            required: true
-        },
-        duration: {
-            startTime: {
-                type: Date
+
+        activities: [{
+            name: {
+                type: String,
+                required: true
             },
-            endTime: {
-                type: Date,
+            location: {
+                type: String,
+                required: true
             },
-        }
+            duration: {
+                startTime: {
+                    type: Date
+                },
+                endTime: {
+                    type: Date,
+                },
+            }
+        }],
     }],
 
     language: {
@@ -87,12 +69,9 @@ const itinerarySchema = new mongoose.Schema({
             userID: {
                 type: Schema.Types.ObjectId,
                 ref: 'User', // Reference to the User model
-                required: true
             },
             rating: {
-                type: Number,
-                required: true,
-                min: 1,
+                type: Number, min: 1,
                 max: 5
             },
             review: {
