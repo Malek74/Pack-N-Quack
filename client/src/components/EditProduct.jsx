@@ -46,7 +46,7 @@ export function EditProductDialog({ product }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-      <Button className="w-8 h-8 p-1 flex justify-center items-center bg-slate-500 text-white rounded-full">
+      <Button>
       <Pencil /></Button>
       </DialogTrigger>
       <DialogContent>
