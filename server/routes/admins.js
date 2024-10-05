@@ -1,5 +1,6 @@
 import express from "express";
-import { getAdmins, addAdmin } from "../controllers/adminsController.js";
+
+import { getAdmins, addAdmin,deleteUser} from "../controllers/adminsController.js";
 import admin from "../models/AdminSchema.js";
 import advertiser from "../models/AdvertiserSchema.js";
 import { config } from "dotenv";
@@ -10,6 +11,7 @@ const router = express.Router();
 config();
 
 router.get("/", getAdmins);
+router.delete("/:id", deleteUser)
 
 router.post("/", addAdmin);
 
