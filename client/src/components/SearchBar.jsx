@@ -12,9 +12,9 @@ export default function SearchBar({ searchTerm, setSearchTerm, placeholder }) {
           onChange={(e) => setSearchTerm(e.target.value)} // Handle changes in search term
           className="p-2 rounded-md w-full border-0"
         />
-        <Button className="bg-yellow-500 flex gap-2 text-white px-6 py-3 rounded-md ml-4">
-         <Search />
-         <p>Search</p>
+        <Button className="bg-gold hover:bg-goldhover flex gap-2 text-white px-6 py-3 rounded-md ml-4">
+          <Search />
+          <p>Search</p>
         </Button>
       </div>
     </div>

@@ -10,7 +10,6 @@
 // import Button from "./ui/button"
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
-import EditPlace from "./EditPlace";
 import PlaceEditForm from "./forms/PlaceEditForm";
 
 export default function HistoricalCard(props) {

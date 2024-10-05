@@ -10,7 +10,6 @@
 // import Button from "./ui/button"
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
-import EditActivity from "./EditActivity";
 import Maps from "./Maps";
 import CreateDialog from "./CreateDialog";
 import ActivityEditForm from "./forms/ActivityEditForm";

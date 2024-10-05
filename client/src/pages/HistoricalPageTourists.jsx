@@ -9,6 +9,8 @@ import CreatePlace from "@/components/CreatePlace"
 import { Button } from "@/components/ui/button"
 import FilterButton from "@/components/FilterButtons"
 import SearchComponent from "@/components/SearchComponent"
+import SearchBar from "@/components/SearchBar"
+
 
 const buttons = [
     {
@@ -25,18 +27,30 @@ const buttons = [
 
 
 export default function Historical() {
+    const [searchTerm, setSearchTerm] = useState("");
 
     return (
 
         <div className="flex flex-col w-screen p-14 ">
-            <Banner
+            {/* <Banner
                 background={Historicalbackground}
                 alt="Historical Background"
                 name="HISTORICAL PLACES & MUSEUMS"
-            />
+            /> */}
+            <div className="relative mb-10">
+                {/* Banner Section */}
+                <Banner
+                    background={Historicalbackground}
+                    alt="Historical Background"
+                    name="HISTORICAL PLACES & MUSEUMS"
+                />
+
+                {/* Search Bar Section - Positioned on top of the banner */}
+                <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for a place.."} />
+            </div>
             <div className="flex mb-10">
                 <span className="ml-24">  <FilterButton buttons={buttons} /></span>
-                <span className="ml-auto mr-24"><SearchComponent></SearchComponent></span>
+                {/* <span className="ml-auto mr-24"><SearchComponent></SearchComponent></span> */}
             </div>
             {/* <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center"></h1> */}
 
