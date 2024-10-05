@@ -1,38 +1,70 @@
-import Tourist from "../models/touristSchema.js";
-import TourGuide from "../models/tourGuideSchema.js";
-import TouristGovernor from "../models/touristGovernor.js"; 
-import Seller from "../models/sellerSchema.js";
-import Admin from "../models/AdminSchema.js";
-import Advertiser from "../models/advertiserSchema.js";
-import Places from '../models/PlacesSchema.js';
-import Tag from '../models/tagSchema.js';
+
+import touristGoverner from '../models/touristGovernorScehma.js';
+import { usernameExists } from './Helpers.js';
 
 
-//Tourism Governer Sign-in
 export const createTouristGovernor = async (req, res) => {
-    const { username, password} = req.body; 
+    const { username, password } = req.body;
+
+    const touristGovernorExists = await touristGoverner.findOne({});
+
+
+
+    //check that tourist governor does not exist
+    if (touristGovernorExists) {
+        return res.status(400).json({ message: "Tourist Governor already exists" });
+    }
+
+    //check if all required fields are present
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username, and password are required." });
+    }
+
+    const userExists = await usernameExists(username);
+    //check that username is unique across all users
+    if (userExists) {
+        return res.status(400).json({ message: "Username already exists" });
+    }
+
+    console.log("Creating tourist governor");
 
     try {
-        // Check if the email or username is already taken by any user
-        const isEmailOrUsernameTaken = await Promise.all([
-            Tourist.findOne({ username }),
-            TourGuide.findOne({ username }),
-            Seller.findOne({ username }),
-            Admin.findOne( { username }),
-            Advertiser.findOne({ username }),
-        ]);
+        const newTouristGovernor = await touristGoverner.create({ username, password, });
+        res.status(201).json(newTouristGovernor);
+    } catch (error) {
+        res.status(409).json({ message: error.message });
+    }
+}
 
-        if (isEmailOrUsernameTaken.some(user => user)) {
-            return res.status(400).json({ message: "Email or username already taken." });
-        }
-        const newtouristGovernor = await TouristGovernor.create({username, password});
-        res.status(200).json(newtouristGovernor);
+export const getTouristGovernor = async (req, res) => {
+    try {
+        const touristGovernor = await touristGoverner.findOne({});
+        res.status(200).json(touristGovernor);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
 }
 
+export const updateTouristGovernor = async (req, res) => {
+    const { username, password } = req.body;
 
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username, and password are required." });
+    }
 
+    try {
+        const updatedTouristGovernor = await touristGoverner.findOneAndUpdate({}, { username, password }, { new: true });
+        res.status(200).json(updatedTouristGovernor);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
 
-
+export const deleteTouristGovernor = async (req, res) => {
+    try {
+        await touristGoverner.findOneAndDelete({});
+        res.status(200).json({ message: "Tourist Governor deleted successfully" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
