@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button"
 
-export default function CreateDialog({ title, type, form }) {
+
+export default function CreateDialog({ title, form }) {
     return (
-        <Dialog className="overflow-scroll">
+        <Dialog>
 
             <DialogTrigger asChild>
                 <Button className="bg-gold hover:bg-goldhover text-white hover:text-white" variant="outline"> Add {title}</Button>

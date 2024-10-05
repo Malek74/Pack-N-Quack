@@ -1,14 +1,119 @@
-import MyFirstComponent from "@/components/MyFirstComponent";
+import React, { useState } from "react";
 import AdminDashboard from "@/components/AdminDashboard";
 import CreateDialog from "@/components/CreateDialog";
+import ActivityCategory from "@/components/ActivityCategory";
+import ActivityTags from "@/components/ActivityTags";
+import { Link } from "react-router-dom";
+import { Bell, CircleUser, Users, Package, LineChart, Package2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import NewUserForm from "@/components/forms/NewUserForm";
-// import ActivityCategory from "@/components/ActivityCategory";
 export default function AdminPage() {
+  const [activeSection, setActiveSection] = useState("dashboard");
 
-    return (<>
-        <AdminDashboard />
-        {/* <ActivityCategory/> */}
-        <CreateDialog title="Tourism Governor" type="gov"  form={<NewUserForm type="gov"/>}/>
-        <CreateDialog title="Admin" type="admin" form={<NewUserForm type="admin"/>}/>
-        </>);
+  // Function to render the correct component based on the active section
+  const renderSection = () => {
+    switch (activeSection) {
+      case "dashboard":
+        return <AdminDashboard />;
+      case "tourismGovernors":
+        return <CreateDialog title="Tourism Governor" type="gov" form={<NewUserForm type="gov" />}/>;
+      case "admins":
+        return <CreateDialog title="Admin" type="admin" form={<NewUserForm type="admin"/>} />;
+      case "activityCategories":
+        return <ActivityCategory />;
+      case "activityTags":
+        return <ActivityTags />;
+      default:
+        return <AdminDashboard />;
+    }
+  };
+
+  return (
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      {/* Sidebar */}
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Package2 className="h-6 w-6" />
+              <span>Admin Page</span>
+            </Link>
+            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
+              <Bell className="h-4 w-4" />
+              <span className="sr-only">Toggle notifications</span>
+            </Button>
+          </div>
+
+          <div className="flex-1">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              <button
+                onClick={() => setActiveSection("dashboard")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "dashboard"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Manage Accounts
+              </button>
+
+              <button
+                onClick={() => setActiveSection("tourismGovernors")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "tourismGovernors"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <CircleUser className="h-4 w-4" />
+                Tourism Governors
+              </button>
+
+              <button
+                onClick={() => setActiveSection("admins")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "admins"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Admins
+              </button>
+
+              <button
+                onClick={() => setActiveSection("activityCategories")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "activityCategories"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Package className="h-4 w-4" />
+                Activity Categories
+              </button>
+
+              <button
+                onClick={() => setActiveSection("activityTags")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "activityTags"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <LineChart className="h-4 w-4" />
+                Activity Tags
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="p-4">
+        {renderSection()}
+      </div>
+    </div>
+  );
 }

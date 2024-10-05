@@ -52,7 +52,7 @@ export default function ProductCard(props) {
         <h4 className="text-base line-clamp-2">{props.description}</h4>
         <h4 className="flex">
           <span className="text-xl text-[#71BCD6] drop-shadow mr-auto">
-            ${props.price}
+            {props.price} EGP
           </span>
         </h4>
       </div>
