@@ -1,3 +1,4 @@
+
 import adminModel from "../models/adminSchema.js";
 import tourGuide from "../models/tourGuideSchema.js";
 import seller from "../models/sellerSchema.js";
@@ -14,6 +15,7 @@ export const getAdmins = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
 
 export const deleteUser = async (req, res) => {
     const role = req.body.role;
@@ -90,4 +92,5 @@ export const addAdmin = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
 

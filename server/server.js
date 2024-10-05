@@ -6,6 +6,18 @@ import products from './routes/products.js';
 import itinerary from './routes/itinerary.js'
 import tourGuide from './routes/tourGuide.js'
 import express from 'express';
+import tagRoutes from './routes/tagRoutes.js';
+import placeRoutes from './routes/placeRoutes.js';
+import touristRoutes from './routes/touristRoutes.js'
+import tourismgovernerRoutes from './routes/tourismgovernerRoutes.js';
+import sellerRoutes from './routes/sellerRoutes.js';
+import advertiserRoutes from './routes/advertiserRoutes.js';
+import tourguideRoutes from './routes/tourguideRoutes.js';
+import tourist from './models/touristSchema.js';
+import touristGoverner from './models/touristGovernor.js';
+import seller from './models/sellerSchema.js';
+import advertiser from './models/advertiserSchema.js';
+import { isTourismGovernor } from './middleware/auth.js';
 import touristGoverner from './routes/touristGovernor.js';
 import itineraryTag from './routes/itineraryTag.js';
 import advertisers from './routes/advertisers.js';
@@ -45,6 +57,9 @@ mongoose.connect(mongoURI)
 
 // Define Endpoints
 app.use('/api/admins', admins);
+app.use('/api/tags', tagRoutes);
+app.use('/api/places', placeRoutes);
+app.use('/api/tourist', touristRoutes);
 app.use('/api/sellers', seller);
 app.use('/api/products', products);
 app.use('/api/itinerary', itinerary);
