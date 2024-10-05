@@ -3,7 +3,7 @@ import tourGuide from "../models/tourGuideSchema.js";
 import seller from "../models/sellerSchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import touristGoverner from "../models/touristGovernorScehma.js";
-import { usernameExists } from '../controllers/Helpers.js';
+import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../controllers/Helpers.js';
 import tourist from "../models/touristSchema.js";
 
 export const getAdmins = async (req, res) => {
@@ -68,27 +68,12 @@ export const deleteUser = async (req, res) => {
     }
 }
 
-const refundMoney = async (itineraryID) => {
-
-    //fetch itinerary
-    const itinerary = await Itinerary.findById(itineraryID);
-
-    //refund money to all subscribers
-    for (let i = 0; i < itinerary.subscribers.length; i++) {
-        const user = await tourist.findById(itinerary.subscribers[i]);
-        user.wallet += itinerary.price;
-    }
-}
-
-//todo:implement this please @GasserAli
-//@description: deletes all products created by a seller
-const deleteProducts = async (sellerID) => {
-
-}
 
 //todo:implement this please @youssefrfarid
 //@description: deletes all activities created by an advertiser
-const deleteActivities = async (advertiserID) => { }
+export const deleteActivities = async (advertiserID) => {
+
+}
 
 export const addAdmin = async (req, res) => {
     const { username, password } = req.body;

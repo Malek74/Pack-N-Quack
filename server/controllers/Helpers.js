@@ -120,3 +120,27 @@ export const emailExists = async (email) => {
         throw new Error("Error checking email existence");
     }
 };
+
+
+export const refundMoney = async (itineraryID) => {
+
+    //fetch itinerary
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    //refund money to all subscribers
+    for (let i = 0; i < itinerary.subscribers.length; i++) {
+        const user = await tourist.findById(itinerary.subscribers[i]);
+        user.wallet += itinerary.price;
+    }
+}
+
+//@description: deletes all products created by a seller
+export const deleteProducts = async (sellerID) => {
+    //fetch all products created by the seller
+    const products = await product.find({ seller_id: sellerID });
+
+    //delete each product
+    for (let i = 0; i < products.length; i++) {
+        await product.findByIdAndDelete(products[i]._id);
+    }
+}
