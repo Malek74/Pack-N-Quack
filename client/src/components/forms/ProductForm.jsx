@@ -68,7 +68,7 @@ export default function ProductForm() {
               <FormControl>
                 <Input placeholder="Enter the price" type="number" {...field} valueAsNumber/>
               </FormControl>
-              <FormDescription>Price of the product in USD.</FormDescription>
+              <FormDescription>Price of the product in EGP.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
