@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const advertiserSchema = new Schema({
-    company_name: {
+    companyName: {
         type: String,
         default: ""
     },
@@ -26,7 +26,7 @@ const advertiserSchema = new Schema({
         type: Number,
         default: 0
     },
-    establishment_date: {
+    establishmentDate: {
         type: Date,
         default: new Date()
     },
@@ -40,6 +40,6 @@ const advertiserSchema = new Schema({
     },
 });
 
-const advertiser = model("Advertiser", advertiserSchema);
+const advertiserModel = model("Advertiser", advertiserSchema);
 
-export default advertiser;
+export default advertiserModel;

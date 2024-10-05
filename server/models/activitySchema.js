@@ -19,6 +19,10 @@ const activitySchema = new Schema({
         type: String,
         required: true
     },
+    googleMapLink: {
+        type: String,
+        required: true
+    },
     priceType: {
         type: String,
         enum: ['fixed', 'range'],
@@ -41,6 +45,38 @@ const activitySchema = new Schema({
         default: [],
         required: true
     },
+    ratings: {
+        averageRating: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5
+        },
+        reviews: {
+            type: [{
+                touristID: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Tourist',
+                    required: true
+                },
+                rating: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    max: 5
+                },
+                comment: {
+                    type: String,
+                    default: ''
+                },
+                date: {
+                    type: Date,
+                    default: Date.now
+                }
+            }],
+            default: []
+        }
+    },
     specialDiscounts: {
         type: [String],
         default: [],
@@ -61,5 +97,5 @@ const activitySchema = new Schema({
     },
 })
 
-const activity = model("Activity", activitySchema);
-export default activity
+const activityModel = model("Activity", activitySchema);
+export default activityModel
