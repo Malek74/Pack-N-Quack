@@ -17,8 +17,8 @@ export const addAdvertiser = async (req, res) => {
 
     const newAdvertiser = new advertiserModel({ email, username, password });
     try {
-        const a = await newAdvertiser.save();
-        res.status(200).json(a);
+        const advertiser = await newAdvertiser.save();
+        res.status(200).json({ data: advertiser, message: "Advertiser created successfully" });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
