@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import AdminDashboard from "@/components/AdminDashboard";
-import CreateNewUser from "@/components/CreateNewUser";
+import CreateDialog from "@/components/CreateDialog";
 import ActivityCategory from "@/components/ActivityCategory";
 import ActivityTags from "@/components/ActivityTags";
 import { Link } from "react-router-dom";
 import { Bell, CircleUser, Users, Package, LineChart, Package2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import NewUserForm from "@/components/forms/NewUserForm";
 export default function AdminPage() {
   const [activeSection, setActiveSection] = useState("dashboard");
 
@@ -16,9 +16,9 @@ export default function AdminPage() {
       case "dashboard":
         return <AdminDashboard />;
       case "tourismGovernors":
-        return <CreateNewUser title="Tourism Governor" type="gov" />;
+        return <CreateDialog title="Tourism Governor" type="gov" form={<NewUserForm type="gov" />}/>;
       case "admins":
-        return <CreateNewUser title="Admin" type="admin" />;
+        return <CreateDialog title="Admin" type="admin" form={<NewUserForm type="admin"/>} />;
       case "activityCategories":
         return <ActivityCategory />;
       case "activityTags":

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button"
 
-export default function CreateDialog({title, type, form}){
+export default function CreateDialog({title, form}){
     return(
         <Dialog>
         <DialogTrigger asChild>
