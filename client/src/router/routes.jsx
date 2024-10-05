@@ -5,11 +5,11 @@ import Layout from "@/components/layout/Layout";
 import ItinerariesPage from "@/pages/ItinerariesPage";
 import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
-import Activities from "@/pages/Activities";
-import Historical from "@/pages/Historical";
+import ActivitiesPage from "@/pages/ActivitiesPage";
+import HistoricalPage from "@/pages/HistoricalPage";
 import ActivitiesTourists from "@/pages/ActivitiesTouristsPage";
 import HistoricalTourists from "@/pages/HistoricalPageTourists";
-
+import MarketplacePage from "@/pages/MarketplacePage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -17,8 +17,8 @@ const routes = createRoutesFromElements(
     <Route path="itineraries" element={<ItinerariesPage />} />
     <Route path="profile" element={<MyProfilePage />} />
     <Route path="admin" element={<AdminPage />} />
-    <Route path="activities" element={<Activities/>}/>
-    <Route path="historical" element={<Historical/>}/>
+    <Route path="activities" element={<ActivitiesPage/>}/>
+    <Route path="historical" element={<HistoricalPage/>}/>
     <Route path="marketplace" element={<MarketplacePage/>}/>
     <Route path="ActivitiesTourists" element={<ActivitiesTourists/>}/>
     <Route path="HistoricalTourists" element={<HistoricalTourists/>}/>    
