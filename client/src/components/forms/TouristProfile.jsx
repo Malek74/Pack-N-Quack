@@ -25,8 +25,8 @@ import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,SelectGroup,SelectLabel} from "@/components/ui/select"
-
-
+import { SampleDatePicker } from "../datepicker";
+import { PhoneInput } from "@/components/PhoneInput";
 
 const nationalities = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia",
@@ -53,17 +53,12 @@ const nationalities = [
   "Zambia", "Zimbabwe"];
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  phoneNumber: z.string().regex(/^\d{11}$/, {
-    message: "Phone number must be exactly 11 digits",
-  }),
+  phoneNumber: z.string().min(1,"Mobile number is required"),
   nationality: z.string().nonempty("Nationality is required"),
   dob: z.date({
     required_error: "A date of birth is required.",
   }),
-  jobStudent: z.enum(["job", "student"], {
-    required_error: "You must select either Job or Student",
-  }),
-
+  jobStudent: z.string().nonempty({ message: "Please select either job or student" }),
 });
 
 export default function TouristProfile() {
@@ -71,12 +66,12 @@ export default function TouristProfile() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       userName:"Rooma",
-      email:"",
+      email:"rooma@gmail.com",
       phoneNumber: "",
       nationality:"",
       dob: "",
       jobStudent:"",
-      Wallet: "00000",
+      wallet: "0",
       
 
     },
@@ -129,9 +124,14 @@ export default function TouristProfile() {
             <FormItem>
               <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="0122 000 1000" {...field} />
+                <PhoneInput
+                  {...field}
+                  value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                  placeholder="Enter your phone number"
+                  className="w-full"
+                />
               </FormControl>
-              <FormDescription>This your phone number.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -162,50 +162,20 @@ export default function TouristProfile() {
         />
 
           {/*DOB*/}
-        <FormField
+          <FormField
           control={form.control}
           name="dob"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
+              <FormControl>
+                <SampleDatePicker value={field.value} onChange={field.onChange} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
-          />
+        />
+
 
         {/* Job/Student (Radio Buttons) */}
         <FormField
@@ -215,13 +185,27 @@ export default function TouristProfile() {
             <FormItem>
               <FormLabel>Are you a job holder or a student?</FormLabel>
               <FormControl>
-                <RadioGroup {...field} className="flex space-x-4">
+                <RadioGroup
+                  value={field.value} // Bind the selected value
+                  onChange={field.onChange} // Handle changes
+                  className="flex space-x-4"
+                >
                   <label className="flex items-center space-x-2">
-                    <input type="radio" value="job" {...field} />
+                    <input
+                      type="radio"
+                      value="job"
+                      checked={field.value === "job"} // Check if value is "job"
+                      onChange={() => field.onChange("job")} // Handle "job" selection
+                    />
                     <span>Job</span>
                   </label>
                   <label className="flex items-center space-x-2">
-                    <input type="radio" value="student" {...field} />
+                    <input
+                      type="radio"
+                      value="student"
+                      checked={field.value === "student"} // Check if value is "student"
+                      onChange={() => field.onChange("student")} // Handle "student" selection
+                    />
                     <span>Student</span>
                   </label>
                 </RadioGroup>
@@ -229,8 +213,8 @@ export default function TouristProfile() {
               <FormMessage />
             </FormItem>
           )}
-
         />
+
         {/* Wallet (uneditable) */}
         <FormField
           control={form.control}
@@ -244,9 +228,6 @@ export default function TouristProfile() {
             </FormItem>
           )}
         />
-
-
-
         <Button type="submit">Submit</Button>
       </form>
     </Form>
