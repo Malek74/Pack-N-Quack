@@ -1,4 +1,3 @@
-import NewUserForm from "./NewUserForm"
 import {
     Dialog,
     DialogContent,
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button"
 
-export default function CreateNewUser({title, type}){
+export default function CreateDialog({title, type, form}){
     return(
         <Dialog>
         <DialogTrigger asChild>
@@ -23,8 +22,7 @@ export default function CreateNewUser({title, type}){
                     Add a new {title}. Click create when you're done.
                 </DialogDescription>
             </DialogHeader>
-            <NewUserForm type={type}/>
-
+            {form}
         </DialogContent>
     </Dialog>
 

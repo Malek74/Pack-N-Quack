@@ -1,12 +1,14 @@
 import MyFirstComponent from "@/components/MyFirstComponent";
 import AdminDashboard from "@/components/AdminDashboard";
-import CreateNewUser from "@/components/CreateNewUser";
+import CreateDialog from "@/components/CreateDialog";
+import NewUserForm from "@/components/forms/NewUserForm";
 // import ActivityCategory from "@/components/ActivityCategory";
 export default function AdminPage() {
+
     return (<>
         <AdminDashboard />
         {/* <ActivityCategory/> */}
-        <CreateNewUser title="Tourism Governor" type="gov"/>
-        <CreateNewUser title="Admin" type="admin"/>
+        <CreateDialog title="Tourism Governor" type="gov"  form={<NewUserForm type="gov"/>}/>
+        <CreateDialog title="Admin" type="admin" form={<NewUserForm type="admin"/>}/>
         </>);
 }

@@ -13,6 +13,9 @@ export default function Header() {
     { label: "Itineraries", path: "/itineraries" },
     { label: "Activities", path: "/activities" },
   ];
+  
+  const user = "admin"
+
   const Tourists = [
     { label: "historicalTourists", path: "/historicalTourists" },
     { label: "activitiesTourist", path: "/activitiesTourists" },
@@ -52,6 +55,11 @@ export default function Header() {
               <Link to="/contact" className={isActive("/contact") ? "text-yellow-500" : ""}>Contact</Link>
             </li>
           </Button>
+          <Button asChild variant="link" >
+          <li>
+            <Link to="/marketplace" className={isActive("/contact") ? "text-yellow-500" : ""}>Marketplace</Link>
+          </li>
+          </Button>
 
           <Button asChild variant="link" >
             <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/activities") ? "text-yellow-500" : isActive("/historical") ? "text-yellow-500" : ""}>
@@ -78,7 +86,7 @@ export default function Header() {
           </Button>
           <Button asChild variant="default" className="bg-primary">
             <li>
-              <Link to="/signup">Sign up</Link>
+              <Link to="/RegistrationPage">Sign up</Link>
             </li>
           </Button>
 

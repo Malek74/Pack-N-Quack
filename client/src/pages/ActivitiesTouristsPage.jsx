@@ -79,7 +79,7 @@ export default function Activities() {
 
             <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
 
-            <grid className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
+            <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
                 <ActivityCard
                     img={lege}
                     alt="Lege-cy concert adv"
@@ -124,7 +124,7 @@ export default function Activities() {
                     discount="50% off for Armed Forces Day"
 
                 />
-            </grid>
+            </div>
         </div>
 
     )
