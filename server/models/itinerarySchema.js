@@ -13,7 +13,7 @@ import mongoose from 'mongoose';
 import { Schema, model } from "mongoose";
 
 
-// Schema for the Itinerary model
+
 const itinerarySchema = new mongoose.Schema({
 
     name: {
@@ -69,9 +69,12 @@ const itinerarySchema = new mongoose.Schema({
             userID: {
                 type: Schema.Types.ObjectId,
                 ref: 'User', // Reference to the User model
+                required: true
             },
             rating: {
-                type: Number, min: 1,
+                type: Number,
+                required: true,
+                min: 1,
                 max: 5
             },
             review: {
