@@ -1,7 +1,8 @@
 // Import necessary modules
 import mongoose from 'mongoose';
 import admins from './routes/admins.js';
-
+import seller from './routes/seller.js';
+import products from './routes/products.js';
 import itinerary from './routes/itinerary.js'
 import tourGuide from './routes/tourGuide.js'
 import express from 'express';
@@ -44,6 +45,8 @@ mongoose.connect(mongoURI)
 
 // Define Endpoints
 app.use('/api/admins', admins);
+app.use('/api/sellers', seller);
+app.use('/api/products', products);
 app.use('/api/itinerary', itinerary);
 app.use('/api/tourGuide', tourGuide);
 app.use('/api/touristGovernor', touristGoverner);
