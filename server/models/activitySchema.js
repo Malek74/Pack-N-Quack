@@ -6,7 +6,6 @@ const activitySchema = new Schema({
         ref: 'Advertiser', // Reference the Advertiser model
         required: true,
     },
-
     categoryID: {
         type: Schema.Types.ObjectId,
         ref: 'ActivityCategory', // Reference the ActivityCategory model
@@ -20,7 +19,6 @@ const activitySchema = new Schema({
         type: String,
         required: true
     },
-
     googleMapLink: {
         type: String,
         required: true
@@ -29,7 +27,6 @@ const activitySchema = new Schema({
         type: String,
         enum: ['fixed', 'range'],
         required: true
-
     },
     price: {
         type: Number,
@@ -40,7 +37,6 @@ const activitySchema = new Schema({
     maxPrice: {
         type: Number,
     },
-
     tags: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -91,15 +87,15 @@ const activitySchema = new Schema({
         default: false,
         required: true
     },
-    duration: {
-        type: Number,
-        required: true
-    },
-
     name: {
         type: String,
         required: true
     },
+    coverImagePath: {
+        type: String,
+        required: true,
+        default: "/images/Background.jpg"
+    }
 })
 
 const activityModel = model("Activity", activitySchema);
