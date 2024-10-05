@@ -8,6 +8,9 @@ import Banner from "@/components/Banner"
 import CreatePlace from "@/components/CreatePlace"
 import { Button } from "@/components/ui/button"
 import CreateTag from "@/components/CreateTag"
+import PlaceForm from "@/components/forms/PlaceForm"
+import CreateDialog from "@/components/CreateDialog"
+
 export default function Historical() {
 
     return (
@@ -21,7 +24,10 @@ export default function Historical() {
             <div className="flex place-content-end mx-8 mb-16">
                 <span className="mr-5">  <CreateTag />
                 </span>
-                <CreatePlace />
+
+                <CreateDialog title="a Place" type="act" form={<PlaceForm />} />
+
+
             </div>
 
             {/* <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center"></h1> */}

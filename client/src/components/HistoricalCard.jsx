@@ -11,6 +11,7 @@
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
 import EditPlace from "./EditPlace";
+import PlaceEditForm from "./forms/PlaceEditForm";
 
 export default function HistoricalCard(props) {
     return (
@@ -21,9 +22,10 @@ export default function HistoricalCard(props) {
                 {(props.notTourist) && (
                     <>
                         <Button className="w-14 absolute bg-transparent "><Trash2 /></Button>
-                        <Button className="w-14 mx-10 absolute bg-transparent"><EditPlace name={props.name} description={props.description}
-                            location={props.location} hours={props.hours} Eprice={props.Eprice} Fprice={props.Fprice}
-                            tags={props.tags}></EditPlace>
+                        <Button className="w-14 mx-10 absolute bg-transparent">
+                            <PlaceEditForm name={props.name} description={props.description}
+                                location={props.location} hours={props.hours} Eprice={props.Eprice} Fprice={props.Fprice}
+                                tags={props.tags}></PlaceEditForm>
                         </Button>
                     </>)}
 
