@@ -7,6 +7,8 @@ import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
 import CreateActivity from "@/components/CreateActivity"
 import { Button } from "@/components/ui/button"
+import CreateDialog from "@/components/CreateDialog"
+import ActivityForm from "@/components/forms/ActivityForm"
 
 export default function Activities() {
 
@@ -19,8 +21,10 @@ export default function Activities() {
                 name="ACTIVITIES"
             />
             <div className="flex place-content-end mr-8">
-                <CreateActivity />
+                <CreateDialog title="an Activity" type="act" form={<ActivityForm type="act" />} />
             </div>
+
+
 
             <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
 

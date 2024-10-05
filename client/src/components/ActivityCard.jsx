@@ -10,9 +10,9 @@
 // import Button from "./ui/button"
 import { Button } from "./ui/button"
 import { Trash2 } from 'lucide-react';
-import EditActivity from "./EditActivity";
 import Maps from "./Maps";
-
+import CreateDialog from "./CreateDialog";
+import ActivityEditForm from "./forms/ActivityEditForm";
 
 export default function activityCard(props) {
     return (
@@ -23,9 +23,10 @@ export default function activityCard(props) {
                 {props.notTourist && (
                     <>
                         <Button className="w-14 absolute bg-transparent "><Trash2 /></Button>
-                        <Button className="w-14 mx-10 absolute bg-transparent "><EditActivity name={props.name} time={props.time}
-                            location={props.location} mapsSrc={props.mapsSrc} category={props.category} price={props.price}
-                            tags={props.tags} booking={props.booking}></EditActivity>
+                        <Button className="w-14 mx-10 absolute bg-transparent ">
+                            <ActivityEditForm type="act" name={props.name} time={props.time}
+                                location={props.location} mapsSrc={props.mapsSrc} category={props.category} price={props.price}
+                                tags={props.tags} booking={props.booking} />
                         </Button>
                     </>)}
             </div>

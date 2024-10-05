@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuComponent from './components/DropDownMenuComponent'
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
+import logo from "@/images/logo.png"
 
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
@@ -13,7 +14,7 @@ export default function Header() {
     { label: "Itineraries", path: "/itineraries" },
     { label: "Activities", path: "/activities" },
   ];
-  
+
   const user = "admin"
 
   const Tourists = [
@@ -25,6 +26,7 @@ export default function Header() {
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
         {/* Logo on the left */}
+        <img src={logo} className="w-20" />
         <Link to="/" className="text-xl font-bold">
           Pack n' Quack
         </Link>
@@ -56,9 +58,9 @@ export default function Header() {
             </li>
           </Button>
           <Button asChild variant="link" >
-          <li>
-            <Link to="/marketplace" className={isActive("/contact") ? "text-yellow-500" : ""}>Marketplace</Link>
-          </li>
+            <li>
+              <Link to="/marketplace" className={isActive("/contact") ? "text-yellow-500" : ""}>Marketplace</Link>
+            </li>
           </Button>
 
           <Button asChild variant="link" >

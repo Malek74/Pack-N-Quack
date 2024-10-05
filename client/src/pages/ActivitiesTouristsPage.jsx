@@ -9,6 +9,8 @@ import CreateActivity from "@/components/CreateActivity"
 import { Button } from "@/components/ui/button"
 import FilterButton from "@/components/FilterButtons"
 import SearchComponent from "@/components/SearchComponent"
+import SearchBar from "@/components/SearchBar"
+import { Input } from "@mui/material"
 
 const buttons = [
     {
@@ -62,19 +64,50 @@ const buttons = [
 ];
 
 export default function Activities() {
+    const [searchTerm, setSearchTerm] = useState("");
 
     return (
 
         <div className="flex flex-col  w-screen p-14">
-            <Banner
+            {/* <Banner
                 background={Activitiesbackground}
                 alt="Activities Background"
                 name="ACTIVITIES"
-            />
+            /> */}
+
+            <div className="relative mb-10">
+                {/* Banner Section */}
+                <Banner
+                    background={Activitiesbackground}
+                    alt="Activities Background"
+                    name="ACTIVITIES"
+                />
+
+                {/* Search Bar Section - Positioned on top of the banner */}
+                <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for an activity.."} />
+            </div>
+
+
+
+            {/* <div className="flex justify-center items-center mt-[-60px] w-full">
+
+                <div className="w-[60%] bg-white rounded-lg p-4 shadow-lg flex justify-center items-center">
+                    <Input
+                        placeholder="Search product name..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="p-2 rounded-md w-full border-0"
+                    />
+                    <Button className="bg-yellow-500 text-white p-3 rounded-md ml-4">
+                        Search
+                    </Button>
+                </div>
+            </div> */}
+
 
             <div className="flex mb-10">
                 <span className="ml-18">  <FilterButton buttons={buttons} /></span>
-                <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span>
+                {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
             </div>
 
             <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
