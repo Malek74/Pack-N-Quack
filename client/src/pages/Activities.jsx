@@ -1,24 +1,30 @@
-import React from "react"
+import React, { useState } from "react"
 import ActivityCard from "@/components/ActivityCard"
-import background from "../images/Background.jpg"
+import Activitiesbackground from "../images/Background.jpg"
 import lege from "../images/lege-cy.jpg"
 import memo from "../images/memo.png"
 import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
+import CreateActivity from "@/components/CreateActivity"
+import { Button } from "@/components/ui/button"
 
 export default function Activities() {
+
     return (
 
-        <div className="flex flex-col items-center w-screen p-14">
-            <Banner 
-            background={background}
-            alt="Activities Background"
-            name="ACTIVITIES"
+        <div className="flex flex-col  w-screen p-14">
+            <Banner
+                background={Activitiesbackground}
+                alt="Activities Background"
+                name="ACTIVITIES"
             />
+            <div className="flex place-content-end mr-8">
+                <CreateActivity  />
+            </div>
 
-            <h1 className="text-5xl text-primary font-bold mb-24">Upcoming Actvities</h1>
+            <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
 
-            <grid className="grid grid-cols-3 justify-stretch w-screen " >
+            <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
                 <ActivityCard
                     img={lege}
                     alt="Lege-cy concert adv"
@@ -49,7 +55,7 @@ export default function Activities() {
                     price="EGP 1300"
                     tags="#Concert #Band #Music"
                 />
-            </grid>
+            </div>
         </div>
 
     )
