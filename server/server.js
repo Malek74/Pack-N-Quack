@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import admins from './routes/admins.js';
 import seller from './routes/seller.js';
+import products from './routes/products.js';
 import express from 'express';
 
 const app = express();
@@ -29,3 +30,4 @@ mongoose.connect(mongoURI)
 // Define Endpoints
 app.use('/api/admins', admins);
 app.use('/api/sellers', seller);
+app.use('/api/products', products);
