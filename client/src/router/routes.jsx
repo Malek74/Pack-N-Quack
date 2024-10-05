@@ -21,9 +21,11 @@ const routes = createRoutesFromElements(
     <Route path="activities" element={<ActivitiesPage/>}/>
     <Route path="historical" element={<HistoricalPage/>}/>
     <Route path="marketplace" element={<MarketplacePage/>}/>
-    <Route path="ActivitiesTourists" element={<ActivitiesTourists/>}/>
-    <Route path="HistoricalTourists" element={<HistoricalTourists/>}/>    
     <Route path="RegistrationPage" element={<RegistrationPage/>}/>    
+    <Route path="activitiesTourists" element={<ActivitiesTourists />} />
+    <Route path="historicalTourists" element={<HistoricalTourists />} />
+
+
   </Route>,
 );
 

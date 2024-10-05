@@ -1,6 +1,7 @@
-import { Link , useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuComponent from './components/DropDownMenuComponent'
+import DropDownMenuTourist from "./components/DropDownMenuTourists";
 
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
@@ -14,6 +15,12 @@ export default function Header() {
   ];
   
   const user = "admin"
+
+  const Tourists = [
+    { label: "historicalTourists", path: "/historicalTourists" },
+    { label: "activitiesTourist", path: "/activitiesTourists" },
+  ];
+
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
@@ -24,29 +31,29 @@ export default function Header() {
 
         {/* Centered Navigation Links */}
         <ul className="flex justify-center mx-auto">
-          
+
           <Button asChild variant="link" >
-          <li>
-            <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>Home</Link>
-          </li>
-          </Button>
-          
-          <Button asChild variant="link" >
-          <li>
-            <Link to="/profile" className={isActive("/profile") ? "text-yellow-500" : ""}>Profile</Link>
-          </li>
+            <li>
+              <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>Home</Link>
+            </li>
           </Button>
 
           <Button asChild variant="link" >
-          <li>
-            <Link to="/about" className={isActive("/about") ? "text-yellow-500" : ""}>About Us</Link>
-          </li>
+            <li>
+              <Link to="/profile" className={isActive("/profile") ? "text-yellow-500" : ""}>Profile</Link>
+            </li>
           </Button>
-          
+
           <Button asChild variant="link" >
-          <li>
-            <Link to="/contact" className={isActive("/contact") ? "text-yellow-500" : ""}>Contact</Link>
-          </li>
+            <li>
+              <Link to="/about" className={isActive("/about") ? "text-yellow-500" : ""}>About Us</Link>
+            </li>
+          </Button>
+
+          <Button asChild variant="link" >
+            <li>
+              <Link to="/contact" className={isActive("/contact") ? "text-yellow-500" : ""}>Contact</Link>
+            </li>
           </Button>
           <Button asChild variant="link" >
           <li>
@@ -55,29 +62,34 @@ export default function Header() {
           </Button>
 
           <Button asChild variant="link" >
-          <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/activities") ? "text-yellow-500" : isActive("/historical") ? "text-yellow-500" : ""}>
-            <DropDownMenuComponent location = {location} />
-          </li>
+            <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/activities") ? "text-yellow-500" : isActive("/historical") ? "text-yellow-500" : ""}>
+              <DropDownMenuComponent location={location} />
+            </li>
           </Button>
-          
-          
-          
+
+          <Button asChild variant="link" >
+            <li className={isActive("/itineraries") ? "text-yellow-500" : isActive("/activitiesTourists") ? "text-yellow-500" : isActive("/historicalTourists") ? "text-yellow-500" : ""}>
+              <DropDownMenuTourist />
+            </li>
+          </Button>
+
+
         </ul>
-        
+
 
         {/* Sign In and Sign Up on the right */}
-        <ul className="flex gap-2"> 
+        <ul className="flex gap-2">
           <Button asChild variant="ghost">
-          <li>
-            <Link to="/login">Log in</Link>
-          </li>
+            <li>
+              <Link to="/login">Log in</Link>
+            </li>
           </Button>
           <Button asChild variant="default" className="bg-primary">
             <li>
               <Link to="/RegistrationPage">Sign up</Link>
             </li>
           </Button>
-          
+
           <li>
             <Link to="/profile">MyProfile</Link>
           </li>

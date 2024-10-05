@@ -3,11 +3,26 @@ import HistoricalCard from "@/components/HistoricalCard"
 import Historicalbackground from "../images/Italy.jpg"
 import pyramids from "../images/Pyramids.jpeg"
 import egyptianmuseum from "../images/egyptianmuseum.jpg"
-// import amy from "../images/amy.jpeg"
+import tourEiffel from "../images/TourEiffel.jpeg"
 import Banner from "@/components/Banner"
 import CreatePlace from "@/components/CreatePlace"
 import { Button } from "@/components/ui/button"
-import FilterButtons from "@/components/FilterButtons"
+import FilterButton from "@/components/FilterButtons"
+import SearchComponent from "@/components/SearchComponent"
+
+const buttons = [
+    {
+        type: 'Tags', // This will create a "Sort By" dropdown
+        options: [
+            { label: "Museums", value: "Museums" },
+            { label: "Palaces", value: "Palaces" },
+            { label: "Budget-friendly", value: "Budget-friendly" },
+            { label: "Family-friendly", value: "Family-friendly" },
+        ],
+    }]
+
+
+
 
 export default function Historical() {
 
@@ -19,9 +34,10 @@ export default function Historical() {
                 alt="Historical Background"
                 name="HISTORICAL PLACES & MUSEUMS"
             />
-
-            <FilterButtons></FilterButtons>
-
+            <div className="flex mb-10">
+                <span className="ml-24">  <FilterButton buttons={buttons} /></span>
+                <span className="ml-auto mr-24"><SearchComponent></SearchComponent></span>
+            </div>
             {/* <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center"></h1> */}
 
             <grid className="grid grid-cols-2 justify-stretch w-screen self-center gap-y-10" >
@@ -51,6 +67,20 @@ export default function Historical() {
                     notTourist={false}
 
                 />
+                {/* 
+                <HistoricalCard
+                    img={tourEiffel}
+                    alt="Eiffel Tower"
+                    name="Eiffel Tower"
+                    description="a wrought-iron lattice tower on the Champ de Mars in Paris, France"
+                    hours="9:15 am - 10:45 every day"
+                    location="Paris, France"
+                    Eprice="Adult: EGP 30, Student: EGP 10"
+                    Fprice="Adult: €8.5 , Student: €4"
+                    tags="#museum #ancientEgyptian #historic_area"
+                    notTourist={false}
+
+                /> */}
 
             </grid>
         </div>

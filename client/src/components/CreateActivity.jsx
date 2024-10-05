@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Multiselect from "multiselect-react-dropdown"
+import BasicDateTimePicker from "./BasicDateTimePicker"
 import {
     Select,
     SelectContent,
@@ -47,7 +48,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Activity Name"
+                            placeholder="Activity Name"
                             className="col-span-3"
                         />
                     </div>
@@ -55,11 +56,9 @@ export default function Create(props) {
                         <Label htmlFor="time" className="text-right">
                             Time & Date:
                         </Label>
-                        <Input
-                            id="time"
-                            defaultValue="Oct 03 | 09:00pm"
-                            className="col-span-3"
-                        />
+                        <span className="w-max">
+                            <BasicDateTimePicker ></BasicDateTimePicker>
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="location" className="text-right">
@@ -67,7 +66,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="location"
-                            defaultValue="Cairo"
+                            placeholder="Cairo"
                             className="col-span-3"
                         />
                     </div>
@@ -77,7 +76,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="maps"
-                            defaultValue={props.googlemaps}
+                            placeholder={props.googlemaps}
                             className="col-span-3"
                         />
                     </div>
@@ -87,7 +86,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="price"
-                            defaultValue="EGP 500"
+                            placeholder="EGP 500"
                             className="col-span-3"
                         />
                     </div>

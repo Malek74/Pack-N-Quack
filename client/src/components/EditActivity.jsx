@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label"
 import { Pencil } from "lucide-react"
 import axios from "axios"
 import { useEffect, useState } from "react"
-
+import BasicDateTimePicker from "./BasicDateTimePicker"
 
 
 export default function Edit(props) {
@@ -64,11 +64,9 @@ export default function Edit(props) {
                         <Label htmlFor="time" className="text-right">
                             Time & Date:
                         </Label>
-                        <Input
-                            id="time"
-                            defaultValue={props.time}
-                            className="col-span-3"
-                        />
+                        <span className="w-max">
+                            <BasicDateTimePicker ></BasicDateTimePicker>
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="location" className="text-right">
