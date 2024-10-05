@@ -37,6 +37,8 @@ export default function Activities() {
                     tags="#Rap #Singer #Entertainment"
                     notTourist={true}
                     booking="Closed"
+                    discount="20% for earlybirds"
+
 
                 />
                 <ActivityCard
@@ -51,9 +53,10 @@ export default function Activities() {
                     tags="#Play #Theatre #Comedy"
                     notTourist={true}
                     booking="Open"
+                    discount="Buy 3 get 1 free"
 
                 />
-                <ActivityCard
+                {/* <ActivityCard
                     img={amy}
                     alt="Amy Whinehouse adv"
                     name="The Amy Whinehouse Band Live"
@@ -65,8 +68,9 @@ export default function Activities() {
                     tags="#Concert #Band #Music"
                     notTourist={true}
                     booking="Open"
+                    discount="50% off for Armed Forces Day"
 
-                />
+                /> */}
             </grid>
         </div>
 

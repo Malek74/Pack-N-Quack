@@ -30,7 +30,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Pedro Duarte"
+                            placeholder="Pedro Duarte"
                             className="col-span-3"
                         />
                     </div>
@@ -40,7 +40,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="A brief about the place"
+                            placeholder="A brief about the place"
                             className="col-span-3"
                         />
                     </div>
@@ -50,7 +50,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="OpeningHours"
-                            defaultValue="7:00 am - 6:00 pm every day"
+                            placeholder="7:00 am - 6:00 pm every day"
                             className="col-span-3"
                         />
                     </div>
@@ -60,7 +60,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="location"
-                            defaultValue="Cairo"
+                            placeholder="Cairo"
                             className="col-span-3"
                         />
                     </div>
@@ -70,7 +70,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="price"
-                            defaultValue="Adult: EGP 60, Student: EGP 30"
+                            placeholder="Adult: EGP 60, Student: EGP 30"
                             className="col-span-3"
                         />
                     </div>
@@ -80,7 +80,7 @@ export default function Create(props) {
                         </Label>
                         <Input
                             id="price"
-                            defaultValue="Adult: €10 , Student: €5"
+                            placeholder="Adult: €10 , Student: €5"
                             className="col-span-3"
                         />
                     </div>

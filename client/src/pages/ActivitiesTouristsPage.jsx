@@ -7,6 +7,59 @@ import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
 import CreateActivity from "@/components/CreateActivity"
 import { Button } from "@/components/ui/button"
+import FilterButton from "@/components/FilterButtons"
+import SearchComponent from "@/components/SearchComponent"
+
+const buttons = [
+    {
+        type: 'Sort By', // This will create a "Sort By" dropdown
+        options: [
+            { label: "Price Low To High", value: "price-low-to-high" },
+            { label: "Price High To Low", value: "price-high-to-low" },
+            { label: "Ratings Low To High", value: "ratings-low-to-high" },
+            { label: "Ratings High To Low", value: "ratings-high-to-low" },
+        ],
+    },
+    {
+        type: 'Price', // This will create a "Filter By" dropdown
+        options: [
+            { label: "EGP 0-100", value: "EGP 0-100" },
+            { label: "EGP 100-200", value: "EGP 100-200" },
+            { label: "EGP 200-300", value: "EGP 200-300" },
+            { label: "EGP 300-400", value: "EGP 300-400" },
+            { label: "EGP 400-500", value: "EGP 400-500" },
+            { label: "More than EGP 500", value: "More than EGP 500" },
+        ],
+    },
+    {
+        type: 'Date',
+        options: [
+            { label: "In the next week", value: "In the next week" },
+            { label: "In the next 2 weeks", value: "In the next 2 weeks" },
+            { label: "In the next 1 month", value: "In the next 1 month" },
+            { label: "In the next 6 months", value: "In the next 6 months" },
+            { label: "In the next 1 year", value: "In the next 1 year" },
+        ],
+    },
+    {
+        type: 'Category',
+        options: [
+            { label: "Concert", value: "In the next week" },
+            { label: "Theatre", value: "In the next 2 weeks" },
+            { label: "Entertainment", value: "In the next 1 month" },
+        ],
+    },
+    {
+        type: 'Ratings',
+        options: [
+            { label: "1 star and more", value: "1 star and more" },
+            { label: "2 stars and more", value: "2 stars and more" },
+            { label: "3 stars and more", value: "3 stars and more" },
+            { label: "4 stars and more", value: "4 stars and more" },
+            { label: "5 stars", value: "5 stars" },
+        ],
+    },
+];
 
 export default function Activities() {
 
@@ -18,6 +71,11 @@ export default function Activities() {
                 alt="Activities Background"
                 name="ACTIVITIES"
             />
+
+            <div className="flex mb-10">
+                <span className="ml-18">  <FilterButton buttons={buttons} /></span>
+                <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span>
+            </div>
 
             <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">Upcoming Actvities</h1>
 
@@ -34,7 +92,7 @@ export default function Activities() {
                     tags="#Rap #Singer #Entertainment"
                     notTourist={false}
                     booking="Closed"
-
+                    discount="20% for earlybirds"
                 />
                 <ActivityCard
                     img={memo}
@@ -48,6 +106,7 @@ export default function Activities() {
                     tags="#Play #Theatre #Comedy"
                     notTourist={false}
                     booking="Open"
+                    discount="Buy 3 get 1 free"
 
                 />
                 <ActivityCard
@@ -62,6 +121,7 @@ export default function Activities() {
                     tags="#Concert #Band #Music"
                     notTourist={false}
                     booking="Open"
+                    discount="50% off for Armed Forces Day"
 
                 />
             </grid>

@@ -17,12 +17,12 @@ const routes = createRoutesFromElements(
     <Route path="itineraries" element={<ItinerariesPage />} />
     <Route path="profile" element={<MyProfilePage />} />
     <Route path="admin" element={<AdminPage />} />
-    <Route path="activities" element={<Activities/>}/>
-    <Route path="historical" element={<Historical/>}/>
-    <Route path="ActivitiesTourists" element={<ActivitiesTourists/>}/>
-    <Route path="HistoricalTourists" element={<HistoricalTourists/>}/>
+    <Route path="activities" element={<Activities />} />
+    <Route path="historical" element={<Historical />} />
+    <Route path="activitiesTourists" element={<ActivitiesTourists />} />
+    <Route path="historicalTourists" element={<HistoricalTourists />} />
 
-    
+
   </Route>,
 );
 
