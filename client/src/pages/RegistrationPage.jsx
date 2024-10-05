@@ -289,34 +289,26 @@ export default function RegistrationPage() {
     }, 500); // Redirect after 0.5 second (you can adjust this delay)
   }
 
-  const buttonStyle = {
-    backgroundColor: '#555',
-    color: 'white',
-    padding: '10px 20px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    margin: '10px',
-  };
+
 
   return (
     <div>
       {buttonClicked === null ? (
         // Display the two buttons when no option is selected
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '20px' }}>
-          <button style={buttonStyle} onClick={() => handleButtonClick('Tourist')}>
+        <div className="flex justify-center gap-5 m-5">
+          <Button onClick={() => handleButtonClick('Tourist')}>
             Sign up as Tourist
-          </button>
-          <button style={buttonStyle} onClick={() => handleButtonClick('TourguideAdvertiserSeller')}>
+          </Button>
+          <Button onClick={() => handleButtonClick('TourguideAdvertiserSeller')}>
             Sign up as Tour Guide / Advertiser / Seller
-          </button>
+          </Button>
         </div>
       ) : buttonClicked === 'Tourist' ? (
         // Display the Tourist registration form
-        <div>
+        <div className='flex justify-center items-center px-20'>
           {submitted && <p style={{ color: 'green' }}>Account created successfully!</p>} {/* Optional success message */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 border p-6 border-gray-500 rounded-lg">
 
               {/* Username Field */}
               <FormField
@@ -525,10 +517,11 @@ export default function RegistrationPage() {
         </div>
       ) : buttonClicked === 'TourguideAdvertiserSeller' ? (
         // Display the second form (Tour Guide / Advertiser / Seller)
-        <div>
-          <h2>Tour Guide / Advertiser / Seller Registration</h2>
+        <div className='flex justify-center items-center px-20'>
           <Form {...form2}>
-          <form onSubmit={form2.handleSubmit(onSubmit2)} className="space-y-8">
+
+          <form onSubmit={form2.handleSubmit(onSubmit2)} className="space-y-8 border p-6 border-gray-500 rounded-lg">
+          <h2>Tour Guide / Advertiser / Seller Registration</h2>
 
             {/* Username Field */}
             <FormField

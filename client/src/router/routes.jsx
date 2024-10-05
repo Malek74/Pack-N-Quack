@@ -10,6 +10,7 @@ import HistoricalPage from "@/pages/HistoricalPage";
 import ActivitiesTourists from "@/pages/ActivitiesTouristsPage";
 import HistoricalTourists from "@/pages/HistoricalPageTourists";
 import MarketplacePage from "@/pages/MarketplacePage";
+import RegistrationPage from "@/pages/RegistrationPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -22,6 +23,7 @@ const routes = createRoutesFromElements(
     <Route path="marketplace" element={<MarketplacePage/>}/>
     <Route path="ActivitiesTourists" element={<ActivitiesTourists/>}/>
     <Route path="HistoricalTourists" element={<HistoricalTourists/>}/>    
+    <Route path="RegistrationPage" element={<RegistrationPage/>}/>    
   </Route>,
 );
 
