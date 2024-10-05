@@ -1,8 +1,47 @@
 import express from "express";
-import { getAdmins } from "../controllers/adminsController.js";
+
+import { getAdmins, addAdmin, deleteUser } from "../controllers/adminsController.js";
+import adminModel from "../models/adminSchema.js";
+import advertiserModel from "../models/advertiserSchema.js";
+import { config } from "dotenv";
+import jwt from "jsonwebtoken";
+import { protect } from "../middleware/authenticator.js";
 
 const router = express.Router();
+config();
 
 router.get("/", getAdmins);
+router.delete("/:id", deleteUser)
+
+router.post("/", addAdmin);
+
+router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+    const user = await adminModel.findOne({ username }) || await advertiserModel.findOne({ username });
+    if (user) {
+        console.log(password + " " + user.password);
+        if (password === user.password) {
+            const token = jwt.sign(
+                { username: username, _id: user._id },
+                process.env.JWT_SECRET_KEY,
+                { expiresIn: "2m" }
+            )
+
+            res.status(200).json({
+                id: user._id,
+                username: user.username,
+                token: token,
+            });
+        } else {
+            res.status(400).json({ message: "Incorrect password" });
+        }
+    } else {
+        res.status(400).json({ message: "Username not found" });
+    }
+});
+
+router.get("/verify", protect, (req, res) => {
+    res.status(200).json(req.user);
+});
 
 export default router;
