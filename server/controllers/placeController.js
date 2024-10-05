@@ -1,31 +1,26 @@
-import Tourist from "../models/touristSchema.js";
-import TourGuide from "../models/tourGuideSchema.js";
-import TouristGovernor from "../models/touristGovernor.js"; 
-import Seller from "../models/sellerSchema.js";
-import Admin from "../models/AdminSchema.js";
-import Advertiser from "../models/advertiserSchema.js";
+
 import Places from '../models/PlacesSchema.js';
 import Tag from '../models/tagSchema.js';
 
 
 // Create Place function
 export const createPlace = async (req, res) => {
-    const { 
+    const {
         name,
-        description, 
-        pictures, 
-        location, 
-        opening_hour, 
-        ticket_price_native, 
-        ticket_price_foreigner, 
-        ticket_price_student, 
-        tags 
+        description,
+        pictures,
+        location,
+        opening_hour,
+        ticket_price_native,
+        ticket_price_foreigner,
+        ticket_price_student,
+        tags
     } = req.body;
 
     try {
-        // Check for location and name duplicates
-        const existingPlace = await Places.findOne({ 
-            $or: [{ location }, { name }]
+        // Check for location and name duplicates 
+        const existingPlace = await Places.findOne({
+            location: location
         });
 
         if (existingPlace) {
@@ -33,9 +28,7 @@ export const createPlace = async (req, res) => {
             if (existingPlace.location === location) {
                 messages.push("A place with this location already exists.");
             }
-            if (existingPlace.name === name) {
-                messages.push("A place with this name already exists.");
-            }
+
             return res.status(400).json({ message: messages.join(' ') });
         }
 
@@ -43,21 +36,21 @@ export const createPlace = async (req, res) => {
         // Loop through tags array to validate and store them
         for (const tag of tags) {
             // Check if the tag and its options already exist to restrict TG
-            const existingTag = await Tag.findOne({ 
-                name_tag: tag.name_tag, 
+            const existingTag = await Tag.findOne({
+                name_tag: tag.name_tag,
                 options: { $in: tag.options }  // Ensure option exists within the tag
             });
 
             if (!existingTag) {
-                return res.status(400).json({ 
-                    message: `The tag "${tag.name_tag}" with option "${tag.options}" does not exist. Please select from existing options.` 
+                return res.status(400).json({
+                    message: `The tag "${tag.name_tag}" with option "${tag.options}" does not exist. Please select from existing options.`
                 });
             }
 
-            createdTags.push(existingTag); 
+            createdTags.push(existingTag);
         }
-           
-        
+
+
         const newPlace = await Places.create({
             name,
             description,
@@ -67,7 +60,7 @@ export const createPlace = async (req, res) => {
             ticket_price_native,
             ticket_price_foreigner,
             ticket_price_student,
-            tags: createdTags.map(tag => tag._id),  
+            tags: createdTags.map(tag => tag._id),
         });
 
         res.status(201).json(newPlace);
@@ -76,11 +69,9 @@ export const createPlace = async (req, res) => {
     }
 };
 
-
 // Read Place function
 export const readPlace = async (req, res) => {
-    const { name } = req.params;  
-
+    const { name } = req.params;
     try {
         // Search for the place by its name
         const place = await Places.findOne({ name }).populate('tags');
@@ -144,6 +135,7 @@ export const updatePlace = async (req, res) => {
 
 // Get all places
 export const getAllPlaces = async (req, res) => {
+    console.log("get all places");
     try {
         // Find all places in the database
         const places = await Places.find().populate('tags'); // Populate tags if you want tag details as well
@@ -156,11 +148,10 @@ export const getAllPlaces = async (req, res) => {
     }
 };
 
-
 // Delete Place function
 export const deletePlace = async (req, res) => {
     const { name } = req.params;  // Ensure name is passed in the request body
-        console.log(name);
+    console.log(name);
     try {
         // Find the place by name and delete it
         const deletedPlace = await Places.findOneAndDelete({ name });  // Use correct query object
@@ -175,34 +166,53 @@ export const deletePlace = async (req, res) => {
     }
 };
 
-
 // Search for a specific place using name and/or tag
 export const SearchForPlace = async (req, res) => {
-    const { name } = req.params; // Assume name is a path parameter
-    const { tags } = req.query;   // Assume tags are passed as query parameters
+    const { name } = req.query; // Assume name is a path parameter
+    const { tagsName, tagsOption } = req.query;   // Assume tags are passed as query parameters
+
 
     try {
         const matchCriteria = {};
 
         // If name is provided, add it to the match criteria
         if (name) {
-            matchCriteria.name = { $regex: name, $options: 'i' }; 
+            matchCriteria.name = { $regex: name, $options: 'i' };
         }
 
+
         // If tags are provided, process them
-        if (tags) {
+        if (tagsName && tagsOption) {
+
             // Convert the tags string to an array
-            const tagsArray = tags.split(',').map(tag => tag.trim());
+            const tagsNameArr = tagsName.split(',').map(tag => tag.trim());
+            console.log(tagsNameArr);
+
+            // Convert the tags string to an array
+            const tagsOptionArr = tagsOption.split(',').map(tag => tag.trim());
+            console.log(tagsOptionArr)
 
             // Find matching tags in the database
-            const matchingTags = await Tag.find({
-                name_tag: { $in: tagsArray } // Modify this to match your tag structure
-            }).distinct('_id');
+            let matchingTags = [];
+            for (let i = 0; i < tagsNameArr.length; i++) {
+                console.log(tagsNameArr[i] + ":" + tagsOptionArr[i]);
+                const tag = await Tag.findOne({
+                    name_tag: tagsNameArr[i],
+                    options: tagsOptionArr[i] // Ensure we match the specified options
+                });
+                matchingTags.push(tag._id);
+            }
+
+            console.log(matchingTags);
 
             // If matching tags are found, add them to the match criteria
             if (matchingTags.length > 0) {
-                matchCriteria.tags = { $in: matchingTags }; // Match places with these tags
+
+                //fetch only data that has all the tags
+                matchCriteria.tags = { $all: matchingTags };
+
             }
+
         }
 
         // Search for places based on the constructed match criteria
@@ -220,7 +230,8 @@ export const SearchForPlace = async (req, res) => {
 
 // Filter places by tag
 export const FilterPlacesByTag = async (req, res) => {
-    const { tag } = req.query; // Assume the tag is passed as a query parameter in the format: tag=name_tag,options
+    const { tags } = req.query; // Assume the tag is passed as a query parameter in the format: tag=name_tag,options
+    console.log(tags);
 
     try {
         // Validate the tag input

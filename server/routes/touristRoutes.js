@@ -1,16 +1,17 @@
 import express from 'express';
-import { 
+import {
     createTourist,
     getTourist,
-    updateTourist
+    updateTourist,
+    getTourists
 } from '../controllers/touristController.js';
 
 
 const router = express.Router();
 
-router.post('/tourist', createTourist); // Create
-router.get('/tourist/:email', getTourist); // Read 
-router.put('/tourist/:username', updateTourist); // Update 
-
+router.post('/', createTourist); // Create
+router.get('/:username', getTourist); // Read 
+router.put('/:username', updateTourist); // Update 
+router.get('/', getTourists)
 
 export default router;

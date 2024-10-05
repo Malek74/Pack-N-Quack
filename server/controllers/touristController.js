@@ -1,13 +1,13 @@
 import Tourist from "../models/touristSchema.js";
 import TourGuide from "../models/tourGuideSchema.js";
-import TouristGovernor from "../models/touristGovernor.js"; 
+import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
-import Admin from "../models/AdminSchema.js";
+import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
-    const { email, username, password, mobile, dob, nationality, job, wallet } = req.body; 
+    const { email, username, password, mobile, dob, nationality, job, wallet } = req.body;
 
     try {
         // Check if the email or username is already taken by any user
@@ -16,7 +16,7 @@ export const createTourist = async (req, res) => {
             TourGuide.findOne({ $or: [{ email }, { username }] }),
             TouristGovernor.findOne({ username }),
             Seller.findOne({ $or: [{ email }, { username }] }),
-            Admin.findOne( { username }),
+            Admin.findOne({ username }),
             Advertiser.findOne({ $or: [{ email }, { username }] }),
         ]);
 
@@ -33,14 +33,13 @@ export const createTourist = async (req, res) => {
     }
 };
 
-
 // Tourist view Profile
 export const getTourist = async (req, res) => {
-    const { email } = req.params; 
-
+    const name = req.params;
+    console.log(name);
     try {
         //Find by email as it is unique identifier
-        const touristProfile = await Tourist.findOne({ email }); 
+        const touristProfile = await Tourist.findOne(name);
 
         res.status(200).json(touristProfile);
     } catch (error) {
@@ -48,15 +47,28 @@ export const getTourist = async (req, res) => {
     }
 };
 
+//@desc Get all tourists
+//@route GET /api/tourists
+//@access Public
+export const getTourists = async (req, res) => {
+    try {
+        const tourists = await Tourist.find();
+        res.status(200).json(tourists);
+
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+
+}
 // Tourist update data by username
 export const updateTourist = async (req, res) => {
     // DOB, Username, Wallet are not changable
     const { password, mobile, nationality, job } = req.body;
-    const { username } = req.params; 
+    const { username } = req.params;
 
     try {
         // If a new email is being passed for update, check if it's already taken
-        const newEmail = req.body.email; 
+        const newEmail = req.body.email;
 
         if (newEmail) {
             const isEmailTaken = await Promise.all([
@@ -72,14 +84,14 @@ export const updateTourist = async (req, res) => {
             }
         }
 
-        
+
         const updatedTourist = await Tourist.findOneAndUpdate(
-            { username }, 
-            { email: newEmail, password, mobile, nationality, job }, 
-            { new: true } 
+            { username },
+            { email: newEmail, password, mobile, nationality, job },
+            { new: true }
         );
 
-        res.status(200).json(updatedTourist); 
+        res.status(200).json(updatedTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

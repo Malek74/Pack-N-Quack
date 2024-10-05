@@ -144,3 +144,9 @@ export const deleteProducts = async (sellerID) => {
         await product.findByIdAndDelete(products[i]._id);
     }
 }
+
+//todo:implement this please @youssefrfarid
+//@description: deletes all activities created by an advertiser
+export const deleteActivities = async (advertiserID) => {
+
+}

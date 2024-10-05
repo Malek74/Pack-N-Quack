@@ -1,9 +1,9 @@
 import express from 'express';
-import { 
-    createPlace, 
-    readPlace, 
+import {
+    createPlace,
+    readPlace,
     getAllPlaces,
-    updatePlace, 
+    updatePlace,
     deletePlace,
     SearchForPlace,
     FilterPlacesByTag,
@@ -21,12 +21,9 @@ const router = express.Router();
 // router.get('/places', listAllPlaces);
 router.post('/', createPlace); // Create Place
 router.get('/:name', readPlace); // Read Place
-router.get('/', getAllPlaces); // Read Place
-
-router.put('/:name',updatePlace); // Update Place
+router.put('/:name', updatePlace); // Update Place
 router.delete('/:name', deletePlace); // Delete Place
-router.get('/:name', SearchForPlace); 
-router.get('/', FilterPlacesByTag); 
+router.get('/', SearchForPlace);
 
 
 export default router;

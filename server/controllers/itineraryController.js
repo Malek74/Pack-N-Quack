@@ -114,7 +114,7 @@ export const getItinerary = async (req, res) => {
     try {
         // Build query based on input parameters
         if (name) {
-            query.name = name; // Filter by name if provided
+            query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
         }
 
         if (tag) {

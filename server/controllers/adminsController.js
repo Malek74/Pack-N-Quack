@@ -71,11 +71,6 @@ export const deleteUser = async (req, res) => {
 }
 
 
-//todo:implement this please @youssefrfarid
-//@description: deletes all activities created by an advertiser
-export const deleteActivities = async (advertiserID) => {
-
-}
 
 export const addAdmin = async (req, res) => {
     const { username, password } = req.body;
