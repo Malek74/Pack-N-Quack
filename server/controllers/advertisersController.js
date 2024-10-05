@@ -1,5 +1,5 @@
 import activityModel from "../models/activitySchema.js";
-import advertiserModel from "../models/AdvertiserSchema.js";
+import advertiserModel from "../models/advertiserSchema.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;

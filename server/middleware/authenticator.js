@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-import admin from '../models/AdminSchema.js';
-import advertiser from '../models/AdvertiserSchema.js';
+import adminModel from '../models/adminSchema.js';
+import advertiserModel from '../models/advertiserSchema.js';
 
 config();
 
@@ -21,7 +21,7 @@ export const protect = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
             console.log(decoded)
             // Attach the user to the request object
-            const user = await admin.find({ _id: decoded._id }).select('-password') || await advertiser.find({ _id: decoded._id }).select('-password'); // Exclude the password
+            const user = await adminModel.find({ _id: decoded._id }).select('-password') || await advertiserModel.find({ _id: decoded._id }).select('-password'); // Exclude the password
             req.user = user;
             next(); // Call the next middleware or route handler
         } catch (error) {

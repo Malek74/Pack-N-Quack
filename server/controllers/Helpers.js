@@ -1,9 +1,9 @@
 // Exporting models
-import admin from "../models/adminSchema.js";
+import adminModel from "../models/adminSchema.js";
 import touristGoverner from '../models/touristGovernorScehma.js';
 import tourGuide from '../models/tourGuideSchema.js';
 import seller from '../models/sellerSchema.js';
-import advertiser from '../models/advertiserSchema.js';
+import advertiserModel from "../models/advertiserSchema.js";
 import tourist from '../models/touristSchema.js';
 
 //@desc check if username exists in the database
@@ -18,13 +18,13 @@ export const usernameExists = async (username) => {
         }
 
         // Check if user exists in advertiser collection
-        const advertiserExists = await advertiser.findOne({ username: username });
+        const advertiserExists = await advertiserModel.findOne({ username: username });
         if (advertiserExists) {
             return true;
         }
 
         // Check if user exists in admin collection
-        const adminExists = await admin.findOne({ username: username });
+        const adminExists = await adminModel.findOne({ username: username });
         if (adminExists) {
             return true;
         }
@@ -79,13 +79,13 @@ export const emailExists = async (email) => {
         }
 
         // Check if email exists in advertiser collection
-        const advertiserExists = await advertiser.findOne({ email: email });
+        const advertiserExists = await advertiserModel.findOne({ email: email });
         if (advertiserExists) {
             return true;
         }
 
         // Check if email exists in admin collection
-        const adminExists = await admin.findOne({ email: email });
+        const adminExists = await adminModel.findOne({ email: email });
         if (adminExists) {
             return true;
         }

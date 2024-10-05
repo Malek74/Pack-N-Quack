@@ -1,14 +1,14 @@
-import admin from "../models/adminSchema.js";
+import adminModel from "../models/adminSchema.js";
 import tourGuide from "../models/tourGuideSchema.js";
 import seller from "../models/sellerSchema.js";
-import advertiser from "../models/advertiserSchema.js";
+import advertiserModel from "../models/advertiserSchema.js";
 import touristGoverner from "../models/touristGovernorScehma.js";
 import { usernameExists } from '../controllers/Helpers.js';
 import tourist from "../models/touristSchema.js";
 
 export const getAdmins = async (req, res) => {
     try {
-        const admins = await admin.find({});
+        const admins = await adminModel.find({});
         res.status(200).json(admins);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -48,7 +48,7 @@ export const deleteUser = async (req, res) => {
 
         else if (role === "advertiser") {
             deleteActivities(id);
-            deletedUser = await advertiser.findByIdAndDelete(id);
+            deletedUser = await advertiserModel.findByIdAndDelete(id);
         }
 
         else if (role === "tourist") {
@@ -92,12 +92,12 @@ const deleteActivities = async (advertiserID) => { }
 
 export const addAdmin = async (req, res) => {
     const { username, password } = req.body;
-    const adminExists = await admin.findOne({ username });
+    const adminExists = await adminModel.findOne({ username });
     if (adminExists) {
         return res.status(400).json({ message: "Admin already exists" });
     }
 
-    const newAdmin = new admin({ username, password });
+    const newAdmin = new adminModel({ username, password });
     try {
         const a = await newAdmin.save();
         res.status(200).json(a);
