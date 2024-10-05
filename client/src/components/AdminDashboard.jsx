@@ -10,6 +10,7 @@ import {
 import { Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 
 export default function AdminDashboard() {
@@ -60,4 +61,5 @@ export default function AdminDashboard() {
         </div>
 
     )
+    const [selectedCategory,setSelectedCategory]=useState(null)
 }
