@@ -7,7 +7,7 @@ import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
 import Activities from "@/pages/Activities";
 import Historical from "@/pages/Historical";
-
+import MarketplacePage from "@/pages/MarketplacePage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -17,6 +17,7 @@ const routes = createRoutesFromElements(
     <Route path="admin" element={<AdminPage />} />
     <Route path="activities" element={<Activities/>}/>
     <Route path="historical" element={<Historical/>}/>
+    <Route path="marketplace" element={<MarketplacePage/>}/>
     
   </Route>,
 );

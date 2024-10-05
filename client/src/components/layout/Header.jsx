@@ -13,6 +13,7 @@ export default function Header() {
     { label: "Activities", path: "/activities" },
   ];
   
+  const user = "admin"
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
@@ -45,6 +46,11 @@ export default function Header() {
           <Button asChild variant="link" >
           <li>
             <Link to="/contact" className={isActive("/contact") ? "text-yellow-500" : ""}>Contact</Link>
+          </li>
+          </Button>
+          <Button asChild variant="link" >
+          <li>
+            <Link to="/marketplace" className={isActive("/contact") ? "text-yellow-500" : ""}>Marketplace</Link>
           </li>
           </Button>
 
