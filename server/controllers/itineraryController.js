@@ -186,7 +186,6 @@ export const getMyItineraries = async (req, res) => {
     }
 }
 
-
 export const viewAllItineraries = async (req, res) => {
     try {
         const itinerary = await Itinerary.find({});
@@ -267,4 +266,24 @@ export const updateItinerary = async (req, res) => {
     }
 
 
+}
+
+export const getItineraryById = async (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    if (!id) {
+        return res.status(400).json({ message: "Itinerary ID is required." });
+    }
+
+    try {
+        const itineraryExists = await Itinerary.findById(id);
+
+        if (!itineraryExists) {
+            return res.status(404).json({ message: "Itinerary not found." });
+        }
+        return res.status(200).json(itineraryExists);
+
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
 }
