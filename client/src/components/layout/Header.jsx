@@ -74,7 +74,7 @@ export default function Header() {
           </Button>
           <Button asChild variant="default" className="bg-primary">
             <li>
-              <Link to="/signup">Sign up</Link>
+              <Link to="/RegistrationPage">Sign up</Link>
             </li>
           </Button>
           

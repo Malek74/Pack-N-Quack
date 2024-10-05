@@ -3,5 +3,5 @@ import RegistrationPage from "./RegistrationPage";
 import TouristProfile from "@/components/forms/TouristProfile";
 
 export default function HomePage() {
-  return (<><MyFirstComponent pageName="Home" /><RegistrationPage/><TouristProfile /></>);
+  return (<></>);
 }
