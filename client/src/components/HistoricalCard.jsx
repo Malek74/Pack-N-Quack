@@ -16,15 +16,21 @@ export default function HistoricalCard(props) {
     return (
         <div className="container rounded-lg w-[30rem] h-auto shadow-md">
             <div className="flex place-content-end ">
-            <img className=" w-[25rem] h-[15rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
-            
-            <Button className="w-14 absolute "><Trash2/></Button>
-            <Button className="w-14 mx-10 absolute "><EditPlace name={props.name} description={props.description} 
-            location={props.location} hours={props.hours} Eprice ={props.Eprice} Fprice={props.Fprice} 
-            tags={props.tags}></EditPlace>
-            </Button> </div>
+                <img className=" w-[25rem] h-[15rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
+
+                {(props.notTourist) ? (
+                    <>
+                        <Button className="w-14 absolute bg-transparent "><Trash2 /></Button>
+                        <Button className="w-14 mx-10 absolute bg-transparent"><EditPlace name={props.name} description={props.description}
+                            location={props.location} hours={props.hours} Eprice={props.Eprice} Fprice={props.Fprice}
+                            tags={props.tags}></EditPlace>
+                        </Button>
+                    </>) : (<></>)}
+
+
+            </div>
             <div className="flex flex-col gap-2">
-                <h1 className=" flex"> <span className="font-semibold text-xl mr-auto text-[#71BCD6] stroke-black ">{props.name} </span></h1>
+                <h1 className=" flex"> <span className="font-semibold text-xl mr-auto text-skyblue stroke-black ">{props.name} </span></h1>
                 <h4 className="text-base">{props.description}</h4>
                 <h4 className="text-base"><b>Opening Hours: </b>{props.hours}</h4>
                 <h4 className="text-base"><b>Location: </b>{props.location} <br />

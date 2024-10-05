@@ -142,7 +142,7 @@ export default function Edit(props) {
                 </div>
                 <DialogFooter>
                     <DialogClose>
-                        <Button type="submit" className="w-min bg-[#E7B008] hover:bg-[#b89319]">Save changes</Button>
+                        <Button type="submit" className="w-min bg-gold hover:bg-goldhover">Save changes</Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>

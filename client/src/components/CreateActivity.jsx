@@ -34,7 +34,7 @@ export default function Create(props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-min bg-[#E7B008] text-white">Create a new Activity</Button>
+                <Button variant="outline" className="w-min bg-gold hover:bg-goldhover hover:text-white text-white">Create a new Activity</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -72,6 +72,16 @@ export default function Create(props) {
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="mapsSource" className="text-right">
+                            Google Maps Link:
+                        </Label>
+                        <Input
+                            id="maps"
+                            defaultValue={props.googlemaps}
+                            className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="price" className="text-right">
                             Price:
                         </Label>
@@ -86,7 +96,7 @@ export default function Create(props) {
                             Category:
                         </Label>
                         <Select>
-                            <SelectTrigger className="w-auto">
+                            <SelectTrigger className="w-max">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -104,7 +114,7 @@ export default function Create(props) {
                         <Label htmlFor="tags" className="text-right">
                             Tags:
                         </Label>
-                        <Multiselect className="w-min"
+                        <Multiselect className="w-max"
                             isObject={false}
                             onKeyPressFn={function noRefCheck() { }}
                             onRemove={function noRefCheck() { }}
@@ -118,10 +128,26 @@ export default function Create(props) {
                             ]}
                         />
                     </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="booking" className="text-right">
+                            Booking:
+                        </Label>
+                        <Select>
+                            <SelectTrigger className="w-max">
+                                <SelectValue placeholder="Is booking open?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Open">Open</SelectItem>
+                                <SelectItem value="Closed">Closed</SelectItem>
+
+                            </SelectContent>
+                        </Select>
+
+                    </div>
                 </div>
                 <DialogFooter>
                     <DialogClose>
-                        <Button type="submit" className="w-min bg-[#E7B008] hover:bg-[#b89319]">Save changes</Button>
+                        <Button type="submit" className="w-min bg-gold hover:bg-goldhover">Save changes</Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>
