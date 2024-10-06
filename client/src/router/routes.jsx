@@ -4,8 +4,6 @@ import Layout from "@/components/layout/Layout";
 import ItinerariesPage from "@/pages/ItinerariesPage";
 import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
-import Activities from "@/pages/Activities";
-import Historical from "@/pages/Historical";
 import SingleItineraryPage from "@/pages/SingleItineraryPage";
 
 import ActivitiesPage from "@/pages/ActivitiesPage";
