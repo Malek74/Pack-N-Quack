@@ -22,51 +22,82 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import CreateDialog from "./CreateDialog";
-import NewPreferenceForm from "./forms/NewPreferenceTag";
+import NewActivityTagForm from "./forms/NewActivityTagForm";
 import { EditTagDialog } from "./EditTag";
-export default function tagTags() {
-  const deleteClicked = (id) => {
-    console.log(id);
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import DeleteButton from "./DeleteButton";
+export default function TagTags() {
+  const [tags, setTags] = useState(null);
+  const { toast } = useToast();
+  // Fetch tags
+  const fetchTags = () => {
+    axios
+      .get("api/activity/tag")
+      .then((response) => {
+        setTags(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
-  const tagTags = [
-    { id: 1, name: "historic areas" },
-    { id: 2, name: "beaches" },
-    { id: 3, name: "family-friendly" },
-    { id: 4, name: "shopping" },
-  ];
+
+  useEffect(() => {
+    fetchTags(); // Initial fetch when component mounts
+  }, []);
+
+  const deleteClicked = (tagName) => {
+    axios
+      .delete(`api/activity/tag/delete/${tagName}`)
+      .then((response) => {
+        toast({
+          title: "Tag deleted succesfully!",
+        });
+        fetchTags(); // Refresh the tags list after deletion
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          text: `Failed to delete tag "${tagName}"`,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
 
   return (
     <Table>
       <TableCaption>A list of preference tags.</TableCaption>
       <TableHeader>
         <TableCell>
-          <CreateDialog title="Preference Tag" form={<NewPreferenceForm />} />
+          <CreateDialog
+            title="Activity Tag"
+            form={<NewActivityTagForm onTagCreate={fetchTags} />}
+          />
         </TableCell>
         <TableRow>
-          <TableHead className="w-[100px]">ID</TableHead>
           <TableHead>Name</TableHead>
           <TableHead></TableHead>
           <TableHead className="text-right"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {tagTags.map((tag) => (
-          <TableRow key={tag.id}>
-            <TableCell className="font-medium">{tag.id}</TableCell>
-            <TableCell>{tag.name}</TableCell>
-            <TableCell>
-                <EditTagDialog tag={tag.name} />
-            </TableCell>
-            <TableCell className="text-right">
-              <Button
-                onClick={() => deleteClicked(account.id)}
-                variant="destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+        {tags &&
+          tags.map((tag) => (
+            <TableRow key={tag.id}>
+              <TableCell>{tag.name}</TableCell>
+              <TableCell>
+                {/* Pass the fetchTags function to EditTagDialog */}
+                <EditTagDialog tag={tag.name} onTagUpdate={fetchTags} />
+              </TableCell>
+              <TableCell className="text-right">
+                <DeleteButton
+                  onConfirm={() => deleteClicked(tag.name) + fetchTags()}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );
