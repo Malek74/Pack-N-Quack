@@ -7,7 +7,10 @@ import egyptianmuseum from "../images/egyptianmuseum.jpg"
 import Banner from "@/components/Banner"
 import CreatePlace from "@/components/CreatePlace"
 import { Button } from "@/components/ui/button"
-import CreateTags from "@/components/CreateTags"
+import CreateTag from "@/components/CreateTag"
+import PlaceForm from "@/components/forms/PlaceForm"
+import CreateDialog from "@/components/CreateDialog"
+
 export default function Historical() {
 
     return (
@@ -19,9 +22,12 @@ export default function Historical() {
                 name="HISTORICAL PLACES & MUSEUMS"
             />
             <div className="flex place-content-end mx-8 mb-16">
-              <span className="mr-5">  <CreateTags />
-              </span>
-                <CreatePlace />
+                <span className="mr-5">  <CreateTag />
+                </span>
+
+                <CreateDialog title="a Place" type="act" form={<PlaceForm />} />
+
+
             </div>
 
             {/* <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center"></h1> */}
@@ -34,9 +40,11 @@ export default function Historical() {
                     description="The oldest of the Seven Wonders of the Ancient World"
                     hours="7:00 am - 6:00 pm every day"
                     location="Giza, Egypt"
-                    Eprice="Adult: EGP 60, Student: EGP 30" 
+                    Eprice="Adult: EGP 60, Student: EGP 30"
                     Fprice="Adult: €10 , Student: €5"
                     tags="#budget_friendly #family_friendly #historic_area"
+                    notTourist={true}
+
                 />
                 <HistoricalCard
                     img={egyptianmuseum}
@@ -45,11 +53,13 @@ export default function Historical() {
                     description="One of the largest museums in the world, and the first national museum in the Middle East"
                     hours="9:00 am – 5:00 pm every day"
                     location="Downtown Cairo, Egypt"
-                    Eprice="Adult: EGP 30, Student: EGP 10" 
+                    Eprice="Adult: EGP 30, Student: EGP 10"
                     Fprice="Adult: €8.5 , Student: €4"
                     tags="#museum #ancientEgyptian #historic_area"
+                    notTourist={true}
+
                 />
-               
+
             </grid>
         </div>
 

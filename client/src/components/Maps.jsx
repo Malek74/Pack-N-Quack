@@ -8,24 +8,24 @@ import {
     DialogTrigger,
     DialogClose
 } from "@/components/ui/dialog"
-import MapsApp from "./MapsApp"
+import GoogleMap from "./GoogleMap"
 import { Label } from "./ui/label"
 import { Button } from "./ui/button"
 
-export default function Maps() {
-   
-        return (
-            <Dialog>
-                <DialogTrigger><Label className="w-min text-black hover:text-gray-500 hover:underline">Open in Maps</Label></DialogTrigger>
-                <DialogContent>
-                    <MapsApp></MapsApp>
-                    <DialogFooter>
-                        <DialogClose>
-                            <Button type="close" className="w-min bg-[#E7B008] hover:bg-[#b89319]">Close</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
+export default function Maps(props) {
 
-            </Dialog>
-        )
-    }
+    return (
+        <Dialog>
+            <DialogTrigger><Label className="w-min text-black hover:text-gray-500 hover:underline">Open in Maps</Label></DialogTrigger>
+            <DialogContent>
+                <GoogleMap src={props.mapsSrc} className="w-auto"></GoogleMap>
+                <DialogFooter>
+                    <DialogClose>
+                        <Button type="close" className="w-min bg-gold hover:bg-goldhover">Close</Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+
+        </Dialog>
+    )
+}
