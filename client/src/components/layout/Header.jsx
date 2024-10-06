@@ -26,8 +26,9 @@ export default function Header() {
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
         {/* Logo on the left */}
-        <img src={logo} className="w-20" />
-        <Link to="/" className="text-xl font-bold">
+        <Link to="/" className="text-xl font-bold flex items-center gap-3">
+        <img src={logo} className="w-8" />
+
           Pack n' Quack
         </Link>
 

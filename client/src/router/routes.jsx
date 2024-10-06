@@ -12,6 +12,8 @@ import ActivitiesTourists from "@/pages/ActivitiesTouristsPage";
 import HistoricalTourists from "@/pages/HistoricalPageTourists";
 import MarketplacePage from "@/pages/MarketplacePage";
 import RegistrationPage from "@/pages/RegistrationPage";
+import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary";
+import NotFoundPage from "@/components/errorBoundary/NotFoundPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -26,6 +28,14 @@ const routes = createRoutesFromElements(
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
     <Route path="itineraryfullpage" element={<SingleItineraryPage/>}/>
+    <Route
+      path="*"
+      element={
+        <ErrorBoundary>
+          <NotFoundPage />
+        </ErrorBoundary>
+      }
+    />
   </Route>,
 );
 
