@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 // import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { CheckIcon } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 import {
   Command,
   CommandEmpty,
@@ -43,8 +43,11 @@ import NewSellerForm from "@/components/forms/NewSellerForm";
 import registration from "../assets/registration.jpg";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+
+
 export default function RegistrationPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [type, setType] = useState("");
 
   const createNewTourist = (values) => {
@@ -62,11 +65,41 @@ export default function RegistrationPage() {
       })
       .then((response) => {
         console.log("Tourist created successfully", response.data);
+        toast({
+          title: "Account created succesfully",
+        });
+        navigate("/")
       })
       .catch((error) => {
         console.error("Error creating tourist", error);
         toast({
-          text: "Couldn't sign up",
+          title: "Couldn't sign up",
+          description: error.response.data.message,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
+
+  const createNewTourguideSellerAdvertiser = (values) => {
+    console.log("axios");
+    const endpoint = values.status === "Advertiser" ? "advertisers" : values.status==="Seller" ? "sellers" : "tourGuide"
+    axios
+      .post(`/api/${endpoint}/`, {
+        username: values.username, // Default value for username
+        email: values.email, // Default value for email
+        password: values.password, // Default value for password
+      })
+      .then((response) => {
+        console.log("Account created successfully", response.data);
+        toast({
+          title: "Account created succesfully",
+        });
+        navigate("/")
+      })
+      .catch((error) => {
+        console.error("Error creating account", error);
+        toast({
+          title: "Couldn't sign up",
           description: error.response.data.message,
           variant: "destructive", // Error variant
         });
@@ -97,7 +130,7 @@ export default function RegistrationPage() {
         <div>
           <Button onClick={() => setType("")}>Back</Button>
 
-          <NewSellerForm />
+          <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser}/>
         </div>
       )}
     </div>
