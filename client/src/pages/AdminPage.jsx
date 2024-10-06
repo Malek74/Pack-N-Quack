@@ -2,9 +2,17 @@ import React, { useState } from "react";
 import AdminDashboard from "@/components/AdminDashboard";
 import CreateDialog from "@/components/CreateDialog";
 import ActivityCategory from "@/components/ActivityCategory";
+import ItineraryTags from "@/components/ItineraryTags";
 import ActivityTags from "@/components/ActivityTags";
 import { Link } from "react-router-dom";
-import { Bell, CircleUser, Users, Package, LineChart, Package2 } from "lucide-react";
+import {
+  Bell,
+  CircleUser,
+  Users,
+  Package,
+  LineChart,
+  Package2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NewUserForm from "@/components/forms/NewUserForm";
 export default function AdminPage() {
@@ -16,13 +24,27 @@ export default function AdminPage() {
       case "dashboard":
         return <AdminDashboard />;
       case "tourismGovernors":
-        return <CreateDialog title="Tourism Governor" type="gov" form={<NewUserForm type="gov" />}/>;
+        return (
+          <CreateDialog
+            title="Tourism Governor"
+            type="gov"
+            form={<NewUserForm type="gov" />}
+          />
+        );
       case "admins":
-        return <CreateDialog title="Admin" type="admin" form={<NewUserForm type="admin"/>} />;
+        return (
+          <CreateDialog
+            title="Admin"
+            type="admin"
+            form={<NewUserForm type="admin" />}
+          />
+        );
       case "activityCategories":
         return <ActivityCategory />;
       case "activityTags":
         return <ActivityTags />;
+      case "itineraryTags":
+        return <ItineraryTags />;
       default:
         return <AdminDashboard />;
     }
@@ -105,15 +127,24 @@ export default function AdminPage() {
                 <LineChart className="h-4 w-4" />
                 Activity Tags
               </button>
+              <button
+                onClick={() => setActiveSection("itineraryTags")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "itineraryTags"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <LineChart className="h-4 w-4" />
+                Itinerary Tags
+              </button>
             </nav>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="p-4">
-        {renderSection()}
-      </div>
+      <div className="p-4">{renderSection()}</div>
     </div>
   );
 }

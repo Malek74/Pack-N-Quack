@@ -22,19 +22,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import CreateDialog from "./CreateDialog";
-import NewActivityTagForm from "./forms/NewActivityTagForm";
-import { EditTagDialog } from "./EditActivityTag";
+import NewItineraryTagForm from "./forms/NewItineraryTagForm";
+import { EditItineraryTag } from "./EditItineraryTag";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DeleteButton from "./DeleteButton";
-export default function ActivityTags() {
+export default function ItineraryTags() {
   const [tags, setTags] = useState(null);
   const { toast } = useToast();
   // Fetch tags
   const fetchTags = () => {
     axios
-      .get("api/activity/tag")
+      .get("api/itiernaryTags")
       .then((response) => {
         setTags(response.data);
         console.log(response.data);
@@ -50,8 +50,9 @@ export default function ActivityTags() {
 
   const deleteClicked = (tagName) => {
     axios
-      .delete(`api/activity/tag/delete/${tagName}`)
+      .delete(`api/itiernaryTags/${tagName}`)
       .then((response) => {
+        console.log(response);
         toast({
           title: "Tag deleted succesfully!",
         });
@@ -72,8 +73,8 @@ export default function ActivityTags() {
       <TableHeader>
         <TableCell>
           <CreateDialog
-            title="Activity Tag"
-            form={<NewActivityTagForm onTagCreate={fetchTags} />}
+            title="Itinerary Tag"
+            form={<NewItineraryTagForm onTagCreate={fetchTags} />}
           />
         </TableCell>
         <TableRow>
@@ -85,15 +86,15 @@ export default function ActivityTags() {
       <TableBody>
         {tags &&
           tags.map((tag) => (
-            <TableRow key={tag.name}>
-              <TableCell>{tag.name}</TableCell>
+            <TableRow key={tag.tag}>
+              <TableCell>{tag.tag}</TableCell>
               <TableCell>
                 {/* Pass the fetchTags function to EditTagDialog */}
-                <EditTagDialog tag={tag.name} onTagUpdate={fetchTags} />
+                <EditItineraryTag tag={tag.tag} onTagUpdate={fetchTags} />
               </TableCell>
               <TableCell className="text-right">
                 <DeleteButton
-                  onConfirm={() => deleteClicked(tag.name) + fetchTags()}
+                  onConfirm={() => deleteClicked(tag.tag) + fetchTags()}
                 />
               </TableCell>
             </TableRow>
