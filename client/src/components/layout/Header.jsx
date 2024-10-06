@@ -71,13 +71,6 @@ export default function Header() {
               <Link to="/signup">Sign up</Link>
             </li>
           </Button>
-          
-          <li>
-            <Link to="/profile">MyProfile</Link>
-          </li>
-          <li>
-            <Link to="/admin">Admin</Link>
-          </li>
         </ul>
       </nav>
     </header>
