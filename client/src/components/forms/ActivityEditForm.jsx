@@ -85,9 +85,7 @@ export default function ActivityEditForm(props) {
 
     async function onSubmit(values) {
 
-        console.log(discounts);
-        values.discount = discounts;
-        console.log(values);
+        values.specialDiscounts = discounts;
         const cleanedValues = cleanObject(values); // Clean the submitted values
         console.log("EDITTED ACTIVITY FORM SUBMITTED");
         console.log(cleanedValues); // This will log the cleaned object without empty fields
@@ -105,7 +103,7 @@ export default function ActivityEditForm(props) {
         priceType: z.string(),
         categoryID: z.string(),
         tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
-        isBookingOpen: z.string(),
+        isBookingOpen: z.boolean(),
         specialDiscounts: z.string(),
     }).optional;
     const form = useForm({
@@ -121,7 +119,7 @@ export default function ActivityEditForm(props) {
             priceType: "",
             categoryID: "",
             tags: "",
-            isBookingOpen: "",
+            isBookingOpen: false,
             specialDiscounts: ""
         },
     });
@@ -136,7 +134,7 @@ export default function ActivityEditForm(props) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{props.task}</DialogTitle>
+                    <DialogTitle>Edit the Activity</DialogTitle>
                     <DialogDescription>
                         Make changes to your activity here. Click save when you are done.
                     </DialogDescription>
@@ -276,7 +274,7 @@ export default function ActivityEditForm(props) {
 
                         <FormField
                             control={form.control}
-                            name="category"
+                            name="categoryID"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Category</FormLabel>
@@ -339,7 +337,12 @@ export default function ActivityEditForm(props) {
                                     <FormControl>
                                         <Select
                                             onValueChange={(value) => {
-                                                field.onChange(value);  // Pass the value to the form control
+                                                if (value == "Open") {
+                                                    field.onChange(true);
+                                                }
+                                                else {
+                                                    field.onChange(false);
+                                                }  // Pass the value to the form control
                                             }}
                                         >
                                             <SelectTrigger className="w-48">
@@ -356,20 +359,7 @@ export default function ActivityEditForm(props) {
                                 </FormItem>
                             )}
                         />
-                        {/* <FormField
-                            control={form.control}
-                            name="discount"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Special Discount:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder={props.discounts} {...field} />
-                                    </FormControl>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
 
 
                         <FormField

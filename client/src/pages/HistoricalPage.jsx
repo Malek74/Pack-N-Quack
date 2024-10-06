@@ -7,37 +7,60 @@ import CreateTag from "@/components/CreateTag"
 import PlaceForm from "@/components/forms/PlaceForm"
 import CreateDialog from "@/components/CreateDialog"
 import { useState, useEffect } from "react"
+import axios from "axios"
 
 export default function Historical() {
 
     const [places, setPlaces] = useState([]);
     const [placeDeleted, setPlaceDeleted] = useState();
+    const [placeUpdated, setPlaceUpdated] = useState();
+    const [placeCreated, setPlaceCreated] = useState();
 
 
-    const deletePlace = async (id) => {
+    const addPlace = async (values) => {
         try {
-            const response = await axios.delete(`/api/place/delete/${id}`);
-            console.log('Delete successful:', response.data);
-            setPlaceDeleted(response.data);
+            const response = await axios.post(`/api/places`, values);
+            console.log('Created successfully:', response.data);
+            setPlaceCreated(response.data);
         } catch (error) {
-            console.error('Error deleting activity:', error);
+            console.error('Error creating place:', error);
         }
     };
 
+    const deletePlace = async (id) => {
+        try {
+            const response = await axios.delete(`/api/places/${id}`);
+            console.log('Delete successful:', response.data);
+            setPlaceDeleted(response.data);
+        } catch (error) {
+            console.error('Error deleting place:', error);
+        }
+    };
+
+    const editPlace = async (id, values) => {
+        try {
+            const response = await axios.put(`/api/places/${id}`, values);
+            console.log('Updated successfully:', response.data);
+            setPlaceUpdated(response.data);
+        } catch (error) {
+            console.error('Error updating place:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchActivites = async () => {
+        const fetchPlaces = async () => {
             try {
-                const response = await axios.get("/api/activity");
+                const response = await axios.get("/api/places");
                 setPlaces(response.data);
+
             } catch (error) {
                 console.error(error);
             }
         };
 
-        fetchActivites()
+        fetchPlaces()
 
-    }, [placeDeleted]);
+    }, [placeDeleted, placeUpdated, placeCreated]);
 
 
 
@@ -53,7 +76,7 @@ export default function Historical() {
                 <span className="mr-5">  <CreateTag />
                 </span>
 
-                <CreateDialog title="a Place" type="act" form={<PlaceForm />} />
+                <CreateDialog title="a Place" type="act" form={<PlaceForm createPlaceFunction={addPlace} />} />
 
 
             </div>
@@ -61,7 +84,25 @@ export default function Historical() {
             {/* <h1 className="text-5xl text-[#71BCD6] stroke-2 stroke-black font-bold mb-24 self-center"></h1> */}
 
             <grid className="grid grid-cols-2 justify-stretch w-screen self-center gap-y-10" >
-                <HistoricalCard
+
+                {places.map((place) => (
+                    <HistoricalCard
+                        key={place._id}
+                        img={place.pictures}  //it's an array not one url
+                        name={place.name}
+                        description={place.description}
+                        hours={place.opening_hour}
+                        location={place.location}
+                        Eprice={place.ticket_price_native}
+                        Fprice={place.ticket_price_foreigner}
+                        tags={place.tags}
+                        notTourist={true}
+                        deletePlaceFunction={deletePlace}
+                        updatePlaceFunction={editPlace}
+
+                    />))}
+
+                < HistoricalCard
                     img={pyramids}
                     alt="Pyramids"
                     name="Giza Pyramids and Great Sphinx"
@@ -74,7 +115,7 @@ export default function Historical() {
                     notTourist={true}
 
                 />
-                <HistoricalCard
+                < HistoricalCard
                     img={egyptianmuseum}
                     alt="Egyptian Museum"
                     name="Egyptian Museum"

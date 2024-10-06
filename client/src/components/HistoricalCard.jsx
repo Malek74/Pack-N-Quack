@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // import {
 //     Dialog,
 //     DialogContent,
@@ -20,11 +21,11 @@ export default function HistoricalCard(props) {
 
                 {(props.notTourist) && (
                     <>
-                        <Button className="w-14 absolute bg-transparent "><Trash2 /></Button>
+                        <Button onClick={() => props.deletePlaceFunction(props.key)} className="w-14 absolute bg-transparent "><Trash2 /></Button>
                         <Button className="w-14 mx-10 absolute bg-transparent">
                             <PlaceEditForm name={props.name} description={props.description}
                                 location={props.location} hours={props.hours} Eprice={props.Eprice} Fprice={props.Fprice}
-                                tags={props.tags}></PlaceEditForm>
+                                tags={props.tags} key={props.key}></PlaceEditForm>
                         </Button>
                     </>)}
 
@@ -36,9 +37,10 @@ export default function HistoricalCard(props) {
                 <h4 className="text-base"><b>Opening Hours: </b>{props.hours}</h4>
                 <h4 className="text-base"><b>Location: </b>{props.location} <br />
                 </h4>
-                <h4 className="flex"> <span className="text-base w-max "><b>Price for Egyptians: </b>{props.Eprice} </span></h4>
+                <h4 className="flex"> <span className="text-base w-max "><b>Price for Natives: </b>{props.Eprice} </span></h4>
                 <h4 className="flex"> <span className="text-base w-max "><b>Price for Foreigners: </b>{props.Fprice} </span></h4>
-                <h4 className="flex mb-3  text-gray-500 self-end text-right">{props.tags}</h4>
+                {Array.isArray(props.tags) && props.tags.map((tag) => (<h4 key={tag._id} className="flex mb-3  text-gray-500 self-end text-right">#{tag.name}</h4>
+                ))}
             </div>
         </div >
     )

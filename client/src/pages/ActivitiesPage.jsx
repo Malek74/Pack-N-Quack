@@ -12,7 +12,18 @@ export default function Activities() {
     const [activities, setActivities] = useState([]);
     const [activityDeleted, setActivityDeleted] = useState();
     const [activityUpdated, setActivityUpdated] = useState();
+    const [activityCreated, setActivityCreated] = useState();
 
+
+    const addActivity = async (values) => {
+        try {
+            const response = await axios.post(`/api/activity`, values);
+            console.log('Created successfully:', response.data);
+            setActivityCreated(response.data);
+        } catch (error) {
+            console.error('Error creating activity:', error);
+        }
+    };
 
     const deleteActivity = async (id) => {
         try {
@@ -47,7 +58,7 @@ export default function Activities() {
 
         fetchActivites()
 
-    }, [activityDeleted, activityUpdated]);
+    }, [activityDeleted, activityUpdated, activityCreated]);
 
 
 
@@ -60,7 +71,7 @@ export default function Activities() {
                 name="ACTIVITIES"
             />
             <div className="flex place-content-end mr-8">
-                <CreateDialog title="an Activity" type="act" form={<ActivityForm type="act" />} />
+                <CreateDialog title="an Activity" type="act" form={<ActivityForm type="act" createActivityFunction={addActivity} />} />
             </div>
 
 

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -22,9 +23,22 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import BasicDateTimePicker from "../BasicDateTimePicker"
 import Multiselect from "multiselect-react-dropdown"
+import { Label } from "../ui/label"
+
+export default function ActivityForm(props) {
 
 
-export default function ActivityForm() {
+    const [discounts, setDiscounts] = useState([]); // State to hold user-added discounts
+    const [newDiscount, setNewDiscount] = useState(''); // State for new discount input
+
+    // Handle adding a new discount
+    const handleAddDiscount = () => {
+        if (newDiscount.trim() !== '') {
+            setDiscounts((prev) => [...prev, newDiscount]); // Add new discount to the list
+            setNewDiscount(''); // Clear the input after adding
+        }
+    };
+
 
     const [categories, setCategories] = useState([]);
     const [selectedPriceType, setSelectedPriceType] = useState();
@@ -51,49 +65,60 @@ export default function ActivityForm() {
 
 
     const activityForm = z.object({
-        activityName: z.string().min(1, { message: "Name is required" }),
-        time: z.string(),
+        name: z.string().min(1, { message: "Name is required" }),
+        date: z.string(),
         location: z.string().min(1, { message: "Location is required" }),
-        googlemaps: z.string().min(1, { message: "MapsLink is required" }),
+        googleMapLink: z.string().min(1, { message: "MapsLink is required" }),
         price: z.coerce.number().min(1, { message: "Price must be a positive number." }),
         minPrice: z.coerce.number().min(1, { message: "Price must be a positive number." }),
         maxPrice: z.coerce.number().min(1, { message: "Price must be a positive number." }),
         priceType: z.string().min(1, { message: "Please choose a type" }),
-        category: z.string().min(1, { message: "Please choose a type" }),
+        categoryID: z.string().min(1, { message: "Please choose a type" }),
         tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
-        booking: z.string().min(1, { message: "Please choose if booking is open or closed" }),
-        discount: z.string(),
+        isBookingOpen: z.boolean(),
+        specialDiscounts: z.string(),
 
     });
     const form = useForm({
         resolver: zodResolver(activityForm),
         defaultValues: {
-            activityName: "",
-            time: "",
+            name: "",
+            date: "",
             location: "",
-            googlemaps: "",
+            googleMapLink: "",
             price: "",
             minPrice: "",
             maxPrice: "",
             priceType: "",
-            category: "",
+            categoryID: "",
             tags: "",
-            booking: "",
-            discount: ""
+            isBookingOpen: false,
+            specialDiscounts: ""
         },
     });
-
-    function onSubmit(values) {
-        console.log(values);
-        console.log("NEW ACTIVITY FORM SUBMITTED");
+    function cleanObject(obj) {
+        return Object.fromEntries(
+            Object.entries(obj).filter(([_, value]) => {
+                // Check if the value is not an empty string and not an empty array
+                return value !== '' && !(Array.isArray(value) && value.length === 0);
+            })
+        );
     }
+    async function onSubmit(values) {
 
+        console.log(discounts);
+        values.specialDiscounts = discounts;
+        console.log(values);
+        const cleanedValues = cleanObject(values); // Clean the submitted values
+        console.log("EDITTED ACTIVITY FORM SUBMITTED");
+        props.createActivityFunction(cleanedValues);
+    }
     return (
         <Form  {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col">
                 <FormField
                     control={form.control}
-                    name="activityName"
+                    name="name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Activity Name</FormLabel>
@@ -106,7 +131,7 @@ export default function ActivityForm() {
                 />
                 <FormField
                     control={form.control}
-                    name="time"
+                    name="date"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Date & Time</FormLabel>
@@ -137,7 +162,7 @@ export default function ActivityForm() {
                 />
                 <FormField
                     control={form.control}
-                    name="googlemaps"
+                    name="googleMapLink"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Google Maps Link</FormLabel>
@@ -223,7 +248,7 @@ export default function ActivityForm() {
 
                 <FormField
                     control={form.control}
-                    name="category"
+                    name="categoryID"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Category</FormLabel>
@@ -280,14 +305,19 @@ export default function ActivityForm() {
 
                 <FormField
                     control={form.control}
-                    name="booking"
+                    name="isBookingOpen"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Booking</FormLabel>
                             <FormControl>
                                 <Select
                                     onValueChange={(value) => {
-                                        field.onChange(value);  // Pass the value to the form control
+                                        if (value == "Open") {
+                                            field.onChange(true);
+                                        }
+                                        else {
+                                            field.onChange(false);
+                                        }  // Pass the value to the form control
                                     }}
                                 >
                                     <SelectTrigger className="w-max">
@@ -304,19 +334,49 @@ export default function ActivityForm() {
                         </FormItem>
                     )}
                 />
+
                 <FormField
                     control={form.control}
-                    name="discount"
-                    render={({ field }) => (
+                    name="specialDiscounts"
+                    render={() => (
                         <FormItem>
-                            <FormLabel>Special Discount</FormLabel>
+                            <FormLabel>Discount</FormLabel>
                             <FormControl>
-                                <Input placeholder="50% off" {...field} />
+                                <div>
+                                    <div className="mt-4">
+                                        <h3 className="font-bold">Special Discounts:</h3>
+                                        <ul>
+                                            {discounts.map((discount, index) => (
+                                                <li key={index}>{discount}</li> // Display added discounts
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 items-center self-center justify-evenly gap-2 mt-4">
+                                        <Label htmlFor="new-discount" className="text-left">
+                                            Add New Discount:
+                                        </Label>
+                                        <input
+                                            type="text"
+                                            value={newDiscount}
+                                            onChange={(e) => setNewDiscount(e.target.value)} // Update new discount state
+                                            className="border rounded w-auto p-2"
+                                            placeholder="Enter new discount"
+                                        />
+                                        <Button
+                                            className="w-min bg-gold hover:bg-goldhover text-white"
+                                            onClick={handleAddDiscount}
+                                        >
+                                            Add Discount
+                                        </Button>
+                                    </div></div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
+
+
                 <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
             </form>
         </Form>
