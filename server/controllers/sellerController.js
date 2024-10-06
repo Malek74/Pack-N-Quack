@@ -17,22 +17,22 @@ export const getAllSellers = async (req, res) => {
 //@desc create seller 
 //@route
 export const createSeller = async (req, res) => {
-    const { email, username, password, name, description } = req.body;
-    if (!email || !username || !password || !name || !description) {
+    const { email, username, password } = req.body;
+    if (!email || !username || !password) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
-    
+
     try {
         //check user name is unique across all users
         if (await usernameExists(username)) {
             return res.status(400).json({ message: "Username already exists" });
         }
 
-        const newSeller = await seller.create({ email, username, password, name, description });
+        const newSeller = await seller.create({ email, username, password });
         return res.status(200).json(newSeller);
 
     } catch (error) {
-        res.status(400).json({ error: error.message })
+        return res.status(400).json({ error: error.message })
     }
 }
 

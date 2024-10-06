@@ -8,10 +8,10 @@ export const addItinerary = async (req, res) => {
 
 
     //fetch data from request body
-    const { ratings, name, tourGuideID, activities, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags } = req.body;
+    const { ratings, name, tourGuideID, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
 
     //validate that all fields are present
-    if (!ratings || !tourGuideID || !name || !activities || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
+    if (!ratings || !tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
 
         //write missing fields
         if (!ratings) {
@@ -23,7 +23,7 @@ export const addItinerary = async (req, res) => {
         if (!tourGuideID) {
             return res.status(400).json({ "message": "TourGuideID is missing" });
         }
-        if (!activities) {
+        if (!days) {
             return res.status(400).json({ "message": "Activities is missing" });
         }
         if (!language) {
@@ -47,26 +47,8 @@ export const addItinerary = async (req, res) => {
         if (!tags) {
             return res.status(400).json({ "message": "Tags is missing" });
         }
-
-
-
-    }
-
-    const tagsToInsert = [];
-    for (let i = 0; i < tags.length; i++) {
-
-        //search for tag in the database
-        const tagExists = await itineraryTags.findOne({ tag: tags[i] });
-        if (tagExists) {
-            tagsToInsert.push(tagExists._id)
-        }
-        else {
-            const newTag = new itineraryTags({
-                tag: tags[i]
-            });
-
-            const createdTag = await itineraryTags.create(newTag);
-            tagsToInsert.push(createdTag._id)
+        if (!description) {
+            return res.status(400).json({ "message": "Description is missing" });
         }
     }
 
@@ -75,20 +57,21 @@ export const addItinerary = async (req, res) => {
             ratings: ratings,
             name: name,
             tourGuideID: tourGuideID,
-            activities: activities,
+            days: days,
             language: language,
             price: price,
             available_dates: available_dates,
             pickUpLocation: pickUpLocation,
             dropOffLocation: dropOffLocation,
             accessibility: accessibility,
-            tags: tagsToInsert
+            tags: tags,
+            description: description
         });
 
         const createdItinerary = await Itinerary.create(itinerary);
-        res.status(201).json(itinerary);
+        return res.status(201).json(createdItinerary);
     } catch (error) {
-        res.status(500).json({ message: "Error creating itinerary", error: error.message });
+        return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
 
 };
@@ -276,7 +259,7 @@ export const getItineraryById = async (req, res) => {
     }
 
     try {
-        const itineraryExists = await Itinerary.findById(id);
+        const itineraryExists = await Itinerary.findById(id).populate("tags");
 
         if (!itineraryExists) {
             return res.status(404).json({ message: "Itinerary not found." });

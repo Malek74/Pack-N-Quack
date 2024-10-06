@@ -7,15 +7,15 @@ const router = express.Router();
 router.get("/", getActivityCateogries);
 
 // get a single activity category
-router.get("/:id", getActivityCateogry);
+router.get("/:nane", getActivityCateogry);
 
 // Add an activity category
 router.post("/", addActivityCategory);
 
 // Edit an activity category
-router.put("/update/:id", updateActivityCategory);
+router.put("/update/:name", updateActivityCategory);
 
 // Delete an activity category
-router.delete("/delete/:id", deleteActivityCategory);
+router.delete("/delete/:name", deleteActivityCategory);
 
 export default router;

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import activityModel from "../models/activitySchema.js";
+import activityTag from "../models/activityTagSchema.js";
+import activityCategory from "../models/activityCategorySchema.js";
 
 // @desc Get all activities
 // @route GET /api/activity
@@ -16,6 +18,10 @@ export const getActivities = async (req, res) => {
 // @route POST /api/activity
 // @Body { advertiserID, categoryID, date, location, priceType, price, minPrice, maxPrice, tags, specialDiscounts, isBookingOpen, duration, name }
 export const addActivity = async (req, res) => {
+    console.log(req.body)
+    if (!req.body.advertiserID) {
+        req.body.advertiserID = new mongoose.Types.ObjectId("66ffe2acd9af7892d8193dad");
+    }
     const priceType = req.body.priceType;
     if (priceType === 'range') {
         if (!req.body.minPrice || !req.body.maxPrice) {
@@ -26,12 +32,28 @@ export const addActivity = async (req, res) => {
             return res.status(400).json({ message: 'Please add a price' });
         }
     }
+    if (req.body.tags) {
+        const tags = req.body.tags;
+        let tagsIDs = [];
+        for (let i = 0; i < tags.length; i++) {
+            const tag = await activityTag.findOne({ name: tags[i] });
+            tagsIDs.push(tag._id);
+        }
+        req.body.tags = tagsIDs
+    }
+    if (req.body.categoryID) {
+        const category = await activityCategory.findOne({ name: req.body.categoryID });
+        req.body.categoryID = category._id
+    }
+    console.log(req.body)
     const newActivity = new activityModel(req.body);
     try {
         const a = await newActivity.save();
-        res.status(200).json(a);
+        console.log(a)
+        return res.status(200).json(a);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        console.log(error)
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -42,7 +64,21 @@ export const addActivity = async (req, res) => {
 export const updateActivity = async (req, res) => {
     const id = req.params.id;
     console.log(id)
-    //const _id = mongoose.Types.ObjectId(id);
+    console.log(req.body)
+    if (req.body.tags) {
+        const tags = req.body.tags;
+        let tagsIDs = [];
+        for (let i = 0; i < tags.length; i++) {
+            const tag = await activityTag.findOne({ name: tags[i] });
+            tagsIDs.push(tag._id);
+        }
+        req.body.tags = tagsIDs
+    }
+    if (req.body.categoryID) {
+        const category = await activityCategory.findOne({ name: req.body.categoryID });
+        req.body.categoryID = category._id
+    }
+    console.log(req.body)
     try {
         const updatedActivity = await activityModel.findByIdAndUpdate(id, req.body, { new: true });
         res.status(200).json(updatedActivity);

@@ -16,10 +16,13 @@ export const getActivityCateogries = async (req, res) => {
 // @route GET /api/activity/category/:id
 // @params id of activity category
 export const getActivityCateogry = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name;
     try {
-        const category = await activityCategory.findById(id);
-        res.status(200).json(category);
+        const category = await activityCategory.findOne({ name: name });
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        return res.status(200).json(category);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -41,9 +44,9 @@ export const addActivityCategory = async (req, res) => {
     const newCategory = new activityCategory({ name });
     try {
         const a = await newCategory.save();
-        res.status(200).json(a);
+        return res.status(200).json(a);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -52,12 +55,15 @@ export const addActivityCategory = async (req, res) => {
 // @params id of activity category
 // @Body { name }
 export const updateActivityCategory = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name;
     try {
-        const updatedCategory = await activityCategory.findByIdAndUpdate(id, req.body, { new: true });
-        res.status(200).json(updatedCategory);
+        const updatedCategory = await activityCategory.findOneAndUpdate({ name: name }, req.body, { new: true });
+        if (updatedCategory === null) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        return res.status(200).json(updatedCategory);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -65,11 +71,14 @@ export const updateActivityCategory = async (req, res) => {
 // @route DELETE /api/activity/category/delete/:id
 // @params id of activity category
 export const deleteActivityCategory = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name;
     try {
-        const deletedCategory = await activityCategory.findByIdAndDelete(id);
-        res.status(200).json(deletedCategory);
+        const deletedCategory = await activityCategory.findOneAndDelete({ name: name });
+        if (deletedCategory === null) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        return res.status(200).json(deletedCategory);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }

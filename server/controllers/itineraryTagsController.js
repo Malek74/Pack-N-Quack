@@ -4,7 +4,7 @@ import itineraryTags from "../models/itineraryTagsSchema.js";
 //@route POST api/itineraryTags
 //@Body {tag}
 export const addTag = async (req, res) => {
-    const tag = req.body.tag;
+    const tag = req.body.name;
 
     //check if tag is present
     if (!tag) {
@@ -24,9 +24,9 @@ export const addTag = async (req, res) => {
         });
 
         const createdTag = await itineraryTags.create(newTag);
-        res.status(201).json(createdTag);
+        return res.status(201).json(createdTag);
     } catch (error) {
-        res.status(500).json({ message: "Error creating tag", error: error.message });
+        return res.status(500).json({ message: "Error creating tag", error: error.message });
     }
 
 }
@@ -34,24 +34,24 @@ export const addTag = async (req, res) => {
 export const getTags = async (req, res) => {
     try {
         const tags = await itineraryTags.find();
-        res.status(200).json(tags);
+        return res.status(200).json(tags);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching tags", error: error.message });
+        return res.status(500).json({ message: "Error fetching tags", error: error.message });
     }
 
 }
 
 export const deleteTag = async (req, res) => {
-    const tagID = req.params.id;
+    const tag = req.params.name;
 
     try {
-        const tag = await itineraryTags.find({ tagID });
+        const tags = await itineraryTags.find({ tag: tag });
 
-        if (!tag) {
+        if (!tags) {
             return res.status(404).json({ message: "Tag not found" });
         }
 
-        const deletedTag = await itineraryTags.findByIdAndDelete(tagID);
+        const deletedTag = await itineraryTags.findOneAndDelete({ tag: tag });
         res.status(200).json(deletedTag);
     } catch (error) {
         res.status(500).json({ message: "Error deleting tag", error: error.message });
@@ -60,14 +60,14 @@ export const deleteTag = async (req, res) => {
 }
 
 export const updateTag = async (req, res) => {
-    const id = req.params.id;
-    const tag = req.body.tag;
+    const name = req.params.name;
+    const tag = req.body.name;
 
     try {
-        const updatedTag = await itineraryTags.findByIdAndUpdate(id, { tag: tag }, { new: true });
-        res.status(200).json(updatedTag);
+        const updatedTag = await itineraryTags.findOneAndUpdate({ tag: name }, { tag: tag }, { new: true });
+        return res.status(200).json(updatedTag);
     }
     catch (error) {
-        res.status(500).json({ message: "Error updating tag", error: error.message });
+        return res.status(500).json({ message: "Error updating tag", error: error.message });
     }
 }

@@ -30,9 +30,13 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
-    job: {
+    role: {
         type: String,
         required: true,
+    },
+    jobTitle: {
+        type: String,
+        default: ''
     },
     wallet: {
         type: Number,

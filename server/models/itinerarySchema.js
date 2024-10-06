@@ -22,7 +22,10 @@ const itinerarySchema = new mongoose.Schema({
         ref: 'TourGuide', // Reference the tourguide model
         required: true,
     },
-
+    description: {
+        type: String,
+        required: true
+    },
     //covers the days and activities of the itinerary 
     days: [{
         day: {
@@ -88,9 +91,6 @@ const itinerarySchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-
-
-
     available_dates: {
         type: [Date],
         required: true
@@ -99,7 +99,6 @@ const itinerarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
     dropOffLocation: {
         type: String,
         required: true
@@ -108,26 +107,21 @@ const itinerarySchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-
-    tags:
-        [
-            {
-                type: Schema.Types.ObjectId,
-                ref: 'itineraryTags'
-            }
-        ]
-    ,
-
+    tags: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'itineraryTags'
+        }],
+        default: []
+    },
     subscribers: [{
         type: [Schema.Types.ObjectId],
         ref: 'Tourist'
     }],
-
     accessibility: {
-        type: [String],
+        type: String,
         required: true
     }
-
 });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);

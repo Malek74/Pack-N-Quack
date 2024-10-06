@@ -8,7 +8,7 @@ import { emailExists, usernameExists } from "./Helpers.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
-    const { email, username, password, mobile, dob, nationality, job, name } = req.body;
+    const { email, username, password, mobile, dob, nationality, role, jobTitle, name } = req.body;
 
     try {
         // Check if the email or username is already taken by any user
@@ -24,7 +24,7 @@ export const createTourist = async (req, res) => {
         }
 
         // If both email and username are unique, create a new tourist
-        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, job, name });
+        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name });
         res.status(200).json(newTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -61,7 +61,7 @@ export const getTourists = async (req, res) => {
 // Tourist update data by username
 export const updateTourist = async (req, res) => {
     // DOB, Username, Wallet are not changable
-    const { password, mobile, nationality, job, name } = req.body;
+    const { password, mobile, nationality, role, jobTitle, name } = req.body;
     const { username } = req.params;
 
     try {
@@ -73,10 +73,12 @@ export const updateTourist = async (req, res) => {
         if (doesEmailExists) {
             return res.status(400).json({ message: "Email is already taken" });
         }
-
+        if (role == "Student") {
+            jobTitle = "";
+        }
         const updatedTourist = await Tourist.findOneAndUpdate(
             { username },
-            { email: newEmail, password, mobile, nationality, job, name },
+            { email: newEmail, password, mobile, nationality, jobTitle, role, name },
             { new: true }
         );
         return res.status(200).json(updatedTourist);

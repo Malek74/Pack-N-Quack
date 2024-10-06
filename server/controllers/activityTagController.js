@@ -6,21 +6,24 @@ import activityTag from "../models/activityTagSchema.js";
 export const getActivityTags = async (req, res) => {
     try {
         const tags = await activityTag.find({});
-        res.status(200).json(tags);
+        return res.status(200).json(tags);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
 // @desc Get a single activity tag
 // @route GET /api/activity/tag/:id
 export const getActivityTag = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name;
     try {
-        const tag = await activityTag.findById(id);
-        res.status(200).json(tag);
+        const tag = await activityTag.findOne({ name: name });
+        if (!tag) {
+            return res.status(404).json({ message: 'Tag not found' });
+        }
+        return res.status(200).json(tag);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -29,16 +32,19 @@ export const getActivityTag = async (req, res) => {
 // @Body { name }
 export const addActivityTags = async (req, res) => {
     const tag = req.body;
+    if (!tag.name) {
+        return res.status(400).json({ message: 'Tag name is required' });
+    }
     const tagExists = await activityTag.findOne({ name: tag.name });
     if (tagExists) {
-        return res.status(409).json({ message: 'Tag already exists' });
+        return res.status(400).json({ message: 'Tag already exists' });
     }
     const newTag = new activityTag(tag);
     try {
         await newTag.save();
-        res.status(201).json(newTag);
+        return res.status(201).json(newTag);
     } catch (error) {
-        res.status(409).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 }
 
@@ -46,12 +52,17 @@ export const addActivityTags = async (req, res) => {
 // @route DELETE /api/activity/tag/delete/:id
 // @params id of activity tag
 export const deleteActivityTag = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name;
     try {
-        const deletedTag = await activityTag.findByIdAndDelete(id);
-        res.status(200).json(deletedTag);
+        console.log(name);
+        const deletedTag = await activityTag.findOneAndDelete({ name: name });
+        console.log(deletedTag);
+        if (deletedTag === null) {
+            return res.status(404).json({ message: 'Tag not found' });
+        }
+        return res.status(200).json(deletedTag);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -60,11 +71,20 @@ export const deleteActivityTag = async (req, res) => {
 // @params id of activity tag
 // @Body { name }
 export const updateActivityTag = async (req, res) => {
-    const id = req.params.id;
+    const name = req.params.name
+    console.log(name);
+    console.log(req.body);
+    if (!req.body.name) {
+        return res.status(400).json({ message: 'Tag name is required' });
+    }
     try {
-        const updatedTag = await activityTag.findByIdAndUpdate(id, req.body, { new: true });
-        res.status(200).json(updatedTag);
+        const updatedTag = await activityTag.findOneAndUpdate({ name: name }, req.body, { new: true });
+        console.log(updatedTag);
+        if (updatedTag === null) {
+            return res.status(404).json({ message: 'Tag not found' });
+        }
+        return res.status(200).json(updatedTag);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }

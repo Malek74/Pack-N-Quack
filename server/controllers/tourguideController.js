@@ -5,7 +5,7 @@ import { usernameExists, emailExists } from './Helpers.js';
 //@route POST /api/tourGuide
 //@access Public
 export const createTourGuide = async (req, res) => {
-    const { email, username, password, mobile, experienceYears, previousWork } = req.body;
+    const { email, username, password } = req.body;
 
     const tourGuideExists = await emailExists(email);
 
@@ -25,11 +25,11 @@ export const createTourGuide = async (req, res) => {
     }
 
     try {
-        const newTourGuide = await tourGuide.create({ email: email, username, password, mobile, experienceYears, previousWork });
+        const newTourGuide = await tourGuide.create({ email: email, username, password });
 
-        res.status(201).json(newTourGuide);
+        return res.status(201).json(newTourGuide);
     } catch (error) {
-        res.status(409).json({ message: error.message });
+        return res.status(409).json({ message: error.message });
     }
 }
 

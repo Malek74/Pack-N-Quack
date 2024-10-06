@@ -1,24 +1,24 @@
 import activityModel from "../models/activitySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
+import { usernameExists, emailExists } from "./Helpers.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;
-    const advertiserExists = await advertiserModel.findOne({ email });
 
-    if (advertiserExists) {
-        return res.status(400).json({ message: "Advertiser already exists" });
+    const doesEmailExists = await emailExists(email);
+    if (doesEmailExists) {
+        return res.status(400).json({ message: "Email already exists" });
     }
 
-    const usernameExists = await advertiserModel.findOne({ username });
-
-    if (usernameExists) {
-        return res.status(400).json({ message: "Username already taken" });
+    const doesUsernameExists = await usernameExists(username);
+    if (doesUsernameExists) {
+        return res.status(400).json({ message: "Username already exists" });
     }
 
     const newAdvertiser = new advertiserModel({ email, username, password });
     try {
         const advertiser = await newAdvertiser.save();
-        res.status(200).json({ data: advertiser, message: "Advertiser created successfully" });
+        return res.status(200).json(advertiser);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -27,9 +27,9 @@ export const addAdvertiser = async (req, res) => {
 export const getAdvertisers = async (req, res) => {
     try {
         const advertisers = await advertiserModel.find({});
-        res.status(200).json(advertisers);
+        return res.status(200).json(advertisers);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
