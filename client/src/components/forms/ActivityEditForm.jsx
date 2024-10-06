@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -27,26 +26,44 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogClose
 } from "@/components/ui/dialog"
 import { Pencil } from "lucide-react"
 
-export default function ActivityEditForm({ type }, props) {
+export default function ActivityEditForm(props) {
 
+    const [discounts, setDiscounts] = useState([""]);  // State to track multiple discounts
     const [categories, setCategories] = useState([]);
+    const [selectedPriceType, setSelectedPriceType] = useState(props.priceType);
+    const [tags, setTags] = useState([]);
 
-    useEffect(() => {
-        axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
-            setCategories(response.data);
-        }).catch((error) => {
+    const fetchData = async () => {
+        try {
+            const fetchedTags = await axios.get("/api/activity/tag");
+            const fetchedCategories = await axios.get("/api/activity/category");
+            setTags(fetchedTags.data);
+            setCategories(fetchedCategories.data);
+        } catch (error) {
             console.error(error);
-        })
-    }, []);
+        }
+    };
 
+    const addDiscountField = () => {
+        setDiscounts([...discounts, ""]);  // Add a new empty discount input
+    };
+
+    const removeDiscountField = (index) => {
+        const updatedDiscounts = discounts.filter((_, i) => i !== index);
+        setDiscounts(updatedDiscounts);
+    };
+
+    const handleDiscountChange = (index, value) => {
+        const updatedDiscounts = [...discounts];
+        updatedDiscounts[index] = value;
+        setDiscounts(updatedDiscounts);
+    };
 
     const activityForm = z.object({
         activityName: z.string().min(1, { message: "Name is required" }),
@@ -54,10 +71,13 @@ export default function ActivityEditForm({ type }, props) {
         location: z.string(),
         googlemaps: z.string(),
         price: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        minPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        maxPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        priceType: z.string(),
         category: z.string(),
         tags: z.string(),
         booking: z.string(),
-        discount: z.string()
+        discount: z.array(z.string()).optional(),  // Updated to handle multiple discounts
 
 
     });
@@ -69,10 +89,13 @@ export default function ActivityEditForm({ type }, props) {
             location: "",
             googlemaps: "",
             price: "",
+            minPrice: "",
+            maxPrice: "",
+            priceType: "",
             category: "",
             tags: "",
             booking: "",
-            discount: ""
+            discount: [""],
         },
     });
 
@@ -80,6 +103,8 @@ export default function ActivityEditForm({ type }, props) {
     function onSubmit(values) {
         { console.log("NEW ACTIVITY FORM SUBMITTED") }
         console.log(values);
+        console.log("Discounts: ", discounts);
+
 
 
     }
@@ -87,13 +112,13 @@ export default function ActivityEditForm({ type }, props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="bg-transparent" ><Pencil /></Button>
+                <Button onClick={() => fetchData()} className="bg-transparent" ><Pencil /></Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{props.task}</DialogTitle>
                     <DialogDescription>
-                        Make changes to you activity here. Click save when you're done.
+                        Make changes to your activity here. Click save when you are done.
                     </DialogDescription>
                 </DialogHeader>
                 <Form  {...form}>
@@ -114,7 +139,7 @@ export default function ActivityEditForm({ type }, props) {
                         <FormField
                             control={form.control}
                             name="time"
-                            render={({ field }) => (
+                            render={() => (
                                 <FormItem>
                                     <FormLabel>Date & Time</FormLabel>
                                     <FormControl>
@@ -139,12 +164,13 @@ export default function ActivityEditForm({ type }, props) {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="googlemaps"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Google Maps's Link</FormLabel>
+                                    <FormLabel>Google Maps Link</FormLabel>
                                     <FormControl>
                                         <Input placeholder={props.mapsSrc} {...field} />
                                     </FormControl>
@@ -154,17 +180,76 @@ export default function ActivityEditForm({ type }, props) {
                         />
                         <FormField
                             control={form.control}
-                            name="price"
+                            name="priceType"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Ticket's Price</FormLabel>
+                                    <FormLabel>Price Type</FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.price} {...field} />
+                                        <Select onValueChange={(value) => {
+                                            field.onChange(value);
+                                            setSelectedPriceType(value);  // Set the selected price type
+                                        }}>
+                                            <SelectTrigger className="w-48">
+                                                <SelectValue placeholder={props.priceType} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="fixed">Fixed</SelectItem>
+                                                <SelectItem value="range">Range</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
+                        {/* Conditionally render based on priceType */}
+                        {selectedPriceType === "fixed" && (
+                            <FormField
+                                control={form.control}
+                                name="price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Ticket Price</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder={props.price} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {selectedPriceType === "range" && (
+                            <>
+                                <FormField
+                                    control={form.control}
+                                    name="minPrice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Min Price</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder={props.minPrice} {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="maxPrice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Max Price</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder={props.maxPrice} {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
+                        )}
 
                         <FormField
                             control={form.control}
@@ -181,8 +266,6 @@ export default function ActivityEditForm({ type }, props) {
                                                 {categories.map((category) => (
                                                     <SelectItem value={category.name} key={category._id}>{category.name}</SelectItem>
                                                 ))}
-                                                <SelectItem value="Concert">Concert</SelectItem>
-                                                <SelectItem value="Theatre">Theatre</SelectItem>
 
                                             </SelectContent>
                                         </Select>
@@ -204,12 +287,7 @@ export default function ActivityEditForm({ type }, props) {
                                             onRemove={function noRefCheck() { }}
                                             onSearch={function noRefCheck() { }}
                                             onSelect={function noRefCheck() { }}
-                                            options={[
-                                                'Concert',
-                                                'Entertainment',
-                                                'Theatre',
-
-                                            ]}
+                                            options={tags.map(tag => tag.name)}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -239,19 +317,43 @@ export default function ActivityEditForm({ type }, props) {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="discount"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Special Discount</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder={props.discount} {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {discounts.map((discount, index) => (
+                            <FormField
+                                key={index}
+                                control={form.control}
+                                name={`discount[${index}]`}
+                                render={() => (
+                                    <FormItem>
+                                        <FormLabel>Special Discount {index + 1}</FormLabel>
+                                        <FormControl>
+                                            <div className="flex space-x-2">
+                                                <Input
+                                                    value={discount}
+                                                    onChange={(e) => handleDiscountChange(index, e.target.value)}
+                                                    placeholder="Discount"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => removeDiscountField(index)}
+                                                    className="bg-red-500 hover:bg-red-600"
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+
+                        <Button
+                            type="button"
+                            onClick={addDiscountField}
+                            className="bg-skyblue w-min hover:bg-[#28788c]"
+                        >
+                            Add Discount
+                        </Button>
 
                         <Button className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
                     </form>

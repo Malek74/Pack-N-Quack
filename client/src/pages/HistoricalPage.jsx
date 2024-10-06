@@ -1,17 +1,45 @@
-import React, { useState } from "react"
 import HistoricalCard from "@/components/HistoricalCard"
 import Historicalbackground from "../images/Italy.jpg"
 import pyramids from "../images/Pyramids.jpeg"
 import egyptianmuseum from "../images/egyptianmuseum.jpg"
-// import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
-import CreatePlace from "@/components/CreatePlace"
-import { Button } from "@/components/ui/button"
 import CreateTag from "@/components/CreateTag"
 import PlaceForm from "@/components/forms/PlaceForm"
 import CreateDialog from "@/components/CreateDialog"
+import { useState, useEffect } from "react"
 
 export default function Historical() {
+
+    const [places, setPlaces] = useState([]);
+    const [placeDeleted, setPlaceDeleted] = useState();
+
+
+    const deletePlace = async (id) => {
+        try {
+            const response = await axios.delete(`/api/place/delete/${id}`);
+            console.log('Delete successful:', response.data);
+            setPlaceDeleted(response.data);
+        } catch (error) {
+            console.error('Error deleting activity:', error);
+        }
+    };
+
+
+    useEffect(() => {
+        const fetchActivites = async () => {
+            try {
+                const response = await axios.get("/api/activity");
+                setPlaces(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchActivites()
+
+    }, [placeDeleted]);
+
+
 
     return (
 

@@ -10,17 +10,17 @@ export default function Header() {
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
 
-  const whatToDoMenuItems = [
-    { label: "Itineraries", path: "/itineraries" },
-    { label: "Activities", path: "/activities" },
-  ];
+  // const whatToDoMenuItems = [
+  //   { label: "Itineraries", path: "/itineraries" },
+  //   { label: "Activities", path: "/activities" },
+  // ];
 
-  const user = "admin"
+  // const user = "admin"
 
-  const Tourists = [
-    { label: "historicalTourists", path: "/historicalTourists" },
-    { label: "activitiesTourist", path: "/activitiesTourists" },
-  ];
+  // const Tourists = [
+  //   { label: "historicalTourists", path: "/historicalTourists" },
+  //   { label: "activitiesTourist", path: "/activitiesTourists" },
+  // ];
 
   return (
     <header className="container mx-auto flex py-4">

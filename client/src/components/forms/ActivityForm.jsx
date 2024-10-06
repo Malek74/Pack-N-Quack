@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -23,12 +22,13 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import BasicDateTimePicker from "../BasicDateTimePicker"
 import Multiselect from "multiselect-react-dropdown"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 
-export default function ActivityForm({ type }) {
+export default function ActivityForm() {
 
     const [categories, setCategories] = useState([]);
+    const [selectedPriceType, setSelectedPriceType] = useState();
+
 
     useEffect(() => {
         axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
@@ -45,6 +45,9 @@ export default function ActivityForm({ type }) {
         location: z.string(),
         googlemaps: z.string(),
         price: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        minPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        maxPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
+        priceType: z.string(),
         category: z.string(),
         tags: z.string(),
         booking: z.string(),
@@ -60,6 +63,9 @@ export default function ActivityForm({ type }) {
             location: "",
             googlemaps: "",
             price: "",
+            minPrice: "",
+            maxPrice: "",
+            priceType: "",
             category: "",
             tags: "",
             booking: "",
@@ -94,7 +100,7 @@ export default function ActivityForm({ type }) {
                 <FormField
                     control={form.control}
                     name="time"
-                    render={({ field }) => (
+                    render={() => (
                         <FormItem>
                             <FormLabel>Date & Time</FormLabel>
                             <FormControl>
@@ -124,7 +130,7 @@ export default function ActivityForm({ type }) {
                     name="googlemaps"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Google Maps's Link</FormLabel>
+                            <FormLabel>Google Maps Link</FormLabel>
                             <FormControl>
                                 <Input placeholder="https://maps.app.goo.gl/pqaptgj1zwxdnHNY9" {...field} />
                             </FormControl>
@@ -134,17 +140,76 @@ export default function ActivityForm({ type }) {
                 />
                 <FormField
                     control={form.control}
-                    name="price"
+                    name="priceType"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Ticket's Price</FormLabel>
+                            <FormLabel>Price Type</FormLabel>
                             <FormControl>
-                                <Input placeholder="EGP 50" {...field} />
+                                <Select onValueChange={(value) => {
+                                    field.onChange(value);
+                                    setSelectedPriceType(value);  // Set the selected price type
+                                }}>
+                                    <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="Select Price Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="fixed">Fixed</SelectItem>
+                                        <SelectItem value="range">Range</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
+
+                {/* Conditionally render based on priceType */}
+                {selectedPriceType === "fixed" && (
+                    <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Ticket Price</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="EGP 250" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
+
+                {selectedPriceType === "range" && (
+                    <>
+                        <FormField
+                            control={form.control}
+                            name="minPrice"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Min Price</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="EGP 500" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="maxPrice"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Max Price</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="EGP 2500" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </>
+                )}
 
                 <FormField
                     control={form.control}
@@ -174,7 +239,7 @@ export default function ActivityForm({ type }) {
                 <FormField
                     control={form.control}
                     name="tags"
-                    render={({ field }) => (
+                    render={() => (
                         <FormItem>
                             <FormLabel>Tags</FormLabel>
                             <FormControl>
@@ -200,7 +265,7 @@ export default function ActivityForm({ type }) {
                 <FormField
                     control={form.control}
                     name="booking"
-                    render={({ field }) => (
+                    render={() => (
                         <FormItem>
                             <FormLabel>Booking</FormLabel>
                             <FormControl>
