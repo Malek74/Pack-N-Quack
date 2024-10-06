@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
 const tagSchema = new Schema({
-   
+
     name_tag: {
         type: String,
         required: true,
     },
-    options: {
+    option: {
         type: String,
-        required: true, 
+        required: true,
     },
 
 });

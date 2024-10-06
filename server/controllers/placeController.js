@@ -8,64 +8,38 @@ export const createPlace = async (req, res) => {
     const {
         name,
         description,
-        pictures,
         location,
+        googleMapLink,
         opening_hour,
-        ticket_price_native,
-        ticket_price_foreigner,
-        ticket_price_student,
-        tags
+        tickets,
+        tags,
+        coverImagePath
     } = req.body;
 
     try {
         // Check for location and name duplicates 
         const existingPlace = await Places.findOne({
-            location: location
+            googleMapLink: googleMapLink
         });
 
         if (existingPlace) {
-            const messages = [];
-            if (existingPlace.location === location) {
-                messages.push("A place with this location already exists.");
-            }
-
-            return res.status(400).json({ message: messages.join(' ') });
+            return res.status(400).json({ message: "A place with this location already exists." });
         }
-
-        const createdTags = [];
-        // Loop through tags array to validate and store them
-        for (const tag of tags) {
-            // Check if the tag and its options already exist to restrict TG
-            const existingTag = await Tag.findOne({
-                name_tag: tag.name_tag,
-                options: { $in: tag.options }  // Ensure option exists within the tag
-            });
-
-            if (!existingTag) {
-                return res.status(400).json({
-                    message: `The tag "${tag.name_tag}" with option "${tag.options}" does not exist. Please select from existing options.`
-                });
-            }
-
-            createdTags.push(existingTag);
-        }
-
 
         const newPlace = await Places.create({
             name,
             description,
-            pictures,
             location,
+            googleMapLink,
             opening_hour,
-            ticket_price_native,
-            ticket_price_foreigner,
-            ticket_price_student,
-            tags: createdTags.map(tag => tag._id),
+            tickets,
+            tags,
+            coverImagePath
         });
 
-        res.status(201).json(newPlace);
+        return res.status(201).json(newPlace);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 

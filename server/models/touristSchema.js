@@ -14,6 +14,10 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
+    name: {
+        type: String,
+        required: true,
+    },
     mobile: {
         type: String,
         required: true,

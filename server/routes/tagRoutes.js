@@ -35,7 +35,7 @@ const router = express.Router();
 
 // Routes for tag management
 router.post('/', createTag); // Create a new tag
-router.delete('/:name_tag', deleteTag); // Delete a tag by name_tag
+router.delete('/', deleteTag); // Delete a tag by name_tag
 router.get('/', getAllTags); // Get all tags
 router.put('/', updateTag); // Modify an option in a tag by name_tag
 

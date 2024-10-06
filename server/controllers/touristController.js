@@ -4,29 +4,27 @@ import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
+import { emailExists, usernameExists } from "./Helpers.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
-    const { email, username, password, mobile, dob, nationality, job, wallet } = req.body;
+    const { email, username, password, mobile, dob, nationality, job, name } = req.body;
 
     try {
         // Check if the email or username is already taken by any user
-        const isEmailOrUsernameTaken = await Promise.all([
-            Tourist.findOne({ $or: [{ email }, { username }] }),
-            TourGuide.findOne({ $or: [{ email }, { username }] }),
-            TouristGovernor.findOne({ username }),
-            Seller.findOne({ $or: [{ email }, { username }] }),
-            Admin.findOne({ username }),
-            Advertiser.findOne({ $or: [{ email }, { username }] }),
-        ]);
+        const isEmailTaken = await emailExists(email);
+        const isUsernameTaken = await usernameExists(username);
 
         // Check if any result exists in any user
-        if (isEmailOrUsernameTaken.some(user => user)) {
-            return res.status(400).json({ message: "Email or username already taken." });
+        if (isEmailTaken) {
+            return res.status(400).json({ message: "Email is already taken." });
+        }
+        if (isUsernameTaken) {
+            return res.status(400).json({ message: "Username is already taken." });
         }
 
         // If both email and username are unique, create a new tourist
-        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, job, wallet });
+        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, job, name });
         res.status(200).json(newTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -35,15 +33,15 @@ export const createTourist = async (req, res) => {
 
 // Tourist view Profile
 export const getTourist = async (req, res) => {
-    const name = req.params;
-    console.log(name);
+    const username = req.params;
+    console.log(username);
+
     try {
         //Find by email as it is unique identifier
-        const touristProfile = await Tourist.findOne(name);
-
-        res.status(200).json(touristProfile);
+        const touristProfile = await Tourist.findOne(username);
+        return res.status(200).json(touristProfile);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 };
 
@@ -53,48 +51,49 @@ export const getTourist = async (req, res) => {
 export const getTourists = async (req, res) => {
     try {
         const tourists = await Tourist.find();
-        res.status(200).json(tourists);
+        return res.status(200).json(tourists);
 
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 
 }
 // Tourist update data by username
 export const updateTourist = async (req, res) => {
     // DOB, Username, Wallet are not changable
-    const { password, mobile, nationality, job } = req.body;
+    const { password, mobile, nationality, job, name } = req.body;
     const { username } = req.params;
 
     try {
         // If a new email is being passed for update, check if it's already taken
         const newEmail = req.body.email;
-
-        if (newEmail) {
-            const isEmailTaken = await Promise.all([
-                Tourist.findOne({ email: newEmail }),
-                TourGuide.findOne({ email: newEmail }),
-                Seller.findOne({ email: newEmail }),
-                Advertiser.findOne({ email: newEmail }),
-            ]);
-
-            // If the new email is already taken, return an error
-            if (isEmailTaken.some(user => user)) {
-                return res.status(400).json({ message: "Email is already taken" });
-            }
+        console.log(newEmail);
+        const doesEmailExists = await emailExists(newEmail);
+        console.log(doesEmailExists);
+        if (doesEmailExists) {
+            return res.status(400).json({ message: "Email is already taken" });
         }
-
 
         const updatedTourist = await Tourist.findOneAndUpdate(
             { username },
-            { email: newEmail, password, mobile, nationality, job },
+            { email: newEmail, password, mobile, nationality, job, name },
             { new: true }
         );
-
-        res.status(200).json(updatedTourist);
+        return res.status(200).json(updatedTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+// Tourist delete by username
+export const deleteTourist = async (req, res) => {
+    const { username } = req.params;
 
+    try {
+        const tourist = await Tourist.findOneAndDelete({ username });
+        return res.status(200).json(tourist);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}

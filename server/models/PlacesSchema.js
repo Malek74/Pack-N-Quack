@@ -12,28 +12,47 @@ const placesSchema = new Schema({
     },
     pictures: {
         type: [String], // Array of strings for URLs or paths to pictures
+        default: []
+    },
+    coverImagePath: {
+        type: String,
         required: true,
+        default: "/images/Memo.png"
     },
     location: {
         type: String,
         required: true,
     },
-    opening_hour: {
-        type: String, // Can change to Date if specific times are needed
+    googleMapLink: {
+        type: String,
         required: true,
     },
-    ticket_price_native: {
-        type: Number, 
-        required: true,
-    },
-    ticket_price_foreigner: {
-        type: Number, 
-        required: true,
-    },
-    ticket_price_student: {
-        type: Number, 
-        required: true,
-    },
+    opening_hour: [{
+        day: {
+            type: String,
+            required: true
+        },
+        openTime: {
+            type: String,
+        },
+        closeTime: {
+            type: String,
+        },
+        isOpen: {
+            type: Boolean,
+            required: true
+        }
+    }],
+    tickets: [{
+        type: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true
+        }
+    }],
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }], // Reference to Tag schema
 });
 

@@ -10,6 +10,9 @@ import tourist from '../models/touristSchema.js';
 //@param username
 //@return boolean
 export const usernameExists = async (username) => {
+    if (username === undefined) {
+        return false;
+    }
     try {
         //check if user exists in tourist collection
         const touristExists = await tourist.findOne({ username: username });
@@ -68,6 +71,9 @@ export const usernameExists = async (username) => {
 //@param email
 //@return boolean
 export const emailExists = async (email) => {
+    if (email === undefined) {
+        return false;
+    }
     try {
         // Check if email exists in tourist collection
         const touristExists = await tourist.findOne({

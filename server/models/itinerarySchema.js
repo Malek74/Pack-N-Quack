@@ -12,10 +12,7 @@
 import mongoose from 'mongoose';
 import { Schema, model } from "mongoose";
 
-
-
 const itinerarySchema = new mongoose.Schema({
-
     name: {
         type: String,
         required: true,
@@ -32,7 +29,6 @@ const itinerarySchema = new mongoose.Schema({
             type: Number,
             required: true,
         },
-
         activities: [{
             name: {
                 type: String,

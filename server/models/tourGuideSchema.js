@@ -21,7 +21,6 @@ const tourGuideSchema = new Schema({
         type: Number,
     },
     previousWork: {
-
         title: {
             type: String,
         },

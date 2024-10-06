@@ -1,41 +1,28 @@
 import Tag from '../models/tagSchema.js';
 
-
+// Create Tag
 // Create Tag
 export const createTag = async (req, res) => {
-    const { name, options } = req.body;
+    const { name, option } = req.body;
     console.log(name);
-    console.log(options);
-
+    console.log(option);
 
     try {
-        //validate if tag already exists
-        const isTagExists = await Tag.findOne({ name_tag: name });
-
-        if (isTagExists) {
+        //validate that tag does not exist
+        const existingTag = await Tag.findOne({ name_tag: name, option: option });
+        if (existingTag) {
             return res.status(400).json({ message: "Tag already exists" });
         }
 
+        //create new tag
+        const createdTag = await Tag.create({
+            name_tag: name,
+            option: option
+        });
 
-        // Validate if 'options' is a non-empty array
-        if (!Array.isArray(options) || options.length === 0) {
-            return res.status(400).json({ message: "No options were entered" });
-        }
+        //return the created tag
+        return res.status(200).json(createdTag);
 
-        const createdTags = [];
-
-        // Loop through options and create a tag for each
-        for (const option of options) {
-            const createdTag = {};
-            createdTag.name_tag = name;
-            createdTag.options = option;
-            const newTag = await Tag.create(
-                createdTag
-            );
-            createdTags.push(newTag); // Add the created tag to the array
-        }
-
-        return res.status(201).json(createdTags);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -43,20 +30,19 @@ export const createTag = async (req, res) => {
 
 // Delete Tag
 export const deleteTag = async (req, res) => {
-    const { name_tag } = req.params; // Get the name_tag from the parameters
+    const { name, option } = req.body; // Get the name_tag from the parameters
+
+    //validate that tage exists 
+    const existingTag = await Tag.findOne({ name_tag: name, option: option });
+
+    if (!existingTag) {
+        return res.status(404).json({ message: "Tag not found" });
+    }
 
     try {
-        const deletedTag = await Tag.find({ name_tag: name_tag }); // Find and delete by name_tag
-        console.log(deletedTag);
-        if (deletedTag.length == 0) {
-            return res.status(404).json({ message: "Tag not found" });
-        }
-        for (const deletee of deletedTag) {
-            await Tag.findByIdAndDelete(deletee._id);
-        }
+        const deletedTag = await Tag.findOneAndDelete({ name_tag: name, option: option }); // Find and delete by name_tag
 
-
-        return res.status(200).json({ message: "Tag deleted successfully" });
+        return res.status(200).json(deletedTag);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -81,7 +67,7 @@ export const updateTag = async (req, res) => {
         for (const option of options) {
             const createdTag = {};
             createdTag.name_tag = name;
-            createdTag.options = option;
+            createdTag.option = option;
             const newTag = await Tag.create(
                 createdTag
             );
@@ -107,8 +93,19 @@ export const getAllTags = async (req, res) => {
             return res.status(404).json({ message: "No tags found." });
         }
 
+        // Group the tags by the 'name_tag' field
+        const groupedTags = tags.reduce((acc, tag) => {
+            // Check if the group already exists
+            if (!acc[tag.name_tag]) {
+                acc[tag.name_tag] = []; // Initialize the group if it doesn't exist
+            }
+            // Push the current tag's option into the respective group
+            acc[tag.name_tag].push(tag.option);
+            return acc;
+        }, {});
+
         // Respond with the retrieved tags
-        res.status(200).json(tags);
+        res.status(200).json(groupedTags); // Respond with the grouped tags (name_tag: tags);
     } catch (error) {
         // Log the error for debugging
         console.error("Error retrieving tags:", error.message);

@@ -3,7 +3,8 @@ import {
     createTourist,
     getTourist,
     updateTourist,
-    getTourists
+    getTourists,
+    deleteTourist
 } from '../controllers/touristController.js';
 
 
@@ -13,5 +14,6 @@ router.post('/', createTourist); // Create
 router.get('/:username', getTourist); // Read 
 router.put('/:username', updateTourist); // Update 
 router.get('/', getTourists)
+router.delete('/:username', deleteTourist);
 
 export default router;
