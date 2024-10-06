@@ -10,6 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 // import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { CheckIcon } from "lucide-react";
 
+
 import {
   Command,
   CommandEmpty,
@@ -39,7 +40,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PhoneInput } from "@/components/PhoneInput";
 import { SampleDatePicker } from "@/components/datepicker";
 
-export default function NewSellerForm() {
+export default function NewSellerForm(props) {
   const formSchema2 = z.object({
     username: z
       .string()
@@ -66,8 +67,13 @@ export default function NewSellerForm() {
   // 2.1 Define a submit handler for the Tourist form.
   function onSubmit2(values) {
     console.log(values); // Simulate account creation
+    props.submitFunction(values);
   }
+
+  
   return (
+
+
     <Form {...form2}>
       <form onSubmit={form2.handleSubmit(onSubmit2)} className="space-y-8">
         {/* Username Field */}
