@@ -28,31 +28,41 @@ export default function ActivityForm() {
 
     const [categories, setCategories] = useState([]);
     const [selectedPriceType, setSelectedPriceType] = useState();
-
+    const [tags, setTags] = useState([]);
 
     useEffect(() => {
-        axios.get('https://k0gfbwb4-8000.euw.devtunnels.ms/api/activity/category').then((response) => {
-            setCategories(response.data);
-        }).catch((error) => {
-            console.error(error);
-        })
+        const fetchData = async () => {
+            try {
+                const fetchedTags = await axios.get("/api/activity/tag");
+                const fetchedCategories = await axios.get("/api/activity/category");
+                setTags(fetchedTags.data);
+                setCategories(fetchedCategories.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }; fetchData();
     }, []);
+
+
+
+
+
+
 
 
     const activityForm = z.object({
         activityName: z.string().min(1, { message: "Name is required" }),
         time: z.string(),
-        location: z.string(),
-        googlemaps: z.string(),
-        price: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        minPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        maxPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        priceType: z.string(),
-        category: z.string(),
-        tags: z.string(),
-        booking: z.string(),
-        discount: z.string()
-
+        location: z.string().min(1, { message: "Location is required" }),
+        googlemaps: z.string().min(1, { message: "MapsLink is required" }),
+        price: z.coerce.number().min(1, { message: "Price must be a positive number." }),
+        minPrice: z.coerce.number().min(1, { message: "Price must be a positive number." }),
+        maxPrice: z.coerce.number().min(1, { message: "Price must be a positive number." }),
+        priceType: z.string().min(1, { message: "Please choose a type" }),
+        category: z.string().min(1, { message: "Please choose a type" }),
+        tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
+        booking: z.string().min(1, { message: "Please choose if booking is open or closed" }),
+        discount: z.string(),
 
     });
     const form = useForm({
@@ -73,12 +83,9 @@ export default function ActivityForm() {
         },
     });
 
-    // 2. Define a submit handler.
     function onSubmit(values) {
-        { console.log("NEW ACTIVITY FORM SUBMITTED") }
         console.log(values);
-
-
+        console.log("NEW ACTIVITY FORM SUBMITTED");
     }
 
     return (
@@ -100,11 +107,14 @@ export default function ActivityForm() {
                 <FormField
                     control={form.control}
                     name="time"
-                    render={() => (
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Date & Time</FormLabel>
                             <FormControl>
-                                <BasicDateTimePicker></BasicDateTimePicker>
+                                <BasicDateTimePicker
+                                    value={field.value} // Bind the value
+                                    onChange={(date) => field.onChange(date)} // Update form state
+                                />
                             </FormControl>
 
                             <FormMessage />
@@ -218,7 +228,12 @@ export default function ActivityForm() {
                         <FormItem>
                             <FormLabel>Category</FormLabel>
                             <FormControl>
-                                <Select>
+                                <Select
+                                    onValueChange={(value) => {
+                                        field.onChange(value);  // Pass the value to the form control
+                                        // console.log("Selected Category: ", value);  // Log the selected value
+                                    }}
+                                >
                                     <SelectTrigger className="w-max" onValueChange={field.onChange}>
                                         <SelectValue placeholder="Select a category" />
                                     </SelectTrigger>
@@ -226,8 +241,7 @@ export default function ActivityForm() {
                                         {categories.map((category) => (
                                             <SelectItem value={category.name} key={category._id}>{category.name}</SelectItem>
                                         ))}
-                                        <SelectItem value="Concert">Concert</SelectItem>
-                                        <SelectItem value="Theatre">Theatre</SelectItem>
+
 
                                     </SelectContent>
                                 </Select>
@@ -239,22 +253,24 @@ export default function ActivityForm() {
                 <FormField
                     control={form.control}
                     name="tags"
-                    render={() => (
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Tags</FormLabel>
                             <FormControl>
-                                <Multiselect className="w-min"
+                                <Multiselect
+                                    className="w-max"
                                     isObject={false}
-                                    onKeyPressFn={function noRefCheck() { }}
-                                    onRemove={function noRefCheck() { }}
-                                    onSearch={function noRefCheck() { }}
-                                    onSelect={function noRefCheck() { }}
-                                    options={[
-                                        'Concert',
-                                        'Entertainment',
-                                        'Theatre',
-
-                                    ]}
+                                    options={tags.map(tag => tag.name)}  // Populate options with tag names
+                                    onSelect={(selectedList) => {
+                                        // Update the field value with the selected tags array
+                                        field.onChange(selectedList);
+                                        // console.log("Selected Tags: ", selectedList);
+                                    }}
+                                    onRemove={(selectedList) => {
+                                        // Update the field value when tags are removed
+                                        field.onChange(selectedList);
+                                        // console.log("Updated Tags After Removal: ", selectedList);
+                                    }}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -265,11 +281,15 @@ export default function ActivityForm() {
                 <FormField
                     control={form.control}
                     name="booking"
-                    render={() => (
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Booking</FormLabel>
                             <FormControl>
-                                <Select>
+                                <Select
+                                    onValueChange={(value) => {
+                                        field.onChange(value);  // Pass the value to the form control
+                                    }}
+                                >
                                     <SelectTrigger className="w-max">
                                         <SelectValue placeholder="Is booking open?" />
                                     </SelectTrigger>
@@ -297,7 +317,7 @@ export default function ActivityForm() {
                         </FormItem>
                     )}
                 />
-                <Button className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
+                <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
             </form>
         </Form>
     )

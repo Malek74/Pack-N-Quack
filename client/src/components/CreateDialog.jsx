@@ -2,7 +2,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -18,7 +17,7 @@ export default function CreateDialog({ title, form }) {
                 <Button className="bg-gold hover:bg-goldhover text-white hover:text-white" variant="outline"> Add {title}</Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-auto max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Create a new {title}</DialogTitle>
                     <DialogDescription>

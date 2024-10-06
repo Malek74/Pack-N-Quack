@@ -11,6 +11,7 @@ export default function Activities() {
 
     const [activities, setActivities] = useState([]);
     const [activityDeleted, setActivityDeleted] = useState();
+    const [activityUpdated, setActivityUpdated] = useState();
 
 
     const deleteActivity = async (id) => {
@@ -23,12 +24,22 @@ export default function Activities() {
         }
     };
 
+    const editActivity = async (id, values) => {
+        try {
+            const response = await axios.put(`/api/activity/update/${id}`, values);
+            console.log('Updated successfully:', response.data);
+            setActivityUpdated(response.data);
+        } catch (error) {
+            console.error('Error updating activity:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchActivites = async () => {
             try {
                 const response = await axios.get("/api/activity");
                 setActivities(response.data);
+
             } catch (error) {
                 console.error(error);
             }
@@ -36,7 +47,7 @@ export default function Activities() {
 
         fetchActivites()
 
-    }, [activityDeleted]);
+    }, [activityDeleted, activityUpdated]);
 
 
 
@@ -78,6 +89,7 @@ export default function Activities() {
                     rating={activity.ratings.averageRating}
                     activityID={activity._id}
                     deleteActivityFunction={deleteActivity}
+                    updateActivityFunction={editActivity}
                 />))}
 
 
