@@ -51,7 +51,7 @@ export default function ActivityEditForm(props) {
     };
 
     const addDiscountField = () => {
-        setDiscounts([...discounts, ""]);  // Add a new empty discount input
+        setDiscounts([...discounts, { value: "" }]);
     };
 
     const removeDiscountField = (index) => {
@@ -61,10 +61,20 @@ export default function ActivityEditForm(props) {
 
     const handleDiscountChange = (index, value) => {
         const updatedDiscounts = [...discounts];
-        updatedDiscounts[index] = value;
+        updatedDiscounts[index].value = value;
         setDiscounts(updatedDiscounts);
     };
 
+
+    function onSubmit(values) {
+        console.log("NEW ACTIVITY FORM SUBMITTED")
+        values.discounts = discounts;
+        console.log(values);
+        console.log("Discounts: ", discounts);
+
+
+
+    }
     const activityForm = z.object({
         activityName: z.string().min(1, { message: "Name is required" }),
         time: z.string(),
@@ -75,10 +85,11 @@ export default function ActivityEditForm(props) {
         maxPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
         priceType: z.string(),
         category: z.string(),
-        tags: z.string(),
+        tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
         booking: z.string(),
-        discount: z.array(z.string()).optional(),  // Updated to handle multiple discounts
-
+        discounts: z.array(z.object({
+            value: z.string().min(1, { message: "Discount value is required" })
+        }))
 
     });
     const form = useForm({
@@ -95,19 +106,12 @@ export default function ActivityEditForm(props) {
             category: "",
             tags: "",
             booking: "",
-            discount: [""],
+            discounts: [''],
         },
     });
 
     // 2. Define a submit handler.
-    function onSubmit(values) {
-        { console.log("NEW ACTIVITY FORM SUBMITTED") }
-        console.log(values);
-        console.log("Discounts: ", discounts);
 
-
-
-    }
 
     return (
         <Dialog>
@@ -258,13 +262,18 @@ export default function ActivityEditForm(props) {
                                 <FormItem>
                                     <FormLabel>Category</FormLabel>
                                     <FormControl>
-                                        <Select>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                field.onChange(value);  // Pass the value to the form control
+                                                // console.log("Selected Category: ", value);  // Log the selected value
+                                            }}
+                                        >
                                             <SelectTrigger className="w-48" onValueChange={field.onChange}>
-                                                <SelectValue placeholder={props.category} />
+                                                <SelectValue placeholder={props.category}  {...field} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {categories.map((category) => (
-                                                    <SelectItem value={category.name} key={category._id}>{category.name}</SelectItem>
+                                                    <SelectItem value={category.name} key={category._id}>{category.name} </SelectItem>
                                                 ))}
 
                                             </SelectContent>
@@ -281,13 +290,20 @@ export default function ActivityEditForm(props) {
                                 <FormItem>
                                     <FormLabel>Tags</FormLabel>
                                     <FormControl>
-                                        <Multiselect className="w-max"
+                                        <Multiselect
+                                            className="w-max"
                                             isObject={false}
-                                            onKeyPressFn={function noRefCheck() { }}
-                                            onRemove={function noRefCheck() { }}
-                                            onSearch={function noRefCheck() { }}
-                                            onSelect={function noRefCheck() { }}
-                                            options={tags.map(tag => tag.name)}
+                                            options={tags.map(tag => tag.name)}  // Populate options with tag names
+                                            onSelect={(selectedList) => {
+                                                // Update the field value with the selected tags array
+                                                field.onChange(selectedList);
+                                                // console.log("Selected Tags: ", selectedList);
+                                            }}
+                                            onRemove={(selectedList) => {
+                                                // Update the field value when tags are removed
+                                                field.onChange(selectedList);
+                                                // console.log("Updated Tags After Removal: ", selectedList);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -302,7 +318,11 @@ export default function ActivityEditForm(props) {
                                 <FormItem>
                                     <FormLabel>Booking</FormLabel>
                                     <FormControl>
-                                        <Select>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                field.onChange(value);  // Pass the value to the form control
+                                            }}
+                                        >
                                             <SelectTrigger className="w-48">
                                                 <SelectValue placeholder={props.booking} />
                                             </SelectTrigger>
@@ -321,14 +341,14 @@ export default function ActivityEditForm(props) {
                             <FormField
                                 key={index}
                                 control={form.control}
-                                name={`discount[${index}]`}
+                                name={`discounts[${index}].value`}
                                 render={() => (
                                     <FormItem>
                                         <FormLabel>Special Discount {index + 1}</FormLabel>
                                         <FormControl>
                                             <div className="flex space-x-2">
                                                 <Input
-                                                    value={discount}
+                                                    value={discount.value}
                                                     onChange={(e) => handleDiscountChange(index, e.target.value)}
                                                     placeholder="Discount"
                                                 />
@@ -346,7 +366,6 @@ export default function ActivityEditForm(props) {
                                 )}
                             />
                         ))}
-
                         <Button
                             type="button"
                             onClick={addDiscountField}
@@ -355,7 +374,7 @@ export default function ActivityEditForm(props) {
                             Add Discount
                         </Button>
 
-                        <Button className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
+                        <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
                     </form>
                 </Form>
             </DialogContent>
