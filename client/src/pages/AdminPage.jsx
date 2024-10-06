@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AdminDashboard from "@/components/AdminDashboard";
-import CreateDialog from "@/components/CreateDialog";
 import ActivityCategory from "@/components/ActivityCategory";
 import ItineraryTags from "@/components/ItineraryTags";
 import ActivityTags from "@/components/ActivityTags";
 import { Link } from "react-router-dom";
 import {
   Bell,
-  CircleUser,
-  Users,
   Package,
-  LineChart,
+  Tags,
   Package2,
+  TableOfContents,
+  UserRoundPlus,
+  UserRoundPen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NewUserForm from "@/components/forms/NewUserForm";
+import AdminsList from "@/components/AdminsList";
+import AdminProducts from "@/components/AdminProducts";
+import GovernorsList from "@/components/GovernorsList";
 export default function AdminPage() {
   const [activeSection, setActiveSection] = useState("dashboard");
 
@@ -24,27 +26,17 @@ export default function AdminPage() {
       case "dashboard":
         return <AdminDashboard />;
       case "tourismGovernors":
-        return (
-          <CreateDialog
-            title="Tourism Governor"
-            type="gov"
-            form={<NewUserForm type="gov" />}
-          />
-        );
+        return <GovernorsList />;
       case "admins":
-        return (
-          <CreateDialog
-            title="Admin"
-            type="admin"
-            form={<NewUserForm type="admin" />}
-          />
-        );
+        return <AdminsList />;
       case "activityCategories":
         return <ActivityCategory />;
       case "activityTags":
         return <ActivityTags />;
       case "itineraryTags":
         return <ItineraryTags />;
+      case "adminProducts":
+        return <AdminProducts />;
       default:
         return <AdminDashboard />;
     }
@@ -76,7 +68,7 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Users className="h-4 w-4" />
+                <UserRoundPen className="h-4 w-4" />
                 Manage Accounts
               </button>
 
@@ -88,7 +80,7 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <CircleUser className="h-4 w-4" />
+                <UserRoundPlus className="h-4 w-4" />
                 Tourism Governors
               </button>
 
@@ -100,7 +92,7 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Users className="h-4 w-4" />
+                <UserRoundPlus className="h-4 w-4" />
                 Admins
               </button>
 
@@ -112,7 +104,7 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Package className="h-4 w-4" />
+                <TableOfContents className="h-4 w-4" />
                 Activity Categories
               </button>
 
@@ -124,7 +116,7 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <LineChart className="h-4 w-4" />
+                <Tags className="h-4 w-4" />
                 Activity Tags
               </button>
               <button
@@ -135,8 +127,19 @@ export default function AdminPage() {
                     : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <LineChart className="h-4 w-4" />
+                <Tags className="h-4 w-4" />
                 Itinerary Tags
+              </button>
+              <button
+                onClick={() => setActiveSection("adminProducts")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeSection === "activityCategories"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Package className="h-4 w-4" />
+                Products
               </button>
             </nav>
           </div>

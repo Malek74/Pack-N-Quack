@@ -118,12 +118,14 @@ export default function MarketplacePage() {
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for a product.."}/>
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder={"Look for a product.."}
+        />
       </div>
 
-     
       <div className="flex justify-center items-center mt-[-60px] w-full">
-        
         <div className="w-[60%] bg-white rounded-lg p-4 shadow-lg flex justify-center items-center">
           <Input
             placeholder="Search product name..."
@@ -137,9 +139,6 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      <div className="flex place-content-end mr-8">
-        <CreateDialog title="Product" form={<ProductForm />} />
-      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product, index) => (

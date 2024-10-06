@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import ItineraryCard from './components/ItineraryCard';
-import Banner from './components/BannerV2';
-import BannerImage from '../assets/romanBanner.jpg';
-import { Button } from '@/components/ui/button';
-import AddActivity from './components/AddActivity';
+import React, { useState } from "react";
+import ItineraryCard from "./components/ItineraryCard";
+import Banner from "./components/BannerV2";
+import BannerImage from "../assets/romanBanner.jpg";
+import { Button } from "@/components/ui/button";
+import AddActivity from "./components/AddActivity";
 const ItinerariesPage = () => {
   const [itineraries, setItineraries] = useState([
     {
@@ -16,8 +16,10 @@ const ItinerariesPage = () => {
       point3: "Beaches",
       language: "English",
       accessibility: "wheel chair",
-      pickUpLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row"
       days: [
         {
@@ -63,8 +65,10 @@ const ItinerariesPage = () => {
       point3: "Coastal Views",
       language: "English",
       accessibility: "wheel chair",
-      pickUpLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row-reverse"
       days: [
         {
@@ -110,8 +114,10 @@ const ItinerariesPage = () => {
       point3: "Natural Wonders",
       language: "English",
       accessibility: "wheel chair",
-      pickUpLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row"
       days: [
         {
@@ -157,8 +163,10 @@ const ItinerariesPage = () => {
       point3: "Fjord Exploration",
       language: "Arabic",
       accessibility: "wheel chair",
-      pickUpLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row-reverse"
       days: [
         {
@@ -204,8 +212,10 @@ const ItinerariesPage = () => {
       point3: "Cultural Immersion",
       language: "Arabic",
       accessibility: "wheel chair",
-      pickUpLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation: "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       days: [
         {
           day: 1,
@@ -243,16 +253,16 @@ const ItinerariesPage = () => {
   ]);
 
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    point1: '',
-    point2: '',
-    point3: '',
-    language:'',
-    accessibility: '',
-    pickUpLocation: '',
-    dropOffLocation: '',
+    title: "",
+    description: "",
+    price: "",
+    point1: "",
+    point2: "",
+    point3: "",
+    language: "",
+    accessibility: "",
+    pickUpLocation: "",
+    dropOffLocation: "",
     days: [],
   });
 
@@ -263,7 +273,7 @@ const ItinerariesPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -283,7 +293,20 @@ const ItinerariesPage = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', point1: '', point2: '', point3: '', language:'', accessibility:'', pickUpLocation:'', dropOffLocation:'', days:[],  direction: 'flex-row' });
+    setFormData({
+      title: "",
+      description: "",
+      price: "",
+      point1: "",
+      point2: "",
+      point3: "",
+      language: "",
+      accessibility: "",
+      pickUpLocation: "",
+      dropOffLocation: "",
+      days: [],
+      direction: "flex-row",
+    });
     setShowModal(false);
     setIsUpdating(false);
     setCurrentIndex(null);
@@ -303,126 +326,127 @@ const ItinerariesPage = () => {
   };
 
   return (
-    <div className='flex flex-col gap-y-10 py-8 px-[5.6rem]'>
+    <div className="flex flex-col gap-y-10 py-8 px-[5.6rem]">
       <Banner background={BannerImage} name="Itineraries" />
-      <div className='w-full flex justify-center'>
-      <Button onClick={() => setShowModal(true)} className="my-4 bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400">
-        Add Itinerary
-      </Button>
+      <div className="w-full flex justify-center">
+        <Button
+          onClick={() => setShowModal(true)}
+          className="my-4 bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400"
+        >
+          Add Itinerary
+        </Button>
       </div>
-
-     
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h3 className="font-bold mb-2">{isUpdating ? 'Update Itinerary' : 'Add New Itinerary'}</h3>
-            <input 
-              type="text" 
-              name="title" 
-              value={formData.title} 
-              onChange={handleInputChange} 
-              placeholder="Title" 
+            <h3 className="font-bold mb-2">
+              {isUpdating ? "Update Itinerary" : "Add New Itinerary"}
+            </h3>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Title"
               className="mb-2 p-2 border rounded w-full"
             />
-            <textarea 
-              name="description" 
-              value={formData.description} 
-              onChange={handleInputChange} 
-              placeholder="Description" 
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Description"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="number" 
-              name="price" 
-              value={formData.price} 
-              onChange={handleInputChange} 
-              placeholder="Price" 
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleInputChange}
+              placeholder="Price"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point1" 
-              value={formData.point1} 
-              onChange={handleInputChange} 
-              placeholder="Point 1" 
+            <input
+              type="text"
+              name="point1"
+              value={formData.point1}
+              onChange={handleInputChange}
+              placeholder="Point 1"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point2" 
-              value={formData.point2} 
-              onChange={handleInputChange} 
-              placeholder="Point 2" 
+            <input
+              type="text"
+              name="point2"
+              value={formData.point2}
+              onChange={handleInputChange}
+              placeholder="Point 2"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point3" 
-              value={formData.point3} 
-              onChange={handleInputChange} 
-              placeholder="Point 3" 
+            <input
+              type="text"
+              name="point3"
+              value={formData.point3}
+              onChange={handleInputChange}
+              placeholder="Point 3"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="language" 
-              value={formData.language} 
-              onChange={handleInputChange} 
-              placeholder="Language" 
+            <input
+              type="text"
+              name="language"
+              value={formData.language}
+              onChange={handleInputChange}
+              placeholder="Language"
               className="mb-2 p-2 border rounded w-full"
             />
-             <input 
-              type="text" 
-              name="accessibility" 
-              value={formData.accessibility} 
-              onChange={handleInputChange} 
-              placeholder="Accessibility" 
+            <input
+              type="text"
+              name="accessibility"
+              value={formData.accessibility}
+              onChange={handleInputChange}
+              placeholder="Accessibility"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="pickUpLocation" 
-              value={formData.pickUpLocation} 
-              onChange={handleInputChange} 
-              placeholder="Pick up location" 
+            <input
+              type="text"
+              name="pickUpLocation"
+              value={formData.pickUpLocation}
+              onChange={handleInputChange}
+              placeholder="Pick up location"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="dropOffLocation" 
-              value={formData.dropOffLocation} 
-              onChange={handleInputChange} 
-              placeholder="Drop off location " 
+            <input
+              type="text"
+              name="dropOffLocation"
+              value={formData.dropOffLocation}
+              onChange={handleInputChange}
+              placeholder="Drop off location "
               className="mb-2 p-2 border rounded w-full"
             />
 
-          
+            <div className="flex flex-row justify-between">
+              <Button onClick={isUpdating ? updateItinerary : addItinerary}>
+                {isUpdating ? "Update Itinerary" : "Add Itinerary"}
+              </Button>
 
-          <div className='flex flex-row justify-between'>
-          <Button
-              onClick={isUpdating ? updateItinerary : addItinerary} 
-          >
+              <AddActivity
+                className
+                showModal={showActivityModal}
+                setShowModal={setShowActivityModal}
+              />
 
-              {isUpdating ? 'Update Itinerary' : 'Add Itinerary'}
-            </Button>
-
-          <AddActivity className showModal={showActivityModal} setShowModal={setShowActivityModal} />
-           
-            <Button
-              onClick={resetForm} 
-              className="ml-2 bg-gray-500 hover:bg-gray-400"
-            >
-              Cancel
-            </Button>
-          </div>
-            
+              <Button
+                onClick={resetForm}
+                className="ml-2 bg-gray-500 hover:bg-gray-400"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
       {itineraries.map((itinerary, index) => (
-        <ItineraryCard 
+        <ItineraryCard
           key={index}
           direction={index % 2 === 0 ? "flex-row" : "flex-row-reverse"}
           title={itinerary.title}
@@ -439,7 +463,6 @@ const ItinerariesPage = () => {
           onUpdate={() => openUpdateModal(index)} // Pass the update function
         />
       ))}
-       
     </div>
   );
 };

@@ -7,56 +7,78 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
-export default function AdminDashboard() {
-  const accounts = [
-    { id: 1, email: "mariam@gmail.com", username: "maria" },
-    { id: 2, email: "ramnito@gmail.com", username: "ramito" },
-    { id: 3, email: "manjo@gmail.com", username: "manjp" },
-    { id: 4, email: "amir@gmail.com", username: "miro" },
-  ];
-  const deleteClicked = (id) => {
-    console.log(id);
+import { useToast } from "@/hooks/use-toast";
+import DeleteButton from "./DeleteButton";
+export default function AccountDashboard() {
+  const { toast } = useToast();
+  const [accounts, setAccounts] = useState();
+  const fetchAccounts = () => {
+    axios
+      .get("api/admins/users")
+      .then((response) => {
+        setAccounts(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
-  const tableRows = accounts.map((account) => {
-    return (
-      <TableRow key={account.id}>
-        <TableCell className="font-medium">{account.id}</TableCell>
-        <TableCell>{account.username}</TableCell>
-        <TableCell>{account.email}</TableCell>
-        <TableCell className="text-right">
-          <Button
-            onClick={() => deleteClicked(account.id)}
-            variant="destructive"
-          >
-            <Trash2 className="mr-2 h-4 w-4" /> Delete Account
-          </Button>
-        </TableCell>
-      </TableRow>
-    );
-  });
+  const deleteClicked = (account) => {
+    console.log("Hi " + account.userType);
+    axios
+      .delete(`api/admins/${account._id}`, {
+        data: {
+          userType: account.userType,
+        },
+      })
+      .then(() => {
+        toast({
+          title: "Account deleted succesfully!",
+        });
+        fetchAccounts(); // Refresh the tags list after deletion
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          text: `Failed to delete account"`,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
+
+  useEffect(() => {
+    fetchAccounts(); // Initial fetch when component mounts
+  }, []);
+
   return (
     <div>
       <Table>
-        <TableCaption>A list of accounts</TableCaption>
+        <TableCaption>A list of accounts.</TableCaption>
         <TableHeader>
+          <TableCell></TableCell>
           <TableRow>
-            <TableHead className="w-[100px]">Id</TableHead>
             <TableHead>Username</TableHead>
-
             <TableHead>Email</TableHead>
-            <TableHead className="text-right"></TableHead>
+            <TableHead>User Type</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>{tableRows}</TableBody>
+        <TableBody>
+          {accounts &&
+            accounts.map((account) => (
+              <TableRow key={account._id}>
+                <TableCell>{account.username}</TableCell>
+                <TableCell>{account.email}</TableCell>
+                <TableCell>{account.userType}</TableCell>
+                <TableCell>
+                  <DeleteButton onConfirm={() => deleteClicked(account)} />
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
       </Table>
     </div>
   );
-  const [selectedCategory, setSelectedCategory] = useState(null);
 }
