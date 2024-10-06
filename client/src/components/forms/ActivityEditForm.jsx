@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import BasicDateTimePicker from "../BasicDateTimePicker"
 import Multiselect from "multiselect-react-dropdown"
 import {
@@ -34,7 +34,7 @@ import { Pencil } from "lucide-react"
 
 export default function ActivityEditForm(props) {
 
-    const [discounts, setDiscounts] = useState([""]);  // State to track multiple discounts
+    const [discounts, setDiscounts] = useState([]);  // State to track multiple discounts
     const [categories, setCategories] = useState([]);
     const [selectedPriceType, setSelectedPriceType] = useState(props.priceType);
     const [tags, setTags] = useState([]);
@@ -50,31 +50,24 @@ export default function ActivityEditForm(props) {
         }
     };
 
-    const addDiscountField = () => {
-        setDiscounts([...discounts, { value: "" }]);
-    };
 
-    const removeDiscountField = (index) => {
-        const updatedDiscounts = discounts.filter((_, i) => i !== index);
-        setDiscounts(updatedDiscounts);
-    };
-
-    const handleDiscountChange = (index, value) => {
-        const updatedDiscounts = [...discounts];
-        updatedDiscounts[index].value = value;
-        setDiscounts(updatedDiscounts);
-    };
-
+    function cleanObject(obj) {
+        return Object.fromEntries(
+            Object.entries(obj).filter(([_, value]) => {
+                // Check if the value is not an empty string and not an empty array
+                return value !== '' && !(Array.isArray(value) && value.length === 0);
+            })
+        );
+    }
 
     function onSubmit(values) {
-        console.log("NEW ACTIVITY FORM SUBMITTED")
-        values.discounts = discounts;
         console.log(values);
-        console.log("Discounts: ", discounts);
-
-
-
+        const cleanedValues = cleanObject(values); // Clean the submitted values
+        console.log("NEW ACTIVITY FORM SUBMITTED");
+        console.log(cleanedValues); // This will log the cleaned object without empty fields
+        // Proceed with your submission logic here, e.g., sending the cleanedValues to an API
     }
+
     const activityForm = z.object({
         activityName: z.string().min(1, { message: "Name is required" }),
         time: z.string(),
@@ -87,11 +80,8 @@ export default function ActivityEditForm(props) {
         category: z.string(),
         tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
         booking: z.string(),
-        discounts: z.array(z.object({
-            value: z.string().min(1, { message: "Discount value is required" })
-        }))
-
-    });
+        discount: z.string(),
+    }).optional;
     const form = useForm({
         resolver: zodResolver(activityForm),
         defaultValues: {
@@ -106,7 +96,7 @@ export default function ActivityEditForm(props) {
             category: "",
             tags: "",
             booking: "",
-            discounts: [''],
+            discount: ""
         },
     });
 
@@ -143,11 +133,14 @@ export default function ActivityEditForm(props) {
                         <FormField
                             control={form.control}
                             name="time"
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Date & Time</FormLabel>
                                     <FormControl>
-                                        <BasicDateTimePicker></BasicDateTimePicker>
+                                        <BasicDateTimePicker
+                                            value={field.value} // Bind the value
+                                            onChange={(date) => field.onChange(date)} // Update form state
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
@@ -337,42 +330,21 @@ export default function ActivityEditForm(props) {
                                 </FormItem>
                             )}
                         />
-                        {discounts.map((discount, index) => (
-                            <FormField
-                                key={index}
-                                control={form.control}
-                                name={`discounts[${index}].value`}
-                                render={() => (
-                                    <FormItem>
-                                        <FormLabel>Special Discount {index + 1}</FormLabel>
-                                        <FormControl>
-                                            <div className="flex space-x-2">
-                                                <Input
-                                                    value={discount.value}
-                                                    onChange={(e) => handleDiscountChange(index, e.target.value)}
-                                                    placeholder="Discount"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    onClick={() => removeDiscountField(index)}
-                                                    className="bg-red-500 hover:bg-red-600"
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        ))}
-                        <Button
-                            type="button"
-                            onClick={addDiscountField}
-                            className="bg-skyblue w-min hover:bg-[#28788c]"
-                        >
-                            Add Discount
-                        </Button>
+                        <FormField
+                            control={form.control}
+                            name="discount"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Special Discount:</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder={props.discounts} {...field} />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
 
                         <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
                     </form>

@@ -128,6 +128,7 @@ export default function Activities() {
             <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
 
                 {activities.map((activity) => (<ActivityCard
+                    key={activity.activityID}
                     img={activity.coverImagePath}
                     name={activity.name}
                     category={activity.categoryID.name}
@@ -139,7 +140,7 @@ export default function Activities() {
                     maxPrice={activity.maxPrice}
                     price={activity.price}
                     tags={activity.tags}
-                    notTourist={true}
+                    notTourist={false}
                     booking={activity.isBookingOpen}
                     discounts={activity.specialDiscounts}
                     rating={activity.ratings.averageRating}

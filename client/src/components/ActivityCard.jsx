@@ -21,7 +21,7 @@ export default function activityCard(props) {
                             <ActivityEditForm type="act" name={props.name} time={date}
                                 location={props.location} mapsSrc={props.googlemaps} category={props.category} minPrice={props.minPrice}
                                 maxPrice={props.maxPrice} price={props.price} priceType={props.priceType}
-                                tags={props.tags} booking={props.booking} />
+                                tags={props.tags} booking={props.booking} discounts={props.discounts} />
                         </Button>
                     </>)}
             </div>
