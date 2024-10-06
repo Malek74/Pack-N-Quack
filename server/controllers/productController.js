@@ -19,18 +19,33 @@ export const getProductByID = async (req, res) => {
 
 //create product
 export const createProduct = async (req, res) => {
-    const { name, price, description, seller_id, ratings, reviews, available_quantity } = req.body;
-    if (!name || !price || !description || !seller_id || !available_quantity) {
+    const { name, price, description, available_quantity } = req.body;
+    console.log(req.body);
+    if (!name || !price || !description || !available_quantity) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
     try {
-        const newproduct = await product.create({ name, price, description, seller_id, ratings, reviews, available_quantity });
+        const newproduct = await product.create({ name, price, description, available_quantity });
         res.status(200).json(newproduct);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 }
 
+export const editProduct = async (req, res) => {
+    const { id } = req.params;
+    const { description, price } = req.body;
+    if (!id) {
+        return res.status(400).json({ message: "Please provide a product ID" });
+    }
+    try {
+        const newproduct = await product.findByIdAndUpdate(id, { description, price }, { new: true });
+        console.log(newproduct)
+        res.status(200).json(newproduct);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
 //update product by ID
 export const updateProduct = async (req, res) => {
     const id = req.params.id;
@@ -157,3 +172,16 @@ export const getProducts = async (req, res) => {
     }
 }
 */
+
+export const deleteProduct = async (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({ message: "Please provide a product ID" });
+    }
+    try {
+        const deletedProduct = await product.findByIdAndDelete(id);
+        return res.status(200).json(deletedProduct);
+    } catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+}

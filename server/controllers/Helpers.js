@@ -5,6 +5,9 @@ import tourGuide from '../models/tourGuideSchema.js';
 import seller from '../models/sellerSchema.js';
 import advertiserModel from "../models/advertiserSchema.js";
 import tourist from '../models/touristSchema.js';
+import activityModel from "../models/activitySchema.js";
+import product from "../models/productSchema.js";
+import Itinerary from "../models/itinerarySchema.js";
 
 //@desc check if username exists in the database
 //@param username
@@ -154,5 +157,6 @@ export const deleteProducts = async (sellerID) => {
 //todo:implement this please @youssefrfarid
 //@description: deletes all activities created by an advertiser
 export const deleteActivities = async (advertiserID) => {
-
+    const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: advertiserID });
+    console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
 }
