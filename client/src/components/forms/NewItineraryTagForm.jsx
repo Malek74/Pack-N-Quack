@@ -12,38 +12,43 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { DialogTrigger } from "../ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+export default function NewItineraryTagForm({ onTagCreate }) {
+  const { toast } = useToast();
 
-export default function NewCategoryForm() {
-  const NewCategoryFormSchema = z.object({
-    category: z
+  const NewItineraryTagFormSchema = z.object({
+    tag: z
       .string()
-      .min(2, { message: "Category must be at least 2 characters long." })
-      .max(20, { message: "Username must be 20 characters or less." }),
+      .min(2, { message: "Tag must be at least 2 characters long." })
+      .max(20, { message: "Tag must be 20 characters or less." }),
   });
+
   const form = useForm({
-    resolver: zodResolver(NewCategoryFormSchema),
+    resolver: zodResolver(NewItineraryTagFormSchema),
     defaultValues: {
-      category: "",
+      tag: "",
     },
   });
 
   // 2. Define a submit handler.
   function onSubmit(values) {
     axios
-      .post("/api/activity/category", {
-        name: values.name, // Adjusted to use POST for creation
+      .post("api/itiernaryTags", {
+        name: values.tag, // Adjusted to use POST for creation
       })
       .then((response) => {
-        console.log("Category created successfully:", response.data);
+        console.log("Tag created successfully:", response.data);
         toast({
-          title: "Category created succesfully!",
+          title: "Tag created succesfully!",
         });
-        onCategoryCreate(); // Call the parent function to refresh the table
+        onTagCreate(); // Call the parent function to refresh the table
       })
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Category could not be created",
+          title: "Tag could not be created",
           description: error.response.data.message,
         });
         console.error(error);
@@ -59,25 +64,26 @@ export default function NewCategoryForm() {
       >
         <FormField
           control={form.control}
-          name="category"
+          name="tag"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Tag</FormLabel>
               <FormControl>
                 <Input
                   placeholder="Standup comedy, concert, party, etc.."
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Enter activity category.</FormDescription>
+              <FormDescription>Enter Itinerary tag.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Button className="place-self-end" type="submit">
-          Submit
-        </Button>
+        <DialogTrigger asChild>
+          <Button className="place-self-end" type="submit">
+            Submit
+          </Button>
+        </DialogTrigger>
       </form>
     </Form>
   );

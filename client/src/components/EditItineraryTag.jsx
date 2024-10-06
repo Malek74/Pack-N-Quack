@@ -28,18 +28,19 @@ const categoryFormSchema = z.object({
   tag: z.string().min(1, { message: "Tag is required." }),
 });
 
-export function EditTagDialog({ tag }) {
+export function EditItineraryTag({ tag, onTagUpdate }) {
   const { toast } = useToast();
   // Initialize form with default values from the tag being edited
   const updateTagName = (oldName, newName) => {
     axios
-      .put(`/api/activity/tag/update/${oldName}`, {
+      .put(`/api/itiernaryTags/${oldName}`, {
         name: newName,
       })
       .then((response) => {
         toast({
           title: "Tag updated succesfully!",
         });
+        onTagUpdate();
       })
       .catch((error) => {
         toast({
