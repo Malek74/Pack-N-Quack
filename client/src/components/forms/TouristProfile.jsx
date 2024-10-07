@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 import React from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -13,64 +15,75 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from "@/components/ui/select";
-import { SampleDatePicker } from "../datepicker";
+import { SampleDatePicker } from "@/components/datepicker";
 import { PhoneInput } from "@/components/PhoneInput";
-import { nationalities } from "../nationalities";
+import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
+  userName: z.string().nonempty({ message: "Username is required" }),
   email: z.string().email({ message: "Invalid email address" }),
-  phoneNumber: z.string().min(1, "Mobile number is required"),
-  nationality: z.string().nonempty("Nationality is required"),
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  jobStudent: z
+  websiteLink: z.string().url({ message: "Please enter a valid URL" }),
+  hotline: z
+    .number()
+    .min(5, { message: "Hotline must be at least 5 characters" }),
+  companyProfile: z
     .string()
-    .nonempty({ message: "Please select either job or student" }),
+    .nonempty({ message: "Company profile is required" }),
 });
 
-export default function TouristProfile() {
+export default function TouristProfile({ profile, onRefresh }) {
+  const { toast } = useToast();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userName: "Rooma",
-      email: "rooma@gmail.com",
-      phoneNumber: "",
-      nationality: "",
-      dob: "",
-      jobStudent: "",
-      wallet: "0",
+      email: profile.email,
+      password: profile.password,
+      name: profile.name,
+      mobile: profile.mobile,
+      dob: profile.dob,
+      nationality: profile.nationality,
+      role: profile.role,
+      jobTitle: profile.jobTitle,
+
     },
   });
-
   // Define a submit handler
   function onSubmit(values) {
-    console.log(values);
+    axios
+      .put(`api/tourist/update/${profile._id}`, {
+        oldEmail: profile.email,
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        mobile: values.mobile,
+        dob: values.dob,
+        nationality: values.nationality,
+        role: values.role,
+        jobTitle: values.jobTitle,
+
+      })
+      .then(() => {
+        toast({
+          title: "Product updated succesfully!",
+        });
+        onRefresh();
+        // onCategoryUpdate();
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Product could not be updated",
+          // description: error.response.data.message,
+        });
+        console.log(error);
+      });
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Username (uneditable) */}
         <FormField
           control={form.control}
           name="userName"
@@ -78,12 +91,9 @@ export default function TouristProfile() {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input
-                  readOnly
-                  {...field}
-                  className="bg-gray-200 cursor-not-allowed"
-                />
+                <Input {...field} className="bg-white" disabled />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -103,122 +113,84 @@ export default function TouristProfile() {
           )}
         />
 
-        {/* phone number */}
+        {/* Website Link */}
         <FormField
           control={form.control}
-          name="phoneNumber"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
-                <PhoneInput
-                  {...field}
-                  value={field.value}
-                  onChange={(value) => field.onChange(value)}
-                  placeholder="Enter your phone number"
-                  className="w-full"
-                />
+                <Input placeholder="Rooma" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {/* Nationality (Select) */}
+        {/* Hotline */}
+        <FormField
+          control={form.control}
+          name="mobile"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mobile</FormLabel>
+              <FormControl>
+                <Input placeholder="123-456-7890" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dob"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date Of Birth</FormLabel>
+              <FormControl>
+                <Input placeholder="123-456-7890" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="nationality"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nationality</FormLabel>
-              <Select onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a nationality" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Nationalities</SelectLabel>
-                    {nationalities.map((nation, index) => (
-                      <SelectItem key={index} value={nation}>
-                        {nation}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-
-        {/*DOB*/}
-        <FormField
-          control={form.control}
-          name="dob"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
               <FormControl>
-                <SampleDatePicker
-                  value={field.value}
-                  onChange={field.onChange}
-                />
+                <Input placeholder="egyptian" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Job/Student (Radio Buttons) */}
         <FormField
           control={form.control}
-          name="jobStudent"
+          name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Are you a job holder or a student?</FormLabel>
+              <FormLabel>Role</FormLabel>
               <FormControl>
-                <RadioGroup
-                  value={field.value} // Bind the selected value
-                  onChange={field.onChange} // Handle changes
-                  className="flex space-x-4"
-                >
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      value="job"
-                      checked={field.value === "job"} // Check if value is "job"
-                      onChange={() => field.onChange("job")} // Handle "job" selection
-                    />
-                    <span>Job</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      value="student"
-                      checked={field.value === "student"} // Check if value is "student"
-                      onChange={() => field.onChange("student")} // Handle "student" selection
-                    />
-                    <span>Student</span>
-                  </label>
-                </RadioGroup>
+                <Input placeholder="student" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Wallet (uneditable) */}
         <FormField
           control={form.control}
-          name="wallet"
+          name="jobTitle"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Wallet</FormLabel>
+              <FormLabel>Job Title</FormLabel>
               <FormControl>
-                <Input
-                  readOnly
-                  {...field}
-                  className="bg-gray-200 cursor-not-allowed"
-                />
+                <Input placeholder="student" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

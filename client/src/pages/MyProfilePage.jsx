@@ -20,8 +20,8 @@ export default function MyProfilePage() {
   const isTourist = usertype === "tourist";
 
   const [profile, setProfile] = useState();
-  const endpoint = "sellers";
-  const userId = "6703ba52daf9eae5ef55344c";
+  const endpoint = "tourist";
+  const userId = "6702cde57d7e2444d9713d8d";
 
   const fetchProfile = () => {
     axios
@@ -48,7 +48,6 @@ export default function MyProfilePage() {
         website,
         email,
         username,
-        isAccepted,
       } = profile;
       return (
         <Card className="max-w-md mx-auto shadow-md rounded-lg">
@@ -184,13 +183,99 @@ export default function MyProfilePage() {
       );
     }
   }
+
+  function TouristCard() {
+    if (profile) {
+      const {
+        name,
+        mobile,
+        dob,
+        email,
+        nationality,
+        role,
+        jobTitle,
+        wallet,
+        createdAt,
+        updatedAt,
+        username,
+      } = profile;
+      return (
+        <Card className="max-w-md mx-auto shadow-md rounded-lg">
+          {/* Company Name */}
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              {name}
+            </CardTitle>
+
+          </CardHeader>
+
+          Content
+          <CardContent className="space-y-4">
+            {/* Description */}
+            <div>
+              <h3 className="text-sm font-semibold">Description</h3>
+              <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
+
+            {/* Establishment Date */}
+            <div>
+
+            </div>
+
+            {/* Contact Information */}
+            <div>
+              <h3 className="text-sm font-semibold">Contact Information</h3>
+              <p className="text-sm text-muted-foreground">
+                <strong>Mobile:</strong> {mobile}
+              </p>
+
+
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold">Date of Birth</h3>
+              <p className="text-sm text-muted-foreground">
+                {new Date(dob).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p></div>
+            {/* Email */}
+            <div>
+              <h3 className="text-sm font-semibold">Email</h3>
+              <p className="text-sm text-muted-foreground">{email}</p>
+            </div>
+
+            {/* Username */}
+            <div>
+              <h3 className="text-sm font-semibold">Username</h3>
+              <p className="text-sm text-muted-foreground">{username}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <CreateDialog
+                form={
+                  <TouristProfile
+                    profile={profile}
+                    onRefresh={fetchProfile}
+                  />
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+  }
+
   return (
     <div>
       <MyFirstComponent />
       {isTourGuide && <TourGuideProfile />}
       {isAdvertiser && <div>{profile && <AdvCard />}</div>}
       {isSeller && <div>{profile && <SellerCard />}</div>}
-      {isTourist && <TouristProfile />}
+      {isTourist && <div>{profile && <TouristCard />}</div>}
     </div>
   );
 }
