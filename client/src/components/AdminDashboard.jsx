@@ -11,6 +11,14 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import DeleteButton from "./DeleteButton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 export default function AccountDashboard() {
   const { toast } = useToast();
   const [accounts, setAccounts] = useState();
@@ -54,31 +62,44 @@ export default function AccountDashboard() {
   }, []);
 
   return (
-    <div>
-      <Table>
-        <TableCaption>A list of accounts.</TableCaption>
-        <TableHeader>
-          <TableCell></TableCell>
-          <TableRow>
-            <TableHead>Username</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>User Type</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {accounts &&
-            accounts.map((account) => (
-              <TableRow key={account._id}>
-                <TableCell>{account.username}</TableCell>
-                <TableCell>{account.email}</TableCell>
-                <TableCell>{account.userType}</TableCell>
-                <TableCell>
-                  <DeleteButton onConfirm={() => deleteClicked(account)} />
-                </TableCell>
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Accounts</CardTitle>
+          <CardDescription>Manage all accounts.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {" "}
+          <Table>
+            <TableCaption>A list of accounts.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>User Type</TableHead>
               </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody>
+              {accounts &&
+                accounts.map((account) => (
+                  <TableRow key={account._id}>
+                    <TableCell>{account.username}</TableCell>
+                    <TableCell>{account.email}</TableCell>
+                    <TableCell>{account.userType}</TableCell>
+                    <TableCell>
+                      <DeleteButton onConfirm={() => deleteClicked(account)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{accounts && accounts.length}</strong> accounts
+          </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

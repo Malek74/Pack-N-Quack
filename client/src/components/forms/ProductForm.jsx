@@ -64,7 +64,7 @@ export default function ProductForm({ onRefresh, adderId }) {
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Tag could not be created",
+          title: "Product could not be created",
           description: error.response.data.message,
         });
         console.error(error);
