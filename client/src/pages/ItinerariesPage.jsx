@@ -8,7 +8,10 @@ import SearchBar from "@/components/SearchBar";
 import FilterButton from "@/components/FilterButtons";
 import Multiselect from "multiselect-react-dropdown";
 import DateInput from './components/DateInput';
+import { Input } from '@/components/ui/input';
+import { DatePickerWithRange } from '@/components/DatePickerWithRange';
 import axios from "axios";
+
 
 
 
@@ -22,38 +25,15 @@ const ItinerariesPage = () => {
   const [itineraryUpdate, setItineraryUpdate] = useState([]);
   const [itineraryUpdatingID,setItineraryUpdatingID] = useState('');
   const [updateActivityList, setUpdateActivityList] = useState([]);
+  const [filteredSelectedTags, setFilteredSelectedTags] = useState();
+  const [selectedRange, setSelectedRange] = useState({ from: null, to: null })
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [minPrice, setMinPrice] = useState();
+  const [maxPrice, setMaxPrice] = useState();
+  const [tags, setTags] = useState([]);
   
 
-  const onUpdateActivity = (dayNumber,) => {
 
-  }
-
-  useEffect(() => {
-    const fetchItineraries = async () => {
-      try {
-        const response = await axios.get("/api/itinerary/");
-        console.log(response.data)
-        setItinerariesDB(response.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchItineraries();
-  },[itineraryDeleted, itineraryCreated, itineraryUpdate])
-
-  const [tags, setTags] = useState([]);
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await axios.get("/api/itiernaryTags");
-        console.log(response.data)
-        setTags(response.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchTags();
-  },[])
 
   const handleDelete = (id) => {
     axios
@@ -67,35 +47,98 @@ const ItinerariesPage = () => {
       });
   };
 
+  useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        const response = await axios.post("/api/itinerary/filterSort",
+          {
+            name: searchTerm,
+            minBudget: minPrice, maxBudget: maxPrice,  sortPrice: selectedFilters["Sort By"] == "price-asc" ? 1 : selectedFilters["Sort By"] == "price-desc" ? -1 : 0,
+            sortRating: selectedFilters["Sort By"] == "ratings-asc" ? 1 : selectedFilters["Sort By"] == "ratings-desc" ? -1 : 0,
+            minDate: selectedRange.from, maxDate: selectedRange.to, language: selectedFilters.Language
+
+          }
+        );
+        console.log(response.data)
+        setItinerariesDB(response.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchItineraries();
+    const fetchData = async () => {
+    try {
+        const fetchedTags = await axios.get("/api/activity/tag");
+
+        setTags(fetchedTags.data);
+
+
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+fetchData();
+
+
+ 
+
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get("/api/itiernaryTags");
+        console.log(response.data)
+        setTags(response.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchTags();
+}, [searchTerm, minPrice, maxPrice, selectedFilters, filteredSelectedTags, selectedRange, itineraryCreated, itineraryDeleted, itineraryUpdate])
+
+
+    // Handler to update selected filter values
+    const handleFilterChange = (type, value) => {
+        setSelectedFilters((prev) => ({
+            ...prev,
+            [type]: value, // Update the selected value based on the type
+        }));
+    };
+    const handleDateChange = (date) => {
+        setSelectedRange(date)
+    }
+
   const buttons = [
     {
-        type: 'Sort By', // This will create a "Sort By" dropdown
-        options: [
-            { label: "Price Low To High", value: "price-low-to-high" },
-            { label: "Price High To Low", value: "price-high-to-low" },
-        ],
+      type: 'Sort By',
+      options: [
+          { label: "Price Low To High", value: "price-asc" },
+          { label: "Price High To Low", value: "price-desc" },
+          { label: "Ratings Low To High", value: "ratings-asc" },
+          { label: "Ratings High To Low", value: "ratings-desc" },
+      ],
     },
-    {
-        type: 'Price', // This will create a "Filter By" dropdown
-        options: [
-            { label: "EGP 0-100", value: "EGP 0-100" },
-            { label: "EGP 100-200", value: "EGP 100-200" },
-            { label: "EGP 200-300", value: "EGP 200-300" },
-            { label: "EGP 300-400", value: "EGP 300-400" },
-            { label: "EGP 400-500", value: "EGP 400-500" },
-            { label: "More than EGP 500", value: "More than EGP 500" },
-        ],
-    },
-    {
-        type: 'Date',
-        options: [
-            { label: "In the next week", value: "In the next week" },
-            { label: "In the next 2 weeks", value: "In the next 2 weeks" },
-            { label: "In the next 1 month", value: "In the next 1 month" },
-            { label: "In the next 6 months", value: "In the next 6 months" },
-            { label: "In the next 1 year", value: "In the next 1 year" },
-        ],
-    },
+    // {
+    //     type: 'Price', // This will create a "Filter By" dropdown
+    //     options: [
+    //         { label: "EGP 0-100", value: "EGP 0-100" },
+    //         { label: "EGP 100-200", value: "EGP 100-200" },
+    //         { label: "EGP 200-300", value: "EGP 200-300" },
+    //         { label: "EGP 300-400", value: "EGP 300-400" },
+    //         { label: "EGP 400-500", value: "EGP 400-500" },
+    //         { label: "More than EGP 500", value: "More than EGP 500" },
+    //     ],
+    // },
+    // {
+    //     type: 'Date',
+    //     options: [
+    //         { label: "In the next week", value: "In the next week" },
+    //         { label: "In the next 2 weeks", value: "In the next 2 weeks" },
+    //         { label: "In the next 1 month", value: "In the next 1 month" },
+    //         { label: "In the next 6 months", value: "In the next 6 months" },
+    //         { label: "In the next 1 year", value: "In the next 1 year" },
+    //     ],
+    // },
     {
         type: 'Language',
         options: [
@@ -113,16 +156,16 @@ const ItinerariesPage = () => {
           })),
         ],
     },
-    {
-      type: 'Ratings',
-      options: [
-          { label: "1 star and more", value: "1 star and more" },
-          { label: "2 stars and more", value: "2 stars and more" },
-          { label: "3 stars and more", value: "3 stars and more" },
-          { label: "4 stars and more", value: "4 stars and more" },
-          { label: "5 stars", value: "5 stars" },
-      ],
-  },
+  //   {
+  //     type: 'Ratings',
+  //     options: [
+  //         { label: "1 star and more", value: 1 },
+  //         { label: "2 stars and more", value: 2 },
+  //         { label: "3 stars and more", value: 3 },
+  //         { label: "4 stars and more", value: 4 },
+  //         { label: "5 stars", value: 5 },
+  //     ],
+  // },
   ];
 
 
@@ -283,11 +326,45 @@ const ItinerariesPage = () => {
       </div>
       
      
+      <div className="flex mb-10">
+                <span className="ml-18">   <FilterButton
+                    buttons={buttons}
+                    onFilterChange={handleFilterChange}
+                /></span>
+                <span><Multiselect
+                    className="w-max"
+                    isObject={false}
+                    onSelect={(selectedList) => {
+                        setFilteredSelectedTags(selectedList);
+                        count = count + 1;
+                    }}
+                    onRemove={(selectedList) => {
+                        setFilteredSelectedTags(selectedList);
+                        count--;
+                    }}
+                    options={tags.map((tag) => tag.name)}
+                /></span>
+                <span>
+                    <Input
+                        placeholder="Min Price"
+                        value={minPrice}
+                        type="number"
+                        onChange={(e) => setMinPrice(e.target.value)} // Capture min price
+                    />
+                </span>
+                <span>
+                    <Input
+                        placeholder="Max Price"
+                        value={maxPrice}
+                        type="number"
+                        onChange={(e) => setMaxPrice(e.target.value)} // Capture max price
+                    />
+                </span>
 
-      <div className="flex">
-                <span className="ml-18">  <FilterButton buttons={buttons} /></span>
+                <span> <DatePickerWithRange onDateChange={handleDateChange} /></span>
+                <span><Button onClick={() => console.log(selectedFilters)} className="">Submit Filters</Button></span>
                 {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
-      </div>
+            </div>
 
       <div className='w-full flex justify-center'>
       <Button onClick={() => setShowModal(true)} className="my-4 bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400">
