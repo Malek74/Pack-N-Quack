@@ -1,107 +1,29 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import Activitiesbackground from "../images/Background.jpg";
 import Banner from "./components/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ProductForm from "@/components/forms/ProductForm";
-import CreateDialog from "@/components/CreateDialog";
 import SearchBar from "@/components/SearchBar";
+import axios from "axios";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState([]);
+  const fetchProducts = () => {
+    axios
+      .get("api/products")
+      .then((response) => {
+        setProducts(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-  const products = [
-    {
-      img: Activitiesbackground,
-      name: "Sample Product 1",
-      seller: "Amazon",
-      rating: 2,
-      reviewsCount: 25,
-      price: "99.99",
-      description: "This is a sample product",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-  ];
+  useEffect(() => {
+    fetchProducts(); // Initial fetch when component mounts
+  }, []);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())

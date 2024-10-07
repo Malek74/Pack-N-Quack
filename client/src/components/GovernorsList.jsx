@@ -42,12 +42,12 @@ export default function GovernorsList() {
 
   return (
     <div>
-      <CreateButton default />
-
       <Table>
         <TableCaption>A list of governors.</TableCaption>
         <TableHeader>
-          <TableCell></TableCell>
+          <TableCell>
+            <CreateButton />{" "}
+          </TableCell>
           <TableRow>
             <TableHead>Name</TableHead>
           </TableRow>

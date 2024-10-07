@@ -56,7 +56,12 @@ export default function ActivityCategory() {
   }, []);
 
   const CreateButton = () => {
-    return <CreateDialog title="Category" form={<NewCategoryForm />} />;
+    return (
+      <CreateDialog
+        title="Category"
+        form={<NewCategoryForm onRefresh={fetchCategories} />}
+      />
+    );
   };
 
   return (
@@ -78,7 +83,10 @@ export default function ActivityCategory() {
             <TableRow key={category.name}>
               <TableCell>{category.name}</TableCell>
               <TableCell>
-                <EditCategoryDialog category={category.name} />
+                <EditCategoryDialog
+                  category={category.name}
+                  onRefresh={fetchCategories}
+                />
               </TableCell>
               <TableCell className="text-right">
                 <DeleteButton

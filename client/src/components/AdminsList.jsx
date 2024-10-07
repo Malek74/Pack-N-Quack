@@ -46,12 +46,12 @@ export default function AdminsList() {
 
   return (
     <div>
-      <CreateButton default />
-
       <Table>
         <TableCaption>A list of admins.</TableCaption>
         <TableHeader>
-          <TableCell></TableCell>
+          <TableCell>
+            <CreateButton />
+          </TableCell>
           <TableRow>
             <TableHead>Name</TableHead>
           </TableRow>
