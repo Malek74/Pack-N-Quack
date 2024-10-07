@@ -1,82 +1,106 @@
 import { useState, useEffect } from "react"
 import ActivityCard from "@/components/ActivityCard"
 import Activitiesbackground from "../images/Background.jpg"
-import amy from "../images/amy.jpeg"
 import Banner from "@/components/Banner"
 import FilterButton from "@/components/FilterButtons"
 import SearchBar from "@/components/SearchBar"
 import axios from "axios"
-
-
-const buttons = [
-    {
-        type: 'Sort By', // This will create a "Sort By" dropdown
-        options: [
-            { label: "Price Low To High", value: "price-low-to-high" },
-            { label: "Price High To Low", value: "price-high-to-low" },
-            { label: "Ratings Low To High", value: "ratings-low-to-high" },
-            { label: "Ratings High To Low", value: "ratings-high-to-low" },
-        ],
-    },
-    {
-        type: 'Price', // This will create a "Filter By" dropdown
-        options: [
-            { label: "EGP 0-100", value: "EGP 0-100" },
-            { label: "EGP 100-200", value: "EGP 100-200" },
-            { label: "EGP 200-300", value: "EGP 200-300" },
-            { label: "EGP 300-400", value: "EGP 300-400" },
-            { label: "EGP 400-500", value: "EGP 400-500" },
-            { label: "More than EGP 500", value: "More than EGP 500" },
-        ],
-    },
-    {
-        type: 'Date',
-        options: [
-            { label: "In the next week", value: "In the next week" },
-            { label: "In the next 2 weeks", value: "In the next 2 weeks" },
-            { label: "In the next 1 month", value: "In the next 1 month" },
-            { label: "In the next 6 months", value: "In the next 6 months" },
-            { label: "In the next 1 year", value: "In the next 1 year" },
-        ],
-    },
-    {
-        type: 'Category',
-        options: [
-            { label: "Concert", value: "In the next week" },
-            { label: "Theatre", value: "In the next 2 weeks" },
-            { label: "Entertainment", value: "In the next 1 month" },
-        ],
-    },
-    {
-        type: 'Ratings',
-        options: [
-            { label: "1 star and more", value: "1 star and more" },
-            { label: "2 stars and more", value: "2 stars and more" },
-            { label: "3 stars and more", value: "3 stars and more" },
-            { label: "4 stars and more", value: "4 stars and more" },
-            { label: "5 stars", value: "5 stars" },
-        ],
-    },
-];
+import Multiselect from "multiselect-react-dropdown"
+import { Button } from "@/components/ui/button"
+import { DatePickerWithRange } from "@/components/DatePickerWithRange"
+import { Input } from "@/components/ui/input"
 
 export default function Activities() {
     const [searchTerm, setSearchTerm] = useState("");
     const [activities, setActivities] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [selectedRange, setSelectedRange] = useState({ from: null, to: null })
+    const [selectedFilters, setSelectedFilters] = useState({});
+    const [minPrice, setMinPrice] = useState();
+    const [maxPrice, setMaxPrice] = useState();
+    const [sortPrice, setSortPrice] = useState();
+    const [sortRating, setSortRating] = useState();
 
+
+    // Handler to update selected filter values
+    const handleFilterChange = (type, value) => {
+        setSelectedFilters((prev) => ({
+            ...prev,
+            [type]: value, // Update the selected value based on the type
+        }));
+    };
+    const handleDateChange = (date) => {
+        setSelectedRange(date)
+    }
+
+    let buttons = [
+        {
+            type: 'Sort By',
+            options: [
+                { label: "Price Low To High", value: "price-asc" },
+                { label: "Price High To Low", value: "price-desc" },
+                { label: "Ratings Low To High", value: "ratings-asc" },
+                { label: "Ratings High To Low", value: "ratings-desc" },
+            ],
+        },
+
+        {
+            type: 'Category',
+            options: categories
+        },
+        {
+            type: 'Ratings',
+            options: [
+                { label: "1 star and more", value: 1 },
+                { label: "2 stars and more", value: 2 },
+                { label: "3 stars and more", value: 3 },
+                { label: "4 stars and more", value: 4 },
+                { label: "5 stars", value: 5 },
+            ],
+        },
+    ];
+
+    let count = 0;
 
     useEffect(() => {
         const fetchActivites = async () => {
             try {
-                const response = await axios.get("/api/activity");
+                const response = await axios.post("/api/activity/filterSort",
+                    {
+                        name: searchTerm, budgetMin: minPrice, budgetMax: maxPrice, category: selectedFilters.Category,
+                        tags: selectedTags, sortPrice: selectedFilters["Sort By"] == "price-asc" ? 1 : selectedFilters["Sort By"] == "price-desc" ? -1 : 0,
+                        sortRating: selectedFilters["Sort By"] == "ratings-asc" ? 1 : selectedFilters["Sort By"] == "ratings-desc" ? -1 : 0,
+                        rating: selectedFilters.Ratings, dateMin: selectedRange.from, dateMax: selectedRange.to
+                    });
                 setActivities(response.data);
+                console.log(selectedRange);
+
+                console.log(selectedFilters["Sort By"]);
+
+            } catch (error) {
+                console.error(error);
+            }
+
+        };
+        const fetchData = async () => {
+            try {
+                const fetchedTags = await axios.get("/api/activity/tag");
+                const fetchedCategories = await axios.get("/api/activity/category");
+                setTags(fetchedTags.data);
+                setCategories(fetchedCategories.data);
+                buttons[1].options = fetchedCategories.data.map((category) => category.name);
+
             } catch (error) {
                 console.error(error);
             }
         };
 
-        fetchActivites()
+        fetchActivites();
+        fetchData();
 
-    }, []);
+    }, [searchTerm, minPrice, maxPrice, selectedFilters, selectedTags, count, selectedRange]);
 
 
     return (
@@ -119,7 +143,43 @@ export default function Activities() {
 
 
             <div className="flex mb-10">
-                <span className="ml-18">  <FilterButton buttons={buttons} /></span>
+                <span className="ml-18">   <FilterButton
+                    categories={categories}
+                    buttons={buttons}
+                    onFilterChange={handleFilterChange}
+                /></span>
+                <span><Multiselect
+                    className="w-max"
+                    isObject={false}
+                    onSelect={(selectedList) => {
+                        setSelectedTags(selectedList);
+                        count = count + 1;
+                    }}
+                    onRemove={(selectedList) => {
+                        setSelectedTags(selectedList);
+                        count--;
+                    }}
+                    options={tags.map((tag) => tag.name)}
+                /></span>
+                <span>
+                    <Input
+                        placeholder="Min Price"
+                        value={minPrice}
+                        type="number"
+                        onChange={(e) => setMinPrice(e.target.value)} // Capture min price
+                    />
+                </span>
+                <span>
+                    <Input
+                        placeholder="Max Price"
+                        value={maxPrice}
+                        type="number"
+                        onChange={(e) => setMaxPrice(e.target.value)} // Capture max price
+                    />
+                </span>
+
+                <span> <DatePickerWithRange onDateChange={handleDateChange} /></span>
+                <span><Button onClick={() => console.log(searchTerm)} className="">Submit Filters</Button></span>
                 {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
             </div>
 
@@ -147,7 +207,7 @@ export default function Activities() {
 
                 />))}
 
-                <ActivityCard
+                {/* <ActivityCard
                     img={amy}
                     alt="Amy Whinehouse adv"
                     name="The Amy Whinehouse Band Live"
@@ -161,7 +221,7 @@ export default function Activities() {
                     booking="Open"
                     discount="50% off for Armed Forces Day"
 
-                />
+                /> */}
             </div>
         </div>
 

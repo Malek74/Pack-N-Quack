@@ -5,10 +5,12 @@ import Banner from "@/components/Banner"
 import CreateDialog from "@/components/CreateDialog"
 import ActivityForm from "@/components/forms/ActivityForm"
 import axios from "axios"
-
+import { useParams } from "react-router-dom"
 
 export default function Activities() {
 
+    const { idAdv } = useParams();
+    console.log(idAdv);
     const [activities, setActivities] = useState([]);
     const [activityDeleted, setActivityDeleted] = useState();
     const [activityUpdated, setActivityUpdated] = useState();
@@ -48,7 +50,7 @@ export default function Activities() {
     useEffect(() => {
         const fetchActivites = async () => {
             try {
-                const response = await axios.get("/api/activity");
+                const response = await axios.get(`/api/activity/my/${idAdv}`);
                 setActivities(response.data);
 
             } catch (error) {
