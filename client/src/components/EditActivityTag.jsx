@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -20,14 +21,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Pencil } from "lucide-react";
-
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 // Define the schema for validation
 const categoryFormSchema = z.object({
-  tag: z.string().min(1, { message: "tag is required." }),
+  tag: z.string().min(1, { message: "Tag is required." }),
 });
 
-export function EditTagDialog({ tag }) {
+export function EditTagDialog({ tag, onTagUpdate }) {
+  const { toast } = useToast();
   // Initialize form with default values from the tag being edited
+  const updateTagName = (oldName, newName) => {
+    axios
+      .put(`/api/activity/tag/update/${oldName}`, {
+        name: newName,
+      })
+      .then((response) => {
+        toast({
+          title: "Tag updated succesfully!",
+        });
+        onTagUpdate();
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Tag could not be updated",
+          description: error.response.data.message,
+        });
+        console.log(error);
+      });
+  };
+
   const form = useForm({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
@@ -37,40 +61,48 @@ export function EditTagDialog({ tag }) {
 
   // Handle form submission
   function onSubmit(values) {
-    console.log("tag Edited:", values.tag);
+    updateTagName(tag, values.tag);
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex gap-2">
-          <Pencil /> <p> Edit </p>
+        <Button size="sm" className="h-8 gap-2">
+          <Pencil className="h-3.5 w-3.5" />
+          <span className="sr-only mr-2 sm:not-sr-only sm:whitespace-nowrap">
+            Edit
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit tag</DialogTitle>
+          <DialogTitle>Edit Tag</DialogTitle>
         </DialogHeader>
         {/* Edit tag Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 flex flex-col"
+          >
             {/* tag Field */}
             <FormField
               control={form.control}
-              name="Tag"
+              name="tag"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>tag</FormLabel>
+                  <FormLabel>Tag</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter tag" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className="place-self-end" type="submit">
-              Save Changes
-            </Button>
+            <DialogClose asChild>
+              <Button className="place-self-end" type="submit">
+                Save Changes
+              </Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

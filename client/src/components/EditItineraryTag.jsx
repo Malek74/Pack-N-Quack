@@ -2,12 +2,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -21,48 +23,45 @@ import { Input } from "@/components/ui/input";
 import { Pencil } from "lucide-react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import { DialogClose } from "@radix-ui/react-dialog";
 // Define the schema for validation
+const categoryFormSchema = z.object({
+  tag: z.string().min(1, { message: "Tag is required." }),
+});
 
-export function EditCategoryDialog({ category, onRefresh }) {
-  const categoryFormSchema = z.object({
-    category: z.string().min(1, { message: "Category is required." }),
-  });
-
-  // Initialize form with default values from the category being edited
-  const form = useForm({
-    resolver: zodResolver(categoryFormSchema),
-    defaultValues: {
-      category: category ?? "", // Set the default value for category
-    },
-  });
+export function EditItineraryTag({ tag, onTagUpdate }) {
   const { toast } = useToast();
   // Initialize form with default values from the tag being edited
-  const updateCategory = (oldName, newName) => {
+  const updateTagName = (oldName, newName) => {
     axios
-      .put(`api/activity/category/update/${oldName}`, {
+      .put(`/api/itiernaryTags/${oldName}`, {
         name: newName,
       })
       .then((response) => {
         toast({
-          title: "Category updated succesfully!",
+          title: "Tag updated succesfully!",
         });
-        onRefresh();
+        onTagUpdate();
       })
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Category could not be updated",
+          title: "Tag could not be updated",
           description: error.response.data.message,
         });
         console.log(error);
       });
   };
 
+  const form = useForm({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      tag: tag ?? "", // Set the default value for tag
+    },
+  });
+
   // Handle form submission
   function onSubmit(values) {
-    console.log(category, values.category);
-    updateCategory(category, values.category);
+    updateTagName(tag, values.tag);
   }
 
   return (
@@ -77,29 +76,29 @@ export function EditCategoryDialog({ category, onRefresh }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Category</DialogTitle>
+          <DialogTitle>Edit Tag</DialogTitle>
         </DialogHeader>
-        {/* Edit Category Form */}
+        {/* Edit tag Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 flex flex-col"
           >
-            {/* Category Field */}
+            {/* tag Field */}
             <FormField
               control={form.control}
-              name="category"
+              name="tag"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Tag</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter category" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DialogClose>
+            <DialogClose asChild>
               <Button className="place-self-end" type="submit">
                 Save Changes
               </Button>

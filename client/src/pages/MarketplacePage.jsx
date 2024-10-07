@@ -1,111 +1,92 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import Activitiesbackground from "../images/Background.jpg";
 import Banner from "./components/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ProductForm from "@/components/forms/ProductForm";
-import CreateDialog from "@/components/CreateDialog";
 import SearchBar from "@/components/SearchBar";
+import axios from "axios";
+import FilterButton from "@/components/FilterButtons";
+import PriceSlider from "./PriceSlider";
+import CreateDialog from "@/components/CreateDialog";
+import ProductForm from "@/components/forms/ProductForm";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState([]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(null); // Start as null until it's fetched
+  const [priceRange, setPriceRange] = useState([0, 100000000]); // Applied price range
+  const [sliderRange, setSliderRange] = useState([0, 100000000]); // Temporary slider range
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const userType = "tourist";
+  // Fetch products based on filters and search term
+  const fetchProducts = () => {
+    axios
+      .get(
+        `api/products?maxPrice=${priceRange[1]}&minPrice=${priceRange[0]}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+      )
+      .then((response) => {
+        setProducts(response.data);
+        console.log(response.data);
+        console.log(priceRange);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-  const products = [
+  // Fetch the maximum product price
+  const fetchMaxPrice = () => {
+    axios
+      .get(`api/products/maxProductPrice`)
+      .then((response) => {
+        setMaxPrice(response.data.maxPrice + 200);
+        setSliderRange([0, response.data.maxPrice]); // Set the range once maxPrice is fetched
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  // Re-fetch products when filters or search terms change
+  useEffect(() => {
+    if (maxPrice !== null) {
+      fetchProducts(); // Fetch products after maxPrice is fetched
+    }
+  }, [searchTerm, maxPrice, priceRange, selectedFilters]);
+
+  // Fetch maxPrice when component mounts
+  useEffect(() => {
+    fetchMaxPrice();
+  }, []);
+
+  const handleFilterChange = (type, value) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [type]: value, // Update the selected value based on the type
+    }));
+    console.log(type, value);
+  };
+
+  // Handle price change from the slider
+  const handlePriceChange = (newRange) => {
+    setSliderRange(newRange); // Temporarily update the slider range
+  };
+
+  // Apply the slider range to the actual price range on clicking "Apply"
+  const applyPriceRange = () => {
+    setPriceRange(sliderRange); // Apply the selected price range
+  };
+
+  let buttons = [
     {
-      img: Activitiesbackground,
-      name: "Sample Product 1",
-      seller: "Amazon",
-      rating: 2,
-      reviewsCount: 25,
-      price: "99.99",
-      description: "This is a sample product",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
-    },
-    {
-      img: Activitiesbackground,
-      name: "Another Product",
-      seller: "BestBuy",
-      rating: 4.5,
-      reviewsCount: 15,
-      price: "199.99",
-      description: "Another product example",
+      type: "Sort By Rating",
+      options: [
+        { label: "Ratings Low To High", value: "asc" },
+        { label: "Ratings High To Low", value: "desc" },
+      ],
     },
   ];
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="flex flex-col px-16">
@@ -116,47 +97,68 @@ export default function MarketplacePage() {
           alt="Hustling market"
           name="Marketplace"
         />
-
-        {/* Search Bar Section - Positioned on top of the banner */}
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for a product.."}/>
-      </div>
-
-     
-      <div className="flex justify-center items-center mt-[-60px] w-full">
-        
-        <div className="w-[60%] bg-white rounded-lg p-4 shadow-lg flex justify-center items-center">
-          <Input
-            placeholder="Search product name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 rounded-md w-full border-0"
+        <div>
+          <SearchBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            placeholder={"Look for a product.."}
           />
-          <Button className="bg-yellow-500 text-white p-3 rounded-md ml-4">
-            Search
-          </Button>
         </div>
       </div>
 
-      <div className="flex place-content-end mr-8">
-        <CreateDialog title="Product" form={<ProductForm />} />
+      <div className="mt-8 flex">
+        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} />
+        {maxPrice !== null && (
+          <div className="flex items-center justify-center">
+            <PriceSlider
+              min={0}
+              max={maxPrice}
+              priceRange={sliderRange} // Use the temporary slider range
+              handlePriceChange={handlePriceChange} // Update slider range on change
+            />
+            <Button
+              size="sm"
+              onClick={applyPriceRange} // Apply the price range on click
+              className="ml-2 px-4 py-2 rounded-md"
+            >
+              Apply
+            </Button>
+          </div>
+        )}
       </div>
+      {userType === "seller" && (
+        <CreateDialog
+          title="Product"
+          form={
+            <ProductForm
+              onRefresh={fetchProducts}
+              adderId="6703ba52daf9eae5ef55344c"
+            />
+          }
+        />
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product, index) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <ProductCard
-              key={index}
-              img={product.img}
+              key={product._id}
+              id={product._id}
+              img={product.picture}
               alt={product.name}
+              available_quantity={product.available_quantity}
               name={product.name}
               seller={product.seller}
-              rating={product.rating}
-              reviewsCount={product.reviewsCount}
+              rating={product.ratings.averageRating}
+              reviewsCount={product.ratings.reviews.length}
               price={product.price}
               description={product.description}
+              onRefresh={fetchProducts}
+              userType={userType}
             />
           ))
         ) : (
-          <p>No products found</p>
+          <p>Loading</p>
         )}
       </div>
     </div>

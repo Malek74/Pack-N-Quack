@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import ItineraryCard from './components/ItineraryCard';
-import Banner from './components/BannerV2';
-import BannerImage from '../assets/romanBanner.jpg';
-
+import React, { useState } from "react";
+import ItineraryCard from "./components/ItineraryCard";
+import Banner from "./components/BannerV2";
+import BannerImage from "../assets/romanBanner.jpg";
+import { Button } from "@/components/ui/button";
+import AddActivity from "./components/AddActivity";
 const ItinerariesPage = () => {
   const [itineraries, setItineraries] = useState([
     {
@@ -13,8 +14,46 @@ const ItinerariesPage = () => {
       point1: "Landmarks",
       point2: "Cuisine",
       point3: "Beaches",
-      language: "English"
+      language: "English",
+      accessibility: "wheel chair",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row"
+      days: [
+        {
+          day: 1,
+          activities: [
+            {
+              name: "Visit Eiffel Tower",
+              description: "Landmark tour",
+              startTime: "2024-12-01T09:00:00.000Z",
+              endTime: "2024-12-01T12:00:00.000Z",
+              location: "Paris, France",
+            },
+            {
+              name: "Wine Tasting in Bordeaux",
+              description: "Wine tour",
+              startTime: "2024-12-01T14:00:00.000Z",
+              endTime: "2024-12-01T17:00:00.000Z",
+              location: "Bordeaux, France",
+            },
+          ],
+        },
+        {
+          day: 2,
+          activities: [
+            {
+              name: "Lavender Field Tour",
+              description: "Scenic walk",
+              startTime: "2024-12-02T10:00:00.000Z",
+              endTime: "2024-12-02T13:00:00.000Z",
+              location: "Provence, France",
+            },
+          ],
+        },
+      ],
     },
     {
       title: "Grand Tour of Italy",
@@ -24,8 +63,46 @@ const ItinerariesPage = () => {
       point1: "Ancient Ruins",
       point2: "Art & Architecture",
       point3: "Coastal Views",
-      language: "English"
+      language: "English",
+      accessibility: "wheel chair",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row-reverse"
+      days: [
+        {
+          day: 1,
+          activities: [
+            {
+              name: "Visit Eiffel Tower",
+              description: "Landmark tour",
+              startTime: "2024-12-01T09:00:00.000Z",
+              endTime: "2024-12-01T12:00:00.000Z",
+              location: "Paris, France",
+            },
+            {
+              name: "Wine Tasting in Bordeaux",
+              description: "Wine tour",
+              startTime: "2024-12-01T14:00:00.000Z",
+              endTime: "2024-12-01T17:00:00.000Z",
+              location: "Bordeaux, France",
+            },
+          ],
+        },
+        {
+          day: 2,
+          activities: [
+            {
+              name: "Lavender Field Tour",
+              description: "Scenic walk",
+              startTime: "2024-12-02T10:00:00.000Z",
+              endTime: "2024-12-02T13:00:00.000Z",
+              location: "Provence, France",
+            },
+          ],
+        },
+      ],
     },
     {
       title: "Mystical Japan",
@@ -35,8 +112,46 @@ const ItinerariesPage = () => {
       point1: "Modern Cities",
       point2: "Historic Temples",
       point3: "Natural Wonders",
-      language: "English"
+      language: "English",
+      accessibility: "wheel chair",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row"
+      days: [
+        {
+          day: 1,
+          activities: [
+            {
+              name: "Visit Eiffel Tower",
+              description: "Landmark tour",
+              startTime: "2024-12-01T09:00:00.000Z",
+              endTime: "2024-12-01T12:00:00.000Z",
+              location: "Paris, France",
+            },
+            {
+              name: "Wine Tasting in Bordeaux",
+              description: "Wine tour",
+              startTime: "2024-12-01T14:00:00.000Z",
+              endTime: "2024-12-01T17:00:00.000Z",
+              location: "Bordeaux, France",
+            },
+          ],
+        },
+        {
+          day: 2,
+          activities: [
+            {
+              name: "Lavender Field Tour",
+              description: "Scenic walk",
+              startTime: "2024-12-02T10:00:00.000Z",
+              endTime: "2024-12-02T13:00:00.000Z",
+              location: "Provence, France",
+            },
+          ],
+        },
+      ],
     },
     {
       title: "Scenic New Zealand",
@@ -46,8 +161,46 @@ const ItinerariesPage = () => {
       point1: "Outdoor Adventures",
       point2: "Cultural Experiences",
       point3: "Fjord Exploration",
-      language: "Arabic"
+      language: "Arabic",
+      accessibility: "wheel chair",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
       // direction: "flex-row-reverse"
+      days: [
+        {
+          day: 1,
+          activities: [
+            {
+              name: "Visit Eiffel Tower",
+              description: "Landmark tour",
+              startTime: "2024-12-01T09:00:00.000Z",
+              endTime: "2024-12-01T12:00:00.000Z",
+              location: "Paris, France",
+            },
+            {
+              name: "Wine Tasting in Bordeaux",
+              description: "Wine tour",
+              startTime: "2024-12-01T14:00:00.000Z",
+              endTime: "2024-12-01T17:00:00.000Z",
+              location: "Bordeaux, France",
+            },
+          ],
+        },
+        {
+          day: 2,
+          activities: [
+            {
+              name: "Lavender Field Tour",
+              description: "Scenic walk",
+              startTime: "2024-12-02T10:00:00.000Z",
+              endTime: "2024-12-02T13:00:00.000Z",
+              location: "Provence, France",
+            },
+          ],
+        },
+      ],
     },
     {
       title: "Treasures of Egypt",
@@ -57,28 +210,70 @@ const ItinerariesPage = () => {
       point1: "Ancient Monuments",
       point2: "Nile River Cruise",
       point3: "Cultural Immersion",
-      language: "Arabic"
-      
-    }
+      language: "Arabic",
+      accessibility: "wheel chair",
+      pickUpLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      dropOffLocation:
+        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
+      days: [
+        {
+          day: 1,
+          activities: [
+            {
+              name: "Visit Eiffel Tower",
+              description: "Landmark tour",
+              startTime: "2024-12-01T09:00:00.000Z",
+              endTime: "2024-12-01T12:00:00.000Z",
+              location: "Paris, France",
+            },
+            {
+              name: "Wine Tasting in Bordeaux",
+              description: "Wine tour",
+              startTime: "2024-12-01T14:00:00.000Z",
+              endTime: "2024-12-01T17:00:00.000Z",
+              location: "Bordeaux, France",
+            },
+          ],
+        },
+        {
+          day: 2,
+          activities: [
+            {
+              name: "Lavender Field Tour",
+              description: "Scenic walk",
+              startTime: "2024-12-02T10:00:00.000Z",
+              endTime: "2024-12-02T13:00:00.000Z",
+              location: "Provence, France",
+            },
+          ],
+        },
+      ],
+    },
   ]);
 
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    point1: '',
-    point2: '',
-    point3: '',
-    language:'',
+    title: "",
+    description: "",
+    price: "",
+    point1: "",
+    point2: "",
+    point3: "",
+    language: "",
+    accessibility: "",
+    pickUpLocation: "",
+    dropOffLocation: "",
+    days: [],
   });
 
+  const [showActivityModal, setShowActivityModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false); // Flag to check if updating or adding
   const [currentIndex, setCurrentIndex] = useState(null); // To keep track of which itinerary is being updated
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -98,7 +293,20 @@ const ItinerariesPage = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', point1: '', point2: '', point3: '', language:'', direction: 'flex-row' });
+    setFormData({
+      title: "",
+      description: "",
+      price: "",
+      point1: "",
+      point2: "",
+      point3: "",
+      language: "",
+      accessibility: "",
+      pickUpLocation: "",
+      dropOffLocation: "",
+      days: [],
+      direction: "flex-row",
+    });
     setShowModal(false);
     setIsUpdating(false);
     setCurrentIndex(null);
@@ -118,93 +326,127 @@ const ItinerariesPage = () => {
   };
 
   return (
-    <div className='flex flex-col gap-y-10 ml-11 p-8'>
+    <div className="flex flex-col gap-y-10 py-8 px-[5.6rem]">
       <Banner background={BannerImage} name="Itineraries" />
-      <div className='w-full pe-14 flex justify-center'>
-      <button onClick={() => setShowModal(true)} className="my-4 bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400">
-        Add Itinerary
-      </button>
+      <div className="w-full flex justify-center">
+        <Button
+          onClick={() => setShowModal(true)}
+          className="my-4 bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400"
+        >
+          Add Itinerary
+        </Button>
       </div>
-
-     
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h3 className="font-bold mb-2">{isUpdating ? 'Update Itinerary' : 'Add New Itinerary'}</h3>
-            <input 
-              type="text" 
-              name="title" 
-              value={formData.title} 
-              onChange={handleInputChange} 
-              placeholder="Title" 
+            <h3 className="font-bold mb-2">
+              {isUpdating ? "Update Itinerary" : "Add New Itinerary"}
+            </h3>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Title"
               className="mb-2 p-2 border rounded w-full"
             />
-            <textarea 
-              name="description" 
-              value={formData.description} 
-              onChange={handleInputChange} 
-              placeholder="Description" 
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Description"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="price" 
-              value={formData.price} 
-              onChange={handleInputChange} 
-              placeholder="Price" 
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleInputChange}
+              placeholder="Price"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point1" 
-              value={formData.point1} 
-              onChange={handleInputChange} 
-              placeholder="Point 1" 
+            <input
+              type="text"
+              name="point1"
+              value={formData.point1}
+              onChange={handleInputChange}
+              placeholder="Point 1"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point2" 
-              value={formData.point2} 
-              onChange={handleInputChange} 
-              placeholder="Point 2" 
+            <input
+              type="text"
+              name="point2"
+              value={formData.point2}
+              onChange={handleInputChange}
+              placeholder="Point 2"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="point3" 
-              value={formData.point3} 
-              onChange={handleInputChange} 
-              placeholder="Point 3" 
+            <input
+              type="text"
+              name="point3"
+              value={formData.point3}
+              onChange={handleInputChange}
+              placeholder="Point 3"
               className="mb-2 p-2 border rounded w-full"
             />
-            <input 
-              type="text" 
-              name="language" 
-              value={formData.language} 
-              onChange={handleInputChange} 
-              placeholder="Language" 
+            <input
+              type="text"
+              name="language"
+              value={formData.language}
+              onChange={handleInputChange}
+              placeholder="Language"
               className="mb-2 p-2 border rounded w-full"
             />
-            <button 
-              onClick={isUpdating ? updateItinerary : addItinerary} 
-              className="bg-green-500 text-white p-2 rounded"
-            >
-              {isUpdating ? 'Update Itinerary' : 'Add Itinerary'}
-            </button>
-            <button 
-              onClick={resetForm} 
-              className="ml-2 bg-gray-500 text-white p-2 rounded"
-            >
-              Cancel
-            </button>
+            <input
+              type="text"
+              name="accessibility"
+              value={formData.accessibility}
+              onChange={handleInputChange}
+              placeholder="Accessibility"
+              className="mb-2 p-2 border rounded w-full"
+            />
+            <input
+              type="text"
+              name="pickUpLocation"
+              value={formData.pickUpLocation}
+              onChange={handleInputChange}
+              placeholder="Pick up location"
+              className="mb-2 p-2 border rounded w-full"
+            />
+            <input
+              type="text"
+              name="dropOffLocation"
+              value={formData.dropOffLocation}
+              onChange={handleInputChange}
+              placeholder="Drop off location "
+              className="mb-2 p-2 border rounded w-full"
+            />
+
+            <div className="flex flex-row justify-between">
+              <Button onClick={isUpdating ? updateItinerary : addItinerary}>
+                {isUpdating ? "Update Itinerary" : "Add Itinerary"}
+              </Button>
+
+              <AddActivity
+                className
+                showModal={showActivityModal}
+                setShowModal={setShowActivityModal}
+              />
+
+              <Button
+                onClick={resetForm}
+                className="ml-2 bg-gray-500 hover:bg-gray-400"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
       {itineraries.map((itinerary, index) => (
-        <ItineraryCard 
+        <ItineraryCard
           key={index}
           direction={index % 2 === 0 ? "flex-row" : "flex-row-reverse"}
           title={itinerary.title}
@@ -214,11 +456,13 @@ const ItinerariesPage = () => {
           point2={itinerary.point2}
           point3={itinerary.point3}
           language={itinerary.language}
+          accessibility={itinerary.accessibility}
+          pickUpLocation={itinerary.pickUpLocation}
+          dropOffLocation={itinerary.dropOffLocation}
           onDelete={() => removeItinerary(index)} // Pass the delete function
           onUpdate={() => openUpdateModal(index)} // Pass the update function
         />
       ))}
-       
     </div>
   );
 };

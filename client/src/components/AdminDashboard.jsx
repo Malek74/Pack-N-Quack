@@ -1,65 +1,105 @@
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { Trash2 } from "lucide-react"
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import DeleteButton from "./DeleteButton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+export default function AccountDashboard() {
+  const { toast } = useToast();
+  const [accounts, setAccounts] = useState();
+  const fetchAccounts = () => {
+    axios
+      .get("api/admins/users")
+      .then((response) => {
+        setAccounts(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
+  const deleteClicked = (account) => {
+    console.log("Hi " + account.userType);
+    axios
+      .delete(`api/admins/${account._id}`, {
+        data: {
+          userType: account.userType,
+        },
+      })
+      .then(() => {
+        toast({
+          title: "Account deleted succesfully!",
+        });
+        fetchAccounts(); // Refresh the tags list after deletion
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          text: `Failed to delete account"`,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
 
+  useEffect(() => {
+    fetchAccounts(); // Initial fetch when component mounts
+  }, []);
 
-export default function AdminDashboard() {
-
-
-
-    const accounts = [
-        { id: 1, email: "mariam@gmail.com", username: "maria" },
-        { id: 2, email: "ramnito@gmail.com", username: "ramito" },
-        { id: 3, email: "manjo@gmail.com", username: "manjp" },
-        { id: 4, email: "amir@gmail.com", username: "miro" }
-    ]
-    const deleteClicked = (id) => {
-        console.log(id)
-    }
-
-    const tableRows = accounts.map((account) => {
-        return (
-            <TableRow key={account.id}>
-                <TableCell className="font-medium">{account.id}</TableCell>
-                <TableCell>{account.username}</TableCell>
-                <TableCell>{account.email}</TableCell>
-                <TableCell className="text-right">
-                    <Button onClick={() => deleteClicked(account.id)} variant="destructive">
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete Account
-                    </Button>
-                </TableCell>
-            </TableRow>)
-    })
-    return (
-        <div>
-            <Table>
-                <TableCaption>A list of accounts</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px]">Id</TableHead>
-                        <TableHead>Username</TableHead>
-
-                        <TableHead>Email</TableHead>
-                        <TableHead className="text-right"></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {tableRows}
-                </TableBody>
-            </Table>
-
-        </div>
-
-    )
-    const [selectedCategory,setSelectedCategory]=useState(null)
+  return (
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Accounts</CardTitle>
+          <CardDescription>Manage all accounts.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {" "}
+          <Table>
+            <TableCaption>A list of accounts.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>User Type</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {accounts &&
+                accounts.map((account) => (
+                  <TableRow key={account._id}>
+                    <TableCell>{account.username}</TableCell>
+                    <TableCell>{account.email}</TableCell>
+                    <TableCell>{account.userType}</TableCell>
+                    <TableCell>
+                      <DeleteButton onConfirm={() => deleteClicked(account)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{accounts && accounts.length}</strong> accounts
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
 }

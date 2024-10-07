@@ -3,31 +3,10 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "./ui/button";
-import { Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import CreateDialog from "./CreateDialog";
-import NewActivityTagForm from "./forms/NewActivityTagForm";
-import { EditTagDialog } from "./EditActivityTag";
-import axios from "axios";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import DeleteButton from "./DeleteButton";
 import {
   Card,
   CardContent,
@@ -36,13 +15,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-export default function ActivityTags() {
+import CreateDialog from "./CreateDialog";
+import NewItineraryTagForm from "./forms/NewItineraryTagForm";
+import { EditItineraryTag } from "./EditItineraryTag";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import DeleteButton from "./DeleteButton";
+export default function ItineraryTags() {
   const [tags, setTags] = useState(null);
   const { toast } = useToast();
   // Fetch tags
   const fetchTags = () => {
     axios
-      .get("api/activity/tag")
+      .get("api/itiernaryTags")
       .then((response) => {
         setTags(response.data);
         console.log(response.data);
@@ -58,8 +44,9 @@ export default function ActivityTags() {
 
   const deleteClicked = (tagName) => {
     axios
-      .delete(`api/activity/tag/delete/${tagName}`)
+      .delete(`api/itiernaryTags/${tagName}`)
       .then((response) => {
+        console.log(response);
         toast({
           title: "Tag deleted succesfully!",
         });
@@ -78,18 +65,18 @@ export default function ActivityTags() {
     <div className="flex flex-col sm:gap-4 sm:py-4">
       <div className="place-self-end">
         <CreateDialog
-          title="Activity Tag"
-          form={<NewActivityTagForm onTagCreate={fetchTags} />}
+          title="Itinerary Tag"
+          form={<NewItineraryTagForm onTagCreate={fetchTags} />}
         />
       </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
-          <CardTitle>Activity Tags</CardTitle>
-          <CardDescription>Manage your activity tags.</CardDescription>
+          <CardTitle>Itinerary Tags</CardTitle>
+          <CardDescription>Manage your itinerary tags.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableCaption>A list of preference tags.</TableCaption>
+            <TableCaption>A list of itinerary tags.</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
@@ -100,15 +87,15 @@ export default function ActivityTags() {
             <TableBody>
               {tags &&
                 tags.map((tag) => (
-                  <TableRow key={tag.name}>
-                    <TableCell>{tag.name}</TableCell>
+                  <TableRow key={tag.tag}>
+                    <TableCell>{tag.tag}</TableCell>
                     <TableCell>
                       {/* Pass the fetchTags function to EditTagDialog */}
-                      <EditTagDialog tag={tag.name} onTagUpdate={fetchTags} />
+                      <EditItineraryTag tag={tag.tag} onTagUpdate={fetchTags} />
                     </TableCell>
                     <TableCell className="text-right">
                       <DeleteButton
-                        onConfirm={() => deleteClicked(tag.name) + fetchTags()}
+                        onConfirm={() => deleteClicked(tag.tag) + fetchTags()}
                       />
                     </TableCell>
                   </TableRow>
@@ -118,7 +105,7 @@ export default function ActivityTags() {
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">
-            Showing <strong>{tags && tags.length}</strong> activity tags
+            Showing <strong>{tags && tags.length}</strong> itinerary tags
           </div>
         </CardFooter>
       </Card>
