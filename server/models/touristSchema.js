@@ -14,6 +14,10 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
+    name: {
+        type: String,
+        required: true,
+    },
     mobile: {
         type: String,
         required: true,
@@ -26,9 +30,13 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
-    job: {
+    role: {
         type: String,
         required: true,
+    },
+    jobTitle: {
+        type: String,
+        default: ''
     },
     wallet: {
         type: Number,

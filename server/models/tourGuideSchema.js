@@ -21,7 +21,21 @@ const tourGuideSchema = new Schema({
         type: Number,
     },
     previousWork: {
-        type: String,
+        title: {
+            type: String,
+        },
+        description: {
+            type: String,
+        },
+
+        duration: {
+            type: [Date]
+        },
+
+        company: {
+            type: String,
+        },
+
     },
     isAccepted: {
         type: Boolean,
@@ -32,4 +46,4 @@ const tourGuideSchema = new Schema({
 );
 
 const tourGuide = model('TourGuide', tourGuideSchema);
-export default tourGuide;
+export default tourGuide
