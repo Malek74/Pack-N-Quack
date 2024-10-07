@@ -2,8 +2,29 @@ import { Button } from "./ui/button";
 import { Trash2 } from "lucide-react";
 import { EditProductDialog } from "./EditProduct";
 import { Rating } from "./Rating";
-
+import DeleteButton from "./DeleteButton";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 export default function ProductCard(props) {
+  const { toast } = useToast();
+  const isSeller = props.userType === "seller" ? true : false;
+  const deleteClicked = (id) => {
+    axios
+      .delete(`api/products/delete/${id}`)
+      .then(() => {
+        toast({
+          title: "Product deleted succesfully!",
+        });
+        props.onRefresh(); // Refresh the products list after deletion
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          text: "Failed to delete product",
+          variant: "destructive", // Error variant
+        });
+      });
+  };
   return (
     <div className="rounded-xl w-[20rem] h-[25rem] shadow-md relative overflow-hidden">
       {/* Image Section */}
@@ -14,20 +35,24 @@ export default function ProductCard(props) {
       />
 
       {/* Button Section */}
-      <div className="absolute top-4 right-4 flex gap-2">
-        <Button className="">
-          <Trash2 />
-        </Button>
-        <EditProductDialog
-          className="w-14 absolute bg-transparent"
-          product={{
-            name: props.name,
-            price: props.price,
-            description: props.description,
-            available_quantity: props.quantity,
-          }}
-        ></EditProductDialog>
-      </div>
+      {isSeller && (
+        <div className="absolute top-4 right-4 flex gap-2">
+          <DeleteButton
+            onConfirm={() => deleteClicked(props.id) + props.onRefresh()}
+          />
+          <EditProductDialog
+            className="w-14 absolute bg-transparent"
+            product={{
+              _id: props.id,
+              name: props.name,
+              price: props.price,
+              description: props.description,
+              available_quantity: props.available_quantity,
+            }}
+            onRefresh={props.onRefresh}
+          />
+        </div>
+      )}
 
       {/* Product Info Section */}
       <div className="flex flex-col gap-2 p-5">

@@ -48,7 +48,7 @@ export function EditProductDialog({ product, onRefresh }) {
   // Handle form submission
   function onSubmit(values) {
     axios
-      .put(`api/products/update/`, {
+      .put(`api/products/update/${product._id}`, {
         price: values.price,
         description: values.description,
       })

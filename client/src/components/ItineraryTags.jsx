@@ -105,7 +105,7 @@ export default function ItineraryTags() {
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">
-            Showing <strong>{tags && tags.length}</strong> products
+            Showing <strong>{tags && tags.length}</strong> itinerary tags
           </div>
         </CardFooter>
       </Card>

@@ -118,7 +118,8 @@ export default function ActivityCategory() {
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">
-            Showing <strong>{categories && categories.length}</strong> products
+            Showing <strong>{categories && categories.length}</strong>{" "}
+            categories
           </div>
         </CardFooter>
       </Card>
