@@ -12,8 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-export default function NewCategoryForm() {
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+export default function NewCategoryForm({ onRefresh }) {
+  const { toast } = useToast();
   const NewCategoryFormSchema = z.object({
     category: z
       .string()
@@ -31,14 +33,14 @@ export default function NewCategoryForm() {
   function onSubmit(values) {
     axios
       .post("/api/activity/category", {
-        name: values.name, // Adjusted to use POST for creation
+        name: values.category, // Adjusted to use POST for creation
       })
       .then((response) => {
         console.log("Category created successfully:", response.data);
         toast({
           title: "Category created succesfully!",
         });
-        onCategoryCreate(); // Call the parent function to refresh the table
+        onRefresh();
       })
       .catch((error) => {
         toast({

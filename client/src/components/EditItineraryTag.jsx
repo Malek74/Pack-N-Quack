@@ -67,8 +67,11 @@ export function EditItineraryTag({ tag, onTagUpdate }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex gap-2">
-          <Pencil /> <p> Edit </p>
+        <Button size="sm" className="h-8 gap-2">
+          <Pencil className="h-3.5 w-3.5" />
+          <span className="sr-only mr-2 sm:not-sr-only sm:whitespace-nowrap">
+            Edit
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent>

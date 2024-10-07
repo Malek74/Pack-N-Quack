@@ -7,17 +7,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-
+import { PlusCircle } from "lucide-react";
 export default function CreateDialog({ title, form }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="bg-gold hover:bg-goldhover text-white hover:text-white"
+          className="bg-gold hover:bg-goldhover text-white hover:text-white h-8 gap-1"
           variant="outline"
+          size="sm"
         >
-          {" "}
-          Add {title}
+          <PlusCircle className="h-3.5 w-3.5" />
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            Add {title}
+          </span>
         </Button>
       </DialogTrigger>
 

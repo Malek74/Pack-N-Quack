@@ -21,8 +21,8 @@ export default function DeleteButton({
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button variant="destructive">
-          <Trash2 className="mr-2 h-4 w-4" /> Delete
+        <Button size="sm" className="h-8 gap-2" variant="destructive">
+          <Trash2 className="h-4 w-4" /> Delete
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

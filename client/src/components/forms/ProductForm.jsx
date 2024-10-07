@@ -14,7 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-export default function ProductForm({ onRefresh }) {
+import { DialogClose } from "@radix-ui/react-dialog";
+export default function ProductForm({ onRefresh, adderId }) {
   const { toast } = useToast();
   // Define schema for validation
   const productFormSchema = z.object({
@@ -50,6 +51,7 @@ export default function ProductForm({ onRefresh }) {
         price: values.price,
         available_quantity: values.quantity,
         description: values.description,
+        id: adderId,
       })
       .then((response) => {
         console.log("Product created successfully:", response.data);
@@ -148,10 +150,11 @@ export default function ProductForm({ onRefresh }) {
             </FormItem>
           )}
         />
-
-        <Button className="place-self-end" type="submit">
-          Submit
-        </Button>
+        <DialogClose className="place-self-end">
+          <Button className="place-self-end" type="submit">
+            Submit
+          </Button>
+        </DialogClose>
       </form>
     </Form>
   );
