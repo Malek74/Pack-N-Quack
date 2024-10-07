@@ -12,17 +12,17 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
 export default function MyProfilePage() {
-  const usertype = "seller"; // This value will determine which component to render
+  const usertype = "tourist"; // This value will determine which component to render
   const { toast } = useToast();
 
   const isTourGuide = usertype === "tour_guide";
   const isAdvertiser = usertype === "advertiser";
   const isSeller = usertype === "seller";
   const isTourist = usertype === "tourist";
-
+  console.log(isTourist);
   const [profile, setProfile] = useState();
   const endpoint = "tourist";
-  const userId = "6702cde57d7e2444d9713d8d";
+  const userId = "6702e1342ed9e2a0d138f599";
 
   const fetchProfile = () => {
     axios
@@ -303,22 +303,36 @@ export default function MyProfilePage() {
         updatedAt,
         username,
       } = profile;
+
       return (
         <Card className="max-w-md mx-auto shadow-md rounded-lg">
-          {/* Company Name */}
+          {/* Name */}
           <CardHeader>
             <CardTitle className="text-xl font-semibold">{name}</CardTitle>
           </CardHeader>
-          Content
+
           <CardContent className="space-y-4">
-            {/* Description */}
             <div>
-              <h3 className="text-sm font-semibold">Description</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <h3 className="text-sm font-semibold">Username</h3>
+              <p className="text-sm text-muted-foreground">{username}</p>
+            </div>
+            {/* Nationality */}
+            <div>
+              <h3 className="text-sm font-semibold">Nationality</h3>
+              <p className="text-sm text-muted-foreground">{nationality}</p>
             </div>
 
-            {/* Establishment Date */}
-            <div></div>
+            {/* Role */}
+            <div>
+              <h3 className="text-sm font-semibold">Role</h3>
+              <p className="text-sm text-muted-foreground">{role}</p>
+            </div>
+
+            {/* Wallet */}
+            <div>
+              <h3 className="text-sm font-semibold">Wallet Balance</h3>
+              <p className="text-sm text-muted-foreground">${wallet}</p>
+            </div>
 
             {/* Contact Information */}
             <div>
@@ -327,6 +341,8 @@ export default function MyProfilePage() {
                 <strong>Mobile:</strong> {mobile}
               </p>
             </div>
+
+            {/* Date of Birth */}
             <div>
               <h3 className="text-sm font-semibold">Date of Birth</h3>
               <p className="text-sm text-muted-foreground">
@@ -337,17 +353,20 @@ export default function MyProfilePage() {
                 })}
               </p>
             </div>
+
             {/* Email */}
             <div>
               <h3 className="text-sm font-semibold">Email</h3>
               <p className="text-sm text-muted-foreground">{email}</p>
             </div>
 
-            {/* Username */}
-            <div>
-              <h3 className="text-sm font-semibold">Username</h3>
-              <p className="text-sm text-muted-foreground">{username}</p>
-            </div>
+            {/* Job Title (conditionally rendered) */}
+            {jobTitle && (
+              <div>
+                <h3 className="text-sm font-semibold">Job Title</h3>
+                <p className="text-sm text-muted-foreground">{jobTitle}</p>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex space-x-2">
