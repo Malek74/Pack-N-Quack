@@ -1,269 +1,136 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ItineraryCard from "./components/ItineraryCard";
 import Banner from "./components/BannerV2";
 import BannerImage from "../assets/romanBanner.jpg";
 import { Button } from "@/components/ui/button";
 import AddActivity from "./components/AddActivity";
+import SearchBar from "@/components/SearchBar";
+import FilterButton from "@/components/FilterButtons";
+import Multiselect from "multiselect-react-dropdown";
+import DateInput from "./components/DateInput";
+import axios from "axios";
+
 const ItinerariesPage = () => {
-  const [itineraries, setItineraries] = useState([
+  const [searchTerm, setSearchTerm] = useState("");
+  const [itinerariesDB, setItinerariesDB] = useState([]);
+  const [dates, setDates] = useState([]); //stores dates array of input
+  const [itineraryDeleted, setItineraryDeleted] = useState([]);
+  const [itineraryCreated, setItineraryCreated] = useState([]);
+  const [itineraryUpdate, setItineraryUpdate] = useState([]);
+  const [itineraryUpdatingID, setItineraryUpdatingID] = useState("");
+  const [updateActivityList, setUpdateActivityList] = useState([]);
+
+  const onUpdateActivity = (dayNumber) => {};
+
+  useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        const response = await axios.get("/api/itinerary/");
+        console.log(response.data);
+        setItinerariesDB(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchItineraries();
+  }, [itineraryDeleted, itineraryCreated, itineraryUpdate]);
+
+  const [tags, setTags] = useState([]);
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get("/api/itiernaryTags");
+        console.log(response.data);
+        setTags(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchTags();
+  }, []);
+
+  const handleDelete = (id) => {
+    axios
+      .delete(`/api/itinerary/${id}`)
+      .then((response) => {
+        setItineraryDeleted(response.data); // Update the deletion state
+        console.log("Deleted itinerary:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error deleting itinerary:", error);
+      });
+  };
+
+  const buttons = [
     {
-      title: "Discover France",
-      description:
-        "Explore the rich culture of France with this itinerary! Begin in Paris, the City of Lights, where you'll visit iconic landmarks such as the Eiffel Tower, the Louvre Museum, and Notre-Dame Cathedral. Then, venture into the wine country of Bordeaux and the rolling lavender fields of Provence. Finally, unwind on the glamorous beaches of the French Riviera. This journey combines history, art, cuisine, and natural beauty to give you an unforgettable French experience.",
-      price: "1200",
-      point1: "Landmarks",
-      point2: "Cuisine",
-      point3: "Beaches",
-      language: "English",
-      accessibility: "wheel chair",
-      pickUpLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      // direction: "flex-row"
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "Visit Eiffel Tower",
-              description: "Landmark tour",
-              startTime: "2024-12-01T09:00:00.000Z",
-              endTime: "2024-12-01T12:00:00.000Z",
-              location: "Paris, France",
-            },
-            {
-              name: "Wine Tasting in Bordeaux",
-              description: "Wine tour",
-              startTime: "2024-12-01T14:00:00.000Z",
-              endTime: "2024-12-01T17:00:00.000Z",
-              location: "Bordeaux, France",
-            },
-          ],
-        },
-        {
-          day: 2,
-          activities: [
-            {
-              name: "Lavender Field Tour",
-              description: "Scenic walk",
-              startTime: "2024-12-02T10:00:00.000Z",
-              endTime: "2024-12-02T13:00:00.000Z",
-              location: "Provence, France",
-            },
-          ],
-        },
+      type: "Sort By", // This will create a "Sort By" dropdown
+      options: [
+        { label: "Price Low To High", value: "price-low-to-high" },
+        { label: "Price High To Low", value: "price-high-to-low" },
       ],
     },
     {
-      title: "Grand Tour of Italy",
-      description:
-        "Discover the timeless beauty of Italy with this extensive itinerary! Start in Rome, where ancient ruins like the Colosseum and Roman Forum await. Marvel at Vatican City, home to St. Peter's Basilica and the Sistine Chapel. Travel to Florence for Renaissance art and architecture, and then to Venice, where gondola rides through scenic canals offer a glimpse of its unique charm. Conclude your trip in the Amalfi Coast, renowned for its stunning cliffs and azure waters.",
-      price: "1500",
-      point1: "Ancient Ruins",
-      point2: "Art & Architecture",
-      point3: "Coastal Views",
-      language: "English",
-      accessibility: "wheel chair",
-      pickUpLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      // direction: "flex-row-reverse"
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "Visit Eiffel Tower",
-              description: "Landmark tour",
-              startTime: "2024-12-01T09:00:00.000Z",
-              endTime: "2024-12-01T12:00:00.000Z",
-              location: "Paris, France",
-            },
-            {
-              name: "Wine Tasting in Bordeaux",
-              description: "Wine tour",
-              startTime: "2024-12-01T14:00:00.000Z",
-              endTime: "2024-12-01T17:00:00.000Z",
-              location: "Bordeaux, France",
-            },
-          ],
-        },
-        {
-          day: 2,
-          activities: [
-            {
-              name: "Lavender Field Tour",
-              description: "Scenic walk",
-              startTime: "2024-12-02T10:00:00.000Z",
-              endTime: "2024-12-02T13:00:00.000Z",
-              location: "Provence, France",
-            },
-          ],
-        },
+      type: "Price", // This will create a "Filter By" dropdown
+      options: [
+        { label: "EGP 0-100", value: "EGP 0-100" },
+        { label: "EGP 100-200", value: "EGP 100-200" },
+        { label: "EGP 200-300", value: "EGP 200-300" },
+        { label: "EGP 300-400", value: "EGP 300-400" },
+        { label: "EGP 400-500", value: "EGP 400-500" },
+        { label: "More than EGP 500", value: "More than EGP 500" },
       ],
     },
     {
-      title: "Mystical Japan",
-      description:
-        "Embark on a journey through the ancient and modern wonders of Japan. Begin in Tokyo, a city where cutting-edge technology meets traditional temples. Visit Kyoto, where you can stroll through tranquil bamboo forests, serene Zen gardens, and centuries-old shrines. Experience the beauty of Mount Fuji and enjoy a hot spring bath in the nearby Hakone region. Finally, head to Hiroshima to witness a city that has transformed into a symbol of peace and resilience.",
-      price: "1800",
-      point1: "Modern Cities",
-      point2: "Historic Temples",
-      point3: "Natural Wonders",
-      language: "English",
-      accessibility: "wheel chair",
-      pickUpLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      // direction: "flex-row"
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "Visit Eiffel Tower",
-              description: "Landmark tour",
-              startTime: "2024-12-01T09:00:00.000Z",
-              endTime: "2024-12-01T12:00:00.000Z",
-              location: "Paris, France",
-            },
-            {
-              name: "Wine Tasting in Bordeaux",
-              description: "Wine tour",
-              startTime: "2024-12-01T14:00:00.000Z",
-              endTime: "2024-12-01T17:00:00.000Z",
-              location: "Bordeaux, France",
-            },
-          ],
-        },
-        {
-          day: 2,
-          activities: [
-            {
-              name: "Lavender Field Tour",
-              description: "Scenic walk",
-              startTime: "2024-12-02T10:00:00.000Z",
-              endTime: "2024-12-02T13:00:00.000Z",
-              location: "Provence, France",
-            },
-          ],
-        },
+      type: "Date",
+      options: [
+        { label: "In the next week", value: "In the next week" },
+        { label: "In the next 2 weeks", value: "In the next 2 weeks" },
+        { label: "In the next 1 month", value: "In the next 1 month" },
+        { label: "In the next 6 months", value: "In the next 6 months" },
+        { label: "In the next 1 year", value: "In the next 1 year" },
       ],
     },
     {
-      title: "Scenic New Zealand",
-      description:
-        "Experience the stunning landscapes of New Zealand with this outdoor adventure itinerary. Start in Auckland and make your way to Rotorua, known for its geothermal activity and Maori culture. Then, explore the rolling hills of Hobbiton and continue to Queenstown, the adventure capital, where activities like bungee jumping, skiing, and mountain biking await. Finally, visit the majestic Milford Sound, a fjord surrounded by towering cliffs and cascading waterfalls.",
-      price: "2000",
-      point1: "Outdoor Adventures",
-      point2: "Cultural Experiences",
-      point3: "Fjord Exploration",
-      language: "Arabic",
-      accessibility: "wheel chair",
-      pickUpLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      // direction: "flex-row-reverse"
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "Visit Eiffel Tower",
-              description: "Landmark tour",
-              startTime: "2024-12-01T09:00:00.000Z",
-              endTime: "2024-12-01T12:00:00.000Z",
-              location: "Paris, France",
-            },
-            {
-              name: "Wine Tasting in Bordeaux",
-              description: "Wine tour",
-              startTime: "2024-12-01T14:00:00.000Z",
-              endTime: "2024-12-01T17:00:00.000Z",
-              location: "Bordeaux, France",
-            },
-          ],
-        },
-        {
-          day: 2,
-          activities: [
-            {
-              name: "Lavender Field Tour",
-              description: "Scenic walk",
-              startTime: "2024-12-02T10:00:00.000Z",
-              endTime: "2024-12-02T13:00:00.000Z",
-              location: "Provence, France",
-            },
-          ],
-        },
+      type: "Language",
+      options: [
+        { label: "English", value: "English" },
+        { label: "Arabic", value: "Arabic" },
+        { label: "Russian", value: "Russian" },
       ],
     },
     {
-      title: "Treasures of Egypt",
-      description:
-        "Delve into the wonders of ancient Egypt with this historically rich itinerary. Begin your journey in Cairo, where the Great Pyramids of Giza and the Sphinx stand as testaments to Egypt's grandeur. Sail along the Nile River to Luxor, home to the Valley of the Kings and Karnak Temple. Explore the temples of Abu Simbel, and cap off your trip with a visit to the vibrant markets of Aswan. This itinerary is perfect for history buffs and those seeking a connection to one of the world's oldest civilizations.",
-      price: "1700",
-      point1: "Ancient Monuments",
-      point2: "Nile River Cruise",
-      point3: "Cultural Immersion",
-      language: "Arabic",
-      accessibility: "wheel chair",
-      pickUpLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      dropOffLocation:
-        "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate",
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "Visit Eiffel Tower",
-              description: "Landmark tour",
-              startTime: "2024-12-01T09:00:00.000Z",
-              endTime: "2024-12-01T12:00:00.000Z",
-              location: "Paris, France",
-            },
-            {
-              name: "Wine Tasting in Bordeaux",
-              description: "Wine tour",
-              startTime: "2024-12-01T14:00:00.000Z",
-              endTime: "2024-12-01T17:00:00.000Z",
-              location: "Bordeaux, France",
-            },
-          ],
-        },
-        {
-          day: 2,
-          activities: [
-            {
-              name: "Lavender Field Tour",
-              description: "Scenic walk",
-              startTime: "2024-12-02T10:00:00.000Z",
-              endTime: "2024-12-02T13:00:00.000Z",
-              location: "Provence, France",
-            },
-          ],
-        },
+      type: "Preferences",
+      options: [
+        ...tags.map((tag) => ({
+          label: tag.tag,
+          value: tag.tag,
+        })),
       ],
     },
-  ]);
+    {
+      type: "Ratings",
+      options: [
+        { label: "1 star and more", value: "1 star and more" },
+        { label: "2 stars and more", value: "2 stars and more" },
+        { label: "3 stars and more", value: "3 stars and more" },
+        { label: "4 stars and more", value: "4 stars and more" },
+        { label: "5 stars", value: "5 stars" },
+      ],
+    },
+  ];
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     price: "",
-    point1: "",
-    point2: "",
-    point3: "",
     language: "",
     accessibility: "",
     pickUpLocation: "",
     dropOffLocation: "",
+    tags: [],
     days: [],
+    dates: [],
+    tourGuideID: "66fb241366ea8f57d59ec6db",
   });
 
   const [showActivityModal, setShowActivityModal] = useState(false);
@@ -280,16 +147,62 @@ const ItinerariesPage = () => {
   };
 
   const addItinerary = () => {
-    setItineraries([...itineraries, formData]);
+    // setItineraries([formData]);
+
+    formData.dates = dates;
+    formData.days = activitiesByDay;
+    formData.tags = selectedTags;
+    formData.tourGuideID = "66fb241366ea8f57d59ec6db";
+    console.log(formData);
+
+    axios
+      .post("/api/itinerary/", formData) // Pass formData directly as the second argument
+      .then((response) => {
+        console.log("Itinerary added:", response.data); // Handle successful response
+        setItineraryCreated(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error adding the itinerary:", error); // Handle errors
+      });
+
     resetForm();
   };
 
   const updateItinerary = () => {
-    const updatedItineraries = itineraries.map((itinerary, index) =>
-      index === currentIndex ? formData : itinerary
-    );
-    setItineraries(updatedItineraries);
+    formData.dates = dates;
+    formData.days = activitiesByDay;
+    formData.tags = selectedTags;
+    formData.tourGuideID = "66fb241366ea8f57d59ec6db";
+
+    console.log(formData);
+
+    axios
+      .put(`/api/itinerary/${itineraryUpdatingID}`, formData) // Pass formData directly as the second argument
+      .then((response) => {
+        console.log(response.data);
+        setItineraryUpdate(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error adding the itinerary:", error); // Handle errors
+      });
     resetForm();
+  };
+
+  const handleSelectTags = (selectedList) => {
+    const tagsString = selectedList.map((tag) => `#${tag}`).join(" ");
+    setFormData((prevData) => ({
+      ...prevData,
+      tags: tagsString,
+    }));
+  };
+
+  // Function to handle when an option is removed
+  const handleRemoveTags = (selectedList) => {
+    const tagsString = selectedList.map((tag) => `#${tag}`).join(" ");
+    setFormData((prevData) => ({
+      ...prevData,
+      tags: tagsString,
+    }));
   };
 
   const resetForm = () => {
@@ -297,37 +210,91 @@ const ItinerariesPage = () => {
       title: "",
       description: "",
       price: "",
-      point1: "",
-      point2: "",
-      point3: "",
       language: "",
       accessibility: "",
       pickUpLocation: "",
       dropOffLocation: "",
       days: [],
+      tags: "",
+      dates: [],
       direction: "flex-row",
     });
+    setDates([]);
+    setActivitiesByDay([]);
+    setSelectedTags([]);
     setShowModal(false);
     setIsUpdating(false);
     setCurrentIndex(null);
   };
 
-  const removeItinerary = (index) => {
-    const updatedItineraries = itineraries.filter((_, i) => i !== index);
-    setItineraries(updatedItineraries);
-  };
+  // const removeItinerary = (index) => {
+  //   const updatedItineraries = itineraries.filter((_, i) => i !== index);
+  //   setItineraries(updatedItineraries);
+  // };
 
   // Function to handle the update button click
-  const openUpdateModal = (index) => {
-    setFormData(itineraries[index]); // Pre-fill the form with the itinerary data
+  const openUpdateModal = (index, id) => {
+    setItineraryUpdatingID(id);
+    setFormData({ ...itinerariesDB[index], title: itinerariesDB[index].name }); // Pre-fill the form with the itinerary data
     setCurrentIndex(index); // Set the current index of the itinerary being updated
     setIsUpdating(true); // Set the flag to updating
     setShowModal(true); // Show the modal
   };
 
+  const [activitiesByDay, setActivitiesByDay] = useState([]);
+
+  const handleAddActivity = (dayNumber, newActivity) => {
+    // Find if the day already exists
+    const dayIndex = activitiesByDay.findIndex(
+      (daySearchIndex) => daySearchIndex.day === parseInt(dayNumber)
+    );
+
+    if (dayIndex !== -1) {
+      // If the day exists, append the new activity
+      const updatedActivities = activitiesByDay;
+      updatedActivities[dayIndex].activities.push(newActivity);
+      setActivitiesByDay(updatedActivities);
+    } else {
+      // If the day doesn't exist, create a new day object
+      const newDay = {
+        day: parseInt(dayNumber),
+        activities: [newActivity],
+      };
+      setActivitiesByDay([...activitiesByDay, newDay]);
+    }
+    console.log(activitiesByDay);
+  };
+
+  const [selectedTags, setSelectedTags] = useState([]);
+  const handleSelect = (selectedList) => {
+    setSelectedTags(selectedList);
+    // Log or perform other actions with the selected tags
+  };
+
+  const handleRemove = (selectedList) => {
+    setSelectedTags(selectedList);
+    // Log or perform other actions with the updated tags
+  };
+
   return (
     <div className="flex flex-col gap-y-10 py-8 px-[5.6rem]">
-      <Banner background={BannerImage} name="Itineraries" />
+      <div className="relative mb-6">
+        <Banner background={BannerImage} name="Itineraries" />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder={"Look for something fun to do!"}
+        />
+      </div>
+
+      <div className="flex">
+        <span className="ml-18">
+          {" "}
+          <FilterButton buttons={buttons} />
+        </span>
+        {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
+      </div>
+
       <div className="w-full flex justify-center">
         <Button
           onClick={() => setShowModal(true)}
@@ -368,35 +335,21 @@ const ItinerariesPage = () => {
             />
             <input
               type="text"
-              name="point1"
-              value={formData.point1}
-              onChange={handleInputChange}
-              placeholder="Point 1"
-              className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-              type="text"
-              name="point2"
-              value={formData.point2}
-              onChange={handleInputChange}
-              placeholder="Point 2"
-              className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-              type="text"
-              name="point3"
-              value={formData.point3}
-              onChange={handleInputChange}
-              placeholder="Point 3"
-              className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-              type="text"
               name="language"
               value={formData.language}
               onChange={handleInputChange}
               placeholder="Language"
               className="mb-2 p-2 border rounded w-full"
+            />
+
+            <Multiselect
+              className="w-full mb-2"
+              isObject={false} // Set to true if using objects instead of strings
+              options={tags.map((tag) => tag.tag)} // Populate options with tag names
+              onSelect={handleSelect} // Callback when tags are selected
+              onRemove={handleRemove} // Callback when tags are removed
+              selectedValues={selectedTags} // Set the currently selected tags
+              displayValue="tag" // Set display value (if using objects)
             />
             <input
               type="text"
@@ -423,6 +376,8 @@ const ItinerariesPage = () => {
               className="mb-2 p-2 border rounded w-full"
             />
 
+            <DateInput dates={dates} setDates={setDates} />
+
             <div className="flex flex-row justify-between">
               <Button onClick={isUpdating ? updateItinerary : addItinerary}>
                 {isUpdating ? "Update Itinerary" : "Add Itinerary"}
@@ -432,6 +387,7 @@ const ItinerariesPage = () => {
                 className
                 showModal={showActivityModal}
                 setShowModal={setShowActivityModal}
+                onSubmit={handleAddActivity}
               />
 
               <Button
@@ -444,25 +400,46 @@ const ItinerariesPage = () => {
           </div>
         </div>
       )}
-
-      {itineraries.map((itinerary, index) => (
+      {itinerariesDB.map((itinerary, index) => (
         <ItineraryCard
+          id={itinerary._id}
+          key={itinerary._id}
+          direction={index % 2 === 0 ? "flex-row" : "flex-row-reverse"}
+          title={itinerary.name}
+          description={itinerary.description}
+          price={itinerary.price}
+          language={itinerary.language}
+          accessibility={itinerary.accessibility}
+          pickUpLocation={itinerary.pickUpLocation}
+          dropOffLocation={itinerary.dropOffLocation}
+          days={itinerary.days}
+          availableDates={itinerary.available_dates}
+          tags={itinerary.tags}
+          rating={itinerary.ratings.averageRating}
+          onDelete={() => {
+            handleDelete(itinerary._id);
+          }} // Pass the delete function
+          onUpdate={() => {
+            openUpdateModal(index, itinerary._id);
+          }} // Pass the update function
+        />
+      ))}
+      {/* {itineraries.map((itinerary, index) => (
+        <ItineraryCard 
           key={index}
           direction={index % 2 === 0 ? "flex-row" : "flex-row-reverse"}
           title={itinerary.title}
           description={itinerary.description}
           price={itinerary.price}
-          point1={itinerary.point1}
-          point2={itinerary.point2}
-          point3={itinerary.point3}
           language={itinerary.language}
           accessibility={itinerary.accessibility}
           pickUpLocation={itinerary.pickUpLocation}
           dropOffLocation={itinerary.dropOffLocation}
+          tags={itinerary.tags}
           onDelete={() => removeItinerary(index)} // Pass the delete function
           onUpdate={() => openUpdateModal(index)} // Pass the update function
         />
-      ))}
+      ))} */}
     </div>
   );
 };

@@ -27,7 +27,7 @@ const routes = createRoutesFromElements(
     <Route path="RegistrationPage" element={<RegistrationPage />} />
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
-    <Route path="itineraryfullpage" element={<SingleItineraryPage/>}/>
+    <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
     <Route
       path="*"
       element={
@@ -36,7 +36,7 @@ const routes = createRoutesFromElements(
         </ErrorBoundary>
       }
     />
-  </Route>,
+  </Route>
 );
 
 export default routes;
