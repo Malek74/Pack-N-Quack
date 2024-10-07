@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+
 export default function MyProfilePage() {
-  const usertype = "advertiser"; // This value will determine which component to render
+  const usertype = "tour_guide"; // This value will determine which component to render
   const { toast } = useToast();
   const isTourGuide = usertype === "tour_guide";
   const isAdvertiser = usertype === "advertiser";
@@ -19,8 +20,8 @@ export default function MyProfilePage() {
   const isTourist = usertype === "tourist";
 
   const [profile, setProfile] = useState();
-  const endpoint = "advertisers";
-  const userId = "670422fdde2123588af70756";
+  const endpoint = usertype === "tour_guide" ? "tourGuide" : "advertiser"; // Change API endpoint based on user type
+  const userId = "67043893d24088186a943773";
 
   const fetchProfile = () => {
     axios
@@ -33,10 +34,12 @@ export default function MyProfilePage() {
         console.error(error);
       });
   };
+
   useEffect(() => {
     fetchProfile(); // Initial fetch when component mounts
   }, []);
 
+  // Advertiser Profile Card (AdvCard)
   function AdvCard() {
     if (profile) {
       const {
@@ -49,6 +52,7 @@ export default function MyProfilePage() {
         username,
         isAccepted,
       } = profile;
+
       return (
         <Card className="max-w-md mx-auto shadow-md rounded-lg">
           {/* Company Name */}
@@ -130,11 +134,111 @@ export default function MyProfilePage() {
         </Card>
       );
     }
+    return null;
   }
+
+  // Tour Guide Profile Card (TourGuideCard)
+  function TourGuideCard() {
+    if (profile) {
+      const {
+        previousWork,
+        experienceYears,
+        email,
+        username,
+        mobile,
+        isAccepted,
+      } = profile;
+
+      return (
+        <Card className="max-w-md mx-auto shadow-md rounded-lg">
+          {/* Tour Guide Info */}
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">{username}</CardTitle>
+            <Badge
+              variant={isAccepted ? "success" : "destructive"}
+              className="mt-2"
+            >
+              {isAccepted ? "Accepted" : "Pending"}
+            </Badge>
+          </CardHeader>
+
+          {/* Content */}
+          <CardContent className="space-y-4">
+            {/* Experience Years */}
+            <div>
+              <h3 className="text-sm font-semibold">Experience</h3>
+              <p className="text-sm text-muted-foreground">
+                {experienceYears} years of experience
+              </p>
+            </div>
+
+            {/* Previous Work Section */}
+            <div>
+              <h3 className="text-sm font-semibold">Previous Work</h3>
+              <div className="space-y-2">
+                {Array.isArray(previousWork) && previousWork.length > 0 ? (
+                  previousWork.map((work, index) => (
+                    <div key={index} className="border p-2 rounded-lg">
+                      <p className="font-semibold text-sm">{work.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Company:</strong> {work.company}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Duration:</strong>{" "}
+                        {work.duration.length > 0
+                          ? `${new Date(
+                              work.duration[0]
+                            ).toLocaleDateString()} - ${new Date(
+                              work.duration[1]
+                            ).toLocaleDateString()}`
+                          : "Duration not available"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {work.description}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No previous work data available.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div>
+              <h3 className="text-sm font-semibold">Contact Information</h3>
+              <p className="text-sm text-muted-foreground">
+                <strong>Email:</strong> {email}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <strong>Mobile:</strong> {mobile}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <CreateDialog
+                form={
+                  <TourGuideProfile
+                    profile={profile}
+                    onRefresh={fetchProfile}
+                  />
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+    return null;
+  }
+
   return (
     <div>
       <MyFirstComponent />
-      {isTourGuide && <TourGuideProfile />}
+      {isTourGuide && <div>{profile && <TourGuideCard />}</div>}
       {isAdvertiser && <div>{profile && <AdvCard />}</div>}
       {isSeller && <SellerProfile />}
       {isTourist && <TouristProfile />}
