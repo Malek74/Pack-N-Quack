@@ -70,11 +70,14 @@ export const getTourGuideById = async (req, res) => {
 export const editTourGuide = async (req, res) => {
     try {
         const id = req.params.id;
-        const { email, mobile, experienceYears, previousWork, isAccepted } = req.body;
-
+        const { email, mobile, experienceYears, previousWork, isAccepted, oldEmail } = req.body;
+        console.log(req.body)
         if (email) {
-            if (await emailExists(email)) {
-                return res.status(400).json({ message: "Email already exists" });
+            if (email != oldEmail) {
+                console.log("HIII")
+                if (await emailExists(email)) {
+                    return res.status(400).json({ message: "Email already exists" });
+                }
             }
         }
         // Create an object with the fields to update

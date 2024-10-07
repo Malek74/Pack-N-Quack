@@ -61,26 +61,26 @@ export const getTourists = async (req, res) => {
 // Tourist update data by username
 export const updateTourist = async (req, res) => {
     // DOB, Username, Wallet are not changable
-    const { password, mobile, nationality, role, jobTitle, name } = req.body;
-    const { username } = req.params;
-
+    const username = req.params.id;
+    console.log(req.body)
+    console.log(username)
     try {
         // If a new email is being passed for update, check if it's already taken
         const newEmail = req.body.email;
         console.log(newEmail);
-        const doesEmailExists = await emailExists(newEmail);
-        console.log(doesEmailExists);
-        if (doesEmailExists) {
-            return res.status(400).json({ message: "Email is already taken" });
-        }
-        if (role == "Student") {
-            jobTitle = "";
+        if (newEmail != req.body.oldEmail) {
+            const doesEmailExists = await emailExists(newEmail);
+            console.log(doesEmailExists);
+            if (doesEmailExists) {
+                return res.status(400).json({ message: "Email is already taken" });
+            }
         }
         const updatedTourist = await Tourist.findOneAndUpdate(
-            { username },
-            { email: newEmail, password, mobile, nationality, jobTitle, role, name },
+            { _id: username },
+            req.body,
             { new: true }
         );
+        console.log(updatedTourist);
         return res.status(200).json(updatedTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });

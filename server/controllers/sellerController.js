@@ -53,14 +53,14 @@ export const getSellerByID = async (req, res) => {
 //update by ID
 export const updateSellerInfo = async (req, res) => {
     const id = req.params.id;
-    const { email, username, password, name, description, isAccepted } = req.body;
+    const { email, oldEmail, username, password, name, description, isAccepted } = req.body;
 
     const oldSeller = await seller.findById(id);
     if (!oldSeller) {
         return res.status(404).json({ message: "Seller not found" });
     }
 
-    if (email) {
+    if (email != oldEmail) {
         const doesEmailExists = await emailExists(email);
         if (doesEmailExists) {
             return res.status(400).json({ message: "Email already exists" });
