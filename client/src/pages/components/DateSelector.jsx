@@ -23,7 +23,7 @@ const DateSelector = ({ dates }) => {
       <h1 className="text-2xl font-bold mb-4">
         {selectedDate
           ? `Selected Date: ${formatDate(selectedDate)}`
-          : 'Avialable Dates'}
+          : 'Available Dates'}
       </h1>
 
       {/* Dropdown for selecting a date */}
@@ -33,7 +33,7 @@ const DateSelector = ({ dates }) => {
         className="border p-2 rounded"
       >
         <option value="" disabled>Select a date</option>
-        {dates.map((date, index) => (
+        {(Array.isArray(dates) ? dates : []).map((date, index) => (
           <option key={index} value={date}>
             {formatDate(date)}
           </option>

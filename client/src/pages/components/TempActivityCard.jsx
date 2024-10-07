@@ -3,12 +3,24 @@ import { Trash2 } from 'lucide-react';
 import EditActivity from "./editItineraryActivity";
 import Maps from "../../components/Maps";
 
-function formatTime(time) {
-    const [hours, minutes] = time.split(':');
-    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-    const amPm = hours >= 12 ? 'PM' : 'AM';
-    return `${formattedHours}:${minutes} ${amPm}`;
-}
+// Function to format the ISO date to a more readable time format
+const formatTime = (isoString) => {
+    const date = new Date(isoString);
+    
+    // Get the hours and minutes
+    let hours = date.getUTCHours(); // Use getUTCHours() to avoid timezone conversion
+    const minutes = date.getUTCMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM'; // Determine AM or PM
+
+    // Convert to 12-hour format
+    hours = hours % 12; // Convert 0-23 hour format to 0-11
+    hours = hours ? hours : 12; // If hours is 0, set it to 12 for 12 AM
+
+    // Format hours and minutes to be two digits
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+    
+    return formattedTime; // Return the formatted time
+};
 
 export default function TempActivityCard(props) {
     return (

@@ -15,6 +15,8 @@ const ItineraryCardDetails = (props) => {
             <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Accessibility: `}<span className="font-normal text-base">{props.accessibility}</span></span></li>
             <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Pick up location: `}<span className="font-normal text-base">{props.pickUpLocation}</span></span></li>
             <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Drop off location: `}<span className="font-normal text-base">{props.dropOffLocation}</span></span></li>
+            <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Rating: `}<span className="font-normal text-base">{props.rating}</span></span></li>
+            <li className='flex items-center flex-row mt-4 text-base font-light text-gray-500 gap-x-2'>{Array.isArray(props.tags)&&props.tags.map((tag) => (<span>{`#${tag.tag}`}</span>))}</li>
               <DateSelector dates={props.availableDates}></DateSelector>
             </ul>
             <img

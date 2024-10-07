@@ -3,9 +3,9 @@ import BlurredImage from './BlurredImage';
 import checkIcon from '../../assets/check.svg'
 import highlights from "../../assets/itineraryHighlights.svg"
 import { Button } from '@/components/ui/button';
-import { Link  } from "react-router-dom";
-
+import { useNavigate} from "react-router-dom";
 const ItineraryCard = (props) => {
+  const navigate = useNavigate();
   return (
     <div className= {`flex w-full justify-between ${props.direction}`}> {/* Make the card fill the full width */}
       <div className='flex flex-col w-1/2 justify-between'> {/* Left side for text, taking 50% width */}
@@ -14,6 +14,8 @@ const ItineraryCard = (props) => {
         <ul className='list-disc mb-4'>
           <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Tour Language: `}<span className="font-normal text-base">{props.language}</span></span></li>
           <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Accessibility: `}<span className="font-normal text-base">{props.accessibility}</span></span></li>
+          <li className='flex items-center'><img src={checkIcon} alt="icon" style={{ width: '20px', height: '20px', marginRight: '10px' }}></img> <span className="font-medium text-lg">{`Rating: `}<span className="font-normal text-base">{props.rating}</span></span></li>
+          <li className='flex items-center flex-row mt-4 text-base font-light text-gray-500 gap-x-2'>{Array.isArray(props.tags)&&props.tags.map((tag) => (<span>{`#${tag.tag}`}</span>))}</li>
           
         </ul>
         <img
@@ -23,10 +25,9 @@ const ItineraryCard = (props) => {
        />
        
        <div className='flex flex-row gap-4'>
-        <Button className = "w-1/5 h-12">
-        <Link   to = {{pathname: '/itineraryfullpage', state: props}} >
+        <Button className = "w-1/5 h-12" onClick={()=>{navigate(`/itineraryfullpage/${props.id}`)
+}}>
           View Details
-        </Link>
         </Button>
         <Button 
           onClick={ props.onUpdate} 

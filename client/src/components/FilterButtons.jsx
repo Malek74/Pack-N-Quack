@@ -9,7 +9,7 @@ import {
 // Define the component to accept an array of buttons with type and options
 export default function FilterButtons({ buttons = [] }) {
     return (
-        <section className="flex mb-20 gap-2">
+        <section className="flex mb-1 gap-2">
             {/* Check if buttons array exists and map through it */}
             {buttons.length > 0 ? (
                 buttons.map((button, index) => (

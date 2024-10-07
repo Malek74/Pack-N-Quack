@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ItineraryCard from './components/ItineraryCardDetails';
 import TempActivityCard from './components/TempActivityCard';
 import Banner from "@/components/Banner";
@@ -8,25 +8,44 @@ import memo from "../images/memo.png";
 import amy from "../images/amy.jpeg";
 import duckie from "../assets/duckiePool.jpg"
 import { Button } from '@/components/ui/button';
+import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-const SingleItineraryPage = (props) => {
+const SingleItineraryPage = () => {
+  const {id} = useParams();
+  const [itinerary, setItinerary] = useState([])
+
+  useEffect(() => {
+    console.log("ahndhasdnjas")
+    const fetchItinerary = async () => {
+      try {
+        const response = await axios.get(`/api/itinerary/viewItinerary/${id}`);
+        console.log(response.data)
+        setItinerary(response.data)
+       // setItinerariesDB(response.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchItinerary();
+  },[])
+
   // State to hold days and their activities
+  const location = useLocation();
+  const props = location.state || {};
   const [days, setDays] = useState([
     {
       day: 1,
       activities: [
         {
-          img: lege,
-          alt: "Lege-cy concert adv",
-          name: "Lege-Cy Live at Boom Room",
           description: "Concert",
           startTime: "2024-12-10T09:00:00.000Z",
           endTime: "2024-12-10T12:00:00.000Z",
           location: "Boom Room, Open Air Mall, Madinaty",
         },
         {
-          img: memo,
-          alt: "Memo play adv",
+
           name: "MEMO Play",
           description: "Theatrical play",
           startTime: "2024-12-10T09:00:00.000Z",
@@ -64,6 +83,8 @@ const SingleItineraryPage = (props) => {
     accessibility: '',
     pickUpLocation: '',
     dropOffLocation: '',
+    tags: [],
+    rating: '',
     day: null, // To keep track of which day to add the activity
   });
 
@@ -129,24 +150,29 @@ const SingleItineraryPage = (props) => {
     '2024-10-09T09:00:00.000Z',
     '2024-10-10T09:00:00.000Z',
   ];
+  console.log(props);
   
   return (
-  
+
+
     <div className='flex flex-col gap-y-10 py-8 px-[5.6rem]'>
 
       <ItineraryCard
-        title="Grand Tour of Italy"
-        description="Discover the timeless beauty of Italy with this extensive itinerary! Start in Rome, where ancient ruins like the Colosseum and Roman Forum await. Marvel at Vatican City, home to St. Peter's Basilica and the Sistine Chapel. Travel to Florence for Renaissance art and architecture, and then to Venice, where gondola rides through scenic canals offer a glimpse of its unique charm. Conclude your trip in the Amalfi Coast, renowned for its stunning cliffs and azure waters."
-        price= {1500}
-        point1="Ancient Ruins"
-        point2="Art & Architecture"
-        point3="Coastal Views"
-        language="English"
-        accessibility= "wheel chair"
-        pickUpLocation= "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate"
-        dropOffLocation= "Al tagamoa, Gamal Abdel Nasser, New Cairo 1, Cairo Governorate"
-        availableDates= {dates}
+        title= {itinerary.name}
+        description= {itinerary.description}
+        price= {itinerary.price}
+        language={itinerary.language}
+        accessibility= {itinerary.accessibility}
+        pickUpLocation= {itinerary.pickUpLocation}
+        dropOffLocation= {itinerary.dropOffLocation}
+        availableDates= {itinerary.available_dates}
+        rating = {itinerary?.ratings?.averageRating ?? null}
+        tags= {itinerary.tags}
       />
+
+      {/* {{itinerary.days}.map((day) => (
+
+      ));} */}
 
       {/* Button to add a new activity */}      
       <Button onClick={() => setShowModal(true)} className="bg-gray-300 p-2 mt-8 hover:bg-gray-400">
@@ -207,6 +233,7 @@ const SingleItineraryPage = (props) => {
         className="mb-2 p-2 border rounded w-full"
         min="1"
       />
+      
       <Button
         onClick={isUpdating ? updateActivity : addActivity}
         className="bg-green-500 text-white p-2 rounded"
@@ -220,9 +247,31 @@ const SingleItineraryPage = (props) => {
   </div>
 )}
 
+{Array.isArray(itinerary.days) && itinerary.days.map((day) => (
+  <div key = {day.day}>
+    <h1 className='text-6xl mb-8 mt-2 flex justify-center font-semibold text-[#E7B008] drop-shadow '>Day {day.day}</h1>
+          <div className="flex overflow-x-auto p-4 space-x-8">
+            {Array.isArray(day.activities)&&day.activities.map((activity) => (
+              <div className="min-w-[25rem]">
+                <TempActivityCard
+                  id= {activity._id}
+                  img= {duckie}
+                  name={activity.name}
+                  description={"this is one of the best places you will visit"}
+                  startTime={activity.duration.startTime?? 'not provided'}
+                  endTime={activity.duration.endTime?? 'not provided'}
+                  location={activity.location}
+                  onDelete={() => removeActivity(dayIndex, activityIndex)}
+                  onUpdate={() => openUpdateModal(dayIndex, activityIndex)}
+                />
+              </div>
+            ))}
+          </div>
+  </div>
+))}
 
       {/* Display mapped activities grouped by day */}
-      {days.map((dayObj, dayIndex) => (
+      {/* {days.map((dayObj, dayIndex) => (
         <div key={dayIndex}>
           <h1 className='text-6xl mb-8 mt-2 flex justify-center font-semibold text-[#E7B008] drop-shadow '>Day {dayObj.day}</h1>
           <div className="flex overflow-x-auto p-4 space-x-8">
@@ -242,7 +291,7 @@ const SingleItineraryPage = (props) => {
             ))}
           </div>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 };
