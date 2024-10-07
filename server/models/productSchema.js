@@ -14,54 +14,58 @@ const productSchema = new Schema({
     price: {
         type: Number,
         required: true,
+        unique:true
     },
     description: {
         type: String,
         required: true,
     },
-    //add seller name
+
+    sellerUsername: {
+        type: String,
+    },
+
     seller_id: {
         type: Schema.Types.ObjectId,
-        ref: "Seller",
+        ref: 'Seller', // Reference the seller model
     },
-    ratings: {
-        type: Number,
-        required: false,
+
+    adminSellerID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Admin', // Reference the adminSeller model
     },
+
     //list of reviews linked to users
-    //    ratings: {
-    //         averageRating: {
-    //             type: Number,
-    //             default: 0, // Default to 0 for activities with no ratings
-    //             min: 0,
-    //             max: 5
-    //         },
-    //         reviews: [{
-    //             userID: {
-    //                 type: Schema.Types.ObjectId,
-    //                 ref: 'User', // Reference to the User model
-    //                 required: true
-    //             },
-    //             rating: {
-    //                 type: Number,
-    //                 required: true,
-    //                 min: 1,
-    //                 max: 5
-    //             },
-    //             review: {
-    //                 type: String,
-    //                 default: '' // Optional text review
-    //             },
-    //             date: {
-    //                 type: Date,
-    //                 default: Date.now
-    //             }
-    //         }]
-    //     },    
-    reviews: {
-        type: String,
-        required: false,
+    ratings: {
+        averageRating: {
+            type: Number,
+            default: 0, // Default to 0 for activities with no ratings
+            min: 0,
+            max: 5
+        },
+        reviews: [{
+            userID: {
+                type: Schema.Types.ObjectId,
+                ref: 'User', // Reference to the User model
+                required: true
+            },
+            rating: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            },
+            review: {
+                type: String,
+                default: '' // Optional text review
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }]
     },
+
     available_quantity: {
         type: Number,
         required: true,

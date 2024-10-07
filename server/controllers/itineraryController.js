@@ -6,17 +6,15 @@ import itineraryTags from '../models/itineraryTagsSchema.js';
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
 
-
     //fetch data from request body
-    const { ratings, name, tourGuideID, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
+    const tourGuideID = req.body.tourGuideID;
+    const { name, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
 
     //validate that all fields are present
-    if (!ratings || !tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
+    if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
 
         //write missing fields
-        if (!ratings) {
-            return res.status(400).json({ "message": "Rating is missing" });
-        }
+
         if (!name) {
             return res.status(400).json({ "message": "Name is missing" });
         }
@@ -54,7 +52,6 @@ export const addItinerary = async (req, res) => {
 
     try {
         const itinerary = new Itinerary({
-            ratings: ratings,
             name: name,
             tourGuideID: tourGuideID,
             days: days,
@@ -79,6 +76,7 @@ export const addItinerary = async (req, res) => {
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
 export const getItinerary = async (req, res) => {
+    const id = req.query.id;
     const name = req.query.name;
     const tag = req.query.tag;
     const maxBudget = req.query.maxBudget;
@@ -103,7 +101,7 @@ export const getItinerary = async (req, res) => {
         if (tag) {
             const tagID = await itineraryTags.findOne({ tag }).select('_id');
             if (tagID) {
-                // Use $elemMatch properly to filter tags
+                // Use $elemMatch properly to filter tags 
                 query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
             }
         }
@@ -141,7 +139,7 @@ export const getItinerary = async (req, res) => {
         console.log('Sort Options:', sortOptions);
 
         // Fetch the itinerary using the built query
-        let itinerary = await Itinerary.find(query).populate('tags').sort(sortOptions);
+        let itinerary = await Itinerary.find(query).sort(sortOptions).populate('tags');
 
         if (itinerary.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });

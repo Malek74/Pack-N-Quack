@@ -41,6 +41,10 @@ const itinerarySchema = new mongoose.Schema({
                 type: String,
                 required: true
             },
+            googleMapLink: {
+                type: String,
+                required: true
+            },
             duration: {
                 startTime: {
                     type: Date
@@ -48,6 +52,11 @@ const itinerarySchema = new mongoose.Schema({
                 endTime: {
                     type: Date,
                 },
+            },
+
+            description: {
+                type: String,
+                default: ''
             }
         }],
     }],
@@ -99,6 +108,7 @@ const itinerarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
     dropOffLocation: {
         type: String,
         required: true

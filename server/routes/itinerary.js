@@ -3,7 +3,7 @@ import { addItinerary, deleteItinerary, getItinerary, updateItinerary, getMyItin
 
 const router = express.Router();
 
-router.post("/", addItinerary);
+router.post("/:id", addItinerary);
 router.get("/", getItinerary);
 router.delete("/:id", deleteItinerary);
 router.put("/:id", updateItinerary);
