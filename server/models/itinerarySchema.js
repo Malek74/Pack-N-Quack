@@ -43,14 +43,14 @@ const itinerarySchema = new mongoose.Schema({
             },
             googleMapLink: {
                 type: String,
-                required: true
+                required: false
             },
             duration: {
                 startTime: {
-                    type: Date
+                    type: String
                 },
                 endTime: {
-                    type: Date,
+                    type: String,
                 },
             },
 

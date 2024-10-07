@@ -8,13 +8,13 @@ export const addItinerary = async (req, res) => {
 
     //fetch data from request body
     const tourGuideID = req.body.tourGuideID;
-    const { name, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
+    const name = req.body.title;
+    const available_dates = req.body.dates;
+    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
+    let tagsIDS = []
 
     //validate that all fields are present
     if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
-
-        //write missing fields
-
         if (!name) {
             return res.status(400).json({ "message": "Name is missing" });
         }
@@ -49,6 +49,15 @@ export const addItinerary = async (req, res) => {
             return res.status(400).json({ "message": "Description is missing" });
         }
     }
+    console.log(tags);
+
+    for (let i = 0; i < tags.length; i++) {
+        const tag = await itineraryTags.findOne({ tag: tags[i] });
+        tagsIDS.push(tag._id);
+    }
+
+    console.log(tagsIDS);
+
 
     try {
         const itinerary = new Itinerary({
@@ -61,13 +70,14 @@ export const addItinerary = async (req, res) => {
             pickUpLocation: pickUpLocation,
             dropOffLocation: dropOffLocation,
             accessibility: accessibility,
-            tags: tags,
+            tags: tagsIDS,
             description: description
         });
 
         const createdItinerary = await Itinerary.create(itinerary);
         return res.status(201).json(createdItinerary);
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
 
@@ -200,20 +210,18 @@ export const deleteItinerary = async (req, res) => {
         itineraryToDelete = await Itinerary.findByIdAndDelete(req.params.id);
 
         res.status(200).json({ message: "itinerary deleted" + itineraryToDelete });
-
     } catch (error) {
         res.status(401).json({ message: error.message });
-
     }
 }
 
 export const updateItinerary = async (req, res) => {
     const itineraryID = req.params.id;
+    const name = req.body.title;
+    console.log("This is the request body:" + req.body);
 
-    const { name, activities, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility } = req.body;
+    const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility } = req.body;
     const updatedFields = {};
-
-
 
     try {
         let itinerary = await Itinerary.findById(itineraryID);
@@ -227,8 +235,8 @@ export const updateItinerary = async (req, res) => {
         }
 
         const updatedFields = {};
-        if (name) updatedFields.name = req.body.name;
-        if (activities) updatedFields.activities = req.body.activities;
+        if (name) updatedFields.name = req.body.title;
+        if (days) updatedFields.days = req.body.days;
         if (language) updatedFields.language = req.body.language;
         if (price) updatedFields.price = req.body.price;
         if (available_dates) updatedFields.available_dates = req.body.available_dates;
@@ -236,14 +244,22 @@ export const updateItinerary = async (req, res) => {
         if (dropOffLocation) updatedFields.dropOffLocation = req.body.dropOffLocation;
         if (accessibility) updatedFields.accessibility = req.body.accessibility;
 
+
+        // if (activities) {
+        //     updatedFields.$push = { activities: newActivity };
+        // }
+
+        console.log("updated Fields: " + updatedFields);
+
         // Update the itinerary using the updatedFields object
-        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: updatedFields }, { new: true });
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: updatedFields }, { new: true, runValidators: true });
 
         // Send the updated itinerary back in the response
         res.status(200).json(updatedItinerary);
 
     } catch (error) {
         res.status(401).json({ message: "itinerary deosn't exist:" + error.message });
+        console.log(error);
     }
 
 
