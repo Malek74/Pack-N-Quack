@@ -60,7 +60,7 @@ export const getTourGuideById = async (req, res) => {
         return res.status(200).json(tourGuideExists);
 
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 
@@ -70,14 +70,20 @@ export const getTourGuideById = async (req, res) => {
 export const editTourGuide = async (req, res) => {
     try {
         const id = req.params.id;
-        const { mobile, experienceYears, previousWork, isAccepted } = req.body;
+        const { email, mobile, experienceYears, previousWork, isAccepted } = req.body;
 
+        if (email) {
+            if (await emailExists(email)) {
+                return res.status(400).json({ message: "Email already exists" });
+            }
+        }
         // Create an object with the fields to update
         const updatedFields = {};
         if (mobile) updatedFields.mobile = mobile;
         if (experienceYears) updatedFields.experienceYears = experienceYears;
         if (previousWork) updatedFields.previousWork = previousWork;
         if (isAccepted) updatedFields.isAccepted = isAccepted;
+        if (email) updatedFields.email = email;
 
         // Check if the tour guide exists
         let tourGuideEdited = await tourGuide.findById(id);

@@ -67,6 +67,11 @@ export const deleteAdvertiser = async (req, res) => {
 // @Body { companyName, email, username, password, website, hotline, establishmentDate, description, isAccepted }
 export const updateAdvertiser = async (req, res) => {
     const id = req.params.id;
+
+    const doesEmailExists = await emailExists(req.body.email);
+    if (doesEmailExists) {
+        return res.status(400).json({ message: "Email already exists" });
+    }
     try {
         const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(id, req.body, { new: true });
         res.status(200).json(updatedAdvertiser);

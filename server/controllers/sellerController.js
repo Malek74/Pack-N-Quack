@@ -38,17 +38,16 @@ export const createSeller = async (req, res) => {
 
 //read using ID
 export const getSellerByID = async (req, res) => {
-    const { id } = req.params.id;
+    const id = req.params.id;
     if (!id) {
         return res.status(400).json({ message: "Please provide a Seller ID" });
     }
     try {
-        const seller = await seller.findOne({ email });
-        res.status(200).json(seller)
+        const sellerFetched = await seller.findById(id);
+        return res.status(200).json(sellerFetched)
     } catch (error) {
-        res.status(400).json({ error: error.message })
+        return res.status(400).json({ error: error.message })
     }
-    res.status(200).json(newSeller);
 }
 
 //update by ID
@@ -61,6 +60,12 @@ export const updateSellerInfo = async (req, res) => {
         return res.status(404).json({ message: "Seller not found" });
     }
 
+    if (email) {
+        const doesEmailExists = await emailExists(email);
+        if (doesEmailExists) {
+            return res.status(400).json({ message: "Email already exists" });
+        }
+    }
     try {
         const newInfo = {};
         if (email) newInfo.email = email;
@@ -89,9 +94,9 @@ export const deleteSeller = async (req, res) => {
         await deleteProducts(id);
 
 
-        res.status(200).json({ message: `Seller with id ${id} deleted successfully` })
+        return res.status(200).json({ message: `Seller with id ${id} deleted successfully` })
     } catch (error) {
-        res.status(400).json({ error: error.message })
+        return res.status(400).json({ error: error.message })
     }
 }
 
