@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import activityModel from "../models/activitySchema.js";
 import activityTag from "../models/activityTagSchema.js";
 import activityCategory from "../models/activityCategorySchema.js";
+import { query } from "express";
 
 // @desc Get all activities
 // @route GET /api/activity
@@ -180,8 +181,9 @@ export const postReview = async (req, res) => {
 // @route GET /api/activity/filter
 // @Body { budget, date, categoryID, rating }
 export const filterAndSortActivities = async (req, res) => {
-    const { budgetMin, budgetMax, dateMin, dateMax, categoryID, rating, sortPrice, sortRating } = req.query;
+    const { tags, name, budgetMin, budgetMax, category, sortPrice, sortRating, rating, dateMin, dateMax } = req.body;
 
+    console.log(req.body)
     let query = {};
 
     if (budgetMin && budgetMax) {
@@ -194,14 +196,30 @@ export const filterAndSortActivities = async (req, res) => {
     if (dateMin && dateMax) {
         query.date = { $gte: dateMin, $lte: dateMax };
     }
-    if (categoryID) {
-        query.categoryID = categoryID;
+    if (category) {
+        const categoryID = await activityCategory.findOne({ name: category })
+        query.categoryID = categoryID._id;
+    }
+    if (name) {
+        query.name = { $regex: name, $options: 'i' };
     }
     if (rating) {
         query['ratings.averageRating'] = { $gte: rating };
     }
+    if (tags) {
+        let tagsIDs = [];
+        let flag = false;
+        for (let i = 0; i < tags.length; i++) {
+            const tag = await activityTag.findOne({ name: tags[i] });
+            tagsIDs.push(tag._id);
+            flag = true;
+        }
+        console.log(tagsIDs)
+        if (flag)
+            query.tags = { $in: tagsIDs }; // This checks if any of the tagIDs in 'tags' array is in the 'tags' field of activity
+    }
     try {
-        if (sortPrice !== undefined || sortRating !== undefined) {
+        if (sortPrice != 0 || sortRating != 0) {
             const activities = await activityModel.aggregate([
                 { $match: query }, // Apply filters
 
@@ -221,17 +239,34 @@ export const filterAndSortActivities = async (req, res) => {
                 // Sort based on the normalized price and/or rating
                 {
                     $sort: {
-                        ...(sortPrice !== undefined ? { normalizedPrice: sortPrice } : {}), // Sort by price if specified
-                        ...(sortRating !== undefined ? { 'ratings.averageRating': sortRating } : {}) // Sort by rating if specified
+                        ...(sortPrice != 0 ? { normalizedPrice: sortPrice } : {}), // Sort by price if specified
+                        ...(sortRating != 0 ? { 'ratings.averageRating': sortRating } : {}) // Sort by rating if specified
                     }
                 }
             ]).exec();
-            res.status(200).json(activities);
+            //console.log(activities);
+            console.log("dakhal sort")
+            return res.status(200).json(activities);
         } else {
             const activities = await activityModel.find(query).populate('advertiserID categoryID tags');
-            res.status(200).json(activities);
+            console.log(query)
+            //console.log(activities)
+            return res.status(200).json(activities);
         }
     } catch (error) {
         res.status(404).json({ message: error.message });
+    }
+}
+
+export const getMyActivities = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const activities = await activityModel.find({ advertiserID: id }).populate('advertiserID categoryID tags');
+        if (activities.lemgth === 0) {
+            return res.status(404).json({ message: 'No activities found' });
+        }
+        return res.status(200).json(activities);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
     }
 }

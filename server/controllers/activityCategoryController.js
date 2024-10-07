@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import activityCategory from "../models/activityCategorySchema.js";
-
+import activityModel from "../models/activitySchema.js";
 // @desc Get all activity categories
 // @route GET /api/activity/category
 export const getActivityCateogries = async (req, res) => {
@@ -73,7 +73,10 @@ export const updateActivityCategory = async (req, res) => {
 export const deleteActivityCategory = async (req, res) => {
     const name = req.params.name;
     try {
+        const categoryToDelete = await activityCategory.findOne({ name: name });
+        const deletedActivities = await activityModel.deleteMany({ categoryID: categoryToDelete._id });
         const deletedCategory = await activityCategory.findOneAndDelete({ name: name });
+        console.log(deletedActivities);
         if (deletedCategory === null) {
             return res.status(404).json({ message: 'Category not found' });
         }
