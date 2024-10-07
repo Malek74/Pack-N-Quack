@@ -37,14 +37,11 @@ import { Label } from "../ui/label"
 export default function ActivityEditForm(props) {
 
 
-
-
-
-
-
-
     const [discounts, setDiscounts] = useState([]); // State to hold user-added discounts
     const [newDiscount, setNewDiscount] = useState(''); // State for new discount input
+    const [categories, setCategories] = useState([]);
+    const [selectedPriceType, setSelectedPriceType] = useState(props.priceType);
+    const [tags, setTags] = useState([]);
 
     // Handle adding a new discount
     const handleAddDiscount = () => {
@@ -55,11 +52,6 @@ export default function ActivityEditForm(props) {
     };
 
 
-
-
-    const [categories, setCategories] = useState([]);
-    const [selectedPriceType, setSelectedPriceType] = useState(props.priceType);
-    const [tags, setTags] = useState([]);
 
     const fetchData = async () => {
         try {

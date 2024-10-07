@@ -14,9 +14,7 @@ import axios from "axios";
 
 export default function CreateTag() {
 
-    const [tags, setTags] = useState({
-
-    });
+    const [tags, setTags] = useState({});
 
     // useEffect(() => {
     const fetchTags = async () => {

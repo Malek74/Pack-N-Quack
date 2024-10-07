@@ -1,16 +1,16 @@
 import HistoricalCard from "@/components/HistoricalCard"
 import Historicalbackground from "../images/Italy.jpg"
-import pyramids from "../images/Pyramids.jpeg"
-import egyptianmuseum from "../images/egyptianmuseum.jpg"
 import Banner from "@/components/Banner"
 import CreateTag from "@/components/CreateTag"
 import PlaceForm from "@/components/forms/PlaceForm"
 import CreateDialog from "@/components/CreateDialog"
 import { useState, useEffect } from "react"
 import axios from "axios"
+import { useParams } from "react-router-dom"
 
 export default function Historical() {
 
+    const { idTG } = useParams();
     const [places, setPlaces] = useState([]);
     const [placeDeleted, setPlaceDeleted] = useState();
     const [placeUpdated, setPlaceUpdated] = useState();
@@ -19,6 +19,7 @@ export default function Historical() {
 
     const addPlace = async (values) => {
         try {
+            values.touristGovenorID = idTG;
             const response = await axios.post(`/api/places`, values);
             console.log('Created successfully:', response.data);
             setPlaceCreated(response.data);
@@ -50,8 +51,9 @@ export default function Historical() {
     useEffect(() => {
         const fetchPlaces = async () => {
             try {
-                const response = await axios.get("/api/places");
+                const response = await axios.get(`/api/places/my/${idTG}`);
                 setPlaces(response.data);
+                console.log(response.data)
 
             } catch (error) {
                 console.error(error);
@@ -88,46 +90,21 @@ export default function Historical() {
                 {places.map((place) => (
                     <HistoricalCard
                         key={place._id}
-                        img={place.pictures}  //it's an array not one url
+                        img={place.coverImagePath}
+                        pictures={place.pictures}
                         name={place.name}
                         description={place.description}
-                        hours={place.opening_hour}
+                        openingHours={place.opening_hour}
                         location={place.location}
-                        Eprice={place.ticket_price_native}
-                        Fprice={place.ticket_price_foreigner}
+                        prices={place.tickets}
                         tags={place.tags}
                         notTourist={true}
                         deletePlaceFunction={deletePlace}
                         updatePlaceFunction={editPlace}
-
+                        placeID={place._id}
+                        googlemaps={place.googleMapLink}
                     />))}
 
-                < HistoricalCard
-                    img={pyramids}
-                    alt="Pyramids"
-                    name="Giza Pyramids and Great Sphinx"
-                    description="The oldest of the Seven Wonders of the Ancient World"
-                    hours="7:00 am - 6:00 pm every day"
-                    location="Giza, Egypt"
-                    Eprice="Adult: EGP 60, Student: EGP 30"
-                    Fprice="Adult: €10 , Student: €5"
-                    tags="#budget_friendly #family_friendly #historic_area"
-                    notTourist={true}
-
-                />
-                < HistoricalCard
-                    img={egyptianmuseum}
-                    alt="Egyptian Museum"
-                    name="Egyptian Museum"
-                    description="One of the largest museums in the world, and the first national museum in the Middle East"
-                    hours="9:00 am – 5:00 pm every day"
-                    location="Downtown Cairo, Egypt"
-                    Eprice="Adult: EGP 30, Student: EGP 10"
-                    Fprice="Adult: €8.5 , Student: €4"
-                    tags="#museum #ancientEgyptian #historic_area"
-                    notTourist={true}
-
-                />
 
             </grid>
         </div>

@@ -19,21 +19,52 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogClose
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { useState } from "react"
-import Multiselect from "multiselect-react-dropdown"
+// import Multiselect from "multiselect-react-dropdown"
 import { Pencil } from "lucide-react"
+import EditOpeningHours from "../EditOpeningHours"
+import TicketPriceEditor from "../TicketPriceEditor"
+import { Label } from "../ui/label"
+import EditTag from "../SelectTag"
 
 export default function PlaceEditForm(props) {
 
-    const [tags, setTags] = useState([]);
+    const [tags, setTags] = useState();
+    const [tagsToEdit, setTagsToEdit] = useState(props.tags);
+    const [openingHoursOutput, setOpeningHoursOutput] = useState();
+    const [tickets, setTickets] = useState();
+    const [pictures, setPictures] = useState([]);
+    const [newPicture, setNewPicture] = useState('');
 
+
+    const handleTagsChange = (updatedTags) => {
+        setTagsToEdit(updatedTags);
+        console.log("Updated Tags:", updatedTags);
+    };
+    const handleAddPicture = () => {
+        if (newPicture.trim() !== '') {
+            setPictures((prev) => [...prev, newPicture]); // Add new discount to the list
+            setNewPicture(''); // Clear the input after adding
+        }
+    };
+
+
+    const handleTicketsChange = (updatedTickets) => {
+        setTickets(updatedTickets);
+        // You can also send updatedTickets to an API or other logic here
+    };
+    const handleOpeningHoursChange = (updatedOpeningHours) => {
+        console.log(updatedOpeningHours);
+        setOpeningHoursOutput(updatedOpeningHours);
+    };
     const fetchData = async () => {
         try {
-            const fetchedTags = await axios.get("/api/activity/tag");
-            setTags(fetchedTags.data);
+            const response = await axios.get("/api/tags");
+            setTags(response.data);
         } catch (error) {
             console.error(error);
         }
@@ -50,35 +81,43 @@ export default function PlaceEditForm(props) {
 
     async function onSubmit(values) {
 
+        // This will log the cleaned object without empty fields
+        values.pictures = pictures;
+        values.opening_hour = openingHoursOutput;
+        values.tickets = tickets;
+        values.tags = tagsToEdit;
         const cleanedValues = cleanObject(values); // Clean the submitted values
         console.log("EDITTED PLACE FORM SUBMITTED");
-        console.log(cleanedValues); // This will log the cleaned object without empty fields
-        props.updatePlaceFunction(props.key, cleanedValues);
+        console.log(cleanedValues);
+        console.log(props.placeID);
+        cleanedValues.id = props.placeID;
+        props.updatePlaceFunction(props.placeID, cleanedValues);
     }
 
 
-    const activityForm = z.object({
+    const placeForm = z.object({
         name: z.string().min(1, { message: "Name is required" }),
-        pictures: z.array(z.string()),
+        pictures: z.string(),
         description: z.string(),
         opening_hour: z.string(),
+        googleMapLink: z.string().min(1, { message: "MapsLink is required" }),
         location: z.string(),
-        ticket_price_native: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        ticket_price_foreigner: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        tags: z.array(z.string())
+        tickets: z.string(),
+        tags: z.string()
 
-    });
+    }).optional;
     const form = useForm({
-        resolver: zodResolver(activityForm),
+        resolver: zodResolver(placeForm),
         defaultValues: {
-            name: "",
-            pictures: [""],
-            description: "",
-            opening_hour: "",
-            location: "",
-            ticket_price_native: "",
-            ticket_price_foreigner: "",
-            tags: [""]
+            name: props.name,
+            pictures: props.pictures,
+            description: props.description,
+            opening_hour: props.openingHour,
+            location: props.location,
+            googleMapLink: props.googleMapLink,
+            tickets: props.prices,
+            tags: props.tags,
+
         },
     });
 
@@ -130,9 +169,9 @@ export default function PlaceEditForm(props) {
                             name="opening_hour"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Opening Hours</FormLabel>
+                                    <FormLabel></FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.hours} {...field} />
+                                        <EditOpeningHours onOpeningHoursChange={handleOpeningHoursChange} />
                                     </FormControl>
 
                                     <FormMessage />
@@ -154,31 +193,36 @@ export default function PlaceEditForm(props) {
                         />
                         <FormField
                             control={form.control}
-                            name="ticket_price_native"
+                            name="googleMapLink"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Ticket Price for Natives</FormLabel>
+                                    <FormLabel>Google Maps Link</FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.Eprice} {...field} />
+                                        <Input placeholder="https://maps.app.goo.gl/pqaptgj1zwxdnHNY9" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="tickets"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Ticket Prices</FormLabel>
+                                    <FormControl>
+                                        <div>
+                                            <TicketPriceEditor
+                                                initialTickets={tickets}
+                                                onTicketsChange={handleTicketsChange}
+                                            />
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="ticket_price_foreigner"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Ticket Price for Foreigners</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder={props.Fprice} {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         <FormField
                             control={form.control}
                             name="tags"
@@ -186,30 +230,60 @@ export default function PlaceEditForm(props) {
                                 <FormItem>
                                     <FormLabel>Tags</FormLabel>
                                     <FormControl>
-                                        <Multiselect
-                                            className="w-max"
-                                            isObject={false}
-                                            options={tags.map(tag => tag.name)}  // Populate options with tag names
-                                            onSelect={(selectedList) => {
-                                                // Update the field value with the selected tags array
-                                                field.onChange(selectedList);
-                                                // console.log("Selected Tags: ", selectedList);
-                                            }}
-                                            onRemove={(selectedList) => {
-                                                // Update the field value when tags are removed
-                                                field.onChange(selectedList);
-                                                // console.log("Updated Tags After Removal: ", selectedList);
-                                            }}
-                                        />
+
+                                        <div>
+                                            <EditTag initialTags={props.tags} onTagsChange={handleTagsChange} />
+
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
+                        <FormField
+                            control={form.control}
+                            name="pictures"
+                            render={() => (
+                                <FormItem>
+                                    <FormLabel>Pictures</FormLabel>
+                                    <FormControl>
+                                        <div>
+                                            <div className="mt-4">
+                                                <h3 className="font-bold">Pictures Paths:</h3>
+                                                <ul>
+                                                    {pictures.map((picture, index) => (
+                                                        <li key={index}>{picture}</li> // Display added discounts
+                                                    ))}
+                                                </ul>
+                                            </div>
 
-
-                        <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
+                                            <div className="grid grid-cols-3 items-center self-center justify-evenly gap-2 mt-4">
+                                                <Label htmlFor="new-discount" className="text-left">
+                                                    Add New Picture:
+                                                </Label>
+                                                <input
+                                                    type="text"
+                                                    value={newPicture}
+                                                    onChange={(e) => setNewPicture(e.target.value)}
+                                                    className="border rounded w-auto p-2"
+                                                    placeholder="Enter new picture"
+                                                />
+                                                <Button
+                                                    className="w-min bg-gold hover:bg-goldhover text-white"
+                                                    onClick={handleAddPicture}
+                                                >
+                                                    Add Picture
+                                                </Button>
+                                            </div></div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <DialogClose className="place-self-end">
+                            <Button onClick={() => onSubmit(form.getValues())} className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white" type="submit">Submit</Button>
+                        </DialogClose>
                     </form>
                 </Form>
             </DialogContent>

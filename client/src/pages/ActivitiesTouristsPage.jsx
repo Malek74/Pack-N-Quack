@@ -20,8 +20,7 @@ export default function Activities() {
     const [selectedFilters, setSelectedFilters] = useState({});
     const [minPrice, setMinPrice] = useState();
     const [maxPrice, setMaxPrice] = useState();
-    const [sortPrice, setSortPrice] = useState();
-    const [sortRating, setSortRating] = useState();
+
 
 
     // Handler to update selected filter values
@@ -72,8 +71,10 @@ export default function Activities() {
                         name: searchTerm, budgetMin: minPrice, budgetMax: maxPrice, category: selectedFilters.Category,
                         tags: selectedTags, sortPrice: selectedFilters["Sort By"] == "price-asc" ? 1 : selectedFilters["Sort By"] == "price-desc" ? -1 : 0,
                         sortRating: selectedFilters["Sort By"] == "ratings-asc" ? 1 : selectedFilters["Sort By"] == "ratings-desc" ? -1 : 0,
-                        rating: selectedFilters.Ratings, dateMin: selectedRange.from, dateMax: selectedRange.to
+                        rating: selectedFilters.Ratings,
+                        dateMin: selectedRange.from, dateMax: selectedRange.to
                     });
+                console.log(response.data);
                 setActivities(response.data);
                 console.log(selectedRange);
 
@@ -207,21 +208,6 @@ export default function Activities() {
 
                 />))}
 
-                {/* <ActivityCard
-                    img={amy}
-                    alt="Amy Whinehouse adv"
-                    name="The Amy Whinehouse Band Live"
-                    category="Concert"
-                    time="Oct 05 | 11:00pm"
-                    location="The Theater Somabay Marina"
-                    googlemaps="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2553.608620259062!2d33.98254983670627!3d26.84981674800142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144d6fc7bf7f4123%3A0x1dce7abda4de4a3e!2sSoma%20Bay%20Marina!5e0!3m2!1sen!2seg!4v1728068796045!5m2!1sen!2seg"
-                    price="EGP 1300"
-                    tags="#Concert #Band #Music"
-                    notTourist={false}
-                    booking="Open"
-                    discount="50% off for Armed Forces Day"
-
-                /> */}
             </div>
         </div>
 

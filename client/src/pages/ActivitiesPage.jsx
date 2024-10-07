@@ -19,6 +19,7 @@ export default function Activities() {
 
     const addActivity = async (values) => {
         try {
+            values.advertiserID = idAdv;
             const response = await axios.post(`/api/activity`, values);
             console.log('Created successfully:', response.data);
             setActivityCreated(response.data);

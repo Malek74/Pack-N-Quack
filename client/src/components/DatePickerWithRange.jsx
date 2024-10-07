@@ -17,7 +17,7 @@ import {
 export function DatePickerWithRange({ className, onDateChange }) {
     const [date, setDate] = React.useState({
         from: new Date(),
-        to: addDays(new Date(), 20),
+        to: addDays(new Date("2027-01-01"), 20),
     })
 
     // Call the callback function when date changes
