@@ -194,7 +194,7 @@ export const filterAndSortActivities = async (req, res) => {
         ];
     }
     if (dateMin && dateMax) {
-        query.date = { $gte: dateMin, $lte: dateMax };
+        query.date = { $gte: new Date(dateMin), $lte: new Date(dateMax) };
     }
     if (category) {
         const categoryID = await activityCategory.findOne({ name: category })
@@ -219,42 +219,52 @@ export const filterAndSortActivities = async (req, res) => {
             query.tags = { $in: tagsIDs }; // This checks if any of the tagIDs in 'tags' array is in the 'tags' field of activity
     }
     try {
-        if (sortPrice != 0 || sortRating != 0) {
-            const activities = await activityModel.aggregate([
-                { $match: query }, // Apply filters
+        if (sortPrice || sortRating) {
+            if (sortPrice != 0 || sortRating != 0) {
+                let sortOptions = {};
+                if (sortPrice != undefined && sortPrice != 0) {
+                    sortOptions.normalizedPrice = sortPrice;
+                }
+                if (sortRating != undefined && sortRating != 0) {
+                    sortOptions['ratings.averageRating'] = sortRating;
+                }
+                console.log("dakhal sort")
+                console.log(query)
+                const activities = await activityModel.aggregate([
+                    { $match: query }, // Apply filters
 
-                // Add a virtual field called "normalizedPrice"
-                {
-                    $addFields: {
-                        normalizedPrice: {
-                            $cond: {
-                                if: { $eq: ["$priceType", "fixed"] }, // If priceType is "fixed"
-                                then: "$price", // Use the price value
-                                else: "$minPrice"// For range, use the average of minPrice and maxPrice
+                    // Add a virtual field called "normalizedPrice"
+                    {
+                        $addFields: {
+                            normalizedPrice: {
+                                $cond: {
+                                    if: { $eq: ["$priceType", "fixed"] }, // If priceType is "fixed"
+                                    then: "$price", // Use the price value
+                                    else: "$minPrice"// For range, use the average of minPrice and maxPrice
+                                }
                             }
                         }
-                    }
-                },
+                    },
 
-                // Sort based on the normalized price and/or rating
-                {
-                    $sort: {
-                        ...(sortPrice != 0 ? { normalizedPrice: sortPrice } : {}), // Sort by price if specified
-                        ...(sortRating != 0 ? { 'ratings.averageRating': sortRating } : {}) // Sort by rating if specified
+                    // Sort based on the normalized price and/or rating
+                    {
+                        $sort: sortOptions
                     }
-                }
-            ]).exec();
-            //console.log(activities);
-            console.log("dakhal sort")
-            return res.status(200).json(activities);
-        } else {
+                ]).exec();
+                //console.log(activities);
+                console.log("dakhal sort")
+                console.log(activities)
+                return res.status(200).json(activities);
+            }
+        }
+        else {
             const activities = await activityModel.find(query).populate('advertiserID categoryID tags');
             console.log(query)
             //console.log(activities)
             return res.status(200).json(activities);
         }
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
     }
 }
 

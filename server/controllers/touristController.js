@@ -33,12 +33,12 @@ export const createTourist = async (req, res) => {
 
 // Tourist view Profile
 export const getTourist = async (req, res) => {
-    const username = req.params;
-    console.log(username);
+    const id = req.params.id;
+    console.log(id);
 
     try {
         //Find by email as it is unique identifier
-        const touristProfile = await Tourist.findOne(username);
+        const touristProfile = await Tourist.findById(id);
         return res.status(200).json(touristProfile);
     } catch (error) {
         return res.status(404).json({ message: error.message });

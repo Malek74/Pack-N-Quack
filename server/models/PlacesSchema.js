@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
 const placesSchema = new Schema({
+    touristGovenorID: {
+        type: Schema.Types.ObjectId,
+        ref: "TouristGoverner",
+        required: true
+    },
     name: {
         type: String,
         required: true,
@@ -12,7 +17,7 @@ const placesSchema = new Schema({
     },
     pictures: {
         type: [String], // Array of strings for URLs or paths to pictures
-        default: []
+        default: ["/images/Memo.png", "/images/Lege-cy.jpg", "/images/Pyramids.jpeg"]
     },
     coverImagePath: {
         type: String,

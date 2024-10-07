@@ -1,42 +1,61 @@
 
+import mongoose from 'mongoose';
 import Places from '../models/PlacesSchema.js';
 import Tag from '../models/tagSchema.js';
 
+const formatTime = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+    return `${formattedHours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+};
+const convertOpeningHours = (openingHourObj) => {
+    const daysOfWeek = Object.keys(openingHourObj); // Get the days of the week
+
+    return daysOfWeek.map((day, index) => {
+        const { open, openingTime, closingTime } = openingHourObj[day];
+
+        return {
+            day,
+            openTime: openingTime ? formatTime(openingTime) : '',
+            closeTime: closingTime ? formatTime(closingTime) : '',
+            isOpen: open,
+            _id: new mongoose.Types.ObjectId() // Generate a new ObjectId for each day
+        };
+    });
+};
 
 // Create Place function
 export const createPlace = async (req, res) => {
-    const {
-        name,
-        description,
-        location,
-        googleMapLink,
-        opening_hour,
-        tickets,
-        tags,
-        coverImagePath
-    } = req.body;
 
     try {
-        // Check for location and name duplicates 
-        const existingPlace = await Places.findOne({
-            googleMapLink: googleMapLink
-        });
-
-        if (existingPlace) {
-            return res.status(400).json({ message: "A place with this location already exists." });
+        if (!req.body.tickets) {
+            return res.status(400).json({ message: "Please add a price" });
         }
+        // // Check for location and name duplicates 
+        // const existingPlace = await Places.findOne({
+        //     googleMapLink: googleMapLink
+        // });
 
-        const newPlace = await Places.create({
-            name,
-            description,
-            location,
-            googleMapLink,
-            opening_hour,
-            tickets,
-            tags,
-            coverImagePath
-        });
+        // if (existingPlace) {
+        //     return res.status(400).json({ message: "A place with this location already exists." });
+        // }
+        if (req.body.tags) {
+            let tagsIDs = [];
+            for (let i = 0; i < req.body.tags.length; i++) {
+                const tag = await Tag.findOne({ name_tag: req.body.tags[i].name_tag, option: req.body.tags[i].option });
+                tagsIDs.push(tag._id);
+            }
 
+            req.body.tags = tagsIDs;
+        }
+        if (req.body.opening_hour) {
+            req.body.opening_hour = convertOpeningHours(req.body.opening_hour);
+        }
+        console.log(req.body)
+        const newPlace = await Places.create(
+            req.body
+        );
         return res.status(201).json(newPlace);
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -61,12 +80,11 @@ export const readPlace = async (req, res) => {
 };
 
 export const updatePlace = async (req, res) => {
-    const { name } = req.params; // Get the place name from the URL parameters
-    const updates = req.body; // The updates from the request body
-
+    const placeID = req.body.id;
     try {
         // Find the place by its name
-        const place = await Places.findOne({ name });
+        const place = await Places.findOne({ _id: placeID });
+        //console.log(place);
 
         // If place is not found, return an error
         if (!place) {
@@ -74,36 +92,33 @@ export const updatePlace = async (req, res) => {
         }
 
         // Check if tags are being updated
-        if (updates.tags) {
-            const newTagIds = [];
-            for (const tag of updates.tags) {
-                // Check if the provided tag already exists
-                let existingTag = await Tag.findOne({ name_tag: tag.name_tag, options: tag.options });
-
-                // If the tag does not exist, create it
-                if (!existingTag) {
-                    existingTag = await Tag.create({ name_tag: tag.name_tag, options: tag.options });
-                }
-
-                // Push the tag's ID into the newTagIds array
-                newTagIds.push(existingTag._id);
+        if (req.body.tags) {
+            let tagsIDs = [];
+            for (let i = 0; i < req.body.tags.length; i++) {
+                const tag = await Tag.findOne({ name_tag: req.body.tags[i].name_tag, option: req.body.tags[i].option });
+                tagsIDs.push(tag._id);
             }
 
-            // Link the new tags to the place without deleting old tags
-            updates.tags = newTagIds;
+            req.body.tags = tagsIDs;
         }
 
+        // Check if opening hours are being updated
+        if (req.body.opening_hour) {
+            req.body.opening_hour = convertOpeningHours(req.body.opening_hour);
+        }
         // Update the place with the new data and populate tags
         const updatedPlace = await Places.findOneAndUpdate(
-            { name }, // Match the place by name
-            { $set: updates }, // Apply the updates
+            { _id: placeID }, // Match the place by name
+            req.body, // Apply the updates
             { new: true } // Return the updated document
         ).populate('tags'); // Populate the tags in the response
+        console.log(req.body);
+        console.log(updatedPlace);
 
         // Respond with the updated place
-        res.status(200).json(updatedPlace);
+        return res.status(200).json(updatedPlace);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 };
 
@@ -115,10 +130,10 @@ export const getAllPlaces = async (req, res) => {
         const places = await Places.find().populate('tags'); // Populate tags if you want tag details as well
 
         // Send back the list of places
-        res.status(200).json(places);
+        return res.status(200).json(places);
     } catch (error) {
         // Handle any errors that occur during the request
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
@@ -128,77 +143,53 @@ export const deletePlace = async (req, res) => {
     console.log(name);
     try {
         // Find the place by name and delete it
-        const deletedPlace = await Places.findOneAndDelete({ name });  // Use correct query object
+        const deletedPlace = await Places.findOneAndDelete({ _id: name });  // Use correct query object
 
         if (!deletedPlace) {
             return res.status(404).json({ message: "Place not found" });
         }
 
-        res.status(200).json({ message: "Place deleted successfully" });
+        return res.status(200).json(deletePlace);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
 // Search for a specific place using name and/or tag
 export const SearchForPlace = async (req, res) => {
-    const { name } = req.query; // Assume name is a path parameter
-    const { tagsName, tagsOption } = req.query;   // Assume tags are passed as query parameters
-
-
+    const { name, tags } = req.body;
+    console.log(req.body)
     try {
-        const matchCriteria = {};
+        let query = {};
 
         // If name is provided, add it to the match criteria
         if (name) {
-            matchCriteria.name = { $regex: name, $options: 'i' };
+            query.name = { $regex: name, $options: 'i' };
         }
 
-
-        // If tags are provided, process them
-        if (tagsName && tagsOption) {
-
-            // Convert the tags string to an array
-            const tagsNameArr = tagsName.split(',').map(tag => tag.trim());
-            console.log(tagsNameArr);
-
-            // Convert the tags string to an array
-            const tagsOptionArr = tagsOption.split(',').map(tag => tag.trim());
-            console.log(tagsOptionArr)
-
-            // Find matching tags in the database
-            let matchingTags = [];
-            for (let i = 0; i < tagsNameArr.length; i++) {
-                console.log(tagsNameArr[i] + ":" + tagsOptionArr[i]);
-                const tag = await Tag.findOne({
-                    name_tag: tagsNameArr[i],
-                    options: tagsOptionArr[i] // Ensure we match the specified options
-                });
-                matchingTags.push(tag._id);
+        if (tags) {
+            let tagsIDs = [];
+            let flag = false;
+            for (let i = 0; i < tags.length; i++) {
+                const tag = await Tag.findOne({ name_tag: tags[i].name_tag, option: tags[i].option });
+                tagsIDs.push(tag._id);
+                flag = true;
             }
-
-            console.log(matchingTags);
-
-            // If matching tags are found, add them to the match criteria
-            if (matchingTags.length > 0) {
-
-                //fetch only data that has all the tags
-                matchCriteria.tags = { $all: matchingTags };
-
-            }
-
+            console.log(tagsIDs)
+            if (flag)
+                query.tags = { $in: tagsIDs }; // This checks if any of the tagIDs in 'tags' array is in the 'tags' field of activity
         }
-
         // Search for places based on the constructed match criteria
-        const searchedPlaces = await Places.find(matchCriteria).populate('tags');
-
+        console.log(query)
+        const searchedPlaces = await Places.find(query).populate('tags');
+        //console.log(searchedPlaces)
         if (searchedPlaces.length === 0) {
             return res.status(404).json({ message: "No places found matching the criteria" });
         }
 
-        res.status(200).json(searchedPlaces);
+        return res.status(200).json(searchedPlaces);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
@@ -240,3 +231,15 @@ export const FilterPlacesByTag = async (req, res) => {
     }
 };
 
+
+export const getMyPlaces = async (req, res) => {
+    const tgID = req.params.name
+    console.log(tgID)
+    try {
+        const places = await Places.find({ touristGovenorID: tgID }).populate('tags');
+        console.log(places)
+        return res.status(200).json(places);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}

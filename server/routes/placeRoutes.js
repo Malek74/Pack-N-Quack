@@ -6,10 +6,10 @@ import {
     updatePlace,
     deletePlace,
     SearchForPlace,
-    FilterPlacesByTag,
-    // listAllPlaces 
+    getMyPlaces
 } from '../controllers/placeController.js'; // Adjust the path as necessary
 import { isTourismGovernor } from '../middleware/auth.js'; // Middleware to check if the user is a tourism governor
+import { get } from 'mongoose';
 
 const router = express.Router();
 
@@ -21,9 +21,11 @@ const router = express.Router();
 // router.get('/places', listAllPlaces);
 router.post('/', createPlace); // Create Place
 router.get('/:name', readPlace); // Read Place
-router.put('/:name', updatePlace); // Update Place
+router.put('/:id', updatePlace); // Update Place
 router.delete('/:name', deletePlace); // Delete Place
-router.get('/', SearchForPlace);
+router.post('/filterSort', SearchForPlace);
+router.get('/', getAllPlaces);
+router.get('/my/:name', getMyPlaces);
 
 
 export default router;
