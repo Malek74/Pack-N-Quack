@@ -98,10 +98,8 @@ export default function NewUserForm({ type, onUserCreate }) {
             </FormItem>
           )}
         />
-        <DialogClose>
-          <Button className="place-self-end" type="submit">
-            Submit
-          </Button>
+        <DialogClose className="place-self-end">
+          <Button type="submit">Submit</Button>
         </DialogClose>
       </form>
     </Form>

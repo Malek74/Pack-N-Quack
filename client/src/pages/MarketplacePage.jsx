@@ -66,18 +66,18 @@ export default function MarketplacePage() {
           filteredProducts.map((product, index) => (
             <ProductCard
               key={index}
-              img={product.img}
+              img={product.picture}
               alt={product.name}
               name={product.name}
               seller={product.seller}
-              rating={product.rating}
-              reviewsCount={product.reviewsCount}
+              rating={product.ratings.averageRating}
+              reviewsCount={product.ratings.reviews.length}
               price={product.price}
               description={product.description}
             />
           ))
         ) : (
-          <p>No products found</p>
+          <p>Loading</p>
         )}
       </div>
     </div>

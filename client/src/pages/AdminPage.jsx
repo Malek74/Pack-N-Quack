@@ -211,11 +211,6 @@ export default function AdminPage() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex gap-4">
-            <form>
-              <div className="">
-                <Input type="search" placeholder="Search..." className="" />
-              </div>
-            </form>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

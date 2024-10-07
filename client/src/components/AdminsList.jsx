@@ -12,11 +12,16 @@ import {
 import CreateDialog from "./CreateDialog";
 import NewUserForm from "./forms/NewUserForm";
 import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
-import { DialogClose } from "./ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useState, useEffect } from "react";
 export default function AdminsList() {
-  const { toast } = useToast();
   const [admins, setAdmins] = useState(null);
 
   const fetchAdmins = () => {
@@ -45,26 +50,39 @@ export default function AdminsList() {
   };
 
   return (
-    <div>
-      <Table>
-        <TableCaption>A list of admins.</TableCaption>
-        <TableHeader>
-          <TableCell>
-            <CreateButton />
-          </TableCell>
-          <TableRow>
-            <TableHead>Name</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {admins &&
-            admins.map((admin) => (
-              <TableRow key={admin.username}>
-                <TableCell>{admin.username}</TableCell>
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <div className="place-self-end">
+        <CreateButton className="" />
+      </div>
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Admins</CardTitle>
+          <CardDescription>Manage your admins.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>A list of admins.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
               </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody>
+              {admins &&
+                admins.map((admin) => (
+                  <TableRow key={admin.username}>
+                    <TableCell>{admin.username}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{admins && admins.length}</strong> admins
+          </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

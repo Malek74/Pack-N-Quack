@@ -48,7 +48,7 @@ export function EditProductDialog({ product, onRefresh }) {
   // Handle form submission
   function onSubmit(values) {
     axios
-      .put(`api/products/update/${product._id}`, {
+      .put(`api/products/update/`, {
         price: values.price,
         description: values.description,
       })
@@ -72,8 +72,11 @@ export function EditProductDialog({ product, onRefresh }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
-          <Pencil />
+        <Button size="sm" className="h-8 gap-2">
+          <Pencil className="h-3.5 w-3.5" />
+          <span className="sr-only mr-2 sm:not-sr-only sm:whitespace-nowrap">
+            Edit
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -108,11 +111,7 @@ export function EditProductDialog({ product, onRefresh }) {
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      valueAsNumber // Automatically converts the input to a number
-                    />
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormDescription>
                     Price of the product in USD.
@@ -140,10 +139,8 @@ export function EditProductDialog({ product, onRefresh }) {
               )}
             />
 
-            <DialogClose>
-              <Button className="place-self-end" type="submit">
-                Save Changes
-              </Button>
+            <DialogClose className="place-self-end">
+              <Button type="submit">Save Changes</Button>
             </DialogClose>
           </form>
         </Form>

@@ -28,6 +28,14 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DeleteButton from "./DeleteButton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 export default function ActivityTags() {
   const [tags, setTags] = useState(null);
   const { toast } = useToast();
@@ -67,38 +75,53 @@ export default function ActivityTags() {
   };
 
   return (
-    <Table>
-      <TableCaption>A list of preference tags.</TableCaption>
-      <TableHeader>
-        <TableCell>
-          <CreateDialog
-            title="Activity Tag"
-            form={<NewActivityTagForm onTagCreate={fetchTags} />}
-          />
-        </TableCell>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead></TableHead>
-          <TableHead className="text-right"></TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tags &&
-          tags.map((tag) => (
-            <TableRow key={tag.name}>
-              <TableCell>{tag.name}</TableCell>
-              <TableCell>
-                {/* Pass the fetchTags function to EditTagDialog */}
-                <EditTagDialog tag={tag.name} onTagUpdate={fetchTags} />
-              </TableCell>
-              <TableCell className="text-right">
-                <DeleteButton
-                  onConfirm={() => deleteClicked(tag.name) + fetchTags()}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-      </TableBody>
-    </Table>
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <div className="place-self-end">
+        <CreateDialog
+          title="Activity Tag"
+          form={<NewActivityTagForm onTagCreate={fetchTags} />}
+        />
+      </div>
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Activity Tags</CardTitle>
+          <CardDescription>Manage your activity tags.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>A list of preference tags.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead></TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tags &&
+                tags.map((tag) => (
+                  <TableRow key={tag.name}>
+                    <TableCell>{tag.name}</TableCell>
+                    <TableCell>
+                      {/* Pass the fetchTags function to EditTagDialog */}
+                      <EditTagDialog tag={tag.name} onTagUpdate={fetchTags} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DeleteButton
+                        onConfirm={() => deleteClicked(tag.name) + fetchTags()}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{tags && tags.length}</strong> activity tags
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

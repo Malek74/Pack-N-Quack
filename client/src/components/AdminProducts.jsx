@@ -12,30 +12,12 @@ import CreateDialog from "./CreateDialog";
 import ProductForm from "./forms/ProductForm";
 // import axios from "axios";
 // import { useToast } from "@/hooks/use-toast";
-// import DeleteButton from "./DeleteButton";
-// import { EditProductDialog } from "./EditProduct";
+import DeleteButton from "./DeleteButton";
+import { EditProductDialog } from "./EditProduct";
 // import { useState, useEffect } from "react";
 // export default function Activityproduct() {
 //   const { toast } = useToast();
 //   const [products, setProducts] = useState(null);
-
-//   const deleteClicked = (id) => {
-//     axios
-//       .delete(`api/products/delete/${id}`)
-//       .then(() => {
-//         toast({
-//           title: "Product deleted succesfully!",
-//         });
-//         fetchProducts(); // Refresh the products list after deletion
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//         toast({
-//           text: "Failed to delete product",
-//           variant: "destructive", // Error variant
-//         });
-//       });
-//   };
 
 //   const fetchProducts = () => {
 //     axios
@@ -99,7 +81,7 @@ import ProductForm from "./forms/ProductForm";
 // }
 import axios from "axios";
 import { ListFilter, MoreHorizontal } from "lucide-react";
-
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -114,7 +96,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -135,6 +116,7 @@ export const description =
   "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
 
 export default function AdminProducts() {
+  const { toast } = useToast();
   const [products, setProducts] = useState(null);
   const fetchProducts = () => {
     axios
@@ -148,7 +130,23 @@ export default function AdminProducts() {
         console.error(error);
       });
   };
-
+  const deleteClicked = (id) => {
+    axios
+      .delete(`api/products/delete/${id}`)
+      .then(() => {
+        toast({
+          title: "Product deleted succesfully!",
+        });
+        fetchProducts(); // Refresh the products list after deletion
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          text: "Failed to delete product",
+          variant: "destructive", // Error variant
+        });
+      });
+  };
   useEffect(() => {
     fetchProducts(); // Initial fetch when component mounts
   }, []);
@@ -190,7 +188,12 @@ export default function AdminProducts() {
                 </DropdownMenu>
                 <CreateDialog
                   title="Product"
-                  form={<ProductForm onRefresh={fetchProducts} />}
+                  form={
+                    <ProductForm
+                      onRefresh={fetchProducts}
+                      adderId="670304850bf9fdbd2db01e47"
+                    />
+                  }
                 />
               </div>
             </div>
@@ -209,15 +212,16 @@ export default function AdminProducts() {
                         <TableHead className="hidden w-[100px] sm:table-cell">
                           <span className="sr-only">Image</span>
                         </TableHead>
-                        <TableHead>Name</TableHead>
                         <TableHead>Seller</TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Price
-                        </TableHead>
 
-                        <TableHead>
-                          <span className="sr-only">Actions</span>
-                        </TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Rating</TableHead>
+
+                        <TableHead className="hidden md:table-cell"></TableHead>
+
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -233,9 +237,6 @@ export default function AdminProducts() {
                                 width="64"
                               />
                             </TableCell>
-                            <TableCell className="font-medium">
-                              {product.name}
-                            </TableCell>
                             <TableCell>
                               <Badge
                                 variant={
@@ -244,32 +245,34 @@ export default function AdminProducts() {
                                     : "secondary"
                                 }
                               >
-                                {/* {product.seller_id.username
-                                  ? product.seller_id.username
-                                  : ""} */}
+                                {product.sellerUsername}
                               </Badge>
                             </TableCell>
+                            <TableCell className="font-medium">
+                              {product.name}
+                            </TableCell>
+                            <TableCell className="">
+                              {product.description}
+                            </TableCell>
+
                             <TableCell className="hidden md:table-cell">
                               {product.price}
                             </TableCell>
                             <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    aria-haspopup="true"
-                                    size="icon"
-                                    variant="ghost"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                                  <DropdownMenuItem>Delete</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              {product.ratings.averageRating}
+                            </TableCell>
+                            <TableCell>
+                              <EditProductDialog
+                                product={product}
+                                onRefresh={fetchProducts}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <DeleteButton
+                                onConfirm={() =>
+                                  deleteClicked(product._id) + fetchProducts()
+                                }
+                              />
                             </TableCell>
                           </TableRow>
                         ))}

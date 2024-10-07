@@ -17,6 +17,14 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import DeleteButton from "./DeleteButton";
 import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 export default function ActivityCategory() {
   const { toast } = useToast();
   const [categories, setCategories] = useState(null);
@@ -65,39 +73,55 @@ export default function ActivityCategory() {
   };
 
   return (
-    <Table>
-      <TableCaption>A list of activity categories.</TableCaption>
-      <TableHeader>
-        <TableCell>
-          <CreateButton default />
-        </TableCell>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead></TableHead>
-          <TableHead className="text-right"></TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {categories &&
-          categories.map((category) => (
-            <TableRow key={category.name}>
-              <TableCell>{category.name}</TableCell>
-              <TableCell>
-                <EditCategoryDialog
-                  category={category.name}
-                  onRefresh={fetchCategories}
-                />
-              </TableCell>
-              <TableCell className="text-right">
-                <DeleteButton
-                  onConfirm={() =>
-                    deleteClicked(category.name) + fetchCategories()
-                  }
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-      </TableBody>
-    </Table>
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <div className="place-self-end">
+        <CreateButton className="" />
+      </div>
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Categories</CardTitle>
+          <CardDescription>Manage your activity categories.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>A list of activity categories.</TableCaption>
+            <TableHeader>
+              <TableCell></TableCell>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead></TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {categories &&
+                categories.map((category) => (
+                  <TableRow key={category.name}>
+                    <TableCell>{category.name}</TableCell>
+                    <TableCell>
+                      <EditCategoryDialog
+                        category={category.name}
+                        onRefresh={fetchCategories}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DeleteButton
+                        onConfirm={() =>
+                          deleteClicked(category.name) + fetchCategories()
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{categories && categories.length}</strong> products
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

@@ -7,7 +7,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import CreateDialog from "./CreateDialog";
 import NewItineraryTagForm from "./forms/NewItineraryTagForm";
 import { EditItineraryTag } from "./EditItineraryTag";
@@ -55,38 +62,53 @@ export default function ItineraryTags() {
   };
 
   return (
-    <Table>
-      <TableCaption>A list of preference tags.</TableCaption>
-      <TableHeader>
-        <TableCell>
-          <CreateDialog
-            title="Itinerary Tag"
-            form={<NewItineraryTagForm onTagCreate={fetchTags} />}
-          />
-        </TableCell>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead></TableHead>
-          <TableHead className="text-right"></TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tags &&
-          tags.map((tag) => (
-            <TableRow key={tag.tag}>
-              <TableCell>{tag.tag}</TableCell>
-              <TableCell>
-                {/* Pass the fetchTags function to EditTagDialog */}
-                <EditItineraryTag tag={tag.tag} onTagUpdate={fetchTags} />
-              </TableCell>
-              <TableCell className="text-right">
-                <DeleteButton
-                  onConfirm={() => deleteClicked(tag.tag) + fetchTags()}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-      </TableBody>
-    </Table>
+    <div className="flex flex-col sm:gap-4 sm:py-4">
+      <div className="place-self-end">
+        <CreateDialog
+          title="Itinerary Tag"
+          form={<NewItineraryTagForm onTagCreate={fetchTags} />}
+        />
+      </div>
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader>
+          <CardTitle>Itinerary Tags</CardTitle>
+          <CardDescription>Manage your itinerary tags.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>A list of itinerary tags.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead></TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tags &&
+                tags.map((tag) => (
+                  <TableRow key={tag.tag}>
+                    <TableCell>{tag.tag}</TableCell>
+                    <TableCell>
+                      {/* Pass the fetchTags function to EditTagDialog */}
+                      <EditItineraryTag tag={tag.tag} onTagUpdate={fetchTags} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DeleteButton
+                        onConfirm={() => deleteClicked(tag.tag) + fetchTags()}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{tags && tags.length}</strong> products
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
