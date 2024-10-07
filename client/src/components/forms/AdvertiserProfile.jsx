@@ -4,78 +4,106 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {Form,FormControl,FormDescription,FormField,FormItem,FormLabel,FormMessage,
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SampleDatePicker } from "@/components/datepicker";
 import { PhoneInput } from "@/components/PhoneInput";
-import { Textarea } from "@/components/ui/textarea"
-
+import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
-    userName: z.string().nonempty({ message: "Username is required" }), 
-    email: z.string().email({ message: "Invalid email address" }),
-    websiteLink: z.string().url({ message: "Please enter a valid URL" }),
-    hotline: z.string().min(5, { message: "Hotline must be at least 5 characters" }),
-    companyProfile: z.string().nonempty({ message: "Company profile is required" }), 
-  
-}) ;
+  userName: z.string().nonempty({ message: "Username is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  websiteLink: z.string().url({ message: "Please enter a valid URL" }),
+  hotline: z
+    .number()
+    .min(5, { message: "Hotline must be at least 5 characters" }),
+  companyProfile: z
+    .string()
+    .nonempty({ message: "Company profile is required" }),
+});
 
+export default function AdvertiserProfile({ profile, onRefresh }) {
+  const { toast } = useToast();
 
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userName: profile.username,
+      email: profile.email,
+      websiteLink: profile.website,
+      hotline: profile.hotline,
+      companyProfile: profile.companyName,
+    },
+  });
+  // Define a submit handler
+  function onSubmit(values) {
+    axios
+      .put(`api/advertisers/update/${profile._id}`, {
+        oldEmail: profile.email,
+        email: values.email,
+        website: values.websiteLink,
+        hotline: values.hotline,
+        companyName: values.companyProfile,
+      })
+      .then(() => {
+        toast({
+          title: "Product updated succesfully!",
+        });
+        onRefresh();
+        // onCategoryUpdate();
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Product could not be updated",
+          // description: error.response.data.message,
+        });
+        console.log(error);
+      });
+  }
 
-export default function AdvertiserProfile() {
-    const form = useForm({
-      resolver: zodResolver(formSchema),
-      defaultValues: {
-        userName:"Rooma",
-        email:"Rooma@gmail.com",
-        websiteLink: '',
-        hotline: '',
-        companyProfile: '',
-  
-        
-      },
-    });
-    // Define a submit handler
-    function onSubmit(values) {
-        console.log(values);
-      }
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="userName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input {...field} className="bg-white" disabled />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      return (
-    
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-    
-          <FormField
-      control={form.control}
-      name="userName"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Username</FormLabel>
-          <FormControl>
-            <Input {...field} className="bg-white" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-    
-            
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="email@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                   {/* Website Link */}
+        {/* Website Link */}
         <FormField
           control={form.control}
           name="websiteLink"
@@ -89,8 +117,8 @@ export default function AdvertiserProfile() {
             </FormItem>
           )}
         />
-         {/* Hotline */}
-         <FormField
+        {/* Hotline */}
+        <FormField
           control={form.control}
           name="hotline"
           render={({ field }) => (
@@ -126,4 +154,3 @@ export default function AdvertiserProfile() {
     </Form>
   );
 }
-    
