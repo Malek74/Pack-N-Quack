@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
 export default function MyProfilePage() {
-  const usertype = "advertiser"; // This value will determine which component to render
+  const usertype = "seller"; // This value will determine which component to render
   const { toast } = useToast();
   const isTourGuide = usertype === "tour_guide";
   const isAdvertiser = usertype === "advertiser";
@@ -19,8 +20,8 @@ export default function MyProfilePage() {
   const isTourist = usertype === "tourist";
 
   const [profile, setProfile] = useState();
-  const endpoint = "advertisers";
-  const userId = "670422fdde2123588af70756";
+  const endpoint = "sellers";
+  const userId = "6703ba52daf9eae5ef55344c";
 
   const fetchProfile = () => {
     axios
@@ -131,12 +132,64 @@ export default function MyProfilePage() {
       );
     }
   }
+  function SellerCard() {
+    if (profile) {
+      const { email, username, isAccepted, description } = profile;
+      return (
+        <Card className="max-w-md mx-auto shadow-md rounded-lg">
+          {/* Company Name */}
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">{username}</CardTitle>
+            <Badge
+              variant={isAccepted ? "success" : "destructive"}
+              className="mt-2"
+            >
+              {isAccepted ? "Accepted" : "Pending"}
+            </Badge>
+          </CardHeader>
+
+          {/* Content */}
+          <CardContent className="space-y-4">
+            {/* Description */}
+            <div>
+              <h3 className="text-sm font-semibold">Description</h3>
+              <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
+
+            {/* Email */}
+            <div>
+              <h3 className="text-sm font-semibold">Email</h3>
+              <p className="text-sm text-muted-foreground">{email}</p>
+            </div>
+
+            {/* Username */}
+            <div>
+              <h3 className="text-sm font-semibold">Username</h3>
+              <p className="text-sm text-muted-foreground">{username}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <CreateDialog
+                form={
+                  <SellerProfileDialog
+                    profile={profile}
+                    onRefresh={fetchProfile}
+                  />
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+  }
   return (
     <div>
       <MyFirstComponent />
       {isTourGuide && <TourGuideProfile />}
       {isAdvertiser && <div>{profile && <AdvCard />}</div>}
-      {isSeller && <SellerProfile />}
+      {isSeller && <div>{profile && <SellerCard />}</div>}
       {isTourist && <TouristProfile />}
     </div>
   );
