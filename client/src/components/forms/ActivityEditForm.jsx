@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { useState } from "react"
-import BasicDateTimePicker from "../BasicDateTimePicker"
+import BasicDateTimePicker from "../shared/BasicDateTimePicker"
 import Multiselect from "multiselect-react-dropdown"
 import {
     Dialog,

@@ -1,8 +1,8 @@
 import React from 'react';
-import InstagramIcon from '../../../assets/Instagram.svg';
-import FacebookIcon from '../../../assets/Facebook.svg';
-import TwitterIcon from '../../../assets/Twitter.svg';
-import YouTubeIcon from '../../../assets/Youtube.svg';
+import InstagramIcon from '/assets/icons/Instagram.svg';
+import FacebookIcon from '/assets/icons/Facebook.svg';
+import TwitterIcon from '/assets/icons/Twitter.svg';
+import YouTubeIcon from '/assets/icons/Youtube.svg';
 
 const SocialMediaIcons = () => {
   return (

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import ProductCard from "@/components/ProductCard";
-import Activitiesbackground from "../images/Background.jpg";
-import BannerImage from "../assets/homeBanner.png";
-import Banner from "./components/BannerV2";
+import ProductCard from "@/components/marketplacePage/ProductCard";
+import Activitiesbackground from "/assets/images/Background.jpg";
+import BannerImage from "/assets/images/homeBanner.png";
+import Banner from "../components/shared/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/shared/SearchBar";
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");

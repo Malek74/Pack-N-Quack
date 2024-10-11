@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { useEffect, useState } from "react"
-import EditOpeningHours from "../EditOpeningHours"
-import EditTag from "../SelectTag"
-import TicketPriceEditor from "../TicketPriceEditor"
+import EditOpeningHours from "../editButtonsWillBeReusedLater/EditOpeningHours"
+import EditTag from "../historicalPage/SelectTag"
+import TicketPriceEditor from "../historicalPage/TicketPriceEditor"
 import { Label } from "../ui/label"
 
 export default function PlaceForm(props) {

@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SampleDatePicker } from "@/components/datepicker";
+import { SampleDatePicker } from "@/components/shared/datepicker";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
