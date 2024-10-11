@@ -5,7 +5,7 @@ import ItinerariesPage from "@/pages/ItinerariesPage";
 import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
 import SingleItineraryPage from "@/pages/SingleItineraryPage";
-
+import ComponentTestPage from "@/pages/ComponentTestPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import HistoricalPage from "@/pages/HistoricalPage";
 import ActivitiesTourists from "@/pages/ActivitiesTouristsPage";
@@ -28,6 +28,7 @@ const routes = createRoutesFromElements(
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
     <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
+    <Route path="componentTest" element={<ComponentTestPage />} />
     <Route
       path="*"
       element={
