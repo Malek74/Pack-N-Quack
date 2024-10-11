@@ -14,8 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SampleDatePicker } from "@/components/datepicker";
-import { PhoneInput } from "@/components/PhoneInput";
+import { SampleDatePicker } from "@/components/shared/datepicker";
+import { PhoneInput } from "@/components/shared/PhoneInput";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";

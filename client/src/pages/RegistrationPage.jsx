@@ -36,11 +36,11 @@ import {
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/PhoneInput";
-import { SampleDatePicker } from "@/components/datepicker";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { SampleDatePicker } from "@/components/shared/datepicker";
 import NewTouristForm from "@/components/forms/NewTouristForm";
 import NewSellerForm from "@/components/forms/NewSellerForm";
-import registration from "../assets/registration.jpg";
+import registration from "/assets/images/registration.jpg";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 

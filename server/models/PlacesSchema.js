@@ -17,12 +17,12 @@ const placesSchema = new Schema({
     },
     pictures: {
         type: [String], // Array of strings for URLs or paths to pictures
-        default: ["/images/Memo.png", "/images/Lege-cy.jpg", "/images/Pyramids.jpeg"]
+        default: ["/assets/images/Memo.png", "/assets/images/Lege-cy.jpg", "/assets/images/Pyramids.jpeg"]
     },
     coverImagePath: {
         type: String,
         required: true,
-        default: "/images/Memo.png"
+        default: "/assets/images/Memo.png"
     },
     location: {
         type: String,

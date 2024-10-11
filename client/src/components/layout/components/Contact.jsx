@@ -1,7 +1,7 @@
 import React from 'react';
-import PhoneIcon from '../../../assets/call.svg'; // Adjust the path accordingly
-import EmailIcon from '../../../assets/mail.svg'; // Adjust the path accordingly
-import AddressIcon from '../../../assets/map-pin.svg'; // Adjust the path accordingly
+import PhoneIcon from '/assets/icons/call.svg'; // Adjust the path accordingly
+import EmailIcon from '/assets/icons/mail.svg'; // Adjust the path accordingly
+import AddressIcon from '/assets/icons/map-pin.svg'; // Adjust the path accordingly
 
 const Contact = () => {
   return (

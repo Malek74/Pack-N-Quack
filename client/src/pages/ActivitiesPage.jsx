@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import ActivityCard from "@/components/ActivityCard";
-import Activitiesbackground from "../images/Background.jpg";
-import Banner from "@/components/Banner";
-import CreateDialog from "@/components/CreateDialog";
+import ActivityCard from "@/components/activityPage/ActivityCard";
+import Activitiesbackground from "/assets/images/Background.jpg";
+import Banner from "@/components/shared/Banner";
+import CreateDialog from "@/components/shared/CreateDialog";
 import ActivityForm from "@/components/forms/ActivityForm";
 import axios from "axios";
 import { useParams } from "react-router-dom";

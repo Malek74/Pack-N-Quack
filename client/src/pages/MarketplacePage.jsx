@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import ProductCard from "@/components/ProductCard";
-import Activitiesbackground from "../images/Background.jpg";
-import Banner from "./components/BannerV2";
-import { Input } from "@/components/ui/input";
+import ProductCard from "@/components/marketplacePage/ProductCard";
+import Activitiesbackground from "/assets/images/Background.jpg";
+import Banner from "../components/shared/BannerV2";
 import { Button } from "@/components/ui/button";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
-import FilterButton from "@/components/FilterButtons";
-import PriceSlider from "./PriceSlider";
-import CreateDialog from "@/components/CreateDialog";
+import FilterButton from "@/components/shared/FilterButtons";
+import PriceSlider from "../components/shared/PriceSlider";
+import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");

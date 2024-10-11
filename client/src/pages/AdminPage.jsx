@@ -1,10 +1,10 @@
 import { useState } from "react";
-import AdminDashboard from "@/components/AdminDashboard";
-import ActivityCategory from "@/components/ActivityCategory";
-import ItineraryTags from "@/components/ItineraryTags";
-import ActivityTags from "@/components/ActivityTags";
+import AdminDashboard from "@/components/adminPage/AdminDashboard";
+import ActivityCategory from "@/components/adminPage/ActivityCategory";
+import ItineraryTags from "@/components/adminPage/ItineraryTags";
+import ActivityTags from "@/components/adminPage/ActivityTags";
 import { Link } from "react-router-dom";
-import logo from "@/images/logo.png";
+import logo from "/assets/icons/logo.png";
 
 import {
   Bell,
@@ -20,8 +20,8 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
-import AdminsList from "@/components/AdminsList";
-import AdminProducts from "@/components/AdminProducts";
+import AdminsList from "@/components/adminPage/AdminsList";
+import AdminProducts from "@/components/adminPage/AdminProducts";
 import GovernorsList from "@/components/GovernorsList";
 import { useNavigate } from "react-router-dom";
 
