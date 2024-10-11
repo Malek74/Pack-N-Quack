@@ -4,7 +4,7 @@ import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
-import { emailExists, usernameExists } from "./Helpers.js";
+import { emailExists, usernameExists } from "../utils/Helpers.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {

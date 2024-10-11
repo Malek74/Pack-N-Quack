@@ -1,6 +1,6 @@
 import activityModel from "../models/activitySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
-import { usernameExists, emailExists } from "./Helpers.js";
+import { usernameExists, emailExists } from "../utils/Helpers.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;

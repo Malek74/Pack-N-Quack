@@ -1,6 +1,6 @@
 
 import seller from "../models/sellerSchema.js";
-import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../controllers/Helpers.js';
+import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 
 
 
