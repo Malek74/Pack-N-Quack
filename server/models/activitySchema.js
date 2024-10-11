@@ -94,7 +94,7 @@ const activitySchema = new Schema({
     coverImagePath: {
         type: String,
         required: true,
-        default: "/images/Background.jpg"
+        default: "/assets/images/Background.jpg"
     }
 })
 

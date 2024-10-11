@@ -36,9 +36,9 @@ import {
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/PhoneInput";
-import { SampleDatePicker } from "@/components/datepicker";
-import { nationalities } from "../nationalities";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { SampleDatePicker } from "@/components/shared/datepicker";
+import { nationalities } from "../shared/nationalities";
 export default function NewTouristForm(props) {
   const [status, setStatus] = useState("");
 

@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PhoneInput } from "@/components/PhoneInput";
+import { PhoneInput } from "@/components/shared/PhoneInput";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 

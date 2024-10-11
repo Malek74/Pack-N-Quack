@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react"
-import HistoricalCard from "@/components/HistoricalCard"
-import Historicalbackground from "../images/Italy.jpg"
-import pyramids from "../images/Pyramids.jpeg"
-import egyptianmuseum from "../images/egyptianmuseum.jpg"
-import Banner from "@/components/Banner"
-import SearchBar from "@/components/SearchBar"
-import EditTag from "@/components/SelectTag"
+import HistoricalCard from "@/components/historicalPage/HistoricalCard"
+import Historicalbackground from "/assets/images/Italy.jpg"
+import Banner from "@/components/shared/Banner"
+import SearchBar from "@/components/shared/SearchBar"
+import EditTag from "@/components/historicalPage/SelectTag"
 import axios from "axios"
 
 

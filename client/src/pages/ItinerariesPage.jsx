@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import ItineraryCard from "./components/ItineraryCard";
-import Banner from "./components/BannerV2";
-import BannerImage from "../assets/romanBanner.jpg";
+import ItineraryCard from "../components/itinerariesPage/ItineraryCard";
+import Banner from "../components/shared/BannerV2";
+import BannerImage from "/assets/images/romanBanner.jpg";
 import { Button } from "@/components/ui/button";
-import AddActivity from "./components/AddActivity";
-import SearchBar from "@/components/SearchBar";
-import FilterButton from "@/components/FilterButtons";
+import AddActivity from "../components/itinerariesPage/AddActivity";
+import SearchBar from "@/components/shared/SearchBar";
+import FilterButton from "@/components/shared/FilterButtons";
 import Multiselect from "multiselect-react-dropdown";
-import DateInput from "./components/DateInput";
+import DateInput from "../components/shared/DateInput";
 import axios from "axios";
 
 const ItinerariesPage = () => {

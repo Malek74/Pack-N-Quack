@@ -1,9 +1,8 @@
-import MyFirstComponent from "@/components/MyFirstComponent";
 import TouristProfile from "@/components/forms/TouristProfile";
 import TourGuideProfile from "@/components/forms/TourGuideProfile";
 import AdvertiserProfile from "@/components/forms/AdvertiserProfile";
 import SellerProfile from "@/components/forms/SellerProfile";
-import CreateDialog from "@/components/CreateDialog";
+import CreateDialog from "@/components/shared/CreateDialog";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -384,7 +383,6 @@ export default function MyProfilePage() {
 
   return (
     <div>
-      <MyFirstComponent />
       {isTourGuide && <div>{profile && <TourGuideCard />}</div>}
       {isAdvertiser && <div>{profile && <AdvCard />}</div>}
       {isSeller && <div>{profile && <SellerCard />}</div>}
