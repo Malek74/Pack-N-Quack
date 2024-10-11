@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import CreateDialog from "./shared/CreateDialog";
-import NewUserForm from "./forms/NewUserForm";
+import CreateDialog from "../shared/CreateDialog";
+import NewUserForm from "../forms/NewUserForm";
 import axios from "axios";
 import { useState, useEffect } from "react";
 export default function GovernorsList() {

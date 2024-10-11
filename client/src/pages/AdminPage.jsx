@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
 import AdminsList from "@/components/adminPage/AdminsList";
 import AdminProducts from "@/components/adminPage/AdminProducts";
-import GovernorsList from "@/components/GovernorsList";
+import GovernorsList from "@/components/adminPage/GovernorsList";
 import { useNavigate } from "react-router-dom";
 
 import {
