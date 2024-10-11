@@ -1,0 +1,138 @@
+import React, { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+// import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+import { CheckIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { SampleDatePicker } from "@/components/shared/datepicker";
+import NewTouristForm from "@/components/forms/NewTouristForm";
+import NewSellerForm from "@/components/forms/NewSellerForm";
+import registration from "/assets/images/registration.jpg";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+
+
+export default function RegistrationPage() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [type, setType] = useState("");
+
+  const createNewTourist = (values) => {
+    console.log("axios");
+    axios
+      .post("/api/tourist/", {
+        name: values.name, // Default value for username
+        username: values.username, // Default value for username
+        email: values.email, // Default value for email
+        password: values.password, // Default value for password
+        mobile: values.mobileNumber, // Default value for mobile number
+        nationality: values.nationality, // Default value for nationality
+        role: values.status, // Default value for status dropdown
+        dob: values.dob, // Default value for date of birth
+      })
+      .then((response) => {
+        console.log("Tourist created successfully", response.data);
+        toast({
+          title: "Account created succesfully",
+        });
+        navigate("/")
+      })
+      .catch((error) => {
+        console.error("Error creating tourist", error);
+        toast({
+          title: "Couldn't sign up",
+          description: error.response.data.message,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
+
+  const createNewTourguideSellerAdvertiser = (values) => {
+    console.log("axios");
+    const endpoint = values.status === "Advertiser" ? "advertisers" : values.status==="Seller" ? "sellers" : "tourGuide"
+    axios
+      .post(`/api/${endpoint}/`, {
+        username: values.username, // Default value for username
+        email: values.email, // Default value for email
+        password: values.password, // Default value for password
+      })
+      .then((response) => {
+        console.log("Account created successfully", response.data);
+        toast({
+          title: "Account created succesfully",
+        });
+        navigate("/")
+      })
+      .catch((error) => {
+        console.error("Error creating account", error);
+        toast({
+          title: "Couldn't sign up",
+          description: error.response.data.message,
+          variant: "destructive", // Error variant
+        });
+      });
+  };
+  return (
+    <div className="flex ">
+      <img className="h-svh" src={registration} />
+      {type == "" && (
+        <div className="flex flex-1 justify-center items-center">
+          <Button onClick={() => setType("Tourist")}>Sign up as Tourist</Button>
+          <Button onClick={() => setType("TourguideAdvertiserSeller")}>
+            Sign up as Tour Guide / Advertiser / Seller
+          </Button>
+        </div>
+      )}
+
+      {type == "Tourist" && (
+        <div className="flex flex-col justify-center">
+          <Button onClick={() => setType("")}>Back</Button>
+          <div className="py-4 px-10 border border-red-500 rounded-2xl">
+            <h1 className="text-2xl">Sign up</h1>
+            <NewTouristForm submitFunction={createNewTourist} />
+          </div>
+        </div>
+      )}
+      {type == "TourguideAdvertiserSeller" && (
+        <div>
+          <Button onClick={() => setType("")}>Back</Button>
+
+          <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser}/>
+        </div>
+      )}
+    </div>
+  );
+}
