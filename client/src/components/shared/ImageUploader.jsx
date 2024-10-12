@@ -24,19 +24,34 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import axios from "axios";
 import { Button } from "../ui/button";
+import Loading from "./Loading";
+import { useState } from "react";
 
 ImageUploader.propTypes = {
-  imagesUploaded: PropTypes.array,
-  setImagesUploaded: PropTypes.func,
+  imagesUploaded: PropTypes.array.isRequired,
+  setImagesUploaded: PropTypes.func.isRequired,
+  shouldHandleSave: PropTypes.bool,
   apiEndpoint: PropTypes.string,
+};
+
+ImageUploader.propTypes = {
+  apiEndpoint: (props) => {
+    if (props.shouldHandleSave === true && !props.apiEndpoint) {
+      return new Error(
+        `When 'shouldHandleSave' is true, 'apiEndpoint' is required.`
+      );
+    }
+  },
 };
 
 export default function ImageUploader({
   imagesUploaded,
   setImagesUploaded,
-  apiEndpoint,
+  shouldHandleSave = false,
+  apiEndpoint = "",
 }) {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const imageFileSchema = z.object({
     type: z.string().refine((type) => type.startsWith("image/"), {
@@ -75,19 +90,22 @@ export default function ImageUploader({
         formData.append(`images`, image); // You can name the files based on index or just 'image'
       });
 
+      setIsLoading(true);
       // Send the FormData object via axios
-      const response = await axios.post(apiEndpoint, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Make sure to set this header
-        },
-      });
+      // const response = await axios.post(apiEndpoint, formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data", // Make sure to set this header
+      //   },
+      // });
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       toast({
         description: `All your quacks are packed! ${imagesUploaded.length} pictures uploaded successfully!`,
         variant: "success",
       });
+      setIsLoading(false);
       setImagesUploaded([]);
 
-      console.log(response);
+      // console.log(response);
     } catch (error) {
       toast({
         description: "Something went wrong. The ducks could not be packed.",
@@ -112,7 +130,7 @@ export default function ImageUploader({
               or click to pack them in!
             </p>
           </div>
-          {imagesUploaded.length > 0 && (
+          {imagesUploaded.length > 0 && !isLoading && (
             <Carousel
               className="w-full max-w-xs"
               opts={{
@@ -172,7 +190,7 @@ export default function ImageUploader({
               <CarouselNext />
             </Carousel>
           )}
-          {imagesUploaded.length > 0 && (
+          {imagesUploaded.length > 0 && shouldHandleSave && !isLoading && (
             <Button
               className="bg-gold hover:bg-goldhover place-self-end"
               onClick={handleSave}
@@ -180,6 +198,7 @@ export default function ImageUploader({
               Pack Them Quack!
             </Button>
           )}
+          {isLoading && <Loading />}
         </div>
       )}
     </Dropzone>
