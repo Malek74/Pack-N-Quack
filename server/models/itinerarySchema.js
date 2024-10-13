@@ -66,6 +66,7 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
 
+    
     ratings: {
         averageRating: {
             type: Number,
