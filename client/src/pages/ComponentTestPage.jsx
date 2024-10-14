@@ -1,16 +1,9 @@
-import { useState } from "react";
-import ImageUploader from "@/components/shared/ImageUploader";
-export default function ComponentTestPage() {
-  const [imagesUploaded, setImagesUploaded] = useState([]);
+import AvatarComponent from "@/components/shared/AvatarUploader";
 
+export default function ComponentTestPage() {
   return (
-    <div>
-      <ImageUploader
-        imagesUploaded={imagesUploaded}
-        setImagesUploaded={setImagesUploaded}
-        shouldHandleSave
-        apiEndpoint="/api/upload"
-      />
+    <div className="flex flex-col items-center justify-center">
+      <AvatarComponent size={28} />
     </div>
   );
 }

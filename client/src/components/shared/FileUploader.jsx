@@ -19,9 +19,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ImageMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import {
+  FileText,
+  FileImage,
+  FileVideo,
+  FileAudio,
+  FileX2,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 FileUploader.propTypes = {
   filesUploaded: PropTypes.array,
@@ -58,15 +65,73 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
 
     if (invalidFiles.length > 0) {
       toast({
-        description: "Please only upload image files.",
+        description: "Please only upload document files.",
         variant: "destructive",
       });
     } else {
       setFilesUploaded([...filesUploaded, ...acceptedFiles]);
       toast({
-        description: `All your quacks are packed! ${acceptedFiles.length} pictures uploaded successfully!`,
+        description: `All your quacks are packed! ${acceptedFiles.length} documents uploaded successfully!`,
         variant: "success",
       });
+    }
+  };
+  const getFileIcon = (fileExtension) => {
+    switch (fileExtension) {
+      case "pdf":
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-red-500"
+          />
+        ); // You can replace FileCheck2 with another relevant icon
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+        return (
+          <FileImage
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-blue-500"
+          />
+        );
+      case "doc":
+      case "docx":
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-blue-700"
+          />
+        );
+      case "mp4":
+      case "mkv":
+        return (
+          <FileVideo
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-green-500"
+          />
+        );
+      case "mp3":
+      case "wav":
+        return (
+          <FileAudio
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-purple-500"
+          />
+        );
+      default:
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-neutral-700"
+          />
+        );
     }
   };
 
@@ -106,16 +171,16 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
                     <div className="p-1 relative w-full h-full overflow-hidden">
                       <AlertDialog>
                         <AlertDialogTrigger className="absolute top-1 right-1">
-                          <ImageMinus className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
+                          <FileX2 className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Quack Goodbye to This Image?
+                              Delete this document?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to quack this image goodbye?
-                              Once it’s gone, it won’t waddle back!
+                              Are you sure you want to delete this document?
+                              Once deleted, it cannot be recovered.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -127,7 +192,7 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
                                   filesUploaded.filter((_, i) => i !== index)
                                 );
                                 toast({
-                                  description: `The image has waddled off successfully!`,
+                                  description: `The document has waddled off successfully!`,
                                 });
                               }}
                             >
@@ -137,10 +202,16 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
                         </AlertDialogContent>
                       </AlertDialog>
 
-                      <img
-                        src={file.type}
-                        className="h-full w-full object-cover rounded-lg"
-                      />
+                      <Card>
+                        <CardContent className="flex flex-col items-center justify-center p-4">
+                          {getFileIcon(
+                            file.name.split(".").pop().toLowerCase()
+                          )}
+                          <p className="w-full text-center text-ellipsis overflow-hidden whitespace-nowrap">
+                            {file.name}
+                          </p>
+                        </CardContent>
+                      </Card>
                     </div>
                   </CarouselItem>
                 ))}
