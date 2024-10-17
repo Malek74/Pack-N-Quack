@@ -49,6 +49,7 @@ export default function MyProfilePage() {
         hotline,
         website,
         email,
+        isAccepted,
         username,
       } = profile;
 
