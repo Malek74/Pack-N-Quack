@@ -8,6 +8,8 @@ import tourist from '../models/touristSchema.js';
 import activityModel from "../models/activitySchema.js";
 import product from "../models/productSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
+import axios from "axios";
+import { json } from "express";
 
 //@desc check if username exists in the database
 //@param username
@@ -69,7 +71,6 @@ export const usernameExists = async (username) => {
     }
 };
 
-
 //@desc check if email exists in the database
 //@param email
 //@return boolean
@@ -130,7 +131,6 @@ export const emailExists = async (email) => {
     }
 };
 
-
 export const refundMoney = async (itineraryID) => {
 
     //fetch itinerary
@@ -159,4 +159,59 @@ export const deleteProducts = async (sellerID) => {
 export const deleteActivities = async (advertiserID) => {
     const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: advertiserID });
     console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
+}
+
+export const addLoyaltyPoints = async (touristID, points) => {
+    const subscriber = await tourist.findById(touristID);
+
+    const currLevel = subscriber.level;
+
+    const pointsToAdd = 0;
+    const newPoints = 0;
+
+    switch (currLevel) {
+        case 1:
+            pointsToAdd = points * 0.5;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+            if (newPoints >= 100000) {
+                subscriber.level = 2;
+            }
+            break;
+        case 2:
+            pointsToAdd = points * 1;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+            if (newPoints >= 200000) {
+                subscriber.level = 3;
+            }
+
+            break;
+        case 3:
+            pointsToAdd = points * 1.5;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+
+            break;
+
+        default:
+            break;
+    }
+
+    subscriber.loyaltyPoints = newPoints;
+    await subscriber.save();
+}
+
+export const getAmadeusToken = async () => {
+
+    const data = {
+        grant_type: "client_credentials",
+        client_id: process.env.AMADEUS_API_KEY,
+        client_secret: process.env.AMADEUS_API_SECRET
+    }
+    const res = await axios.post('https://test.api.amadeus.com/v1/security/oauth2/token', data, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+
+    return res.data.access_token;
+
 }

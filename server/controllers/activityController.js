@@ -3,6 +3,8 @@ import activityModel from "../models/activitySchema.js";
 import activityTag from "../models/activityTagSchema.js";
 import activityCategory from "../models/activityCategorySchema.js";
 import { query } from "express";
+import stripe from 'stripe';
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 
 // @desc Get all activities
 // @route GET /api/activity
@@ -19,6 +21,8 @@ export const getActivities = async (req, res) => {
 // @route POST /api/activity
 // @Body { advertiserID, categoryID, date, location, priceType, price, minPrice, maxPrice, tags, specialDiscounts, isBookingOpen, duration, name }
 export const addActivity = async (req, res) => {
+
+    const newActivity = req.body;
     console.log(req.body)
     if (!req.body.advertiserID) {
         req.body.advertiserID = new mongoose.Types.ObjectId("66ffe2acd9af7892d8193dad");
@@ -47,9 +51,27 @@ export const addActivity = async (req, res) => {
         req.body.categoryID = category._id
     }
     console.log(req.body)
-    const newActivity = new activityModel(req.body);
+
+    const stripeProduct = await stripeInstance.products.create({
+        name: req.body.name,
+        description: req.body.description,
+        images: [req.body.image],
+    });
+
+    const stripePrice = await stripeInstance.prices.create({
+        product: stripeProduct.id,
+        unit_amount: req.body.price * 100, //stripe uses cents
+        currency: 'usd'
+    });
+
+    //todo: change to dynamic currency
+    newActivity.stripePriceID = stripePrice.id;
+    newActivity.stripeProductID = stripeProduct.id;
+    const activityCreated = new activityModel(newActivity);
+
+    
     try {
-        const a = await newActivity.save();
+        const a = await activityCreated.save();
         console.log(a)
         return res.status(200).json(a);
     } catch (error) {

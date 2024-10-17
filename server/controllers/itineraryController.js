@@ -1,5 +1,12 @@
+import axios from 'axios';
 import Itinerary from '../models/itinerarySchema.js';
 import itineraryTags from '../models/itineraryTagsSchema.js';
+import product from '../models/productSchema.js';
+import tourist from '../models/touristSchema.js';
+import { addLoyaltyPoints } from '../utils/Helpers.js';
+import stripe from 'stripe';
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
+
 
 //@desc create a new itinerary
 //@route POST api/itinerary
@@ -12,7 +19,7 @@ export const addItinerary = async (req, res) => {
     const available_dates = req.body.dates;
     const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
     let tagsIDS = []
-
+    console.log(req.body);
     //validate that all fields are present
     if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
         if (!name) {
@@ -60,6 +67,18 @@ export const addItinerary = async (req, res) => {
 
 
     try {
+
+
+        const stripeProduct = await stripeInstance.products.create({
+            name: name,
+            description: description,
+        });
+
+        const priceData = await stripeInstance.prices.create({
+            product: stripeProduct.id,
+            unit_amount: price * 100, //stripe uses cents
+            currency: 'usd', //todo: change to dynamic currency
+        });
         const itinerary = new Itinerary({
             name: name,
             tourGuideID: tourGuideID,
@@ -71,12 +90,14 @@ export const addItinerary = async (req, res) => {
             dropOffLocation: dropOffLocation,
             accessibility: accessibility,
             tags: tagsIDS,
-            description: description
+            description: description,
+            stripePriceID: priceData.id,
+            stripeProductID: stripeProduct.id
         });
-
         const createdItinerary = await Itinerary.create(itinerary);
         return res.status(201).json(createdItinerary);
-    } catch (error) {
+    }
+    catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
@@ -86,6 +107,7 @@ export const addItinerary = async (req, res) => {
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
 export const getItinerary = async (req, res) => {
+
 
 
     const id = req.query.id;
@@ -152,6 +174,7 @@ export const getItinerary = async (req, res) => {
 
         // Fetch the itinerary using the built query
         let itinerary = await Itinerary.find(query).sort(sortOptions).populate('tags');
+
 
         if (itinerary.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
@@ -308,6 +331,125 @@ export const getAllLanguages = async (req, res) => {
         const languages = await Itinerary.distinct('language');
         return res.status(200).json(languages);
     } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+//todo:add stripe payment gateway
+export const bookItinerary = async (req, res) => {
+    const itineraryID = req.params.id;
+    const touristID = req.body.touristID;
+    const chosenDate = req.body.date;
+    const numOfBookings = req.body.numOfBookings;
+    console.log(req.body);
+    console.log(itineraryID, touristID, chosenDate, numOfBookings);
+
+    //validate that all fields are present
+    if (!itineraryID || !touristID || !chosenDate || !numOfBookings) {
+        return res.status(400).json({ message: "Itinerary ID, Tourist ID, and Date are required." });
+    }
+
+    //check that date exists 
+    const dateExists = await Itinerary.findOne({ _id: itineraryID, available_dates: { $elemMatch: { $eq: chosenDate } } });
+    if (!dateExists) {
+        return res.status(400).json({ message: "Date not available" });
+    }
+
+    try {
+        const itinerary = await Itinerary.findById(itineraryID);
+
+        //check if itinerary exists
+        if (!itinerary) {
+            return res.status(404).json({ message: "Itinerary not found." });
+        }
+
+        //check if tourist exists
+        const touristExists = await tourist.findById(touristID);
+
+        if (!touristExists) {
+            return res.status(404).json({ message: "Tourist not found." });
+        }
+
+
+        const subscription = { Subscriber: touristID, date: chosenDate, numOfBookings: numOfBookings }
+
+        const subscribers = itinerary.subscribers;
+
+        subscribers.push(subscription);
+
+        const newBookings = itinerary.bookings + numOfBookings;
+
+
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { subscribers, bookings: newBookings }, { new: true });
+
+        //calculate and add loyalty points to tourist
+        await addLoyaltyPoints(touristID, numOfBookings);
+        return res.status(200).json(updatedItinerary);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+export const cancelItineraryBooking = async (req, res) => {
+    const itineraryID = req.params.id;
+    const touristID = req.body.touristID;
+    const date = req.body.date;
+    console.log(itineraryID, touristID, date);
+    if (!itineraryID || !touristID || !date) {
+        return res.status(400).json({ message: "Itinerary ID, Tourist ID, and Date are required." });
+    }
+
+    try {
+        // find the itinerary
+        const itinerary = await Itinerary.findById(itineraryID);
+
+        //check if itinerary exists
+        if (!itinerary) {
+            return res.status(404).json({ message: "Itinerary not found." });
+        }
+
+        //check if tourist exists
+        const touristExists = await tourist.findById(touristID);
+
+        if (!touristExists) {
+            return res.status(404).json({ message: "Tourist not found." });
+        }
+
+        //find the subscription
+        const subscription = itinerary.subscribers.find(sub => sub.Subscriber == touristID && Date(sub.date) === Date(date));
+
+        //check if subscription exists
+        if (!subscription) {
+
+            return res.status(404).json({ message: "Subscription not found." });
+
+
+        }
+
+        console.log(subscription);
+        var todaysDate = new Date();
+        var chosenDate = new Date(date);
+
+        console.log(todaysDate);
+        console.log(chosenDate);
+
+        //check if there are more than 48 hrs left
+        if (chosenDate - todaysDate < 172800000) {
+            return res.status(400).json({ message: "Cannot cancel booking less than 48 hrs before the date" });
+        }
+
+        //remove the subscription
+        const updatedSubscribers = itinerary.subscribers.filter(sub => sub.Subscriber != touristID && sub.date != date);
+
+        //updaate the bookings
+        const newBookings = itinerary.bookings - subscription.numOfBookings;
+
+        //update itirenary
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { subscribers: updatedSubscribers, bookings: newBookings }, { new: true });
+
+        return res.status(200).json(updatedItinerary);
+
+    }
+    catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }

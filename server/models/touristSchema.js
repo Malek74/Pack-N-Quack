@@ -42,6 +42,24 @@ const touristSchema = new Schema({
         type: Number,
         default: 0,
     },
+    loyaltyPoints: {
+        type: Number,
+        default: 0,
+    },
+
+    level: {
+        type: Number,
+        default: 0,
+    },
+    profileImagePath: {
+        type: String,
+        default: "/assets/images/defaultProfilePicture.webp"
+    },
+
+    preferredCurrency: {
+        type: String,
+        default: "EGP"
+    }
 },
     { timestamps: true }
 );

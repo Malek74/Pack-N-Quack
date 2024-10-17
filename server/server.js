@@ -21,7 +21,8 @@ import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
 import uploadImg from './routes/uploadImg.js';
-
+import shareMail from './routes/shareMail.js';
+import flightBooking from './routes/flightBooking.js';
 config();
 const app = express();
 const port = process.env.PORT || 8000;
@@ -62,6 +63,8 @@ app.use('/api/touristGovernor', touristGoverner);
 app.use('/api/itiernaryTags', itineraryTag);
 app.use('/api/advertisers', advertisers);
 app.use('/api/activity', activity)
-app.use('/api/activity/category', activityCategory)
-app.use('/api/activity/tag', activityTag)
-app.use('/api/upload',uploadImg)
+app.use('/api/activity/category', activityCategory);
+app.use('/api/activity/tag', activityTag);
+app.use('/api/upload', uploadImg);
+app.use('/api/share/', shareMail);
+app.use('/api/bookFlight', flightBooking);

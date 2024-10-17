@@ -99,3 +99,6 @@ export const deleteTourist = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const getMyBookings = async (req, res) => {
+}

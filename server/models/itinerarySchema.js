@@ -66,7 +66,7 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
 
-    
+
     ratings: {
         averageRating: {
             type: Number,
@@ -125,10 +125,16 @@ const itinerarySchema = new mongoose.Schema({
         }],
         default: []
     },
-    subscribers: [{
-        type: [Schema.Types.ObjectId],
-        ref: 'Tourist'
-    }],
+    stripeProductID: {
+        type: String,
+        required: true
+    },
+
+    stripePriceID: {
+        type: String,
+        required: true
+    },
+
     accessibility: {
         type: String,
         required: true
