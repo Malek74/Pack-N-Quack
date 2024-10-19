@@ -39,17 +39,9 @@ export const searchFlight = async (req, res) => {
 export const confirmFlightPrice = async (req, res) => {
     const { originLocationCode, destinationLocationCode, departureDate, adults } = req.body;
 
-    //validate that all fields are present
-    if (!originLocationCode || !destinationLocationCode || !departureDate || !adults) {
-        return res.status(400).json({ message: "Please add all fields" });
-    }
+    const searchData = req.body.data;
 
-    const searchData = {
-        originLocationCode,
-        destinationLocationCode,
-        departureDate,
-        adults,
-    }
+    console.log(searchData);
 
     const amadeus = new Amadeus({
         clientId: process.env.AMADEUS_API_KEY,
@@ -57,17 +49,13 @@ export const confirmFlightPrice = async (req, res) => {
     });
 
     try {
-        const flightOffersResponse = await amadeus.shopping.flightOffersSearch.get({
-            searchData
-        });
 
-        console.log(flightOffersResponse);
         const response = await amadeus.shopping.flightOffers.pricing.post(
             {
                 data: {
                     type: "flight-offers-pricing",
-                    flightOffers: [flightOffersResponse.data[0]],
-                },
+                    flightOffers: [searchData],
+                }
             },
             { include: "credit-card-fees,detailed-fare-rules" }
         );
@@ -78,3 +66,70 @@ export const confirmFlightPrice = async (req, res) => {
     }
 
 }
+
+export const bookFlight = async (req, res) => {
+
+
+  try {
+    // Book a flight from MAD to ATH on 2022-08-01
+    const flightOffersResponse = await amadeus.shopping.flightOffersSearch.get({
+      originLocationCode: "MAD",
+      destinationLocationCode: "ATH",
+      departureDate: "2022-08-01",
+      adults: "1",
+    });
+
+    const pricingResponse = await amadeus.shopping.flightOffers.pricing.post({
+      data: {
+        type: "flight-offers-pricing",
+        flightOffers: [flightOffersResponse.data[0]],
+      },
+    });
+
+    const response = await amadeus.booking.flightOrders.post({
+      data: {
+        type: "flight-order",
+        flightOffers: [pricingResponse.data.flightOffers[0]],
+        travelers: [
+          {
+            id: "1",
+            dateOfBirth: "1982-01-16",
+            name: {
+              firstName: "JORGE",
+              lastName: "GONZALES",
+            },
+            gender: "MALE",
+            contact: {
+              emailAddress: "jorge.gonzales833@telefonica.es",
+              phones: [
+                {
+                  deviceType: "MOBILE",
+                  countryCallingCode: "34",
+                  number: "480080076",
+                },
+              ],
+            },
+            documents: [
+              {
+                documentType: "PASSPORT",
+                birthPlace: "Madrid",
+                issuanceLocation: "Madrid",
+                issuanceDate: "2015-04-14",
+                number: "00000000",
+                expiryDate: "2025-04-14",
+                issuanceCountry: "ES",
+                validityCountry: "ES",
+                nationality: "ES",
+                holder: true,
+              },
+            ],
+          },
+        ],
+      },
+    });
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
