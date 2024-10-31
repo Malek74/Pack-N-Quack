@@ -28,7 +28,8 @@ Features can be found in the [FEATURES](FEATURES)
 To set up the project and install all dependencies, run the following command in the root directory:
 
 
-```npm run install:all
+```
+npm run install:all
 ```
 If you encounter errors, you can install the modules for the frontend and backend separately:
 ### Install frontend dependencies
@@ -37,18 +38,21 @@ npm install
 ```
 
 ### Install backend dependencies
-```cd ../server
+```
+cd ../server
 npm install
 ```
 
 To start the project in development mode, open two separate terminals:
 
 ### First Terminal
-```cd client
+```
+cd client
 npm run dev
 ```
 ### Second Terminal
-```cd ../server
+```
+cd ../server
 npm run dev
 ```
 
@@ -57,7 +61,7 @@ npm run dev
 Create a `.env` file in the root directory and add the following variables:
 
 ### Environment Variables
-```
+
 
 
 ```
