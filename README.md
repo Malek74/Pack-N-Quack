@@ -28,16 +28,18 @@ Features can be found in the [FEATURES](FEATURES)
 To set up the project and install all dependencies, run the following command in the root directory:
 
 
-```npm run install:all```
-
+```npm run install:all
+```
 If you encounter errors, you can install the modules for the frontend and backend separately:
 ### Install frontend dependencies
 ```cd client
-npm install```
+npm install
+```
 
 ### Install backend dependencies
 ```cd ../server
-npm install```
+npm install
+```
 
 To start the project in development mode, open two separate terminals:
 
@@ -47,13 +49,32 @@ npm run dev
 ```
 ### Second Terminal
 ```cd ../server
-npm run dev```
+npm run dev
+```
 
 **The frontend and backend should now be running concurrently in development mode.**
 
-Make sure to have access to the env files in order to be able to run the project
+Create a `.env` file in the root directory and add the following variables:
 
 ### Environment Variables
+```
 
+
+```
+PORT=8000
+MONGO_URI='your_mongo_db_connection_string'
+JWT_SECRET_KEY='your_jwt_secret_key'
+
+CLOUDINARY_CLOUD_NAME='your_cloudinary_cloud_name'
+CLOUDINARY_API_KEY='your_cloudinary_api_key'
+CLOUDINARY_API_SECRET='your_cloudinary_api_secret'
+
+STRIPE_SECRET_KEY='your_stripe_secret_key'
+EXHANGE_RATE_API_KEY='your_exchange_rate_api_key'
+
+AMADEUS_API_KEY='your_amadeus_api_key'
+AMADEUS_API_SECRET='your_amadeus_api_secret'
+
+```
 
 
