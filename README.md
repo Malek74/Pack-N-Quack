@@ -18,5 +18,43 @@ This project is built using the **MERN** stack:
 - **React**: Front-end library for building a responsive and dynamic user interface.
 - **Node.js**: JavaScript runtime environment for server-side scripting.
 
-##Features 
+## Features 
 Features can be found in the [FEATURES](FEATURES)
+
+## Code Snippets 
+
+## Installation
+
+To set up the project and install all dependencies, run the following command in the root directory:
+
+```Command Prompt
+npm run install:all```
+
+If you encounter errors, you can install the modules for the frontend and backend separately:
+```Command Prompt
+# Install frontend dependencies
+cd client
+npm install
+
+# Install backend dependencies
+cd ../server
+npm install```
+
+To start the project in development mode, open two separate terminals:
+
+In the first terminal, run the frontend:
+```Command Prompt
+cd client
+npm run dev```
+
+In the second terminal, run the backend:
+
+```Command Prompt
+cd ../server
+npm run dev```
+**The frontend and backend should now be running concurrently in development mode.
+**
+
+
+
+
