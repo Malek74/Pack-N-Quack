@@ -19,4 +19,4 @@ This project is built using the **MERN** stack:
 - **Node.js**: JavaScript runtime environment for server-side scripting.
 
 ##Features 
-Features can be found in the [FEATURES](url)
+Features can be found in the [FEATURES](FEATURES)
