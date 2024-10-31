@@ -41,14 +41,14 @@ npm install`
 
 To start the project in development mode, open two separate terminals:
 
-In the first terminal, run the frontend:
+### First Terminal
 `cd client
 npm run dev
 `
-In the second terminal, run the backend:
-
+### Second Terminal
 `cd ../server
 npm run dev`
+
 **The frontend and backend should now be running concurrently in development mode.
 **
 
