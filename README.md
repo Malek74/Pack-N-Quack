@@ -8,3 +8,15 @@ The project is currently under development, we are actively creating and improvi
 
 
 More updates will be provided as development progresses.
+
+
+## Framework
+This project is built using the **MERN** stack:
+
+- **MongoDB**: NoSQL database for storing data in flexible ,JSON-like format.
+- **Express.js**: Web application framework for handling routing and middleware on the server side.
+- **React**: Front-end library for building a responsive and dynamic user interface.
+- **Node.js**: JavaScript runtime environment for server-side scripting.
+
+##Features 
+Features can be found in the [FEATURES](url)
