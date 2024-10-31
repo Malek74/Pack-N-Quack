@@ -28,30 +28,32 @@ Features can be found in the [FEATURES](FEATURES)
 To set up the project and install all dependencies, run the following command in the root directory:
 
 
-`npm run install:all`
+```npm run install:all```
 
 If you encounter errors, you can install the modules for the frontend and backend separately:
 ### Install frontend dependencies
-`cd client
-npm install`
+```cd client
+npm install```
 
 ### Install backend dependencies
-`cd ../server
-npm install`
+```cd ../server
+npm install```
 
 To start the project in development mode, open two separate terminals:
 
 ### First Terminal
-`cd client
+```cd client
 npm run dev
-`
+```
 ### Second Terminal
-`cd ../server
-npm run dev`
+```cd ../server
+npm run dev```
 
-**The frontend and backend should now be running concurrently in development mode.
-**
+**The frontend and backend should now be running concurrently in development mode.**
 
+Make sure to have access to the env files in order to be able to run the project
+
+### Environment Variables
 
 
 
