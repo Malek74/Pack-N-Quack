@@ -5,6 +5,10 @@ const advertiserSchema = new Schema({
         type: String,
         default: ""
     },
+    gender: {
+        type: String,
+        default: "male"
+    },
     email: {
         type: String,
         required: true,

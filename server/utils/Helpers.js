@@ -161,24 +161,24 @@ export const deleteActivities = async (advertiserID) => {
     console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
 }
 
-export const addLoyaltyPoints = async (touristID, points) => {
+export const addLoyaltyPoints = async (touristID, price) => {
     const subscriber = await tourist.findById(touristID);
-
     const currLevel = subscriber.level;
 
-    const pointsToAdd = 0;
-    const newPoints = 0;
+    let pointsToAdd = 0 ;
+    let newPoints = 0 ;
 
     switch (currLevel) {
         case 1:
-            pointsToAdd = points * 0.5;
+            pointsToAdd = price * 0.5;
             newPoints = subscriber.loyaltyPoints + pointsToAdd;
             if (newPoints >= 100000) {
                 subscriber.level = 2;
             }
+
             break;
         case 2:
-            pointsToAdd = points * 1;
+            pointsToAdd = price * 1;
             newPoints = subscriber.loyaltyPoints + pointsToAdd;
             if (newPoints >= 200000) {
                 subscriber.level = 3;
@@ -186,32 +186,16 @@ export const addLoyaltyPoints = async (touristID, points) => {
 
             break;
         case 3:
-            pointsToAdd = points * 1.5;
+            pointsToAdd = price * 1.5;
             newPoints = subscriber.loyaltyPoints + pointsToAdd;
-
             break;
 
         default:
             break;
     }
-
+    console.log("New Points: ", newPoints);
+    console.log("Points To Add: ", pointsToAdd);
     subscriber.loyaltyPoints = newPoints;
+    console.log(subscriber);
     await subscriber.save();
-}
-
-export const getAmadeusToken = async () => {
-
-    const data = {
-        grant_type: "client_credentials",
-        client_id: process.env.AMADEUS_API_KEY,
-        client_secret: process.env.AMADEUS_API_SECRET
-    }
-    const res = await axios.post('https://test.api.amadeus.com/v1/security/oauth2/token', data, {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    });
-
-    return res.data.access_token;
-
 }

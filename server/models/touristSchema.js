@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 
+
 const touristSchema = new Schema({
     email: {
         type: String,
@@ -49,7 +50,7 @@ const touristSchema = new Schema({
 
     level: {
         type: Number,
-        default: 0,
+        default: 1,
     },
     profileImagePath: {
         type: String,
@@ -59,6 +60,30 @@ const touristSchema = new Schema({
     preferredCurrency: {
         type: String,
         default: "EGP"
+    },
+    gender: {
+        type: String,
+        default: "male"
+    },
+    stripeID: {
+        type: String
+
+    },
+
+    preferences: {
+        preferredItineraries: [{
+            type: Schema.Types.ObjectId,
+            ref: 'itineraryTags'
+        }],
+        preferredActivities: [{
+            type: Schema.Types.ObjectId,
+            ref: 'ActivityTag'
+        }],
+
+        preferredPlaces: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Tag'
+        }],
     }
 },
     { timestamps: true }

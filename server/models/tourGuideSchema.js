@@ -17,6 +17,10 @@ const tourGuideSchema = new Schema({
     mobile: {
         type: String,
     },
+    gender: {
+        type: String,
+        default: "male"
+    },
     experienceYears: {
         type: Number,
     },

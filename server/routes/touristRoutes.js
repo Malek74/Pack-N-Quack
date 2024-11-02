@@ -4,7 +4,10 @@ import {
     getTourist,
     updateTourist,
     getTourists,
-    deleteTourist
+    deleteTourist,
+    getMyprefernces,
+    getMyBookings,
+    redeemPoints
 } from '../controllers/touristController.js';
 
 
@@ -15,5 +18,8 @@ router.get('/:id', getTourist); // Read
 router.put('/:id', updateTourist); // Update 
 router.get('/', getTourists)
 router.delete('/:id', deleteTourist);
+router.get('/myPreferences/:id', getMyprefernces);
+router.get('/myBookings/:id', getMyBookings);
+router.post('/redeemPoints/:id', redeemPoints);
 
 export default router;

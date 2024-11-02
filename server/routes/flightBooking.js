@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.get("/", searchFlight);
 router.post("/", confirmFlightPrice);
+// router.post("/book/:id", bookFlight);
 
 export default router;

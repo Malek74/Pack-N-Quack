@@ -114,10 +114,7 @@ const itinerarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    bookings: {
-        type: Number,
-        default: 0
-    },
+
     tags: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -125,15 +122,12 @@ const itinerarySchema = new mongoose.Schema({
         }],
         default: []
     },
-    stripeProductID: {
+    stripeID: {
         type: String,
         required: true
     },
 
-    stripePriceID: {
-        type: String,
-        required: true
-    },
+
 
     accessibility: {
         type: String,

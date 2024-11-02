@@ -16,11 +16,8 @@ const bookingSchema = new Schema({
     },
     date: {
         type: Date,
-        required: true
-    },
-    numOfBookings: {
-        type: Number,
-        required: true
+        default: Date.now
+
     },
     stripePaymentID: {
         type: String,
@@ -36,3 +33,7 @@ const bookingSchema = new Schema({
 }, { timestamps: true });
 
 const Booking = model("Booking", bookingSchema);
+
+export default Booking;
+
+
