@@ -80,7 +80,7 @@ export default function AvatarUploader({ size = 28 }) {
         {({ getRootProps, getInputProps }) => (
           <div
             {...getRootProps()}
-            className={`border-2 aspect-square flex flex-col items-center justify-center rounded-full w-${size} hover:cursor-pointer hover:bg-slate-50`}
+            className={`border-2 aspect-square flex flex-col items-center justify-center rounded-full w-28 hover:cursor-pointer hover:bg-slate-50`}
           >
             <Input {...getInputProps()} type="file" />
             {croppedImage ? (
