@@ -14,6 +14,7 @@ const bookingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Activity', // Reference the Activity model
     },
+
     date: {
         type: Date,
         default: Date.now

@@ -21,6 +21,7 @@ const cities = [
     { "city": "Hong Kong", "iata_code": "HKG" },
     { "city": "Bangkok", "iata_code": "BKK" },
     { "city": "Istanbul", "iata_code": "IST" }
+
 ]
 
 
@@ -32,10 +33,10 @@ export const listHotels = async (req, res) => {
         clientSecret: process.env.AMADEUS_API_SECRET
     });
 
-    const cityCode = cities.find(city => city.city === cityName).iata_code;
+    const cityCode = cities.find(city => city.city === cityName);
     try {
         const response = await amadeus.referenceData.locations.hotels.byCity.get({
-            cityCode: cityCode
+            cityCode: cityCode.iata_code
         });
         const data = JSON.parse(response.body).data;
         return res.json(data);
@@ -67,15 +68,22 @@ export const listHotelRooms = async (req, res) => {
             return res.status(404).json({ message: "No rooms available for the selected dates" });
         }
         const roomData = data[0].offers;
-        // const room = {
-        //     type: roomData.room.typeEstimated.category,
-        //     beds: roomData.room.typeEstimated.beds,
-        //     bedType: roomData.room.typeEstimated.bedType,
-        //     description: roomData.room.description,
-        //     price: roomData.price.total
-        // }
 
-        return res.json(room);
+        let rooms = []
+        for (let i = 0; i < roomData.length; i++) {
+            const room = {
+                hotel: roomData[i].hotel.name,
+                type: roomData[i].room.typeEstimated.category,
+                beds: roomData[i].room.typeEstimated.beds,
+                bedType: roomData[i].room.typeEstimated.bedType,
+                description: roomData[i].room.description,
+                price: roomData[i].price.total
+            }
+
+            rooms.push(room);
+        }
+
+        return res.json(rooms);
 
 
 
@@ -94,3 +102,6 @@ export const listHotelRooms = async (req, res) => {
 
     }
 };
+
+export const bookRoom = async (req, res) => {
+}
