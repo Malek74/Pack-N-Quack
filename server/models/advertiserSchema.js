@@ -38,6 +38,10 @@ const advertiserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    uploadedFiles: {
+        images: { type: [String], default: [],required:false },
+        documents: { type: [String], default: [],required:false },
+    },
 });
 
 const advertiserModel = model("Advertiser", advertiserSchema);

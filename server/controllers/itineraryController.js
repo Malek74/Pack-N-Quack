@@ -10,11 +10,11 @@ export const addItinerary = async (req, res) => {
     const tourGuideID = req.body.tourGuideID;
     const name = req.body.title;
     const available_dates = req.body.dates;
-    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
+    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description,isActive } = req.body;
     let tagsIDS = []
 
     //validate that all fields are present
-    if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
+    if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility|| !isActive) {
         if (!name) {
             return res.status(400).json({ "message": "Name is missing" });
         }
@@ -48,6 +48,9 @@ export const addItinerary = async (req, res) => {
         if (!description) {
             return res.status(400).json({ "message": "Description is missing" });
         }
+        if (!isActive) {
+            return res.status(400).json({ "message": "Actiivity of itinerary is missing" });
+        }
     }
     console.log(tags);
 
@@ -71,7 +74,8 @@ export const addItinerary = async (req, res) => {
             dropOffLocation: dropOffLocation,
             accessibility: accessibility,
             tags: tagsIDS,
-            description: description
+            description: description,
+            isActive:isActive,
         });
 
         const createdItinerary = await Itinerary.create(itinerary);
@@ -85,9 +89,87 @@ export const addItinerary = async (req, res) => {
 
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
+// export const getItinerary = async (req, res) => {
+
+
+//     const id = req.query.id;
+//     const name = req.query.name;
+//     const tag = req.query.tag;
+//     const maxBudget = req.query.maxBudget;
+//     const minBudget = req.query.minBudget;
+//     const minDate = req.query.minDate;
+//     const maxDate = req.query.maxDate;
+//     const language = req.query.language;
+
+
+//     const sortBy = req.query.sortBy;
+//     const order = req.query.order;
+
+//     let query = {}; // Create an object to build your query
+//     let sortOptions = {};
+
+//     try {
+//         // Build query based on input parameters
+//         if (name) {
+//             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
+//         }
+
+//         if (tag) {
+//             const tagID = await itineraryTags.findOne({ tag }).select('_id');
+//             if (tagID) {
+//                 // Use $elemMatch properly to filter tags 
+//                 query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
+//             }
+//         }
+
+//         if (minBudget || maxBudget) {
+//             query.price = {};
+//             if (minBudget) {
+//                 query.price.$gte = minBudget;
+//             }
+//             if (maxBudget) {
+//                 query.price.$lte = maxBudget;
+//             }
+//         }
+
+//         if (minDate || maxDate) {
+//             query.available_dates = { $elemMatch: {} };
+//             if (minDate) {
+//                 query.available_dates.$elemMatch.$gte = new Date(minDate); // Convert to Date object
+//             }
+//             if (maxDate) {
+//                 query.available_dates.$elemMatch.$lte = new Date(maxDate); // Convert to Date object
+//             }
+//         }
+
+//         if (language) {
+//             query.language = language; // Filter by language if provided
+//         }
+//         console.log(sortBy);
+//         // Set sorting options if provided
+//         if (sortBy && order) {
+//             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
+//         }
+
+//         console.log('Query:', query);
+//         console.log('Sort Options:', sortOptions);
+
+//         // Fetch the itinerary using the built query
+//         let itinerary = await Itinerary.find(query).sort(sortOptions).populate('tags');
+
+//         if (itinerary.length === 0) {
+//             return res.status(404).json({ message: "Itinerary doesn't exist" });
+//         }
+
+//         return res.status(200).json(itinerary);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message }); // Handle server errors
+//     }
+// };
+
+
+ 
 export const getItinerary = async (req, res) => {
-
-
     const id = req.query.id;
     const name = req.query.name;
     const tag = req.query.tag;
@@ -96,15 +178,15 @@ export const getItinerary = async (req, res) => {
     const minDate = req.query.minDate;
     const maxDate = req.query.maxDate;
     const language = req.query.language;
-
-
+    
     const sortBy = req.query.sortBy;
     const order = req.query.order;
 
-    let query = {}; // Create an object to build your query
+    let query = {  };  // Only fetch active itineraries
     let sortOptions = {};
 
     try {
+       
         // Build query based on input parameters
         if (name) {
             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
@@ -113,8 +195,7 @@ export const getItinerary = async (req, res) => {
         if (tag) {
             const tagID = await itineraryTags.findOne({ tag }).select('_id');
             if (tagID) {
-                // Use $elemMatch properly to filter tags 
-                query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
+                query.tags = { $elemMatch: { $eq: tagID._id } };
             }
         }
 
@@ -131,37 +212,41 @@ export const getItinerary = async (req, res) => {
         if (minDate || maxDate) {
             query.available_dates = { $elemMatch: {} };
             if (minDate) {
-                query.available_dates.$elemMatch.$gte = new Date(minDate); // Convert to Date object
+                query.available_dates.$elemMatch.$gte = new Date(minDate);
             }
             if (maxDate) {
-                query.available_dates.$elemMatch.$lte = new Date(maxDate); // Convert to Date object
+                query.available_dates.$elemMatch.$lte = new Date(maxDate);
             }
         }
 
         if (language) {
-            query.language = language; // Filter by language if provided
+            query.language = language;
         }
-        console.log(sortBy);
+
         // Set sorting options if provided
         if (sortBy && order) {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
 
-        console.log('Query:', query);
-        console.log('Sort Options:', sortOptions);
+        // Fetch itineraries with filters and sort options
+        let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags');
 
-        // Fetch the itinerary using the built query
-        let itinerary = await Itinerary.find(query).sort(sortOptions).populate('tags');
-
-        if (itinerary.length === 0) {
+        if (itineraries.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
         }
 
-        return res.status(200).json(itinerary);
+        itineraries = itineraries.filter(itinerary => itinerary.isActive === true);
+        itineraries = itineraries.filter(itinerary => itinerary.flagged === false);
+        
+        return res.status(200).json(itineraries);
+    
     } catch (error) {
-        res.status(500).json({ message: error.message }); // Handle server errors
+        res.status(500).json({ message: error.message });
     }
 };
+
+
+
 
 
 //@desc get all itineraries
@@ -171,29 +256,49 @@ export const getMyItineraries = async (req, res) => {
     console.log(id);
 
     try {
-        const itinerary = await Itinerary.find({ tourGuideID: id });
+        const itinerary = await Itinerary.find({ 
+            tourGuideID: id, 
+            $or: [{ flagged: false }, { flagged: { $exists: false } }] 
+        });
         res.status(200).json(itinerary);
     }
     catch (error) {
-        res.status(401).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 }
 
-export const viewAllItineraries = async (req, res) => {
-    try {
-        const itinerary = await Itinerary.find({});
+// export const getMyItineraries = async (req, res) => {
+//     const id = req.params.id;
+//     console.log(id);
 
-        if (itinerary.length == 0) {
-            return res.status(404).json({ message: "No itineraries found" });
-        }
+//     try {
+//         const itineraries = await Itinerary.find({ 
+//             tourGuideID: id, 
+//             flagged: false 
+//         });
+//         res.status(200).json(itineraries);
+//     }
+//     catch (error) {
+//         res.status(401).json({ message: error.message });
+//     }
+// }
 
-        res.status(200).json(itinerary);
-    } catch (error) {
-        res.status(401).json({ message: "itinerary deosn't exist" });
-    }
 
 
-};
+// export const viewAllItineraries = async (req, res) => {
+//     try {
+//         const itineraries = await Itinerary.find(); 
+
+//         if (itineraries.length === 0) {
+//             return res.status(404).json({ message: "No active itineraries found" });
+//         }
+
+//         res.status(200).json(itineraries);
+//     } catch (error) {
+//         res.status(401).json({ message: "Error fetching itineraries." });
+//     }
+// };
+
 
 export const deleteItinerary = async (req, res) => {
 
@@ -217,12 +322,156 @@ export const deleteItinerary = async (req, res) => {
     }
 }
 
+// export const updateItinerary = async (req, res) => {
+//     const itineraryID = req.params.id;
+//     const name = req.body.title;
+//     console.log("This is the request body:" + req.body);
+
+//     const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility } = req.body;
+//     const updatedFields = {};
+
+//     try {
+//         let itinerary = await Itinerary.findById(itineraryID);
+
+//         if (!itinerary) {
+//             return res.status(404).json({ message: "No itineraries found " + itinerary });
+//         }
+
+//         if (itinerary.bookings != 0) {
+//             res.status(404).json({ message: "Cannot update itinerary with bookings" })
+//         }
+
+//         const updatedFields = {};
+//         if (name) updatedFields.name = req.body.title;
+//         if (days) updatedFields.days = req.body.days;
+//         if (language) updatedFields.language = req.body.language;
+//         if (price) updatedFields.price = req.body.price;
+//         if (available_dates) updatedFields.available_dates = req.body.available_dates;
+//         if (pickUpLocation) updatedFields.pickUpLocation = req.body.pickUpLocation;
+//         if (dropOffLocation) updatedFields.dropOffLocation = req.body.dropOffLocation;
+//         if (accessibility) updatedFields.accessibility = req.body.accessibility;
+
+
+//         // if (activities) {
+//         //     updatedFields.$push = { activities: newActivity };
+//         // }
+
+//         console.log("updated Fields: " + updatedFields);
+
+//         // Update the itinerary using the updatedFields object
+//         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: updatedFields }, { new: true, runValidators: true });
+
+//         // Send the updated itinerary back in the response
+//         res.status(200).json(updatedItinerary);
+
+//     } catch (error) {
+//         res.status(401).json({ message: "itinerary deosn't exist:" + error.message });
+//         console.log(error);
+//     }
+
+
+// }
+
+export const getItineraryById = async (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+
+    if (!id) {
+        return res.status(400).json({ message: "Itinerary ID is required." });
+    }
+    try {
+       
+        const itinerary = await Itinerary.findById(id).populate("tags");
+
+       
+        if (!itinerary ) {
+            return res.status(404).json({ message: "Itinerary not found ." });
+        }
+        if ( itinerary.flagged === true) {
+            return res.status(404).json({ message: "Itinerary is flagged." });
+        }
+
+        
+        return res.status(200).json(itinerary);
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message }); 
+    }
+};
+
+
+export const getMaxPrice = async (req, res) => {
+    try {
+        const result = await Itinerary.aggregate([
+            // {
+            //     $match: { flagged: false } 
+            // },
+            {
+                $group: {
+                    _id: null,
+                    maxPrice: { $max: "$price" }
+                }
+            }
+        ]);
+
+        // Extract the max price, defaulting to 0 if no results were found
+        const maxPrice = result[0]?.maxPrice || 0;
+
+        return res.status(200).json(maxPrice);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+export const getAllLanguages = async (req, res) => {
+    try {
+        // Fetch distinct languages from itineraries where flagged is false
+        //const languages = await Itinerary.distinct("language", { flagged: false });
+        const languages = await Itinerary.distinct("language");
+
+        
+        return res.status(200).json(languages);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+// export const ItineraryActivation = async (req, res) => {
+//     const itineraryID = req.params.id;
+
+//     try {
+//         const itinerary = await Itinerary.findById(itineraryID);
+
+//         if (itinerary.bookings > 0) {
+//             if (!itinerary.isActive) {
+//                 return res.status(400).json({ message: "Itinerary is already deactivated." });
+//             }
+           
+//             itinerary.isActive = false;
+
+//         } else {
+            
+//             itinerary.isActive = !itinerary.isActive; 
+//         }
+
+//         const updatedItinerary = await itinerary.save();
+//         return res.status(200).json({ message: "Itinerary status updated.", itinerary: updatedItinerary });
+//     } catch (error) {
+//         return res.status(500).json({ message: "Error updating itinerary status", error: error.message });
+//     }
+// };
+
+
+
 export const updateItinerary = async (req, res) => {
     const itineraryID = req.params.id;
     const name = req.body.title;
     console.log("This is the request body:" + req.body);
 
-    const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility } = req.body;
+    const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility,isActive } = req.body;
     const updatedFields = {};
 
     try {
@@ -232,11 +481,7 @@ export const updateItinerary = async (req, res) => {
             return res.status(404).json({ message: "No itineraries found " + itinerary });
         }
 
-        if (itinerary.bookings != 0) {
-            res.status(404).json({ message: "Cannot update itinerary with bookings" })
-        }
-
-        const updatedFields = {};
+        // Update fields only if provided
         if (name) updatedFields.name = req.body.title;
         if (days) updatedFields.days = req.body.days;
         if (language) updatedFields.language = req.body.language;
@@ -246,68 +491,52 @@ export const updateItinerary = async (req, res) => {
         if (dropOffLocation) updatedFields.dropOffLocation = req.body.dropOffLocation;
         if (accessibility) updatedFields.accessibility = req.body.accessibility;
 
+        if (itinerary.bookings==0 & isActive==false){
+            return res.status(404).json({ message: "Cannot deactivate an itinerary with no bookings" + itinerary });
+        }
+        else if (itinerary.isActive== false & isActive==true) {
+            return res.status(404).json({ message: "Cannot activate a deactivated booking " + itinerary });
+        }
+        else {
+            updatedFields.isActive = req.body.isActive;
+        }
 
-        // if (activities) {
-        //     updatedFields.$push = { activities: newActivity };
-        // }
-
-        console.log("updated Fields: " + updatedFields);
-
-        // Update the itinerary using the updatedFields object
-        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: updatedFields }, { new: true, runValidators: true });
+        // Save the itinerary with the updated fields and isActive status
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { ...updatedFields } }, { new: true, runValidators: true });
 
         // Send the updated itinerary back in the response
         res.status(200).json(updatedItinerary);
 
     } catch (error) {
-        res.status(401).json({ message: "itinerary deosn't exist:" + error.message });
+        res.status(401).json({ message: "Itinerary doesn't exist:" + error.message });
         console.log(error);
     }
-
-
 }
 
-export const getItineraryById = async (req, res) => {
-    const id = req.params.id;
-    console.log(id);
-    if (!id) {
-        return res.status(400).json({ message: "Itinerary ID is required." });
-    }
+
+export const Flagg = async (req, res) => {
+    const itineraryID = req.params.id;
+    const flagger = req.body.flagger; 
 
     try {
-        const itineraryExists = await Itinerary.findById(id).populate("tags");
+        let itinerary = await Itinerary.findById(itineraryID);
 
-        if (!itineraryExists) {
-            return res.status(404).json({ message: "Itinerary not found." });
+        if (!itinerary) {
+            return res.status(404).json({ message: "No itinerary found with ID " + itineraryID });
         }
-        return res.status(200).json(itineraryExists);
+
+        
+        if (flagger === false && itinerary.flagged === true) {
+            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
+        } else {
+            itinerary.flagged = flagger; 
+            await itinerary.save();     
+        }
+
+        res.status(200).json(itinerary);
 
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: "Error updating itinerary: " + error.message });
+        console.log(error);
     }
-}
-
-export const getMaxPrice = async (req, res) => {
-    try {
-        const maxPrice = await Itinerary.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    maxPrice: { $max: "$price" }
-                }
-            }
-        ]);
-        return res.status(200).json(maxPrice[0]?.maxPrice || 0);
-    } catch (error) {
-        return res.status(404).json({ message: error.message });
-    }
-}
-
-export const getAllLanguages = async (req, res) => {
-    try {
-        const languages = await Itinerary.distinct('language');
-        return res.status(200).json(languages);
-    } catch (error) {
-        return res.status(404).json({ message: error.message });
-    }
-}
+};

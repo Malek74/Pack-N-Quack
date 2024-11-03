@@ -99,3 +99,25 @@ export const deleteTourist = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+// export const RateProduct = async (req, res) => {
+//     const productB  = req.body;
+//     const rating =req.body;
+    
+
+//     try {
+//         if (productB) {
+//             let ProductId = [];
+//             let flag = false;
+//             for (let i = 0; i < productB.length; i++) {
+//                 const prod = await Product.findOne({ name: productB[i].name, rating: productB[i].rating });
+//                 ProductId.push(prod._id);
+//                 flag = true;
+//             }
+        
+//         }
+//     }
+//     catch (error) {
+//         return res.status(500).json({ message: error.message });
+//     }
+// }

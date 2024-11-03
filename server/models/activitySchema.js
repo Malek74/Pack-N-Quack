@@ -95,7 +95,12 @@ const activitySchema = new Schema({
         type: String,
         required: true,
         default: "/assets/images/Background.jpg"
-    }
+    },
+    flagged: {
+        type: Boolean,
+        required: true,
+        default: false, 
+    },
 })
 
 const activityModel = model("Activity", activitySchema);

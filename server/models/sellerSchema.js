@@ -23,6 +23,10 @@ const sellerSchema = new Schema({
         type: Boolean,
         default: false
     },
+    uploadedFiles: {
+        images: { type: [String], default: [],required:false },
+        documents: { type: [String], default: [],required:false },
+    },
 });
 
 const seller = model("Seller", sellerSchema);

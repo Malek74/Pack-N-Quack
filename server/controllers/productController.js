@@ -57,12 +57,12 @@ export const createProduct = async (req, res) => {
 
 export const editProduct = async (req, res) => {
     const { id } = req.params;
-    const { description, price } = req.body;
+    const { description, price,isArchived } = req.body;
     if (!id) {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
-        const newproduct = await product.findByIdAndUpdate(id, { description, price }, { new: true }).populate('seller_id');
+        const newproduct = await product.findByIdAndUpdate(id, { description, price,isArchived }, { new: true }).populate('seller_id');
         console.log(newproduct)
         return res.status(200).json(newproduct);
     } catch (error) {
@@ -72,7 +72,7 @@ export const editProduct = async (req, res) => {
 //update product by ID
 export const updateProduct = async (req, res) => {
     const id = req.params.id;
-    const { name, picture, price, description, seller_id, ratings, reviews, available_quantity } = req.body;
+    const { name, picture, price, description, seller_id, ratings, reviews, available_quantity,product_sales, isArchived } = req.body;
 
     
 
@@ -96,6 +96,14 @@ export const updateProduct = async (req, res) => {
         if (description) newInfo.description = description;
         if (ratings) newInfo.ratings = ratings;
         if (reviews) newInfo.reviews = reviews;
+        if (product_sales) newInfo.product_sales = product_sales;
+        if (isArchived==true) {
+            newInfo.isArchived = true;}
+        else {
+            newInfo.isArchived = false;
+        }    
+
+
         if (available_quantity) {
             if (available_quantity > 0) {
                 newInfo.available_quantity = available_quantity;
@@ -104,7 +112,7 @@ export const updateProduct = async (req, res) => {
             }
         }
         const newproduct = await product.findByIdAndUpdate(id, { $set: newInfo }, { new: true }).populate('seller_id');
-        return res.status(200).json(newproductt);
+        return res.status(200).json(newproduct);
 
     } catch (error) {
         return res.status(400).json({ error: error.message })
@@ -152,6 +160,34 @@ export const getMaxPrice = async (req, res) => {
 
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
+export const allProductSwQ = async (req, res) => {
+    try {
+        
+        let products = await product.find({ $or: [{ isArchived: false }, { isArchived: { $exists: false } }] }).select('name product_sales available_quantity');
+        // products = products.filter(product => product.isArchived == false);
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching product sales and quantities:", error); 
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+export const eachProductSwQ = async (req, res) => {
+    const name = req.params.name;
+    try {
+        
+        const products = await product.findOne({name}).select('name product_sales available_quantity'); 
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products sales and quantities:", error); 
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
 export const getProducts = async (req, res) => {
     const name = req.query.name;
     const maxPrice = req.query.maxPrice;
@@ -191,7 +227,8 @@ export const getProducts = async (req, res) => {
         console.log('Sort Options:', sortOptions);
 
         // Fetch the itinerary using the built query
-        const products = await product.find(query).sort(sortOptions).populate('seller_id');
+        let products = await product.find(query).sort(sortOptions).populate('seller_id');
+         products= products.filter(product=> product.isArchived===false)
 
         return res.status(200).json(products);
 
@@ -200,7 +237,6 @@ export const getProducts = async (req, res) => {
         return res.status(500).json({ message: error.message }); // Handle server errors
     }
 };
-
 
 
 /*//get all products

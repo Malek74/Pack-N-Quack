@@ -42,6 +42,13 @@ const touristSchema = new Schema({
         type: Number,
         default: 0,
     },
+    // prouductsBrought :{
+    //     type: [{
+    //         type: Schema.Types.ObjectId,
+    //         ref: 'Product'
+    //     }],
+    //     default: []
+    // }
 },
     { timestamps: true }
 );

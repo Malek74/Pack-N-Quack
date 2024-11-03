@@ -70,6 +70,20 @@ const productSchema = new Schema({
         type: Number,
         required: true,
     },
+    product_sales:{
+        type: Number,
+        required: true,
+        default:0,
+    },
+    isArchived:{
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    uploadImages:{
+        type: [String],
+        default: [],
+    }
 });
 
 const product = model("Product", productSchema);
