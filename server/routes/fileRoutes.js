@@ -1,7 +1,7 @@
 // routes/fileRoutes.js
 import express from 'express';
 import upload from '../middleware/multer.js';
-import { handleImageUpload, handleDocumentUpload ,handleImageUploadProduct,fetchUserDocuments} from '../controllers/fileController.js';
+import { handleImageUpload, handleDocumentUpload, handleImageUploadProduct, fetchUserDocuments, fetchUserImages } from '../controllers/fileController.js';
 
 const router = express.Router();
 
@@ -14,7 +14,8 @@ router.post('/documents', upload.fields([{ name: 'documents', maxCount: 10 }]), 
 
 router.post('/productImage', upload.fields([{ name: 'uploadImages', maxCount: 10 }]), handleImageUploadProduct);
 
-router.get('/fetchDocuments', fetchUserDocuments);
+router.post('/fetchDocuments', fetchUserDocuments);
+router.post('/fetchImages', fetchUserImages);
 
 
 export default router;
