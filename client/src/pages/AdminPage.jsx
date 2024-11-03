@@ -39,6 +39,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import Complaints from "@/components/adminPage/complaints";
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("Users");
@@ -60,6 +61,8 @@ export default function AdminPage() {
         return <ItineraryTags />;
       case "Products":
         return <AdminProducts />;
+      case "Complaints":
+        return <Complaints />;
       default:
         return <AdminDashboard />;
     }
@@ -175,6 +178,18 @@ export default function AdminPage() {
                 >
                   <Package className="h-4 w-4" />
                   Products
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setActiveSection("Complaints")}
+                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
+                    activeSection === "Complaints"
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
+                >
+                  <Package className="h-4 w-4" />
+                  Complaints
                 </Button>
               </div>
               <div className="pt-4">
