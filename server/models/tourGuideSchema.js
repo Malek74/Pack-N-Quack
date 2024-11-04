@@ -43,10 +43,14 @@ const tourGuideSchema = new Schema({
         default: false
     },
     uploadedFiles: {
-        images: { type: [String], default: [],required:false },
-        documents: { type: [String], default: [],required:false },
+        images: { type: [String], default: [], required: false },
+        documents: [{
+            name: String,
+            link: String
+        }
+        ]
     },
-    
+
 },
     { timestamps: true }
 );

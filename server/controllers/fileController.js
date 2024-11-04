@@ -23,13 +23,11 @@ export const handleImageUpload = async (req, res) => {
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
-    console.log(UserModel);
-    
-    const userExists = await UserModel.findById(userId );
+
+    const userExists = await UserModel.findById(userId);
     if (!userExists) {
         return res.status(404).json({ message: 'User ID does not exist' });
     }
-    console.log(userExists);
     if (!req.files || !req.files['images']) {
         return res.status(400).json({ message: 'No documents uploaded.' });
     }
@@ -62,15 +60,17 @@ export const handleImageUpload = async (req, res) => {
             imagesUrls.push(result.secure_url);
         }
 
-        const updatedUser = await UserModel.findByIdAndUpdate(userId, {uploadedFiles: {
-            images: imagesUrls,
-            documents:userExists.uploadedFiles.documents,
-        } }
-    , { new: true }); 
+        const updatedUser = await UserModel.findByIdAndUpdate(userId, {
+            uploadedFiles: {
+                images: imagesUrls,
+                documents: userExists.uploadedFiles.documents,
+            }
+        }
+            , { new: true });
 
-    if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found or update failed' });
-    }
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found or update failed' });
+        }
 
         res.status(200).json({ message: 'Images uploaded successfully', imagesUrls });
     } catch (error) {
@@ -80,14 +80,14 @@ export const handleImageUpload = async (req, res) => {
 };
 
 export const handleDocumentUpload = async (req, res) => {
-    const { userType, userId } = req.body;
+    const { userType, userId, documentsName } = req.body;
     const UserModel = userModels[userType];
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
     console.log(UserModel);
-    
+
     //const userExists = await UserModel.exists({ _id: userId });
     const userExists = await UserModel.findById(userId);
 
@@ -100,8 +100,8 @@ export const handleDocumentUpload = async (req, res) => {
     }
 
     try {
-        const documentUrls = [];
-
+        const documents = [];
+        let i = 0;
         for (const file of req.files['documents']) {
             const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
             const publicId = sanitizedPublicId;
@@ -121,23 +121,26 @@ export const handleDocumentUpload = async (req, res) => {
                     }
                 );
 
-                uploadStream.end(file.buffer); 
+                uploadStream.end(file.buffer);
             });
 
-            documentUrls.push(result.secure_url);
+            documents.push({ name: documentsName[i], url: result.secure_url });
+            i++;
         }
         //console.log(userExists.uploadedFiles);
-        
-        const updatedUser = await UserModel.findByIdAndUpdate(userId, {uploadedFiles: {
+
+        const updatedUser = await UserModel.findByIdAndUpdate(userId, {
+            uploadedFiles: {
                 images: userExists.uploadedFiles.images,
-                documents:documentUrls
-            } }
-        , { new: true }); 
+                documents: documentUrls
+            }
+        }
+            , { new: true });
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found or update failed' });
         }
-       
+
         res.status(200).json({ message: 'Documents uploaded successfully', documentUrls });
     } catch (error) {
         console.error('Error updating user:', error);
@@ -153,11 +156,11 @@ export const handleImageUploadProduct = async (req, res) => {
     if (!productExists) {
         return res.status(404).json({ message: 'Product ID does not exist' });
     }
-    
+
     if (!req.files || !req.files.uploadImages) {
         return res.status(400).json({ message: 'No images uploaded.' });
     }
-    
+
     try {
         const imagesUrls = [];
 
@@ -192,11 +195,11 @@ export const handleImageUploadProduct = async (req, res) => {
                 return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
             }
         }
-        
-        
+
+
         const updatedProduct = await product.findByIdAndUpdate(
             productId,
-            { $push: { uploadImages: { $each: imagesUrls } } }, 
+            { $push: { uploadImages: { $each: imagesUrls } } },
             { new: true }
         );
 
@@ -213,7 +216,7 @@ export const handleImageUploadProduct = async (req, res) => {
 
 
 export const fetchUserDocuments = async (req, res) => {
-    const { userType, userId, documentIndex } = req.body;
+    const { userType, userId, documentName } = req.body;
     const UserModel = userModels[userType];
 
     if (!UserModel) {
@@ -221,20 +224,45 @@ export const fetchUserDocuments = async (req, res) => {
     }
 
     try {
-       
+
         const user = await UserModel.findById(userId).select('uploadedFiles.documents');
 
         if (!user || !user.uploadedFiles || !user.uploadedFiles.documents || !user.uploadedFiles.documents[documentIndex]) {
             return res.status(404).json({ message: 'Document not found for this user' });
         }
 
-       
-        const documentUrl = user.uploadedFiles.documents[documentIndex];
+        //loop on the documents and get the url for 
+        const documentUrl = user.uploadedFiles.documents.find((document) => document.name === documentName).url;
 
-        
-        res.redirect(documentUrl);
+        return res.status(200).json({ document: documentUrl });
+
     } catch (error) {
         console.error("Error serving user's document:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+export const fetchUserImages = async (req, res) => {
+    const { userType, userId } = req.body;
+    const UserModel = userModels[userType];
+
+    if (!UserModel) {
+        return res.status(400).json({ message: 'Invalid user type' });
+    }
+
+    try {
+
+        const user = await UserModel.findById(userId);
+
+        if (!user || !user.uploadedFiles || !user.uploadedFiles.images) {
+            return res.status(404).json({ message: 'Image not found for this user' });
+        }
+
+
+        const imageUrl = user.uploadedFiles.images[0];
+        return res.status(200).json({ image: imageUrl });
+    } catch (error) {
+        console.error("Error serving user's image:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
