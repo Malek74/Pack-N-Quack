@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import logo from "/assets/icons/logo.png";
 import TourGuides from "@/components/TourGuides";
 
+
 import {
   Bell,
   LogOut,
@@ -44,7 +45,7 @@ export default function TouristDashboard() {
         return <ActivityAttended />;
       
       default:
-        return <TouristDashboard />;
+        return <TourGuides />;
     }
   };
 
