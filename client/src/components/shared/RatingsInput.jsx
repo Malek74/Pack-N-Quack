@@ -12,6 +12,7 @@ export const RatingInput = ({
     small: 12,
     medium: 16,
     large: 24,
+    xl: 40,
   };
 
   const StarIcon = ({ filled, percentage, onClick }) => (
