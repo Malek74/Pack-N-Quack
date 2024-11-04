@@ -25,6 +25,7 @@ import Document from './models/documentSchema.js';
 import  PasswordChangeRequest  from './routes/changePass.js';
 import uploadRoutes from './routes/fileRoutes.js';
 import purchaseRoute from './routes/purchaseRoute.js'
+import bookingRoute from './routes/bookingRoute.js'
 
 config();
 const app = express();
@@ -73,6 +74,8 @@ app.use('/api/changepass', PasswordChangeRequest)
 //app.use('/api/upload',uploadImg)
 app.use('/api/upload', uploadRoutes);
 app.use('/api/trasaction', purchaseRoute);
+app.use('/api/book', bookingRoute);
+
 
 
 

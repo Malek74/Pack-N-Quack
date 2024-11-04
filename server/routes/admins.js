@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getAdmins, addAdmin, deleteUser, getAllUsers ,getPendingPasswordChangeRequests,handlePasswordChangeRequest} from "../controllers/adminsController.js";
+import { getAdmins, addAdmin, deleteUser, getAllUsers ,getPendingPasswordChangeRequests,handlePasswordChangeRequest,acceptOrReject} from "../controllers/adminsController.js";
 import adminModel from "../models/adminSchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import { config } from "dotenv";
@@ -16,6 +16,8 @@ router.get("/users", getAllUsers)
 router.post("/", addAdmin);
 router.get("/getpending",getPendingPasswordChangeRequests);
 router.post("/reviewreq",handlePasswordChangeRequest);
+router.put("/isAccepted",acceptOrReject);
+
 
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;

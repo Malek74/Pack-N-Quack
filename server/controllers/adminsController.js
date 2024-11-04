@@ -250,3 +250,44 @@ export const getPendingPasswordChangeRequests = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const acceptOrReject =async (req,res) => {
+    const {userId,userType,flag} = req.body;
+    let userModel;
+
+    
+    switch (userType) {
+        case 'Seller':
+            userModel = seller;
+            break;
+        case 'Advertiser':
+            userModel = advertiserModel;
+            break;
+        case 'Tour Guide':
+            userModel = tourGuide;
+            break;
+        default:
+            return res.status(400).json({ message: "Invalid user type" });
+    }
+
+    try {
+        const userExist = await userModel.findById(userId);
+        if (!userExist) {
+            return res.status(404).json({ message: "User doesn't exist" });
+        }
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId,{ $set: { "isAccepted": flag } }, { new: true })
+
+        if (flag==true){
+            return res.status(200).json(updatedUser);
+        }
+         else {
+            return res.status(200).json({ message: "You are not accepted." });
+            
+         }  
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+    
+}
