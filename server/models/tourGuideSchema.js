@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 
+
 const tourGuideSchema = new Schema({
     email: {
         type: String,
@@ -45,6 +46,15 @@ const tourGuideSchema = new Schema({
         type: Boolean,
         default: false
     },
+    uploadedFiles: {
+        images: { type: [String], default: [], required: false },
+        documents: [{
+            name: String,
+            link: String
+        }
+        ]
+    },
+
 },
     { timestamps: true }
 );

@@ -42,6 +42,14 @@ const advertiserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    uploadedFiles: {
+        images: { type: [String], default: [], required: false },
+        documents: [{
+            name: String,
+            link: String
+        }
+        ]
+    },
 });
 
 const advertiserModel = model("Advertiser", advertiserSchema);

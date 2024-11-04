@@ -1,5 +1,5 @@
 import express from "express";
-import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities, viewSingleActivity } from "../controllers/activityController.js";
+import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities, viewSingleActivity,Flagg } from "../controllers/activityController.js";
 
 const router = express.Router();
 
@@ -25,10 +25,11 @@ router.get("/upcoming", getUpcomingActivities);
 router.post("/review/:id", postReview);
 
 // Get filtered activities
-router.post("/filterSort", filterAndSortActivities);
+router.get("/filterSort", filterAndSortActivities);
 
 // Get My activities
 router.get("/my/:id", getMyActivities);
 
+router.put("/:id", Flagg);
 router.get("/activityDetails/:id", viewSingleActivity);
 export default router;

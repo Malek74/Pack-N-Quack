@@ -1,5 +1,6 @@
 import tourGuide from '../models/tourGuideSchema.js';
 import { usernameExists, emailExists } from '../utils/Helpers.js';
+import Document from '../models/documentSchema.js';
 
 //@desc Create a new tour guide
 //@route POST /api/tourGuide
@@ -105,4 +106,37 @@ export const editTourGuide = async (req, res) => {
         res.status(409).json({ message: error.message });
     }
 };
+
+// export const TourGuideUploadDocuments = async (req, res) => {
+//     const tgID = req.params.id; 
+//     console.log(tgID);
+//     try {
+//         const docs = []; // Array to store document IDs
+
+//         // Loop through the files and create entries in the database
+//         for (const file of req.files) {
+//             const doc = new Document({
+             
+//                     filename: file.originalname,
+//                     path: savedFilePath, 
+                
+//             });
+//             consol.log(filename);
+//             const savedDoc = await doc.save(); 
+//             docs.push(savedDoc._id); 
+//         }
+
+//         // Update the TourGuide with the new documents
+//         await TourGuide.findByIdAndUpdate(
+//             tgID,
+//             { $push: { documents: { $each: docs } } }, // Push new documents into the array
+//            // { new: true, upsert: true } // Use upsert: true to create a new document if it doesn't exist
+//            { new: true }
+//         );
+
+//         res.status(200).json({ message: 'Files uploaded successfully', docs });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error uploading files', error });
+//     }
+// };
 

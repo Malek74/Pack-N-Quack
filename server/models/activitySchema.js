@@ -110,6 +110,12 @@ const activitySchema = new Schema({
         type: String,
         required: true
     },
+
+    flagged: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 })
 
 const activityModel = model("Activity", activitySchema);

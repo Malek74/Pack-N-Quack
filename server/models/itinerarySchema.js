@@ -132,7 +132,16 @@ const itinerarySchema = new mongoose.Schema({
     accessibility: {
         type: String,
         required: true
-    }
+    },
+    isActive: {
+        type: Boolean,
+        default: true, 
+    },
+    flagged: {
+        type: Boolean,
+        required: true,
+        default: false, 
+    },
 });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);

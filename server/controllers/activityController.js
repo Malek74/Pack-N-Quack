@@ -142,6 +142,41 @@ export const deleteActivity = async (req, res) => {
 // @desc Search for an activity based on Name ,Category or Tag
 // @route GET /api/activity/search
 // @Body { searchBy, name, categoryID, tagID }
+// export const searchActivity = async (req, res) => {
+//     const searchBy = req.body.searchBy; // name, category, tag
+//     const name = req.body.name;
+//     const categoryID = req.body.categoryID;
+//     const tagID = req.body.tagID;
+//     let a;
+    
+//     switch (searchBy) {
+//         case "name":
+//             a = await activityModel.find({ name: name });
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activity not found' });
+//             }
+//             res.status(200).json(a);
+//             break;
+//         case "category":
+//             a = await activityModel.find({ categoryID: categoryID });
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activities not found' });
+//             }
+//             res.status(200).json(a);
+//             break;
+//         case "tag":
+//             a = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activities not found' });
+//             }
+//             a = a.filter(activity => activity.flagged === false);
+//             res.status(200).json(a);
+//             break;
+//         default:
+//             break;
+//     }
+// }
+
 export const searchActivity = async (req, res) => {
     const searchBy = req.body.searchBy; // name, category, tag
     const name = req.body.name;
@@ -203,6 +238,14 @@ export const searchActivity = async (req, res) => {
                 }
                 return activity;
             });
+                
+        activities = activities.filter(activity => !activity.flagged);
+
+        if (activities.length === 0) {
+            return res.status(404).json({ message: 'Activities not found' });
+        }
+
+
             res.status(200).json(activities);
             break;
         default:
@@ -210,15 +253,23 @@ export const searchActivity = async (req, res) => {
     }
 }
 
+
+
+
 // @desc Get all upcoming activities
 // @route GET /api/activity/upcoming
 export const getUpcomingActivities = async (req, res) => {
     try {
         const prefCurrency = req.query.currency;
         const conversionRate = await getConversionRate(prefCurrency);
-        const today = new Date();
-        console.log(today)
-        const activities = await activityModel.find({ date: { $gte: today } }).populate('advertiserID categoryID tags');
+        let today = new Date(); 
+        console.log("Today's date:", today);
+
+        // Use let instead of const for reassigning the activities variable
+        let activities = await activityModel.find({ 
+            date: { $gte: today }, 
+            // flagged: false,
+        }).populate('advertiserID categoryID tags');
 
         //change price to preferred currency
         activities = activities.map(activity => {
@@ -231,11 +282,22 @@ export const getUpcomingActivities = async (req, res) => {
             return activity;
         });
 
+
+        
+        console.log("Fetched Activities:", activities);
+
+        // Check if activities are empty
+        if (activities.length === 0) {
+            console.log("No upcoming activities found.");
+        }
+        activities = activities.filter(activity => !activity.flagged);
         res.status(200).json(activities);
     } catch (error) {
+        console.error("Error fetching upcoming activities:", error);
         res.status(404).json({ message: error.message });
     }
 }
+
 
 // @desc Post a review
 // @route POST /api/activity/review
@@ -248,6 +310,10 @@ export const postReview = async (req, res) => {
         const activity = await activityModel.findById(id);
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
+        }
+        if (activity.flagged)
+        {
+            return res.status(404).json({ message: 'Activity is flagged' });
         }
         activity.ratings.reviews.push({ touristID, review, rating });
         const reviews = activity.ratings.reviews;
@@ -269,95 +335,89 @@ export const postReview = async (req, res) => {
 export const filterAndSortActivities = async (req, res) => {
     const { tags, name, budgetMin, budgetMax, category, sortPrice, sortRating, rating, dateMin, dateMax } = req.body;
 
-    console.log(req.body)
-    let query = {};
+    console.log("Request body:", req.body);
+    let query = { }; 
 
-    if (budgetMin && budgetMax) {
+    // Handle budget filtering
+    if (budgetMin !== undefined && budgetMax !== undefined) {
         query.$or = [
             { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin, $lte: budgetMax } }] },
-            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin, $lte: budgetMax } }] },
-            { $and: [{ priceType: 'range', maxPrice: { $gte: budgetMin, $lte: budgetMax } }] },
+            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin } }, { maxPrice: { $lte: budgetMax } }] }
         ];
     }
+
+    // Handle date filtering
     if (dateMin && dateMax) {
         query.date = { $gte: new Date(dateMin), $lte: new Date(dateMax) };
     }
+
+    // Handle category filtering
     if (category) {
-        const categoryID = await activityCategory.findOne({ name: category })
-        query.categoryID = categoryID._id;
+        const categoryID = await activityCategory.findOne({ name: category });
+        if (categoryID) {
+            query.categoryID = categoryID._id;
+        }
     }
+
+    // Handle name filtering
     if (name) {
-        query.name = { $regex: name, $options: 'i' };
+        query.name = { $regex: name, $options: 'i' }; // Case-insensitive search
     }
+
+    // Handle rating filtering
     if (rating) {
         query['ratings.averageRating'] = { $gte: rating };
     }
-    if (tags) {
-        let tagsIDs = [];
-        let flag = false;
-        for (let i = 0; i < tags.length; i++) {
-            const tag = await activityTag.findOne({ name: tags[i] });
-            tagsIDs.push(tag._id);
-            flag = true;
-        }
-        console.log(tagsIDs)
-        if (flag)
-            query.tags = { $in: tagsIDs }; // This checks if any of the tagIDs in 'tags' array is in the 'tags' field of activity
-    }
-    try {
-        if (sortPrice || sortRating) {
-            if (sortPrice != 0 || sortRating != 0) {
-                let sortOptions = {};
-                if (sortPrice != undefined && sortPrice != 0) {
-                    sortOptions.normalizedPrice = sortPrice;
-                }
-                if (sortRating != undefined && sortRating != 0) {
-                    sortOptions['ratings.averageRating'] = sortRating;
-                }
-                console.log("dakhal sort")
-                console.log(query)
-                const activities = await activityModel.aggregate([
-                    { $match: query }, // Apply filters
 
-                    // Add a virtual field called "normalizedPrice"
-                    {
-                        $addFields: {
-                            normalizedPrice: {
-                                $cond: {
-                                    if: { $eq: ["$priceType", "fixed"] }, // If priceType is "fixed"
-                                    then: "$price", // Use the price value
-                                    else: "$minPrice"// For range, use the average of minPrice and maxPrice
-                                }
+    // Handle tag filtering
+    if (tags && tags.length > 0) {
+        const tagIDs = await Promise.all(tags.map(tag => activityTag.findOne({ name: tag }).then(tagDoc => tagDoc ? tagDoc._id : null)));
+        const filteredTagIDs = tagIDs.filter(id => id); // Remove nulls
+        if (filteredTagIDs.length > 0) {
+            query.tags = { $in: filteredTagIDs }; // Match activities with any of the tagIDs
+        }
+    }
+
+    try {
+        let activities;
+        
+        // Sort and fetch activities based on specified criteria
+        if (sortPrice || sortRating) {
+            const sortOptions = {};
+            if (sortPrice) sortOptions.normalizedPrice = sortPrice;
+            if (sortRating) sortOptions['ratings.averageRating'] = sortRating;
+
+            activities = await activityModel.aggregate([
+                { $match: query },
+                {
+                    $addFields: {
+                        normalizedPrice: {
+                            $cond: {
+                                if: { $eq: ["$priceType", "fixed"] },
+                                then: "$price",
+                                else: { $avg: ["$minPrice", "$maxPrice"] } // Use average for range pricing
                             }
                         }
-                    },
-
-                    // Sort based on the normalized price and/or rating
-                    {
-                        $sort: sortOptions
                     }
-                ]).exec();
-                //console.log(activities);
-                console.log("dakhal sort")
-                console.log(activities)
-                return res.status(200).json(activities);
-            }
+                },
+                { $sort: sortOptions }
+            ]).exec();
+        } else {
+            activities = await activityModel.find(query).populate('advertiserID categoryID tags');
         }
-        else {
-            const activities = await activityModel.find(query).populate('advertiserID categoryID tags');
-            console.log(query)
-            //console.log(activities)
-            return res.status(200).json(activities);
-        }
+        activities = activities.filter(activity => !activity.flagged);
+        console.log("Filtered and sorted activities:", activities);
+        return res.status(200).json(activities);
     } catch (error) {
+        console.error("Error in filtering activities:", error);
         return res.status(404).json({ message: error.message });
     }
-}
+};
 
 export const getMyActivities = async (req, res) => {
     const id = req.params.id;
     try {
-        const activities = await activityModel.find({ advertiserID: id }).populate('advertiserID categoryID tags');
+        const activities = await activityModel.find({ advertiserID: id,flagged:false }).populate('advertiserID categoryID tags');
         if (activities.lemgth === 0) {
             return res.status(404).json({ message: 'No activities found' });
         }
@@ -380,3 +440,30 @@ export const viewSingleActivity = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
+
+export const Flagg = async (req, res) => {
+    const activityID = req.params.id;
+    const flagger = req.body.flagger; 
+
+    try {
+        let activity = await activity.findById(activityID);
+
+        if (!activity) {
+            return res.status(404).json({ message: "No activity found with ID " + activityID });
+        }
+
+        
+        if (flagger === false && activity.flagged === true) {
+            return res.status(400).json({ message: "Cannot unflag an already flagged activity" });
+        } else {
+            activity.flagged = flagger; 
+            await activity.save();     
+        }
+
+        res.status(200).json(activity);
+
+    } catch (error) {
+        res.status(500).json({ message: "Error updating activity: " + error.message });
+        console.log(error);
+    }
+};

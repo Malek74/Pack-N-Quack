@@ -161,6 +161,32 @@ export const deleteActivities = async (advertiserID) => {
     console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
 }
 
+export const checkUserExists = async (userId, userType) => {
+    let userModel;
+
+    switch (userType) {
+        case 'Seller':
+            userModel = seller; // Assuming seller is your model for sellers
+            break;
+        case 'Advertiser':
+            userModel = advertiserModel; // Assuming advertiserModel is your model for advertisers
+            break;
+        case 'Tourist':
+            userModel = tourist; // Assuming tourist is your model for tourists
+            break;
+        case 'Tour Guide':
+            userModel = tourGuide; // Assuming tourGuide is your model for tour guides
+            break;
+        case 'Tourism Governer':
+            userModel = touristGoverner; // Assuming touristGoverner is your model for governors
+            break;
+        default:
+            throw new Error("Invalid user type");
+    }
+
+    // Check if the user exists in the respective model
+    return await userModel.findById(userId);
+};
 export const addLoyaltyPoints = async (touristID, price) => {
     const subscriber = await tourist.findById(touristID);
     const currLevel = subscriber.level;
