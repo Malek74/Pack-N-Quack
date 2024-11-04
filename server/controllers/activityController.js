@@ -5,12 +5,28 @@ import activityCategory from "../models/activityCategorySchema.js";
 import { query } from "express";
 import stripe from 'stripe';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
+import { getConversionRate } from "../utils/Helpers.js";
 
 // @desc Get all activities
 // @route GET /api/activity
 export const getActivities = async (req, res) => {
+    const prefCurrency = req.query.currency;
+    const conversionRate = await getConversionRate(prefCurrency);
+
     try {
-        const activities = await activityModel.find({}).populate('advertiserID categoryID tags');
+        let activities = await activityModel.find({}).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        activities = activities.map(activity => {
+            if (activity.priceType === 'fixed') {
+                activity.price = activity.price * conversionRate;
+            } else {
+                activity.minPrice = activity.minPrice * conversionRate;
+                activity.maxPrice = activity.maxPrice * conversionRate;
+            }
+            return activity;
+        });
+
         res.status(200).json(activities);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -69,7 +85,7 @@ export const addActivity = async (req, res) => {
     newActivity.stripeProductID = stripeProduct.id;
     const activityCreated = new activityModel(newActivity);
 
-    
+
     try {
         const a = await activityCreated.save();
         console.log(a)
@@ -131,29 +147,63 @@ export const searchActivity = async (req, res) => {
     const name = req.body.name;
     const categoryID = req.body.categoryID;
     const tagID = req.body.tagID;
-    let a;
+    let activities;
+    const currency = req.query.currency;
+    const conversionRate = await getConversionRate(currency);
 
     switch (searchBy) {
         case "name":
-            a = await activityModel.find({ name: name });
-            if (!a) {
+            activities = await activityModel.find({ name: name });
+            if (!activities) {
                 return res.status(404).json({ message: 'Activity not found' });
             }
-            res.status(200).json(a);
+
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+
+            res.status(200).json(activities);
             break;
         case "category":
-            a = await activityModel.find({ categoryID: categoryID });
-            if (!a) {
+            activities = await activityModel.find({ categoryID: categoryID });
+            if (!activities) {
                 return res.status(404).json({ message: 'Activities not found' });
             }
-            res.status(200).json(a);
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+            res.status(200).json(activities);
             break;
         case "tag":
-            a = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
-            if (!a) {
+            activities = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
+            if (!activities) {
                 return res.status(404).json({ message: 'Activities not found' });
             }
-            res.status(200).json(a);
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+            res.status(200).json(activities);
             break;
         default:
             break;
@@ -164,9 +214,23 @@ export const searchActivity = async (req, res) => {
 // @route GET /api/activity/upcoming
 export const getUpcomingActivities = async (req, res) => {
     try {
+        const prefCurrency = req.query.currency;
+        const conversionRate = await getConversionRate(prefCurrency);
         const today = new Date();
         console.log(today)
         const activities = await activityModel.find({ date: { $gte: today } }).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        activities = activities.map(activity => {
+            if (activity.priceType === 'fixed') {
+                activity.price = activity.price * conversionRate;
+            } else {
+                activity.minPrice = activity.minPrice * conversionRate;
+                activity.maxPrice = activity.maxPrice * conversionRate;
+            }
+            return activity;
+        });
+
         res.status(200).json(activities);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -298,6 +362,20 @@ export const getMyActivities = async (req, res) => {
             return res.status(404).json({ message: 'No activities found' });
         }
         return res.status(200).json(activities);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+export const viewSingleActivity = async (req, res) => {
+    const id = req.params.id;
+    const prefCurrency = req.query.currency;
+    try {
+        const activity = await activityModel.findById(id).populate('advertiserID categoryID tags');
+        if (!activity) {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+        return res.status(200).json(activity);
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }
