@@ -2,7 +2,7 @@ import adminModel from "../models/adminSchema.js";
 import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import Stripe from "stripe";
-import { convertPrice } from "../utils/Helpers.js";
+import { convertPrice, getConversionRate } from "../utils/Helpers.js";
 
 //get product by ID
 export const getProductByID = async (req, res) => {
@@ -211,6 +211,8 @@ export const getProducts = async (req, res) => {
     const minPrice = req.query.minPrice;
     const sortBy = req.query.sortBy;
     const order = req.query.order;
+    const prefCurrency = req.query.prefCurrency;
+    console.log('Pref Currency:', prefCurrency);
 
     let query = {}; // Create an object to build your query
     let sortOptions = {};
@@ -220,12 +222,13 @@ export const getProducts = async (req, res) => {
         if (minPrice || maxPrice) {
             query.price = {};
             if (minPrice) {
-                query.price.$gte = minPrice;
+                //parseInt converts string to integer
+                query.price.$gte = parseInt(minPrice);
             } else {
                 query.price.$gte = 0;
             }
             if (maxPrice) {
-                query.price.$lte = maxPrice;
+                query.price.$lte = parseInt(maxPrice);
             } else {
                 query.price.$lte = Number.MAX_SAFE_INTEGER;
             }
@@ -239,15 +242,54 @@ export const getProducts = async (req, res) => {
         if (sortBy && order) {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
-
+        const baseCurrency = prefCurrency || 'USD';
         console.log('Query:', query);
         console.log('Sort Options:', sortOptions);
 
         // Fetch the itinerary using the built query
-        const products = await product.find(query).sort(sortOptions).populate('seller_id');
+        // const products = await product.find(query).sort(sortOptions).populate('seller_id');
+        // const conversionRate = getConversionRate(prefCurrency);
+        // const products = await product.aggregate([
+        //     ,
+        //     {
+        //         $project: {
+        //             name: 1,
+        //             description: 1,
+        //             price: { $multiply: ["$price", conversionRate] } // Apply conversion directly
+        //         }
+        //     }
+        // ]);
 
-        return res.status(200).json(products);
+        // Assume conversionRate is fetched from an API beforehand
+        const conversionRate = await getConversionRate(baseCurrency);
+        console.log('Conversion Rate:', conversionRate);
 
+        const convertedProducts = await product.aggregate([
+            { $match: query },  // Filtered documents
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    seller_id: 1,
+                    price: { $multiply: ["$price", conversionRate || 1] }  // Fallback to original price if conversionRate is missing
+                }
+            },
+            { $sort: sortOptions },
+            {
+                $lookup: {
+                    from: "sellers",
+                    localField: "seller_id",
+                    foreignField: "_id",
+                    as: "seller_info"
+                }
+            },
+            { $unwind: "$seller_info" }
+        ]);
+
+        console.log('Converted Products:', convertedProducts);
+
+        return res.json(convertedProducts);
 
     } catch (error) {
         return res.status(500).json({ message: error.message }); // Handle server errors

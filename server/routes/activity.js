@@ -1,5 +1,5 @@
 import express from "express";
-import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities } from "../controllers/activityController.js";
+import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities, viewSingleActivity } from "../controllers/activityController.js";
 
 const router = express.Router();
 
@@ -30,4 +30,5 @@ router.post("/filterSort", filterAndSortActivities);
 // Get My activities
 router.get("/my/:id", getMyActivities);
 
+router.get("/activityDetails/:id", viewSingleActivity);
 export default router;

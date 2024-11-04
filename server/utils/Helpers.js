@@ -204,3 +204,8 @@ export const convertPrice = async (price, currency) => {
     const response = await axios.get(`https://v6.exchangerate-api.com/v6/${process.env.EXHANGE_RATE_API_KEY}/pair/${currency}/USD/${price}`);
     return response.data.conversion_result;
 }
+
+export const getConversionRate = async (currency) => {
+    const response = await axios.get(`https://v6.exchangerate-api.com/v6/${process.env.EXHANGE_RATE_API_KEY}/pair//USD/${currency}`);
+    return response.data.conversion_rate;
+}
