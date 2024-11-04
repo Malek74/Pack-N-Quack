@@ -33,9 +33,18 @@ export default function RateForm(props) {
       rating: 0, // Initialize with 0 or the current rating if available
     },
   });
+  const duckImages = [
+    { id: 1, src: "/assets/images/angryDuck.jpeg", label: "Not Good" },
+    { id: 2, src: "/assets/images/neutralDuck.jpeg", label: "Neutral" },
+    {
+      id: 3,
+      src: "/assets/images/happyDuck.jpeg",
+      label: "Really Good",
+    },
+  ];
 
   // Handle form submission
-  const onSubmit = (values) => {
+  const onSubmit = () => {
     switch (props.type) {
       case "tourguide":
         // Logic for tour guide user type
@@ -71,19 +80,39 @@ export default function RateForm(props) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 flex flex-col"
       >
-        {/* Rating Field */}
+        {/* Duck Rating Field */}
         <FormField
           control={form.control}
           name="rating"
           render={() => (
             <FormItem>
-              <FormLabel>Rating</FormLabel>
+              <FormLabel>How was your experience?</FormLabel>
               <FormControl>
-                <RatingInput
-                  size="large"
-                  initialRating={rating}
-                  onRatingChange={handleRatingChange}
-                />
+                <div className="flex justify-around mb-4">
+                  {duckImages.map((duck) => (
+                    <button
+                      key={duck.id}
+                      onClick={() => handleRatingChange(duck.id)}
+                      type="button"
+                      className={`flex flex-col items-center ${
+                        rating === duck.id ? "text-green-500" : "text-gray-400"
+                      }`}
+                    >
+                      <img
+                        src={duck.src}
+                        alt={duck.label}
+                        className={`w-[100px] h-[100px] ${
+                          rating === duck.id ? "border-2 border-green-500" : ""
+                        }`}
+                      />
+                      {rating === duck.id && (
+                        <span className="text-sm mt-1 font-semibold">
+                          {duck.label}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,7 +132,27 @@ export default function RateForm(props) {
             </FormItem>
           )}
         />
-
+        {/* Rating Field */}
+        <FormField
+          control={form.control}
+          name="rating"
+          render={() => (
+            <FormItem>
+              <FormLabel>Rating</FormLabel>
+              <FormControl>
+                {/* Center the RatingInput component */}
+                <div className="flex justify-center">
+                  <RatingInput
+                    size="xl"
+                    initialRating={rating}
+                    onRatingChange={handleRatingChange}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         {/* Submit Button */}
         <Button
           type="submit"

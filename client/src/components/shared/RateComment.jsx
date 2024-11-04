@@ -28,7 +28,8 @@ export default function RateComment({ title, form }) {
         <DialogHeader>
           <DialogTitle>Rate {title}</DialogTitle>
           <DialogDescription>
-            Let us know your opinion about {title}. Click add when you are done.
+            Let us know your opinion about {title}. Click submit when you are
+            done.
           </DialogDescription>
         </DialogHeader>
         {form}
