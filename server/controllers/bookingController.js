@@ -1,13 +1,13 @@
-import Booking from "../models/bookingSchema";
-import Itinerary from "../models/itinerarySchema";
-import Activity from "../models/activitySchema";
-import Tourist from "../models/touristSchema";
-import advertiserModel from "../models/advertiserSchema";
-import tourGuide from "../models/tourGuideSchema"
+import Booking from "../models/bookingSchema.js";
+import Itinerary from "../models/itinerarySchema.js";
+import Activity from "../models/activitySchema.js";
+import Tourist from "../models/touristSchema.js";
+import advertiserModel from "../models/advertiserSchema.js";
+import tourGuide from "../models/tourGuideSchema.js"
 
 export const flaggedEvents = async (req, res) => {
     const { eventId, userId } = req.body;
-    
+
     try {
         const userExist = await Tourist.findById(userId);
         if (!userExist) {
@@ -21,7 +21,7 @@ export const flaggedEvents = async (req, res) => {
             }
         }
 
-        const bookingExist = await Booking.findOne({touristID: userId, $or: [{ itineraryID: eventId }, { activityID: eventId }] });
+        const bookingExist = await Booking.findOne({ touristID: userId, $or: [{ itineraryID: eventId }, { activityID: eventId }] });
 
         if (!bookingExist) {
             return res.status(404).json({ message: "This tourist did not book this event" });
@@ -29,13 +29,13 @@ export const flaggedEvents = async (req, res) => {
 
         if (eventExist.flagged) {
             userExist.wallet += eventExist.price;
-            await userExist.save(); 
+            await userExist.save();
         }
 
         return res.status(200).json({ message: "Sorry for the inconvenience, the money has been refunded" });
 
     } catch (error) {
-        console.error("Error processing flagged events:", error); 
+        console.error("Error processing flagged events:", error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -47,7 +47,7 @@ export const requestDeleteAccount = async (req, res) => {
 
     let userModel;
 
-  
+
     switch (userType) {
         case 'Advertiser':
             userModel = advertiserModel;
@@ -70,15 +70,15 @@ export const requestDeleteAccount = async (req, res) => {
 
         if (userModel === Tourist) {
             const hasBooking = await Booking.findOne({ touristID: userId });
-            if (hasBooking && !hasBooking.status=='cancelled' ) {
+            if (hasBooking && !hasBooking.status == 'cancelled') {
                 return res.status(400).json({ message: "You cannot delete your account because you have booked an upcoming event" });
             }
         } else if (userModel === tourGuide) {
             const joinedItinerary = await Itinerary.findOne({ tourGuideID: userId });
-            if (joinedItinerary && joinedItinerary.isActive==true && !joinedItinerary.flagged) {
+            if (joinedItinerary && joinedItinerary.isActive == true && !joinedItinerary.flagged) {
                 return res.status(400).json({ message: "You cannot delete your account because you are assigned to an upcoming event" });
             }
-        } else { 
+        } else {
             const joinedActivity = await Activity.findOne({ advertiserID: userId });
             if (joinedActivity && !joinedActivity.flagged) {
                 return res.status(400).json({ message: "You cannot delete your account because you are assigned to an upcoming event" });

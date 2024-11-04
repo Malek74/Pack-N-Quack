@@ -3,8 +3,8 @@ import { PasswordChangeRequest } from "../models/changePassSchema.js";
 import { checkUserExists } from "../utils/Helpers.js";
 
 export const requestPasswordChange = async (req, res) => {
-    const { userId, requestedPassword, userType } = req.body; // Make sure to extract userType
-    
+    const {  requestedPassword, userType } = req.body; // Make sure to extract userType
+    const  userId  = req.params.id;
     try {
         // Check if the user exists
         const userExists = await checkUserExists(userId, userType);
