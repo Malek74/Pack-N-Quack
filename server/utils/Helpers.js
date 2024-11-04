@@ -165,8 +165,8 @@ export const addLoyaltyPoints = async (touristID, price) => {
     const subscriber = await tourist.findById(touristID);
     const currLevel = subscriber.level;
 
-    let pointsToAdd = 0 ;
-    let newPoints = 0 ;
+    let pointsToAdd = 0;
+    let newPoints = 0;
 
     switch (currLevel) {
         case 1:
@@ -198,4 +198,9 @@ export const addLoyaltyPoints = async (touristID, price) => {
     subscriber.loyaltyPoints = newPoints;
     console.log(subscriber);
     await subscriber.save();
+}
+
+export const convertPrice = async (price, currency) => {
+    const response = await axios.get(`https://v6.exchangerate-api.com/v6/${process.env.EXHANGE_RATE_API_KEY}/pair/${currency}/USD/${price}`);
+    return response.data.conversion_result;
 }

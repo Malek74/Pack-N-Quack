@@ -18,7 +18,6 @@ const bookingSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
-
     },
     stripePaymentID: {
         type: String,

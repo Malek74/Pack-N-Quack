@@ -17,11 +17,19 @@ const amadeusBookingSchema = new Schema({
         price: { type: Number, required: true }
     },
 
+    flightData: {
+        flight: { type: String, required: true },
+        departure: { type: String, required: true },
+        arrival: { type: String, required: true },
+        price: { type: Number, required: true }
+    },
+    stripeSessionID: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         default: Date.now
     },
-    flightData: {
-        
-    }
+
 })

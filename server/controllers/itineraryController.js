@@ -109,8 +109,6 @@ export const addItinerary = async (req, res) => {
 //@route GET api/itinerary
 export const getItinerary = async (req, res) => {
 
-
-
     const id = req.query.id;
     const name = req.query.name;
     const tag = req.query.tag;
@@ -160,13 +158,12 @@ export const getItinerary = async (req, res) => {
                 query.available_dates.$elemMatch.$lte = new Date(maxDate); // Convert to Date object
             }
         }
-
-        if (language) {
+        if (language && language !== 'undefined') {
             query.language = language; // Filter by language if provided
         }
-        console.log(sortBy);
+        console.log(language);
         // Set sorting options if provided
-        if (sortBy && order) {
+        if (sortBy && order && order !== 'undefined' && order !== 'undefined') {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
 
@@ -228,8 +225,9 @@ export const deleteItinerary = async (req, res) => {
             return res.status(404).json({ message: "No itineraries found" });
         }
 
-        const numsOfBookings = await Booking.find({ itineraryID: req.params.id }).count();
-        if (numsOfBookings != 0) {
+        const numsOfBookings = await Booking.find({ itineraryID: req.params.id });
+        console.log(numsOfBookings);
+        if (numsOfBookings.length != 0) {
             return res.status(404).json({ message: "Cannot delete itinerary with bookings" })
         }
 
@@ -237,7 +235,9 @@ export const deleteItinerary = async (req, res) => {
 
         res.status(200).json({ message: "itinerary deleted" + itineraryToDelete });
     } catch (error) {
+        console.log(error);
         res.status(401).json({ message: error.message });
+
     }
 }
 
@@ -287,6 +287,24 @@ export const updateItinerary = async (req, res) => {
 
 }
 
+export const addActivity = async (req, res) => {
+    const itineraryID = req.params.id;
+    const { newActivities } = req.body;
+    console.log("This is the body" + req.body)
+
+    try {
+        //fetch itinerary
+        const itinerary = await Itinerary.findById(itineraryID);
+
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { days: req.body } }, { new: true, runValidators: true });
+        console.log(updatedItinerary.days);
+        res.status(200).json(updatedItinerary);
+    } catch (error) {
+        res.status(401).json({ message: "itinerary deosn't exist:" + error.message });
+        console.log(error);
+    }
+}
+
 export const getItineraryById = async (req, res) => {
     const id = req.params.id;
     console.log(id);
@@ -309,15 +327,12 @@ export const getItineraryById = async (req, res) => {
 
 export const getMaxPrice = async (req, res) => {
     try {
+        //get max price of itinerary
         const maxPrice = await Itinerary.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    maxPrice: { $max: "$price" }
-                }
-            }
-        ]);
-        return res.status(200).json(maxPrice[0]?.maxPrice || 0);
+            { $group: { _id: null, maxPrice: { $max: "$price" } } }
+        ])
+
+        return res.status(200).json({ maxPrice: maxPrice.length > 0 ? maxPrice[0].maxPrice : 0 });
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }

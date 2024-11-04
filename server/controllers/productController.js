@@ -2,11 +2,13 @@ import adminModel from "../models/adminSchema.js";
 import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import Stripe from "stripe";
+import { convertPrice } from "../utils/Helpers.js";
 
 //get product by ID
 export const getProductByID = async (req, res) => {
     const { id } = req.params;
     const isAdmin = adminModel.findById(id);
+    const prefCurrency = req.body.prefCurrency;
 
 
     console.log(id + "this is id");
@@ -15,6 +17,8 @@ export const getProductByID = async (req, res) => {
     }
     try {
         const searchedProduct = await product.findById(id).populate('seller_id');
+        const newPrice = convertPrice(searchedProduct.price, prefCurrency);
+        searchedProduct.price = newPrice;
         return res.status(200).json(searchedProduct);
     } catch (error) {
         return res.status(400).json({ error: error.message });
@@ -75,18 +79,30 @@ export const editProduct = async (req, res) => {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
+        const productEdited = await product.findById(id);
 
-        //create product on stripe
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        const productStripe = await stripe.products.create({
-            description: description,
-            default_price_data: {
-                currency: "usd",
-                unit_amount: price * 100,
-            },
-        });
+        //attempt to update product on stripe
+        try {
 
-        const newproduct = await product.findByIdAndUpdate(id, { description, price }, { new: true }).populate('seller_id');
+            ///create new price on stripe
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            const newPrice = await stripe.prices.create({
+                unit_amount: price * 100, // Price in cents
+                currency: 'usd',
+                product: productEdited.stripeID, // Replace with your actual product ID
+            });
+
+
+            const updatedProduct = await stripe.products.update(productEdited.stripeID, {
+                description: description,
+                default_price: newPrice.id,
+            })
+        }
+        catch (error) {
+            console.log(error);
+        }
+
+        const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
         console.log(newproduct)
         return res.status(200).json(newproduct);
     } catch (error) {
