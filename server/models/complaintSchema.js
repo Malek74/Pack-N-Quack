@@ -22,7 +22,8 @@ const complaintSchema = new Schema({
     },
     reply: {
         type: String,
-        required: false
+        required: false,
+        default: null
     },
     date: {
         type: Date,
