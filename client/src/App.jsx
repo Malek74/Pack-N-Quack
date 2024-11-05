@@ -4,8 +4,8 @@ import { Toaster } from "./components/ui/toaster";
 export default function App() {
   return (
     <div className="App">
-      <RouterProvider router={router} />
       <Toaster />
+      <RouterProvider router={router} />
     </div>
   );
 }

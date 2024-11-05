@@ -1,19 +1,28 @@
-// eslint-disable-next-line react/prop-types
-export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
+/* eslint-disable react/prop-types */
+import { useState } from "react";
+
+export const RatingInput = ({
+  initialRating = 0,
+  size = "medium",
+  onRatingChange = () => {},
+}) => {
+  const [selectedRating, setSelectedRating] = useState(initialRating);
+
   const sizes = {
     small: 12,
     medium: 16,
     large: 24,
+    xl: 40,
   };
 
-  // eslint-disable-next-line react/prop-types
-  const StarIcon = ({ filled, percentage }) => (
+  const StarIcon = ({ filled, percentage, onClick }) => (
     <svg
       width={sizes[size]}
       height={sizes[size]}
       viewBox="0 0 18 18"
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-${sizes[size]} h-${sizes[size]} ${
+      onClick={onClick}
+      className={`cursor-pointer w-${sizes[size]} h-${sizes[size]} ${
         filled ? "" : "text-gray-300"
       }`}
     >
@@ -38,10 +47,15 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
     </svg>
   );
 
+  const handleRatingClick = (index) => {
+    setSelectedRating(index);
+    onRatingChange(index); // Optional callback to notify parent component
+  };
+
   const getStarType = (index) => {
-    if (rating >= index) return { filled: true, percentage: 100 };
-    if (rating > index - 1 && rating < index) {
-      const percentage = (rating - (index - 1)) * 100;
+    if (selectedRating >= index) return { filled: true, percentage: 100 };
+    if (selectedRating > index - 1 && selectedRating < index) {
+      const percentage = (selectedRating - (index - 1)) * 100;
       return { filled: false, percentage };
     }
     return { filled: false, percentage: 0 };
@@ -51,10 +65,13 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
     <div className="flex items-center gap-2">
       <div className="inline-flex gap-1 align-center rating">
         {[1, 2, 3, 4, 5].map((star) => (
-          <StarIcon key={star} {...getStarType(star)} />
+          <StarIcon
+            key={star}
+            {...getStarType(star)}
+            onClick={() => handleRatingClick(star)}
+          />
         ))}
       </div>
-      <span className="text-sm text-gray-500">| {numberOfReviews} Reviews</span>
     </div>
   );
 };
