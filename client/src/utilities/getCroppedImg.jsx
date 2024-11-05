@@ -5,7 +5,6 @@ const createImage = (url) =>
     image.addEventListener("error", (error) => reject(error));
     image.src = url;
   });
-
 export default async function getCroppedImg(imageSrc, pixelCrop) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
@@ -32,8 +31,9 @@ export default async function getCroppedImg(imageSrc, pixelCrop) {
         reject(new Error("Canvas is empty"));
         return;
       }
-      const croppedImageUrl = URL.createObjectURL(blob);
-      resolve(croppedImageUrl);
+      // Convert blob to File
+      const file = new File([blob], "malek.jpg", { type: "image/jpeg" });
+      resolve(file);
     }, "image/jpeg");
   });
 }

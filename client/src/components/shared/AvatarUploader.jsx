@@ -8,16 +8,21 @@ import Cropper from "react-easy-crop";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import getCroppedImg from "@/utilities/getCroppedImg"; // Helper function to get cropped image
+import axios from "axios";
 
 AvatarUploader.propTypes = {
   size: PropTypes.number,
 };
 
+// TODO: Add naming like image uploaded
+// TODO: get userType and userId dynamically
+// TODO: Add avatar viewing
 export default function AvatarUploader({ size = 28 }) {
   const { toast } = useToast();
   const [avatarUploaded, setAvatarUploaded] = useState(null); // Use URL for preview
   const [isCropping, setIsCropping] = useState(false);
   const [croppedImage, setCroppedImage] = useState(null); // To store the final cropped image
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null); // URL for display
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -50,11 +55,12 @@ export default function AvatarUploader({ size = 28 }) {
 
   const handleCropSave = async () => {
     try {
-      const croppedImageUrl = await getCroppedImg(
+      const croppedImageFile = await getCroppedImg(
         avatarUploaded,
         croppedAreaPixels
-      ); // Get the cropped image as a data URL or blob
-      setCroppedImage(croppedImageUrl); // Store the cropped image
+      );
+      setCroppedImage(croppedImageFile); // Store the File for upload
+      setCroppedImageUrl(URL.createObjectURL(croppedImageFile)); // Create and store the URL for display
       toast({
         description: "Cropped avatar saved successfully!",
         variant: "success",
@@ -69,6 +75,47 @@ export default function AvatarUploader({ size = 28 }) {
     }
   };
 
+  const handleApiCall = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("images", croppedImage); // Now `croppedImage` is a File
+      formData.append("userType", "tourGuide");
+      formData.append("userId", "66fb241366ea8f57d59ec6db");
+
+      await axios.post("/api/upload/images", formData);
+      toast({
+        description: "Avatar uploaded successfully!",
+        variant: "success",
+      });
+    } catch (e) {
+      toast({
+        description: "Something went wrong while uploading the avatar.",
+        variant: "destructive",
+      });
+      console.error(e);
+    }
+  };
+  const handleApiCall2 = async () => {
+    try {
+      const response = await axios.post("/api/upload/fetchImages", {
+        userType: "tourGuide",
+        userId: "66fb241366ea8f57d59ec6db",
+      });
+
+      console.log(response.data);
+      setCroppedImageUrl(response.data.image);
+      toast({
+        description: "Avatar Downloaded successfully!",
+        variant: "success",
+      });
+    } catch (e) {
+      toast({
+        description: "Something went wrong while getting the avatar.",
+        variant: "destructive",
+      });
+      console.error(e);
+    }
+  };
   return (
     <div>
       <Dropzone
@@ -83,9 +130,9 @@ export default function AvatarUploader({ size = 28 }) {
             className={`border-2 aspect-square flex flex-col items-center justify-center rounded-full w-28 hover:cursor-pointer hover:bg-slate-50`}
           >
             <Input {...getInputProps()} type="file" />
-            {croppedImage ? (
+            {croppedImageUrl ? (
               <img
-                src={croppedImage}
+                src={croppedImageUrl}
                 alt="Cropped Avatar"
                 className="rounded-full object-cover w-full h-full"
               />
@@ -128,6 +175,7 @@ export default function AvatarUploader({ size = 28 }) {
           </DialogContent>
         </Dialog>
       )}
+      <Button onClick={() => handleApiCall2()}>Print cropped image</Button>
     </div>
   );
 }
