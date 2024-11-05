@@ -15,6 +15,8 @@ import RegistrationPage from "@/pages/RegistrationPage";
 import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary";
 import NotFoundPage from "@/components/errorBoundary/NotFoundPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
+import HotelBookingApp from "@/pages/HotelBookPage";
+
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -31,6 +33,8 @@ const routes = createRoutesFromElements(
     <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
+    <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
+
     <Route
       path="*"
       element={

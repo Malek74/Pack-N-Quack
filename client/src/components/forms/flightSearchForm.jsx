@@ -10,10 +10,18 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SampleDatePicker } from "../shared/datepicker";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 
 
@@ -21,23 +29,32 @@ export default function FlightSearchForm({ onSearch }) {
 
 
     function onSubmit(values) {
-        const { origin, destination, departureDate } = values;
-        onSearch(origin, destination, departureDate);
+        const { originLocationCode, destinationLocationCode, departureDate } = values;
+        onSearch(originLocationCode, destinationLocationCode, departureDate);
     };
+    const cities = [
+        "New York", "Los Angeles", "Chicago", "London", "Paris",
+        "Tokyo", "Cairo", "Beijing", "Dubai", "Sydney",
+        "Berlin", "Toronto", "Mexico City", "Moscow",
+        "Seoul", "Sao Paulo", "Mumbai", "Hong Kong",
+        "Bangkok", "Istanbul"
+    ];
+
     const formSchema = z.object({
-        origin: z
+        originLocationCode: z
             .string()
             .min(3, "Must be at least 3 characters"),
-        destination: z
+        destinationLocationCode: z
             .string()
             .min(3, "Must be at least 3 characters"),
-        departureDate: z.date()
+        departureDate: z.date(),
+        //   adults: z.preprocess((val) => Number(val), z.number())
     })
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            origin: "",
-            destination: "",
+            originLocationCode: "",
+            destinationLocationCode: "",
             departureDate: "",
         },
     });
@@ -52,15 +69,27 @@ export default function FlightSearchForm({ onSearch }) {
             >
                 <FormField
                     control={form.control}
-                    name="origin"
+                    name="originLocationCode"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Origin</FormLabel>
                             <FormControl>
-                                <Input className="m-3 p-3"
-                                    placeholder="Enter origin (e.g., JFK)"
-                                    {...field}
-                                />
+                                <Select onValueChange={(value) => {
+                                    field.onChange(value);
+                                }}>
+                                    <SelectTrigger className="w-full" onValueChange={field.onChange}>
+                                        <SelectValue placeholder="Select an origin city" {...field} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Origin</SelectLabel>
+                                            {cities.map((city, index) => (
+                                                <SelectItem key={index} value={city}>{city} </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+
+                                    </SelectContent>
+                                </Select>
+
                             </FormControl>
                             <FormDescription />
                             <FormMessage />
@@ -70,15 +99,26 @@ export default function FlightSearchForm({ onSearch }) {
                 />
                 <FormField
                     control={form.control}
-                    name="destination"
+                    name="destinationLocationCode"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Destination</FormLabel>
                             <FormControl>
-                                <Input className="m-3 p-3"
-                                    placeholder="Enter destination (e.g., LAX)"
-                                    {...field}
-                                />
+                                <Select onValueChange={(value) => {
+                                    field.onChange(value);
+                                }}>
+                                    <SelectTrigger className="w-full" onValueChange={field.onChange}>
+                                        <SelectValue placeholder="Select a destination city" {...field} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Destination</SelectLabel>
+                                            {cities.map((city, index) => (
+                                                <SelectItem key={index} value={city}>{city} </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+
                             </FormControl>
                             <FormDescription />
                             <FormMessage />
@@ -86,6 +126,7 @@ export default function FlightSearchForm({ onSearch }) {
 
                     )}
                 />
+
                 <FormField
                     control={form.control}
                     name="departureDate"
@@ -94,7 +135,7 @@ export default function FlightSearchForm({ onSearch }) {
                             <FormLabel>Departure Date</FormLabel>
                             <br />
                             <FormControl >
-                                <div className="m-3">
+                                <div>
                                     <SampleDatePicker {...field} />
                                 </div>
                             </FormControl>

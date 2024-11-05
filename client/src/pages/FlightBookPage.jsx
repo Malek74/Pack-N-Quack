@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FlightSearchForm from "@/components/forms/flightSearchForm";
 import FlightResults from "@/components/bookingFlights/flightResult";
-import BookingForm from "@/components/forms/flightBookingForm";
+import FlightBookingForm from "@/components/forms/flightBookingForm";
 import axios from "axios";
 import {
     Card,
@@ -9,76 +9,43 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import CreateDialog from "@/components/shared/CreateDialog";
 
 const FlightBookingApp = () => {
     const [flights, setFlights] = useState([]);
     const [selectedFlight, setSelectedFlight] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const searchFlights = async (origin, destination, departureDate) => {
-        const options = {
-            method: 'GET',
-            url: 'https://ryanair2.p.rapidapi.com/api/v1/searchFlights',
-            params: {
-                origin: origin,           // Example: 'JFK'
-                destination: destination, // Example: 'LAX'
-                outboundDate: departureDate,      // Format: '2024-11-01'
-                adults: '1',
-                currency: 'USD',          // Currency of choice
-                countryCode: 'US',        // Country of choice
-                market: 'US'              // Market of choice
-            },
-            headers: {
-                'X-RapidAPI-Key': '8fcaa46a62msh18c3a4dc00d6374p10370ajsn83ef183bc2c5', // Replace with your RapidAPI key
-                'X-RapidAPI-Host': 'ryanair2.p.rapidapi.com'
-            }
-        };
-
+    const searchFlights = async (originLocationCode, destinationLocationCode, departureDate) => {
+        //    departureDate = "2025-08-01";
+        //  console.log(originLocationCode, destinationLocationCode, departureDate);
         try {
-            console.log(origin, destination, departureDate);
-            const response = await axios.request(options);
+            const response = await axios.post('/api/bookFlight', {
+                "originLocationCode": originLocationCode,
+                "destinationLocationCode": destinationLocationCode,
+                "departureDate": departureDate,
+            });
+            //  console.log(originLocationCode, destinationLocationCode, departureDate);
             console.log("Flight Search Results:", response.data);
+            setFlights(response.data);
+            console.log(flights);
+            setSelectedFlight(null); // Reset selection if new search is performed
             return response.data;
         } catch (error) {
-            console.error("Error searching for flights:", error);
+            console.error("Error searching flights:", error);
+            return null;
         }
     };
 
-
-    const bookFlight = async (flightOffer) => {
+    const bookFlight = async (flightOffer, travelerInfo) => {
         try {
-            const response = await axios.post(
-                `https://test.api.amadeus.com/v1/booking/flight-orders`,
-                {
-                    data: {
-                        type: "flight-order",
-                        flightOffers: [flightOffer],
-                        travelers: [
-                            {
-                                id: "1",
-                                dateOfBirth: "1990-01-01",
-                                name: {
-                                    firstName: "John",
-                                    lastName: "Doe"
-                                },
-                                contact: {
-                                    emailAddress: "john.doe@example.com",
-                                    phones: [
-                                        {
-                                            deviceType: "MOBILE",
-                                            number: "+123456789"
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
+            const response = await axios.post('/api/book', {
+                data: {
+                    type: "flight-order",
+                    flightOffers: [flightOffer],
+                    travelers: [travelerInfo],
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer YOUR_ACCESS_TOKEN`
-                    }
-                }
-            );
+            });
             console.log("Booking successful:", response.data);
         } catch (error) {
             console.error("Error booking flight:", error);
@@ -88,33 +55,36 @@ const FlightBookingApp = () => {
 
 
     // Simulating flight search API response
-    const handleSearch = (origin, destination, departureDate) => {
-        // const mockFlights = [
-        //     { origin, destination, departureDate, price: 200 },
-        //     { origin, destination, departureDate, price: 250 },
-        //     { origin, destination, departureDate, price: 180 },
-        // ];
-        const searchedFlights = searchFlights(origin, destination, departureDate);
+    const handleSearch = (originLocationCode, destinationLocationCode, departureDate) => {
+
+        const searchedFlights = searchFlights(originLocationCode, destinationLocationCode, departureDate);
         setFlights(searchedFlights);
+        console.log(flights);
         setSelectedFlight(null); // Reset selection if new search is performed
     };
 
     const handleSelectFlight = (flight) => {
         setSelectedFlight(flight);
+        setIsDialogOpen(true); // Open the dialog when a flight is selected
+        console.log(selectedFlight);
     };
 
 
-    const handleBooking = () => {
+    const handleBooking = (travelerInfo) => {
         if (selectedFlight) {
-            bookFlight(selectedFlight); // Book the selected flight
-            console.log("Booking confirmed!", selectedFlight);
-
+            const flightBookingData = {
+                ...travelerInfo,
+                flightOffer: selectedFlight,
+            };
+            bookFlight(flightBookingData); // Book the selected flight with traveler info
+            console.log("Booking confirmed!", flightBookingData);
         } else {
             console.log("No flight selected.");
         }
     };
+
     return (
-        <div className=" flex justify-center m-8">
+        <div className=" flex justify-center m-8 w-full">
             <Card>
                 <CardHeader>
                     <CardTitle>Book a Flight</CardTitle>
@@ -122,9 +92,17 @@ const FlightBookingApp = () => {
                 <CardContent>
                     <FlightSearchForm onSearch={handleSearch} />
 
-                    <FlightResults flights={flights} onSelect={handleSelectFlight} />
+                    <FlightResults flights={flights} onSelect={handleSelectFlight} handleBooking={handleBooking} />
 
-                    {selectedFlight && <BookingForm flight={selectedFlight} onBook={handleBooking} />}
+                    {/* {selectedFlight && isDialogOpen &&
+
+                        <FlightBookingForm
+                            flight={selectedFlight}
+                            onBook={handleBooking}
+
+                            onClose={() => setIsDialogOpen(false)}
+                        />
+                    } */}
                 </CardContent>
             </Card>
         </div>
