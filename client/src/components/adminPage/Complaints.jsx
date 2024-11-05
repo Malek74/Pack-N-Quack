@@ -19,6 +19,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
+import PendingAndResolved from "../itinerariesPage/PendingAndResolved";
   export default function Complaints() {
     const { toast } = useToast();
     const [complaints, setComplaints] = useState();
@@ -33,11 +34,52 @@ import {
           console.error(error);
         });
     };
-  
+
+   
   
     useEffect(() => {
       fetchComplaints(); // Initial fetch when component mounts
     }, []);
+
+    const dummyComplaints = [
+      {
+        _id: "1",
+        title: "Delayed Response",
+        body: "The response time was very slow.",
+        date: "2024-10-01",
+        status: "pending",
+      },
+      {
+        _id: "2",
+        title: "Incorrect Billing",
+        body: "I was overcharged for my subscription.",
+        date: "2024-10-05",
+        status: "resolved",
+      },
+      {
+        _id: "3",
+        title: "Service Outage",
+        body: "The service was down for over 2 hours.",
+        date: "2024-10-10",
+        status: "pending",
+      },
+      {
+        _id: "4",
+        title: "Unhelpful Support",
+        body: "The support team did not resolve my issue.",
+        date: "2024-10-12",
+        status: "resolved",
+      },
+      {
+        _id: "5",
+        title: "Account Suspension",
+        body: "My account was suspended without notice.",
+        date: "2024-10-15",
+        status: "pending",
+      },
+    ];
+    
+  
   
     return (
       <div className="flex flex-col sm:gap-4 sm:py-4">
@@ -58,12 +100,12 @@ import {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {complaints &&
-                  complaints.map((complaint) => (
+                {dummyComplaints &&
+                  dummyComplaints.map((complaint) => (
                     <TableRow key={complaint._id}>
                       <TableCell>{complaint.title}</TableCell>
                       <TableCell>{complaint.date}</TableCell>
-                      <TableCell>{complaint.status}</TableCell>
+                      <TableCell><PendingAndResolved status={complaint.status} id = {complaint._id}/></TableCell>
                     </TableRow>
                   ))}
               </TableBody>
