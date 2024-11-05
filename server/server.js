@@ -17,10 +17,12 @@ import advertisers from './routes/advertisers.js';
 import activity from './routes/activity.js';
 import activityCategory from './routes/activityCategory.js';
 import activityTag from './routes/activityTag.js';
+import complaint from './routes/complaint.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
 import uploadImg from './routes/uploadImg.js';
+
 
 config();
 const app = express();
@@ -65,3 +67,4 @@ app.use('/api/activity', activity)
 app.use('/api/activity/category', activityCategory)
 app.use('/api/activity/tag', activityTag)
 app.use('/api/upload',uploadImg)
+app.use('/api/complaints',complaint)
