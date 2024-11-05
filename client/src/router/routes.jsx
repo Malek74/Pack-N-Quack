@@ -16,7 +16,7 @@ import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary";
 import NotFoundPage from "@/components/errorBoundary/NotFoundPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
-
+import TouristDashboard from "@/pages/TouristDashboard";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -35,7 +35,8 @@ const routes = createRoutesFromElements(
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
 
-    <Route
+<Route path="touristDashboard" element={<TouristDashboard />} />
+    <Route 
       path="*"
       element={
         <ErrorBoundary>
