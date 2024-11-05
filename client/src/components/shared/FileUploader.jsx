@@ -22,15 +22,18 @@ import {
   FileX2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import axios from "axios";
 
 FileUploader.propTypes = {
   filesUploaded: PropTypes.array,
+  fileToUpload: PropTypes.string,
   setFilesUploaded: PropTypes.func,
 };
 
-export default function FileUploader({ filesUploaded, setFilesUploaded }) {
+export default function FileUploader({
+  filesUploaded,
+  setFilesUploaded,
+  fileToUpload,
+}) {
   const { toast } = useToast();
 
   const documentFileSchema = z.object({
@@ -130,35 +133,12 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
     }
   };
 
-  const handleApiCall = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("userType", "tourGuide");
-    formData.append("userId", "66fb241366ea8f57d59ec6db"); //
-
-    try {
-      const response = await axios.post(
-        "https://api.example.com/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <Dropzone multiple={false} onDrop={handleDrop}>
       {({ getRootProps, getInputProps }) => (
         <div className="flex flex-col gap-4 justify-center items-center">
           <div className="flex gap-4 justify-between items-center w-full">
-            <span className="text-xl">{`Upload Tax Registry: `}</span>
+            <span className="text-xl">{`Upload ${fileToUpload}: `}</span>
             {filesUploaded.length == 0 ? (
               <div
                 {...getRootProps()}
@@ -228,7 +208,6 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
               ))
             )}
           </div>
-          <Button onClick={() => handleApiCall(filesUploaded[0])}>Quack</Button>
         </div>
       )}
     </Dropzone>

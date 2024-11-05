@@ -18,6 +18,8 @@ AvatarUploader.propTypes = {
 // TODO: get userType and userId dynamically
 // TODO: Add avatar viewing
 export default function AvatarUploader({ size = 28 }) {
+  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-${size}`;
+
   const { toast } = useToast();
   const [avatarUploaded, setAvatarUploaded] = useState(null); // Use URL for preview
   const [isCropping, setIsCropping] = useState(false);
@@ -75,26 +77,26 @@ export default function AvatarUploader({ size = 28 }) {
     }
   };
 
-  const handleApiCall = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("images", croppedImage); // Now `croppedImage` is a File
-      formData.append("userType", "tourGuide");
-      formData.append("userId", "66fb241366ea8f57d59ec6db");
+  // const handleApiCall = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("images", croppedImage); // Now `croppedImage` is a File
+  //     formData.append("userType", "tourGuide");
+  //     formData.append("userId", "66fb241366ea8f57d59ec6db");
 
-      await axios.post("/api/upload/images", formData);
-      toast({
-        description: "Avatar uploaded successfully!",
-        variant: "success",
-      });
-    } catch (e) {
-      toast({
-        description: "Something went wrong while uploading the avatar.",
-        variant: "destructive",
-      });
-      console.error(e);
-    }
-  };
+  //     await axios.post("/api/upload/images", formData);
+  //     toast({
+  //       description: "Avatar uploaded successfully!",
+  //       variant: "success",
+  //     });
+  //   } catch (e) {
+  //     toast({
+  //       description: "Something went wrong while uploading the avatar.",
+  //       variant: "destructive",
+  //     });
+  //     console.error(e);
+  //   }
+  // };
   const handleApiCall2 = async () => {
     try {
       const response = await axios.post("/api/upload/fetchImages", {
@@ -125,10 +127,7 @@ export default function AvatarUploader({ size = 28 }) {
         accept="image/*"
       >
         {({ getRootProps, getInputProps }) => (
-          <div
-            {...getRootProps()}
-            className={`border-2 aspect-square flex flex-col items-center justify-center rounded-full w-28 hover:cursor-pointer hover:bg-slate-50`}
-          >
+          <div {...getRootProps()} className={divClassName}>
             <Input {...getInputProps()} type="file" />
             {croppedImageUrl ? (
               <img
