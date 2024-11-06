@@ -35,6 +35,7 @@ export default function RamitoItineraries() {
           fetchedItineraries.map((itinerary) => (
             <RamitoItinerariesCard
               key={itinerary._id}
+              id={itinerary._id}
               image={itinerary.image}
               name={itinerary.name}
               description={itinerary.description}
