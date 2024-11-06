@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
+import DropDownMenuProfile from "./components/DropDownMenuProfile";
 import logo from "/assets/icons/logo.png";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
@@ -86,7 +87,7 @@ export default function Header() {
                   : ""
               }
             >
-              <DropDownMenuComponent location={location} />
+              <DropDownMenuProfile location={location} />
             </li>
           </Button>
 
@@ -105,6 +106,23 @@ export default function Header() {
               <DropDownMenuTourist />
             </li>
           </Button>
+
+          <Button asChild variant="link">
+            <li
+              className={
+                isActive("/itineraries")
+                  ? "text-yellow-500"
+                  : isActive("/activities")
+                  ? "text-yellow-500"
+                  : isActive("/historical")
+                  ? "text-yellow-500"
+                  : ""
+              }
+            >
+              <DropDownMenuProfile location={location} />
+            </li>
+          </Button>
+
         </ul>
 
         {/* Sign In and Sign Up on the right */}

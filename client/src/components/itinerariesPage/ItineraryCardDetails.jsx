@@ -3,8 +3,35 @@ import BlurredImage from "./BlurredImage";
 import checkIcon from "/assets/icons/check.svg";
 import highlights from "/assets/icons/itineraryHighlights.svg";
 import DateSelector from "../shared/DateSelector";
-
+import { Button } from "../ui/button";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 const ItineraryCardDetails = (props) => {
+  const { toast } = useToast();
+  const bookItinerary = () => {
+    try {
+      axios
+        .post(`/api/itinerary/subscribe/${props.id}`, {
+          touristID: "6702cec57d7e2444d9713dbb",
+          date: "2023-11-10T00:00:00.000Z",
+          numOfBookings: 4,
+        })
+        .then((response) => {
+          console.log("Booking created successfully:", response.data);
+          toast({
+            title: "Booking created succesfully!",
+          });
+        })
+        .catch((error) => {
+          toast({
+            variant: "destructive",
+            title: "Booking could not be created",
+            description: error.response.data.message,
+          });
+        });
+    } catch {}
+  };
+
   return (
     <div className={"flex w-full justify-between"}>
       {" "}
@@ -81,6 +108,7 @@ const ItineraryCardDetails = (props) => {
               props.tags.map((tag) => <span>{`#${tag.tag}`}</span>)}
           </li>
           <DateSelector dates={props.availableDates}></DateSelector>
+          <Button onClick={bookItinerary}>Book</Button>
         </ul>
         <img
           src={highlights}

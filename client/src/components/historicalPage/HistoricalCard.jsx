@@ -5,10 +5,23 @@ import { Trash2 } from 'lucide-react';
 import PlaceEditForm from "../forms/PlaceEditForm";
 import ImagesScroll from "../shared/ImagesScroll";
 import Maps from "../shared/Maps";
+import { useNavigate } from "react-router-dom";
+
+
 export default function HistoricalCard(props) {
+    const navigate = useNavigate();
+
+    const date = new Date(props.time);
+    const openHistoricalPage = () => {
+      console.log(props.name)
+      navigate(`/place/${props.name}`);
+    };
+
     return (
-        <div className="container rounded-lg w-[30rem] h-auto pb-3 shadow-md">
-            <div className="flex place-content-end ">
+        <div
+        onClick={openHistoricalPage}
+        className="container rounded-lg w-[25rem] h-auto p-2 shadow-md"
+      >            <div className="flex place-content-end ">
                 <img className=" w-[25rem] h-[15rem] rounded-lg mb-4" src={props.img} alt={props.alt} />
 
                 {(props.notTourist) && (

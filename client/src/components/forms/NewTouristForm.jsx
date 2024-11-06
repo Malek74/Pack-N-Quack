@@ -40,6 +40,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PhoneInput } from "@/components/shared/PhoneInput";
 import { SampleDatePicker } from "@/components/shared/datepicker";
 import { nationalities } from "../shared/nationalities";
+import { Checkbox } from "@/components/ui/checkbox"
+import DialogTerms from "../shared/DialogTerms";
+
 export default function NewTouristForm(props) {
   const [status, setStatus] = useState("");
   const [categories, setCategories] = useState([]);
@@ -53,7 +56,6 @@ export default function NewTouristForm(props) {
       .string()
       .min(3, "Must be at least 2 characters")
       .max(50, "Must be less then 50 characters"),
-
     email: z.string().email(),
     password: z.string().min(8).max(100), // Password validation with min 8 characters
     mobileNumber: z.string().min(1, "Mobile number is required."), // Make mobile number required
@@ -65,7 +67,10 @@ export default function NewTouristForm(props) {
         message: "Date of birth is missing or invalid",
       })
       .transform((date) => (date ? date.toISOString() : null)), // Convert to ISO string or keep null
-    preferedFirstTag: z.string().min(1, "Prefered tag is required"),
+      terms: z.boolean().refine((value) => value === true, {
+        message: "You must accept terms and conditions.",
+      }), 
+      preferedFirstTag: z.string().min(1, "Prefered tag is required"),
     preferedSecondTag: z.string().min(1, "Prefered tag is required"),
     preferedFirstCategory: z.string().min(1, "Prefered category is required"),
     preferedSecondCategory: z.string().min(1, "Prefered category is required"),
@@ -83,6 +88,8 @@ export default function NewTouristForm(props) {
       nationality: "", // Default value for nationality
       status: undefined, // Default value for status dropdown
       jobTitle: "", // Default value for job title (new)
+      dob: "", 
+      terms: false,
       dob: "", // Default value for date of birth
       preferedFirstTag: "", // Default value for prefered first tag
       preferedSecondTag: "", // Default value for prefered second tag
@@ -112,6 +119,8 @@ export default function NewTouristForm(props) {
     console.log("Form errors:", form.formState.errors); // Log any validation errors
   }
 
+
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -347,6 +356,31 @@ export default function NewTouristForm(props) {
             )}
           />
         )}
+        {/* Terms and Conditions */}
+        <FormField
+          control={form.control}
+          name="terms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  {...field} 
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Accept terms and conditions</FormLabel>
+                <FormDescription>
+                  You agree to our {" "}
+                  <DialogTerms></DialogTerms>
+                 
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+
 
         {/* First Category Field */}
         <FormField
@@ -496,4 +530,5 @@ export default function NewTouristForm(props) {
       </form>
     </Form>
   );
-}
+};
+
