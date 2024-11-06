@@ -1,8 +1,10 @@
 import TouristProfile from "@/components/forms/TouristProfile";
 import TourGuideProfile from "@/components/forms/TourGuideProfile";
 import AdvertiserProfile from "@/components/forms/AdvertiserProfile";
-import SellerProfile from "@/components/forms/SellerProfile";
+import SellerProfileD from "@/components/forms/SellerProfile";
 import CreateDialog from "@/components/shared/CreateDialog";
+import ChangePassword from "@/components/forms/ChangePassword";
+import RequestAccDelete from"@/components/forms/RequestAccDelete";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +12,15 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
+import DeleteButton from "@/components/shared/DeleteButton";
 export default function MyProfilePage() {
-  const usertype = "tourist"; // This value will determine which component to render
+  const usertype = "Tourist"; // This value will determine which component to render
   const { toast } = useToast();
 
-  const isTourGuide = usertype === "tour_guide";
-  const isAdvertiser = usertype === "advertiser";
-  const isSeller = usertype === "seller";
-  const isTourist = usertype === "tourist";
+  const isTourGuide = usertype === "Tour Guide";
+  const isAdvertiser = usertype === "Advertiser";
+  const isSeller = usertype === "Seller";
+  const isTourist = usertype === "T ourist";
   console.log(isTourist);
   const [profile, setProfile] = useState();
   const endpoint = "tourist";
@@ -129,8 +132,12 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
+
           </CardContent>
         </Card>
+
+        
       );
     }
     return null;
@@ -227,6 +234,8 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
+
           </CardContent>
         </Card>
       );
@@ -270,10 +279,10 @@ export default function MyProfilePage() {
               <p className="text-sm text-muted-foreground">{username}</p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Edit profile action Buttons */}
             <div className="flex space-x-2">
               <CreateDialog
-                form={
+                form={ 
                   <SellerProfileDialog
                     profile={profile}
                     onRefresh={fetchProfile}
@@ -281,6 +290,8 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
+
           </CardContent>
         </Card>
       );
@@ -367,7 +378,7 @@ export default function MyProfilePage() {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Edit profile action Button */}
             <div className="flex space-x-2">
               <CreateDialog
                 form={
@@ -375,11 +386,38 @@ export default function MyProfilePage() {
                 }
               />
             </div>
-          </CardContent>
-        </Card>
+
+{renderDeleteAccountChangePassword()}
+
+</CardContent>
+      </Card>
+
+
+    
+
       );
     }
   }
+
+function renderDeleteAccountChangePassword() {
+  return (
+    <div>
+      {/* Edit password action Button */}
+      <div className="flex space-x-2">
+        <CreateDialog
+          changePassword
+          form={<ChangePassword profile={profile} userType={usertype} onRefresh={fetchProfile} />}
+        />
+      </div>
+
+      {/* Request account to be deleted action Button */}
+      <div className="flex space-x-2">
+        <RequestAccDelete onRefresh={fetchProfile} userId={userId} userType={usertype} />
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <div>
@@ -387,6 +425,7 @@ export default function MyProfilePage() {
       {isAdvertiser && <div>{profile && <AdvCard />}</div>}
       {isSeller && <div>{profile && <SellerCard />}</div>}
       {isTourist && <div>{profile && <TouristCard />}</div>}
+
     </div>
   );
 }
