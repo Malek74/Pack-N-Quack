@@ -17,6 +17,7 @@ import advertisers from './routes/advertisers.js';
 import activity from './routes/activity.js';
 import activityCategory from './routes/activityCategory.js';
 import activityTag from './routes/activityTag.js';
+import complaint from './routes/complaint.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
@@ -100,4 +101,4 @@ app.use('/api/trasaction', purchaseRoute);
 
 // app.post ('api/upload',upload.single('file'),(req,res)=>{
 //     res.json(req.file);
-// })
+// })app.use('/api/complaints',complaint)

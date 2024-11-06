@@ -655,3 +655,40 @@ export const Flagg = async (req, res) => {
         console.log(error);
     }
 };
+
+
+export const rateIternary = async (req, res) => {
+    const {touristId, rating, comment} = req.body;
+    const itineraryId = req.params.id;
+    if (!itineraryId) {
+        return res.status(400).json({ message: "Itinerary ID is required." });
+    }
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required." });
+    }
+    if (!rating) {
+        return res.status(400).json({ message: "Rating is required." });
+    }
+
+    try{
+        const itinerary = await Itinerary.findById(itineraryId);
+        
+        if(!itinerary){
+            return res.status(404).json({ message: "Itinerary not found." });
+        }
+
+        let averageRating = itinerary.ratings.averageRating;
+        let noOfReviews = itinerary.ratings.reviews.length;
+        averageRating += (rating) / (noOfReviews + 1);
+        const review = {touristId, rating, comment};
+
+        await Itinerary.findByIdAndUpdate(itineraryId,{$push :{"ratings.reviews": review}});
+        const newItinerary = await Itinerary.findByIdAndUpdate(itineraryId, {"ratings.averageRating": averageRating});
+        return res.status(200).json(newItinerary);
+    }
+    catch(error){
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+

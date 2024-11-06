@@ -100,4 +100,20 @@ export const deleteSeller = async (req, res) => {
     }
 }
 
-
+export const acceptTerms = async (req, res) => {
+    const sellerId = req.params.id;
+    if (!sellerId) {
+        return res.status(400).json({ message: "Seller ID is required." });
+    }
+    try{
+        const updatedSeller = await seller.findById(sellerId);
+        if(!updatedSeller){
+            return res.status(404).json({ message: "Seller not found." });
+        }
+        const newSeller = await seller.findByIdAndUpdate(sellerId, {hasAcceptedTerms: true},{new: true})
+        return res.status(200).json(newSeller);
+    }
+    catch(error){
+        return res.status(404).json({ message: error.message });
+    }
+}

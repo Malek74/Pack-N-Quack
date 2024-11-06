@@ -1,5 +1,5 @@
 import express from "express";
-import { addItinerary, deleteItinerary, getMaxPrice, getItinerary, updateItinerary, getMyItineraries, getItineraryById, addActivity, getAllLanguages, Flagg  } from "../controllers/itineraryController.js";
+import { addItinerary, deleteItinerary, getMaxPrice, getItinerary, updateItinerary, getMyItineraries, getItineraryById, addActivity, getAllLanguages, Flagg , rateIternary} from "../controllers/itineraryController.js";
 
 const router = express.Router();
 
@@ -14,5 +14,6 @@ router.get("/languages", getAllLanguages);
 router.put("/:id", Flagg);
 //router.put('/:id', ItineraryActivation);
 router.post("/addActivity/:id", addActivity);
+router.post("/rate/:id", rateIternary); 
 export default router;
 

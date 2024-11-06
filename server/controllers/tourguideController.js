@@ -107,36 +107,60 @@ export const editTourGuide = async (req, res) => {
     }
 };
 
-// export const TourGuideUploadDocuments = async (req, res) => {
-//     const tgID = req.params.id; 
-//     console.log(tgID);
-//     try {
-//         const docs = []; // Array to store document IDs
+export const rateTourGuide = async (req, res) => {
+    const {touristId, rating, comment} = req.body;
+    const tourGuideId = req.params.id;
+    if (!tourGuideId) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required." });
+    }
+    if (!rating) {
+        return res.status(400).json({ message: "Rating is required." });
+    }
 
-//         // Loop through the files and create entries in the database
-//         for (const file of req.files) {
-//             const doc = new Document({
-             
-//                     filename: file.originalname,
-//                     path: savedFilePath, 
-                
-//             });
-//             consol.log(filename);
-//             const savedDoc = await doc.save(); 
-//             docs.push(savedDoc._id); 
-//         }
+    try{
+        const ratedTourGuide = await tourGuide.findById(tourGuideId);
+        if (!ratedTourGuide) {
+            return res.status(404).json({ message: "Tour Guide not found." });
+        }
+        let averageRating = ratedTourGuide.ratings.averageRating;    
+        let noOfReviews = ratedTourGuide.ratings.reviews.length; 
+        averageRating += (rating) / (noOfReviews + 1);
+        const review = {
+            touristId: touristId,
+            rating: rating,
+            comment: comment,
+        }
+        await tourGuide.findByIdAndUpdate(tourGuideId, { $push: { 'ratings.reviews': review } });
+        const newTourGuide = await tourGuide.findByIdAndUpdate(tourGuideId, { 'ratings.averageRating': averageRating });
+        return res.status(200).json(newTourGuide);
+    }
+    catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+};
 
-//         // Update the TourGuide with the new documents
-//         await TourGuide.findByIdAndUpdate(
-//             tgID,
-//             { $push: { documents: { $each: docs } } }, // Push new documents into the array
-//            // { new: true, upsert: true } // Use upsert: true to create a new document if it doesn't exist
-//            { new: true }
-//         );
+export const acceptTerms = async (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
 
-//         res.status(200).json({ message: 'Files uploaded successfully', docs });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error uploading files', error });
-//     }
-// };
+    try {
+        const updatedTourGuide = await tourGuide.findById(id);
+        if (!updatedTourGuide) {
+            return res.status(404).json({ message: "Tour Guide not found." });
+        }
+      
+        const newTourGuide = await tourGuide.findByIdAndUpdate(id, { hasAcceptedTerms: true }, { new: true });
+
+        return res.status(200).json(newTourGuide);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+
 

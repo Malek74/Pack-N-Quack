@@ -93,3 +93,21 @@ export const getAdvertiserActivities = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const acceptTerms = async (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({ message: "Advertiser ID is required." });
+    }
+    try{
+        const advertiser = await advertiserModel.findById(id);
+        if(!advertiser){
+            return res.status(404).json({ message: "Advertiser not found." });
+        }
+        const newAdvertiser = await advertiserModel.findByIdAndUpdate(id,{hasAcceptedTerms: true}, {new: true})
+        return res.status(200).json(newAdvertiser);
+    }
+    catch(error){
+        return res.status(404).json({ message: error.message });
+    }
+}

@@ -31,6 +31,10 @@ const sellerSchema = new Schema({
         }
         ]
     }
+    hasAcceptedTerms: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const seller = model("Seller", sellerSchema);
