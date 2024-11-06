@@ -380,7 +380,6 @@ export const filterAndSortActivities = async (req, res) => {
 
     try {
         let activities;
-
         // Sort and fetch activities based on specified criteria
         if (sortPrice || sortRating) {
             const sortOptions = {};
@@ -408,6 +407,7 @@ export const filterAndSortActivities = async (req, res) => {
         activities = activities.filter(activity => !activity.flagged);
         activities = activities.map(activity => {
             activity.price = activity.price * conversionRate;
+            return activity;
         });
         console.log("Filtered and sorted activities:", activities);
         return res.status(200).json(activities);

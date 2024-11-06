@@ -328,7 +328,7 @@ export const getProducts = async (req, res) => {
     const minPrice = req.query.minPrice;
     const sortBy = req.query.sortBy;
     const order = req.query.order;
-    const prefCurrency = req.query.prefCurrency;
+    const prefCurrency = req.query.currency;
     console.log('Pref Currency:', prefCurrency);
     const isArchived = req.query.isArchived;
     console.log('Is Archived:', isArchived);
@@ -337,6 +337,9 @@ export const getProducts = async (req, res) => {
     let sortOptions = {};
 
     try {
+
+        const conversionRate = await getConversionRate(prefCurrency || 'USD');
+
         // Build query based on input parameters
         if (minPrice || maxPrice) {
             query.price = {};
@@ -347,9 +350,9 @@ export const getProducts = async (req, res) => {
                 query.price.$gte = 0;
             }
             if (maxPrice) {
-                query.price.$lte = parseInt(maxPrice);
+                query.price.$lte = parseInt(maxPrice / conversionRate);
             } else {
-                query.price.$lte = Number.MAX_SAFE_INTEGER;
+                query.price.$lte = Number.MAX_SAFE_INTEGER / conversionRate;
             }
         }
 
@@ -372,7 +375,6 @@ export const getProducts = async (req, res) => {
         console.log('Sort Options:', sortOptions);
 
         // Assume conversionRate is fetched from an API beforehand
-        const conversionRate = await getConversionRate(baseCurrency);
         console.log('Conversion Rate:', conversionRate);
         const products = await product.find(query).sort(sortOptions).populate('seller_id');
 
@@ -382,7 +384,6 @@ export const getProducts = async (req, res) => {
             return product;
         })
 
-        console.log('Converted Products:', convertedProducts);
 
 
         return res.json(convertedProducts);

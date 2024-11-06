@@ -109,7 +109,7 @@ export const cancelBooking = async function (req, res) {
 
 
         //refund money
-        const refundAmount = paymentSession.amount_total / 100;
+        const refundAmount = event.price;
         const newWallet = tourist.wallet + refundAmount;
         await Tourist.findByIdAndUpdate(touristID, { wallet: newWallet });
 
