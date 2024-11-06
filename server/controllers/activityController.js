@@ -157,13 +157,13 @@ export const getUpcomingActivities = async (req, res) => {
 // @Body { touristID, review, rating }
 export const postReview = async (req, res) => {
     const id = req.params.id;
-    const { touristID, review, rating } = req.body;
+    const { touristID, comment, rating } = req.body;
     try {
         const activity = await activityModel.findById(id);
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
         }
-        activity.ratings.reviews.push({ touristID, review, rating });
+        activity.ratings.reviews.push({ touristID, comment, rating });
         const reviews = activity.ratings.reviews;
         let totalRating = 0;
         for (let i = 0; i < reviews.length; i++) {

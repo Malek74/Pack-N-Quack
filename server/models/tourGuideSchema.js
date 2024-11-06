@@ -37,7 +37,41 @@ const tourGuideSchema = new Schema({
         },
 
     },
+    ratings: {
+        averageRating: {
+            type: Number,
+            default: 0, // Default to 0 for activities with no ratings
+            min: 0,
+            max: 5
+        },
+        reviews: [{
+            touristId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Tourist', // Reference to the User model
+                required: true
+            },
+            rating: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            },
+            comment: {
+                type: String,
+                required: false,
+                default: null
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }]
+    },
     isAccepted: {
+        type: Boolean,
+        default: false
+    },
+    hasAcceptedTerms: {
         type: Boolean,
         default: false
     },

@@ -75,9 +75,9 @@ const itinerarySchema = new mongoose.Schema({
             max: 5
         },
         reviews: [{
-            userID: {
+            touristId: {
                 type: Schema.Types.ObjectId,
-                ref: 'User', // Reference to the User model
+                ref: 'Tourist', // Reference to the User model
                 required: true
             },
             rating: {
@@ -86,9 +86,10 @@ const itinerarySchema = new mongoose.Schema({
                 min: 1,
                 max: 5
             },
-            review: {
+            comment: {
                 type: String,
-                default: '' // Optional text review
+                required: false,
+                default: ''
             },
             date: {
                 type: Date,
@@ -96,7 +97,6 @@ const itinerarySchema = new mongoose.Schema({
             }
         }]
     },
-
     price: {
         type: Number,
         required: true

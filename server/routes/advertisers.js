@@ -1,5 +1,5 @@
 import express from "express";
-import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities } from "../controllers/advertisersController.js";
+import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities, acceptTerms } from "../controllers/advertisersController.js";
 
 const router = express.Router();
 
@@ -14,5 +14,7 @@ router.delete("/delete/:id", deleteAdvertiser);
 router.put("/update/:id", updateAdvertiser);
 
 router.get("/activities/:id", getAdvertiserActivities);
+
+router.put("/terms/:id", acceptTerms);
 
 export default router;

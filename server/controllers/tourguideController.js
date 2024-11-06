@@ -106,3 +106,60 @@ export const editTourGuide = async (req, res) => {
     }
 };
 
+export const rateTourGuide = async (req, res) => {
+    const {touristId, rating, comment} = req.body;
+    const tourGuideId = req.params.id;
+    if (!tourGuideId) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required." });
+    }
+    if (!rating) {
+        return res.status(400).json({ message: "Rating is required." });
+    }
+
+    try{
+        const ratedTourGuide = await tourGuide.findById(tourGuideId);
+        if (!ratedTourGuide) {
+            return res.status(404).json({ message: "Tour Guide not found." });
+        }
+        let averageRating = ratedTourGuide.ratings.averageRating;    
+        let noOfReviews = ratedTourGuide.ratings.reviews.length; 
+        averageRating += (rating) / (noOfReviews + 1);
+        const review = {
+            touristId: touristId,
+            rating: rating,
+            comment: comment,
+        }
+        await tourGuide.findByIdAndUpdate(tourGuideId, { $push: { 'ratings.reviews': review } });
+        const newTourGuide = await tourGuide.findByIdAndUpdate(tourGuideId, { 'ratings.averageRating': averageRating });
+        return res.status(200).json(newTourGuide);
+    }
+    catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+};
+
+export const acceptTerms = async (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+
+    try {
+        const updatedTourGuide = await tourGuide.findById(id);
+        if (!updatedTourGuide) {
+            return res.status(404).json({ message: "Tour Guide not found." });
+        }
+      
+        const newTourGuide = await tourGuide.findByIdAndUpdate(id, { hasAcceptedTerms: true }, { new: true });
+
+        return res.status(200).json(newTourGuide);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+
+

@@ -38,6 +38,10 @@ const advertiserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    hasAcceptedTerms: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const advertiserModel = model("Advertiser", advertiserSchema);
