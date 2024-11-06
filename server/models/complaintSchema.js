@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose"
 
 const complaintSchema = new Schema({
-    issuer: {
+    issuerID: {
         type: Schema.Types.ObjectId,
         ref: "Tourist",
         required: true
@@ -19,11 +19,11 @@ const complaintSchema = new Schema({
         enum: ["pending","resolved"],
         default: "pending",
         required: true
-    },
+    },  
     reply: {
-        type: String,
+        type: [String],
         required: false,
-        default: null
+        default: []
     },
     date: {
         type: Date,

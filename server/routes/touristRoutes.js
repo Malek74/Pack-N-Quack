@@ -6,6 +6,7 @@ import {
     getTourists,
     deleteTourist
 } from '../controllers/touristController.js';
+import { createComplaint, viewMyComplaints } from '../controllers/complaintController.js';
 
 
 const router = express.Router();
@@ -15,5 +16,7 @@ router.get('/:id', getTourist); // Read
 router.put('/:id', updateTourist); // Update 
 router.get('/', getTourists)
 router.delete('/:id', deleteTourist);
+router.get('/complaints/:id', viewMyComplaints);
+router.post('/complaints', createComplaint);
 
 export default router;
