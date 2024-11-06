@@ -76,6 +76,7 @@ export default function Activities() {
                     });
                 console.log(response.data);
                 setActivities(response.data);
+                console.log(response.data);
                 console.log(selectedRange);
 
                 console.log(selectedFilters["Sort By"]);
@@ -189,7 +190,8 @@ export default function Activities() {
             <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10" >
 
                 {activities.map((activity) => (<ActivityCard
-                    key={activity.activityID}
+                    key={activity._id}
+                    id={activity._id}
                     img={activity.coverImagePath}
                     name={activity.name}
                     category={activity.categoryID.name}

@@ -14,6 +14,7 @@ const ItineraryCard = (props) => {
         {" "}
         {/* Left side for text, taking 50% width */}
         <h1 className="text-xl font-bold mb-4">{props.title}</h1>
+        <h1 className="text-xl font-bold mb-4">{props.id}</h1>
         <p className="text-gray-500 text-sm mb-5">{props.description}</p>
         <ul className="list-disc mb-4">
           <li className="flex items-center">
