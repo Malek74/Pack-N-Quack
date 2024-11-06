@@ -3,9 +3,11 @@ import { Trash2 } from "lucide-react";
 import { EditProductDialog } from "../editButtonsWillBeReusedLater/EditProduct";
 import { Rating } from "../shared/Rating";
 import DeleteButton from "../shared/DeleteButton";
+import { useUser } from "@/context/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 export default function ProductCard(props) {
+  const { prefCurrency } = useUser();
   const { toast } = useToast();
   const isSeller = props.userType === "seller" ? true : false;
   const deleteClicked = (id) => {
@@ -73,7 +75,8 @@ export default function ProductCard(props) {
         <h4 className="text-base line-clamp-2">{props.description}</h4>
         <h4 className="flex">
           <span className="text-xl text-[#71BCD6] drop-shadow mr-auto">
-            {props.price} EGP
+            {prefCurrency}
+            {props.price}
           </span>
         </h4>
       </div>

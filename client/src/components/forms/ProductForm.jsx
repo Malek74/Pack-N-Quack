@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,10 +20,11 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import ImageUploader from "../shared/ImageUploader";
 
 export default function ProductForm({ onRefresh, adderId }) {
-  const { toast } = useToast();
-  const [imagesUploaded, setImagesUploaded] = useState([]);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false); // Track submission status
 
-  // Define schema for validation
+  const { toast } = useToast();
+
+  // Define schema for validation, including images as an array
   const productFormSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
     price: z.coerce
@@ -34,6 +36,9 @@ export default function ProductForm({ onRefresh, adderId }) {
     description: z
       .string()
       .min(10, { message: "Description must be at least 10 characters." }),
+    images: z
+      .array(z.instanceof(File))
+      .min(1, { message: "At least one image is required." }), // Add validation for images
   });
 
   // Initialize form
@@ -44,6 +49,7 @@ export default function ProductForm({ onRefresh, adderId }) {
       price: "",
       quantity: "",
       description: "",
+      images: [], // Add default empty array for images
     },
   });
 
@@ -51,27 +57,30 @@ export default function ProductForm({ onRefresh, adderId }) {
   async function onSubmit(values) {
     const formData = new FormData();
     formData.append("name", values.name);
-    formData.append("price", values.price);
-    formData.append("available_quantity", values.quantity);
+    formData.append("price", values.price.toString()); // Ensure price is a string
+    formData.append("available_quantity", values.quantity.toString()); // Ensure quantity is a string
     formData.append("description", values.description);
-    formData.append("id", adderId);
-
-    imagesUploaded.forEach((image, index) => {
-      formData.append(`images[${index}]`, image); // Append each image
+    values.images.forEach((image) => {
+      formData.append(`images`, image); // Append each image from form data
     });
 
     try {
-      const response = await axios.post("/api/products/", formData, {
+      const response = await axios.post(`/api/products/${adderId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      setSubmissionSuccess(true); // Set success to true
+
       toast({
         title: "Product created successfully!",
       });
       onRefresh();
-      setImagesUploaded([]);
+
+      form.reset();
     } catch (error) {
+      setSubmissionSuccess(false); // Ensure it doesn’t close on error
+
       toast({
         variant: "destructive",
         title: "Product could not be created",
@@ -111,6 +120,9 @@ export default function ProductForm({ onRefresh, adderId }) {
               <FormControl>
                 <Input placeholder="Enter the price" type="number" {...field} />
               </FormControl>
+              <FormDescription>
+                Price in <strong>USD</strong>.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -150,18 +162,36 @@ export default function ProductForm({ onRefresh, adderId }) {
           )}
         />
 
-        {/* Image Uploader */}
-        <ImageUploader
-          imagesUploaded={imagesUploaded}
-          setImagesUploaded={setImagesUploaded}
-          shouldHandleSave={false} // Set to true if you want to save immediately
+        {/* Image Uploader Field */}
+        <Controller
+          control={form.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Images</FormLabel>
+              <FormControl>
+                <ImageUploader
+                  imagesUploaded={field.value}
+                  setImagesUploaded={(images) => field.onChange(images)}
+                  shouldHandleSave={false}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
-        <DialogClose className="place-self-end">
+        {submissionSuccess ? (
+          <DialogClose asChild>
+            <Button className="place-self-end" type="submit">
+              Submit
+            </Button>
+          </DialogClose>
+        ) : (
           <Button className="place-self-end" type="submit">
             Submit
           </Button>
-        </DialogClose>
+        )}
       </form>
     </Form>
   );

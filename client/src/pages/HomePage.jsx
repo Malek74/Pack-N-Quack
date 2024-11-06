@@ -6,7 +6,7 @@ import Banner from "../components/shared/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
-
+import { ShareButton } from "@/components/shared/ShareButton";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -124,23 +124,7 @@ export default function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product, index) => (
-            <ProductCard
-              key={index}
-              img={product.img}
-              alt={product.name}
-              name={product.name}
-              seller={product.seller}
-              rating={product.rating}
-              reviewsCount={product.reviewsCount}
-              price={product.price}
-              description={product.description}
-            />
-          ))
-        ) : (
-          <p>No products found</p>
-        )}
+        <ShareButton />
       </div>
     </div>
   );

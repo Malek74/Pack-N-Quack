@@ -185,7 +185,7 @@ export default function ImageUploader({
                     </div>
                   </CarouselItem>
                 ))}
-              </CarouselContent>
+              </CarouselContent >
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
