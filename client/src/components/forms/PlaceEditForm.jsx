@@ -26,10 +26,10 @@ import axios from "axios"
 import { useState } from "react"
 // import Multiselect from "multiselect-react-dropdown"
 import { Pencil } from "lucide-react"
-import EditOpeningHours from "../EditOpeningHours"
-import TicketPriceEditor from "../TicketPriceEditor"
+import EditOpeningHours from "../editButtonsWillBeReusedLater/EditOpeningHours"
+import TicketPriceEditor from "../historicalPage/TicketPriceEditor"
 import { Label } from "../ui/label"
-import EditTag from "../SelectTag"
+import EditTag from "../historicalPage/SelectTag"
 
 export default function PlaceEditForm(props) {
 

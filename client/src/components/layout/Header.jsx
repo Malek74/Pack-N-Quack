@@ -2,8 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
-import logo from "@/images/logo.png";
-
+import logo from "/assets/icons/logo.png";
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
 

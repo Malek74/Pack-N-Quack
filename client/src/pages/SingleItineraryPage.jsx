@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import ItineraryCard from "./components/ItineraryCardDetails";
-import TempActivityCard from "./components/TempActivityCard";
-import Banner from "@/components/Banner";
-import lege from "../images/lege-cy.jpg";
-import memo from "../images/memo.png";
-import amy from "../images/amy.jpeg";
-import duckie from "../assets/duckiePool.jpg";
+import ItineraryCard from "../components/itinerariesPage/ItineraryCardDetails";
+import TempActivityCard from "../components/itinerariesPage/TempActivityCard";
+import amy from "/assets/images/Amy.jpeg";
+import duckie from "/assets/images/duckiePool.jpg";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";

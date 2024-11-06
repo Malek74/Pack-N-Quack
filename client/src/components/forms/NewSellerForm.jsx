@@ -37,8 +37,8 @@ import {
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/PhoneInput";
-import { SampleDatePicker } from "@/components/datepicker";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { SampleDatePicker } from "@/components/shared/datepicker";
 
 export default function NewSellerForm(props) {
   const formSchema2 = z.object({
