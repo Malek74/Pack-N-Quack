@@ -57,6 +57,10 @@ const itinerarySchema = new mongoose.Schema({
             description: {
                 type: String,
                 default: ''
+            },
+            image: {
+                type: String,
+                required: true
             }
         }],
     }],
@@ -124,6 +128,14 @@ const itinerarySchema = new mongoose.Schema({
     },
     stripeID: {
         type: String,
+        required: true
+    },
+    coverImage: {
+        type: String,
+        required: true
+    },
+    images: {
+        type: [String],
         required: true
     },
 
