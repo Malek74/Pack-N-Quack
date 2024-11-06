@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 // import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { CheckIcon } from "lucide-react";
+import axios from "axios";
 
 import {
   Command,
@@ -44,6 +45,8 @@ import DialogTerms from "../shared/DialogTerms";
 
 export default function NewTouristForm(props) {
   const [status, setStatus] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const formSchema = z.object({
     name: z
       .string()
@@ -67,7 +70,10 @@ export default function NewTouristForm(props) {
       terms: z.boolean().refine((value) => value === true, {
         message: "You must accept terms and conditions.",
       }), 
-  
+      preferedFirstTag: z.string().min(1, "Prefered tag is required"),
+    preferedSecondTag: z.string().min(1, "Prefered tag is required"),
+    preferedFirstCategory: z.string().min(1, "Prefered category is required"),
+    preferedSecondCategory: z.string().min(1, "Prefered category is required"),
   });
 
   // 1.1 Define your form for tourist signup.
@@ -84,9 +90,27 @@ export default function NewTouristForm(props) {
       jobTitle: "", // Default value for job title (new)
       dob: "", 
       terms: false,
-
+      dob: "", // Default value for date of birth
+      preferedFirstTag: "", // Default value for prefered first tag
+      preferedSecondTag: "", // Default value for prefered second tag
+      preferedFirstCategory: "", // Default value for prefered first category
+      preferedSecondCategory: "", // Default value for prefered second category
     },
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedTags = await axios.get("/api/activity/tag");
+        const fetchedCategories = await axios.get("/api/activity/category");
+        setTags(fetchedTags.data);
+        setCategories(fetchedCategories.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }; fetchData();
+  }, []);
+
 
   // 2.1 Define a submit handler for the Tourist form.
   function onSubmit(values) {
@@ -214,8 +238,8 @@ export default function NewTouristForm(props) {
                     >
                       {field.value
                         ? nationalities.find(
-                            (nationality) => nationality === field.value
-                          )
+                          (nationality) => nationality === field.value
+                        )
                         : "Select nationality"}
                     </Button>
                   </FormControl>
@@ -353,6 +377,148 @@ export default function NewTouristForm(props) {
                  
                 </FormDescription>
               </div>
+            </FormItem>
+          )}
+        />
+
+
+        {/* First Category Field */}
+        <FormField
+          control={form.control}
+          name="preferedFirstCategory"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Preferred Category</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? categories.find(
+                          (category) => category === field.value
+                        )
+                        : "Select category"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search category..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No category found.</CommandEmpty>
+                      <CommandGroup>
+                        {categories.map((category) => (
+                          <CommandItem
+                            value={category}
+                            key={category}
+                            onSelect={() => {
+                              // Update the nationality field immediately
+                              form.setValue("category", category, {
+                                shouldValidate: true,
+                              });
+
+                              // Trigger validation on the nationality field to update it instantly
+                              form.trigger("category");
+                            }}
+                          >
+                            {category}
+                            <CheckIcon
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                category === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Second Category Field */}
+        <FormField
+          control={form.control}
+          name="preferedSecondCategory"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? categories.find(
+                          (category) => category === field.value
+                        )
+                        : "Select category"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search category..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No category found.</CommandEmpty>
+                      <CommandGroup>
+                        {categories.map((category) => (
+                          <CommandItem
+                            value={category}
+                            key={category}
+                            onSelect={() => {
+                              // Update the nationality field immediately
+                              form.setValue("category", category, {
+                                shouldValidate: true,
+                              });
+
+                              // Trigger validation on the nationality field to update it instantly
+                              form.trigger("category");
+                            }}
+                          >
+                            {category}
+                            <CheckIcon
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                category === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
             </FormItem>
           )}
         />

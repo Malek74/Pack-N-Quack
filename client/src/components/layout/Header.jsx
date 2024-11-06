@@ -4,6 +4,9 @@ import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import DropDownMenuProfile from "./components/DropDownMenuProfile";
 import logo from "/assets/icons/logo.png";
+
+import ComboboxCurrency from "./components/ComboboxCurrency";
+
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
 
@@ -124,6 +127,7 @@ export default function Header() {
 
         {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
+          <ComboboxCurrency />
           <Button asChild variant="ghost">
             <li>
               <Link to="/login">Log in</Link>
