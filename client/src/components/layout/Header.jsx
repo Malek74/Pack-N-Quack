@@ -84,7 +84,7 @@ export default function Header() {
                   : ""
               }
             >
-              <DropDownMenuComponent location={location} />
+              <DropDownMenuProfile location={location} />
             </li>
           </Button>
 
