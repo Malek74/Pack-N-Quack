@@ -284,9 +284,14 @@ export const getMyPlaces = async (req, res) => {
         const places = await Places.find({ touristGovenorID: tgID }).populate('tags');
         console.log(places)
 
+        //
         for (let i = 0; i < places.length; i++) {
             for (let j = 0; j < places[i].tickets.length; j++) {
-                places[i].tickets[j].price = places[i].tickets[j].price * conversionRate;
+                //check if price is not null
+                if (places[i].tickets[j].price !== null) {
+                    places[i].tickets[j].price = places[i].tickets[j].price * conversionRate;
+
+                }
             }
         }
         return res.status(200).json(places);

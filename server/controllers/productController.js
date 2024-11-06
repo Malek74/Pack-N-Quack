@@ -3,7 +3,6 @@ import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import Stripe from "stripe";
 import { convertPrice, getConversionRate } from "../utils/Helpers.js";
-
 //get product by ID
 export const getProductByID = async (req, res) => {
     const { id } = req.params;
@@ -30,7 +29,7 @@ export const createProduct = async (req, res) => {
 
     const userID = req.body.id;
     console.log("SellerID: " + userID);
-    const { name, price, description, available_quantity } = req.body;
+    const { name, price, description, available_quantity, } = req.body;
     if (!name || !price || !description || !available_quantity) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
@@ -49,25 +48,58 @@ export const createProduct = async (req, res) => {
     const isAdmin = await adminModel.findById(userID);
     const isSeller = await seller.findById(userID);
 
+    const imagesUrls = [];
 
-    if (!isAdmin) {
+    // Upload each image to Cloudinary
+    for (const file of req.files.uploadImages) { // Access files using 'uploadImages'
         try {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
 
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id }));
-            return res.status(200).json(newproduct);
-        } catch (error) {
-            return res.status(400).json({ error: error.message });
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Cloudinary upload error:", error);
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url)
         }
-    }
-    else {
-        try {
-            console.log("Admin Product");
+        catch (error) {
+            console.error("Error during image upload to Cloudinary:", error);
+            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+        }
 
-            const sellerUsername = await seller.findById(userID).username;
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id }));
-            return res.status(200).json(newproduct);
-        } catch (error) {
-            return res.status(400).json({ error: error.message });
+        if (!isAdmin) {
+            try {
+
+                const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id, picture: imagesUrls }));
+                return res.status(200).json(newproduct);
+            } catch (error) {
+                return res.status(400).json({ error: error.message });
+            }
+        }
+        else {
+            try {
+                console.log("Admin Product");
+                const sellerUsername = await seller.findById(userID).username;
+                const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
+                return res.status(200).json(newproduct);
+            } catch (error) {
+                return res.status(400).json({ error: error.message });
+            }
         }
     }
 }
@@ -80,6 +112,40 @@ export const editProduct = async (req, res) => {
     }
     try {
         const productEdited = await product.findById(id);
+        if (!productEdited) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        let imagesUrls = [];
+        try {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Cloudinary upload error:", error);
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url)
+        }
+        catch (error) {
+            console.error("Error during image upload to Cloudinary:", error);
+            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+        }
+
 
         //attempt to update product on stripe
         try {
@@ -102,8 +168,14 @@ export const editProduct = async (req, res) => {
             console.log(error);
         }
 
-        const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
-        console.log(newproduct)
+        if (imagesUrls.length == 0) {
+            const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
+        }
+        else {
+            const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls }, { new: true }).populate('seller_id');
+        }
+
+
         return res.status(200).json(newproduct);
     } catch (error) {
         return res.status(400).json({ error: error.message });
@@ -201,7 +273,6 @@ export const getMaxPrice = async (req, res) => {
         // Fetch the max price of all unarchived products
 
         const result = await product.aggregate([
-            /*{ $match: { archived: false } }*/,
             { $group: { _id: null, maxPrice: { $max: "$price" } } }
         ]);
         if (result.length === 0) {
@@ -254,6 +325,7 @@ export const getProducts = async (req, res) => {
     const prefCurrency = req.query.prefCurrency;
     console.log('Pref Currency:', prefCurrency);
     const isArchived = req.query.isArchived;
+    console.log('Is Archived:', isArchived);
 
     let query = {}; // Create an object to build your query
     let sortOptions = {};
@@ -278,9 +350,11 @@ export const getProducts = async (req, res) => {
         if (name) {
             query.name = { $regex: name, $options: 'i' };
         }
-
+        console.log(isArchived);
         if (isArchived) {
-            query.isArchived = Boolean(isArchived);
+            if (isArchived === 'true' || isArchived === 'false') {
+                query.isArchived = isArchived === 'true';
+            }
         }
 
         // Set sorting options if provided
@@ -294,31 +368,16 @@ export const getProducts = async (req, res) => {
         // Assume conversionRate is fetched from an API beforehand
         const conversionRate = await getConversionRate(baseCurrency);
         console.log('Conversion Rate:', conversionRate);
+        const products = await product.find(query).sort(sortOptions).populate('seller_id');
 
-        const convertedProducts = await product.aggregate([
-            { $match: query },  // Filtered documents
-            {
-                $project: {
-                    _id: 1,
-                    name: 1,
-                    description: 1,
-                    seller_id: 1,
-                    price: { $multiply: ["$price", conversionRate || 1] }  // Fallback to original price if conversionRate is missing
-                }
-            },
-            { $sort: sortOptions },
-            {
-                $lookup: {
-                    from: "sellers",
-                    localField: "seller_id",
-                    foreignField: "_id",
-                    as: "seller_info"
-                }
-            },
-            { $unwind: "$seller_info" }
-        ]);
+        // Convert prices to preferred currency
+        const convertedProducts = products.map(product => {
+            product.price *= conversionRate;
+            return product;
+        })
 
         console.log('Converted Products:', convertedProducts);
+
 
         return res.json(convertedProducts);
 

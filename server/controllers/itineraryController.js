@@ -204,12 +204,13 @@ export const getItinerary = async (req, res) => {
     const sortBy = req.query.sortBy;
     const order = req.query.order;
 
+    console.log(req.query);
 
     let query = {};
     let sortOptions = {};
 
     // Only fetch active itineraries
-    query.isActive = true;
+    //query.isActive = true;
     let conversionRate;
 
     try {
@@ -260,7 +261,7 @@ export const getItinerary = async (req, res) => {
 
         // Fetch itineraries with filters and sort options
         let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags');
-
+        console.log(itineraries)
         if (itineraries.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
         }
@@ -280,8 +281,6 @@ export const getItinerary = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
 
 
 

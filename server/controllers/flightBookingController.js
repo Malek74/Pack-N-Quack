@@ -230,39 +230,57 @@ export const confirmFlightPrice = async (req, res) => {
 }
 
 export const bookFlight = async (req, res) => {
-  const { price, numTickets, origin, destination, } = req.body;
+  const { price, numTickets, origin, destination, currency } = req.body;
   const touristID = req.params.id;
+  const conversionRate = await getConversionRate(currency);
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+  const originCity = cities.find(city => city.iata_code === origin).city;
+  const destinationCity = cities.find(city => city.iata_code === destination).city;
+
+  console.log(price, numTickets, originCity, destinationCity);
 
   try {
     //fetch tourist
     const tourist = await Tourist.findById(touristID);
+    console.log(tourist);
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
     //convert price to USD using exchange rate api
-    const conversionRate = await getConversionRate(req.query.currency);
-    const price = price / conversionRate;
+    const priceConverted = parseInt(price * conversionRate);
+
+    console.log(priceConverted);
 
     //create product on stripe
     const productStripe = await stripe.products.create({
-      name: `${origin} to ${destination}`,
+      name: `${originCity} to ${destinationCity}`,
       description: 'Have a quacking flight to ${destination}',
       default_price_data: {
         currency: "usd",
-        unit_amount: price * 100,
+        unit_amount: priceConverted * 100,
       },
     });
+
+    console.log(numTickets.numTickets)
 
     //create checkout session 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price: productStripe.default_price_id,
-          quantity: numTickets,
+          price_data: {
+            currency: "usd",
+            unit_amount: priceConverted * 100,
+            product_data: {
+              name: `${originCity} to ${destinationCity}`,
+              description: `Have a quacking flight to ${destination}`,
+            }
+          },
+          quantity: parseInt(numTickets.numTickets),
         },
       ],
       mode: 'payment',
@@ -270,24 +288,23 @@ export const bookFlight = async (req, res) => {
       cancel_url: 'https://www.amazon.com/',  //todo:add correct link
       metadata: {
         tourist_id: touristID,
-        flightData: {
-          flight: `${origin} to ${destination}`,
-          price: price,
-          departure: origin,
-          arrival: destination,
-          type: "flight"
-        }
-
+        flight: `${origin} to ${destination}`,
+        price: price,
+        departure: origin,
+        arrival: destination,
+        type: "flight"
       }
     });
 
+    console.log(session.url);
+    res.redirect(303, session.url);
 
 
   } catch (error) {
-
+    console.log(error);
+    res.status(500).json({ message: "Error booking flight", error: error.message });
   }
 }
-
 
 export const getMyFlights = async (req, res) => {
   const touristID = req.params.id;

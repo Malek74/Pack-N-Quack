@@ -16,8 +16,4 @@ cloudinary.config({
 });
 
 // Route to handle PDF upload
-app.post('/upload-pdf', upload.single('pdf'), (req, res) => {
-  const pdfPath = req.file.path;  // Get the file path
 
-  // Upload PDF to Cloudinary
-  cloudinary.uploader.upload(pdfPath

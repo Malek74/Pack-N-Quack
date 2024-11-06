@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('bookEvent/:id', bookEvent);
 router.post("/cancelBooking/:id", cancelBooking);
 router.put("/flagg", flaggedEvents);
-router.delete("/delete", requestDeleteAccount);
+router.post("/delete", requestDeleteAccount);
 
 export default router;
 

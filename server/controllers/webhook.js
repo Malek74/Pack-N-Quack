@@ -42,15 +42,15 @@ export const confirmPayment = async (req, res) => {
                 }
                 else if (session.metadata.type = "flight") {
                     //save flight booking to database
-                    const flightData = session.metadata.flightData;
                     const touristId = session.metadata.tourist_id;
+                    console.log(touristId);
 
                     const flightBooking = await AmadeusBooking.create({
                         flightData: {
-                            flight: flightData.flight,
-                            price: flightData.price,
-                            departure: flightData.departure,
-                            arrival: flightData.arrival,
+                            flight: session.metadata.flight,
+                            price: session.metadata.price,
+                            departure: session.metadata.departure,
+                            arrival: session.metadata.arrival,
                         },
                         touristID: touristId,
                         stripeSessionID: session.id
@@ -63,7 +63,7 @@ export const confirmPayment = async (req, res) => {
                 return res.status(404).json({ message: error.message });
             }
             //todo:send an email to the tourist
-            
+
 
 
             break;

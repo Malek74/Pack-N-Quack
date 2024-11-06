@@ -174,7 +174,7 @@ export const requestDeleteAccount = async (req, res) => {
     const { userId, userType } = req.body;
 
     let userModel;
-
+    console.log(req.body);
 
     switch (userType) {
         case 'Advertiser':
