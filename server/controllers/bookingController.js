@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
 import { addLoyaltyPoints, refundMoney } from "../utils/Helpers.js";
 import Booking from "../models/bookingsSchema.js";
+import e from "express";
 
 
 export const bookEvent = async (req, res) => {
@@ -106,8 +107,7 @@ export const cancelBooking = async function (req, res) {
 
 
         //refund money
-        const refundAmount = paymentSession.amount_total / 100;
-        const newWallet = tourist.wallet + refundAmount;
+        const newWallet = tourist.wallet + event.price;
         await Tourist.findByIdAndUpdate(touristID, { wallet: newWallet });
 
         //remove entry from bookings
