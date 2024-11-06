@@ -9,6 +9,7 @@ import {
     getMyBookings,
     redeemPoints
 } from '../controllers/touristController.js';
+import { createComplaint, viewMyComplaints } from '../controllers/complaintController.js';
 
 
 const router = express.Router();
@@ -21,5 +22,7 @@ router.delete('/:id', deleteTourist);
 router.get('/myPreferences/:id', getMyprefernces);
 router.get('/myBookings/:id', getMyBookings);
 router.post('/redeemPoints/:id', redeemPoints);
+router.get('/complaints/:id', viewMyComplaints);
+router.post('/complaints', createComplaint);
 
 export default router;
