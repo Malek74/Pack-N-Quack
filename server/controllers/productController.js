@@ -3,6 +3,8 @@ import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import Stripe from "stripe";
 import { convertPrice, getConversionRate } from "../utils/Helpers.js";
+import cloudinary from '../utils/cloudinary.js';
+
 //get product by ID
 export const getProductByID = async (req, res) => {
     const { id } = req.params;
@@ -174,7 +176,6 @@ export const editProduct = async (req, res) => {
         else {
             const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls }, { new: true }).populate('seller_id');
         }
-
 
         return res.status(200).json(newproduct);
     } catch (error) {

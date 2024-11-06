@@ -6,6 +6,7 @@ import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
 import { getConversionRate } from '../utils/Helpers.js';
+import cloudinary from '../utils/cloudinary.js';
 
 
 
@@ -83,6 +84,38 @@ export const addItinerary = async (req, res) => {
                 unit_amount: price * 100,
             },
         });
+
+
+        //add images
+        try {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Cloudinary upload error:", error);
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url)
+        }
+        catch (error) {
+            console.error("Error during image upload to Cloudinary:", error);
+            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+        }
 
 
         const itinerary = new Itinerary({
