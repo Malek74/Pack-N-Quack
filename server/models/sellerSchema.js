@@ -30,7 +30,7 @@ const sellerSchema = new Schema({
             link: String
         }
         ]
-    }
+    },
     hasAcceptedTerms: {
         type: Boolean,
         default: false
