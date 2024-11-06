@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import tourist from "./touristSchema";
+import tourist from "./touristSchema.js";
 
 
 const amadeusBookingSchema = new Schema({
@@ -33,3 +33,7 @@ const amadeusBookingSchema = new Schema({
     },
 
 })
+
+const AmadeusBooking = model("AmadeusBooking", amadeusBookingSchema);
+
+export default AmadeusBooking;

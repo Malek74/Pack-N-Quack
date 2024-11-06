@@ -20,12 +20,9 @@ import activityTag from './routes/activityTag.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
-import uploadImg from './routes/uploadImg.js';
-import Document from './models/documentSchema.js';
 import  PasswordChangeRequest  from './routes/changePass.js';
 import uploadRoutes from './routes/fileRoutes.js';
 import purchaseRoute from './routes/purchaseRoute.js'
-import bookingRoute from './routes/bookingRoute.js'
 import shareMail from './routes/shareEmail.js';
 import flightBooking from './routes/flightBooking.js';
 import currency from './routes/currency.js';

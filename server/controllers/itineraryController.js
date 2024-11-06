@@ -5,6 +5,7 @@ import tourist from '../models/touristSchema.js';
 import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
+import { getConversionRate } from '../utils/Helpers.js';
 
 
 
@@ -189,8 +190,6 @@ export const addItinerary = async (req, res) => {
 //     }
 // };
 
-
-
 export const getItinerary = async (req, res) => {
 
     const id = req.query.id;
@@ -205,13 +204,19 @@ export const getItinerary = async (req, res) => {
     const sortBy = req.query.sortBy;
     const order = req.query.order;
 
+
     let query = {};
     let sortOptions = {};
 
     // Only fetch active itineraries
     query.isActive = true;
+    let conversionRate;
 
     try {
+        console.log(query);
+        if (req.query.currency) {
+            conversionRate = await getConversionRate(req.query.currency);
+        }
 
         // Build query based on input parameters
         if (name) {
@@ -261,6 +266,14 @@ export const getItinerary = async (req, res) => {
         }
 
         itineraries = itineraries.filter(itinerary => itinerary.isActive === true && itinerary.flagged === false);
+
+        if (conversionRate) {
+
+            itineraries = itineraries.map(itinerary => {
+                itinerary.price = itinerary.price * conversionRate;
+                return itinerary;
+            });
+        }
         return res.status(200).json(itineraries);
 
     } catch (error) {
@@ -279,10 +292,24 @@ export const getMyItineraries = async (req, res) => {
     console.log(id);
 
     try {
+        const conversionRate = await getConversionRate(req.query.currency);
+
         const itinerary = await Itinerary.find({
             tourGuideID: id,
             $or: [{ flagged: false }, { flagged: { $exists: false } }]
         });
+
+        if (!itinerary) {
+            return res.status(404).json({ message: "No active itineraries found" });
+        }
+
+        if (conversionRate) {
+            itinerary = itinerary.map(itinerary => {
+                itinerary.price = itinerary.price * conversionRate;
+                return itinerary;
+            });
+        }
+
         res.status(200).json(itinerary);
     }
     catch (error) {
@@ -408,6 +435,7 @@ export const getItineraryById = async (req, res) => {
     try {
 
         const itinerary = await Itinerary.findById(id).populate("tags");
+        const conversionRate = await getConversionRate(req.query.currency);
 
         if (!itinerary) {
             return res.status(404).json({ message: "Itinerary not found ." });
@@ -416,6 +444,9 @@ export const getItineraryById = async (req, res) => {
             return res.status(404).json({ message: "Itinerary is flagged." });
         }
 
+        if (conversionRate) {
+            itinerary.price = itinerary.price * conversionRate;
+        }
 
         return res.status(200).json(itinerary);
 
@@ -565,8 +596,6 @@ export const addActivity = async (req, res) => {
     }
 }
 
-
-
 export const Flagg = async (req, res) => {
     const itineraryID = req.params.id;
     const flagger = req.body.flagger;
@@ -585,6 +614,7 @@ export const Flagg = async (req, res) => {
             itinerary.flagged = flagger;
             await itinerary.save();
         }
+
 
         res.status(200).json(itinerary);
 

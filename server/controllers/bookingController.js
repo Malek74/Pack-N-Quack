@@ -1,13 +1,10 @@
 import activityModel from "../models/activitySchema.js";
-import Itinerary from "../models/itinerarySchema.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
 import { addLoyaltyPoints, refundMoney } from "../utils/Helpers.js";
 import Booking from "../models/bookingsSchema.js";
-import Booking from "../models/bookingSchema.js";
-import Itinerary from "../models/itinerarySchema.js";
 import Activity from "../models/activitySchema.js";
-import Tourist from "../models/touristSchema.js";
+import Itinerary from "../models/itinerarySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import tourGuide from "../models/tourGuideSchema.js"
 
@@ -53,11 +50,12 @@ export const bookEvent = async (req, res) => {
                 eventID: eventID,
                 eventType: eventType,
                 touristID: touristID,
-                amountByWallet: walletAmount
+                amountByWallet: walletAmount,
+                type: "event"
             }
         });
 
-        
+
         res.redirect(303, session.url);
 
     }

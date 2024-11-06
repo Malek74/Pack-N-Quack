@@ -19,11 +19,7 @@ const bookingSchema = new Schema({
         default: Date.now
 
     },
-    status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'cancelled'],
-        required: true
-    }
+
 }, { timestamps: true });
 
 const Booking = model("Booking", bookingSchema);

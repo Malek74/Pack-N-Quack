@@ -5,7 +5,7 @@ import advertiserModel from "../models/advertiserSchema.js";
 import touristGoverner from "../models/touristGovernorScehma.js";
 import tourist from "../models/touristSchema.js";
 import product from '../models/productSchema.js'
-
+import AWS from 'aws-sdk';
 
 const userModels = {
     seller,
@@ -80,25 +80,29 @@ export const handleImageUpload = async (req, res) => {
 };
 
 export const handleDocumentUpload = async (req, res) => {
-    const { userType, userId, documentsName } = req.body;
+    const { userType, userId, documentNames } = req.body;
     const UserModel = userModels[userType];
+
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
-    console.log(UserModel);
-
+    console.log(req.body);
     //const userExists = await UserModel.exists({ _id: userId });
     const userExists = await UserModel.findById(userId);
-
     if (!userExists) {
         return res.status(404).json({ message: 'User ID does not exist' });
     }
-    console.log(userExists);
+    // console.log(JSON.parse(req.body.documents));
+    console.log(req.files['documents'])
     if (!req.files || !req.files['documents']) {
         return res.status(400).json({ message: 'No documents uploaded.' });
     }
-
     try {
         const documents = [];
         let i = 0;
@@ -124,7 +128,18 @@ export const handleDocumentUpload = async (req, res) => {
                 uploadStream.end(file.buffer);
             });
 
-            documents.push({ name: documentsName[i], url: result.secure_url });
+            const generatePDFUrl =
+                cloudinary.url(result.sec, {
+                    resource_type: 'raw', // Ensures Cloudinary treats it as a file and not an image
+                    format: 'pdf',
+                    secure: true      // Forces the file to be served as PDF format
+                });
+
+
+
+            console.log(generatePDFUrl);
+
+            documents.push({ name: documentNames[i], url: generatePDFUrl });
             i++;
         }
         //console.log(userExists.uploadedFiles);
@@ -132,7 +147,7 @@ export const handleDocumentUpload = async (req, res) => {
         const updatedUser = await UserModel.findByIdAndUpdate(userId, {
             uploadedFiles: {
                 images: userExists.uploadedFiles.images,
-                documents: documentUrls
+                documents: documents,
             }
         }
             , { new: true });
@@ -141,7 +156,7 @@ export const handleDocumentUpload = async (req, res) => {
             return res.status(404).json({ message: 'User not found or update failed' });
         }
 
-        res.status(200).json({ message: 'Documents uploaded successfully', documentUrls });
+        res.status(200).json({ message: 'Documents uploaded successfully', documents });
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ message: 'Server Error' });

@@ -1,7 +1,8 @@
 import Amadeus from 'amadeus';
 import Tourist from '../models/touristSchema.js';
 import Stripe from 'stripe';
-import { convertPrice } from '../utils/Helpers.js';
+import { convertPrice, getConversionRate } from '../utils/Helpers.js';
+import AmadeusBooking from '../models/amadeusBooking.js';
 
 const cities = [
   { "city": "New York", "iata_code": "JFK" },
@@ -69,48 +70,167 @@ export const searchFlight = async (req, res) => {
 //@route POST /api/bookFlight/
 //@desc Confirm flight price
 export const confirmFlightPrice = async (req, res) => {
-  const searchData = req.body.data;
+  const searchData = (req.body.flight);
 
   const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
     clientSecret: process.env.AMADEUS_API_SECRET
   });
-
   try {
-
+    const conversionRate = await getConversionRate(req.query.currency);
     const response = await amadeus.shopping.flightOffers.pricing.post(
       {
         data: {
           type: "flight-offers-pricing",
-          flightOffers: [searchData],
+          flightOffers: [
+            {
+              type: "flight-offer",
+              id: "1",
+              source: "GDS",
+              instantTicketingRequired: false,
+              nonHomogeneous: false,
+              oneWay: false,
+              isUpsellOffer: false,
+              lastTicketingDate: "2024-11-06",
+              lastTicketingDateTime: "2024-11-06",
+              numberOfBookableSeats: 9,
+              itineraries: [
+                {
+                  duration: "PT15H20M",
+                  segments: [
+                    {
+                      departure: {
+                        iataCode: "JFK",
+                        terminal: "1",
+                        at: "2024-11-06T20:00:00",
+                      },
+                      arrival: {
+                        iataCode: "CMN",
+                        terminal: "2",
+                        at: "2024-11-07T08:55:00",
+                      },
+                      carrierCode: "AT",
+                      number: "201",
+                      aircraft: {
+                        code: "789",
+                      },
+                      operating: {
+                        carrierCode: "AT",
+                      },
+                      duration: "PT6H55M",
+                      id: "51",
+                      numberOfStops: 0,
+                      blacklistedInEU: false,
+                    },
+                    {
+                      departure: {
+                        iataCode: "CMN",
+                        terminal: "1",
+                        at: "2024-11-07T12:00:00",
+                      },
+                      arrival: {
+                        iataCode: "CAI",
+                        terminal: "2",
+                        at: "2024-11-07T18:20:00",
+                      },
+                      carrierCode: "AT",
+                      number: "270",
+                      aircraft: {
+                        code: "73H",
+                      },
+                      operating: {
+                        carrierCode: "AT",
+                      },
+                      duration: "PT5H20M",
+                      id: "52",
+                      numberOfStops: 0,
+                      blacklistedInEU: false,
+                    },
+                  ],
+                },
+              ],
+              price: {
+                currency: "EUR",
+                total: "421.61",
+                base: "148.00",
+                fees: [
+                  {
+                    amount: "0.00",
+                    type: "SUPPLIER",
+                  },
+                  {
+                    amount: "0.00",
+                    type: "TICKETING",
+                  },
+                ],
+                grandTotal: "421.61",
+              },
+              pricingOptions: {
+                fareType: ["PUBLISHED"],
+                includedCheckedBagsOnly: true,
+              },
+              validatingAirlineCodes: ["AT"],
+              travelerPricings: [
+                {
+                  travelerId: "1",
+                  fareOption: "STANDARD",
+                  travelerType: "ADULT",
+                  price: {
+                    currency: "EUR",
+                    total: "421.61",
+                    base: "148.00",
+                  },
+                  fareDetailsBySegment: [
+                    {
+                      segmentId: "51",
+                      cabin: "ECONOMY",
+                      fareBasis: "OL0WAAMA",
+                      class: "O",
+                      includedCheckedBags: {
+                        quantity: 2,
+                      },
+                    },
+                    {
+                      segmentId: "52",
+                      cabin: "ECONOMY",
+                      fareBasis: "OL0WAAMA",
+                      class: "O",
+                      includedCheckedBags: {
+                        quantity: 2,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }
-
       },
       { include: "credit-card-fees,detailed-fare-rules" }
     );
-
+    conso
     const flightData = (JSON.parse(response.body).data.flightOffers[0]);
-    // return res.status(200).send(flightData);
+    console.log(journeyData);
 
     const journeyData = {
       itineraries: flightData.itineraries,
       basePrice: flightData.travelerPricings[0].price.base,
-      taxes: flightData.travelerPricings[0].price.refundableTaxes,
-      total: flightData.travelerPricings[0].price.total,
+      taxes: flightData.travelerPricings[0].price.refundableTaxes * conversionRate,
+      total: flightData.travelerPricings[0].price.total * conversionRate,
     }
+
+    console.log(journeyData);
 
     return res.status(200).send(journeyData);
 
-
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json(error);
   }
 
 }
 
 export const bookFlight = async (req, res) => {
-  const { price, numTickets, origin, destination, prefCurrency } = req.body;
+  const { price, numTickets, origin, destination, } = req.body;
   const touristID = req.params.id;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -123,7 +243,8 @@ export const bookFlight = async (req, res) => {
     }
 
     //convert price to USD using exchange rate api
-    const price = convertPrice(price, prefCurrency);
+    const conversionRate = await getConversionRate(req.query.currency);
+    const price = price / conversionRate;
 
     //create product on stripe
     const productStripe = await stripe.products.create({
@@ -153,9 +274,10 @@ export const bookFlight = async (req, res) => {
           flight: `${origin} to ${destination}`,
           price: price,
           departure: origin,
-          arrival: destination
+          arrival: destination,
+          type: "flight"
         }
-        
+
       }
     });
 
@@ -163,5 +285,16 @@ export const bookFlight = async (req, res) => {
 
   } catch (error) {
 
+  }
+}
+
+
+export const getMyFlights = async (req, res) => {
+  const touristID = req.params.id;
+  try {
+    const flights = await AmadeusBooking.find({ touristID: touristID });
+    return res.status(200).json(flights);
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
   }
 }

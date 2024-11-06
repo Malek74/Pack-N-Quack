@@ -2,6 +2,8 @@
 import mongoose from 'mongoose';
 import Places from '../models/PlacesSchema.js';
 import Tag from '../models/tagSchema.js';
+import { getConversionRate } from '../utils/Helpers.js';
+import { query } from 'express';
 
 const formatTime = (time) => {
     const [hours, minutes] = time.split(':').map(Number);
@@ -65,9 +67,24 @@ export const createPlace = async (req, res) => {
 // Read Place function
 export const readPlace = async (req, res) => {
     const { name } = req.params;
+    const prefCurrency = req.query.currency;
+
+
+    if (!prefCurrency) {
+        return res.status(400).json({ message: "Please provide a currency" });
+    }
+
     try {
         // Search for the place by its name
         const place = await Places.findOne({ name }).populate('tags');
+        const conversionRate = await getConversionRate(prefCurrency); //getConversionRate(prefCurrency);
+
+        //iterate through the tickets and convert the price to the preferred currency
+
+        for (let i = 0; i < place.tickets.length; i++) {
+            console.log(conversionRate);
+            place.tickets[i].price = place.tickets[i].price * conversionRate;
+        }
 
         if (!place) {
             return res.status(404).json({ message: "Place not found" });
@@ -81,6 +98,7 @@ export const readPlace = async (req, res) => {
 
 export const updatePlace = async (req, res) => {
     const placeID = req.body.id;
+
     try {
         // Find the place by its name
         const place = await Places.findOne({ _id: placeID });
@@ -129,6 +147,14 @@ export const getAllPlaces = async (req, res) => {
         // Find all places in the database
         const places = await Places.find().populate('tags'); // Populate tags if you want tag details as well
 
+        const conversionRate = await getConversionRate(req.query.currency);
+
+        // Iterate through the places and convert the prices to the preferred currency
+        for (let i = 0; i < places.length; i++) {
+            for (let j = 0; j < places[i].tickets.length; j++) {
+                places[i].tickets[j].price = places[i].tickets[j].price * conversionRate;
+            }
+        }
         // Send back the list of places
         return res.status(200).json(places);
     } catch (error) {
@@ -161,6 +187,7 @@ export const SearchForPlace = async (req, res) => {
     console.log(req.body)
     try {
         let query = {};
+        const conversionRate = await getConversionRate(req.query.currency);
 
         // If name is provided, add it to the match criteria
         if (name) {
@@ -187,6 +214,13 @@ export const SearchForPlace = async (req, res) => {
             return res.status(404).json({ message: "No places found matching the criteria" });
         }
 
+        // Iterate through the places and convert the prices to the preferred currency
+        for (let i = 0; i < searchedPlaces.length; i++) {
+            for (let j = 0; j < searchedPlaces[i].tickets.length; j++) {
+                searchedPlaces[i].tickets[j].price = searchedPlaces[i].tickets[j].price * conversionRate;
+            }
+        }
+
         return res.status(200).json(searchedPlaces);
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -195,14 +229,16 @@ export const SearchForPlace = async (req, res) => {
 
 // Filter places by tag
 export const FilterPlacesByTag = async (req, res) => {
-    const { tags } = req.query; // Assume the tag is passed as a query parameter in the format: tag=name_tag,options
-    console.log(tags);
+    const { tag } = req.query; // Assume the tag is passed as a query parameter in the format: tag=name_tag,options
+    console.log(tag);
 
     try {
         // Validate the tag input
         if (!tag || typeof tag !== 'string') {
             return res.status(400).json({ message: "Invalid tag format. Provide a tag in the format: name_tag,options." });
         }
+
+        const conversionRate = await getConversionRate(req.query.currency);
 
         // Split the tag into name_tag and options
         const [name_tag, options] = tag.split(',').map(item => item.trim());
@@ -225,6 +261,13 @@ export const FilterPlacesByTag = async (req, res) => {
             return res.status(404).json({ message: "No places found with the specified tag." });
         }
 
+        // Iterate through the places and convert the prices to the preferred currency
+        for (let i = 0; i < filteredPlaces.length; i++) {
+            for (let j = 0; j < filteredPlaces[i].tickets.length; j++) {
+                filteredPlaces[i].tickets[j].price = filteredPlaces[i].tickets[j].price * conversionRate;
+            }
+        }
+
         res.status(200).json(filteredPlaces);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -236,8 +279,16 @@ export const getMyPlaces = async (req, res) => {
     const tgID = req.params.name
     console.log(tgID)
     try {
+        const conversionRate = await getConversionRate(req.query.currency);
+
         const places = await Places.find({ touristGovenorID: tgID }).populate('tags');
         console.log(places)
+
+        for (let i = 0; i < places.length; i++) {
+            for (let j = 0; j < places[i].tickets.length; j++) {
+                places[i].tickets[j].price = places[i].tickets[j].price * conversionRate;
+            }
+        }
         return res.status(200).json(places);
     } catch (error) {
         return res.status(404).json({ message: error.message });
