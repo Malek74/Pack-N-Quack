@@ -245,11 +245,12 @@ export const getItinerary = async (req, res) => {
     // Only fetch active itineraries
     //query.isActive = true;
     let conversionRate;
+    const currency = req.query.currency;
 
     try {
         console.log(query);
-        if (req.query.currency) {
-            conversionRate = await getConversionRate(req.query.currency);
+        if (currency) {
+            conversionRate = await getConversionRate(currency);
         }
 
         // Build query based on input parameters
@@ -293,7 +294,7 @@ export const getItinerary = async (req, res) => {
         }
 
         // Fetch itineraries with filters and sort options
-        let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags');
+        let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags tourGuideID');
         console.log(itineraries)
         if (itineraries.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
@@ -322,14 +323,16 @@ export const getItinerary = async (req, res) => {
 export const getMyItineraries = async (req, res) => {
     const id = req.params.id;
     console.log(id);
-
+    const currency = req.query.currency
     try {
-        const conversionRate = await getConversionRate(req.query.currency);
+        if (currency) {
+            const conversionRate = await getConversionRate(currency);
+        }
 
         const itinerary = await Itinerary.find({
             tourGuideID: id,
             $or: [{ flagged: false }, { flagged: { $exists: false } }]
-        });
+        }).populate('tags tourGuideID');
 
         if (!itinerary) {
             return res.status(404).json({ message: "No active itineraries found" });
@@ -466,7 +469,7 @@ export const getItineraryById = async (req, res) => {
     }
     try {
 
-        const itinerary = await Itinerary.findById(id).populate("tags");
+        const itinerary = await Itinerary.findById(id).populate("tags tourGuideID");
         const conversionRate = await getConversionRate(req.query.currency);
 
         if (!itinerary) {
@@ -658,7 +661,7 @@ export const Flagg = async (req, res) => {
 
 
 export const rateIternary = async (req, res) => {
-    const {touristId, rating, comment} = req.body;
+    const { touristId, rating, comment } = req.body;
     const itineraryId = req.params.id;
     if (!itineraryId) {
         return res.status(400).json({ message: "Itinerary ID is required." });
@@ -670,23 +673,23 @@ export const rateIternary = async (req, res) => {
         return res.status(400).json({ message: "Rating is required." });
     }
 
-    try{
+    try {
         const itinerary = await Itinerary.findById(itineraryId);
-        
-        if(!itinerary){
+
+        if (!itinerary) {
             return res.status(404).json({ message: "Itinerary not found." });
         }
 
         let averageRating = itinerary.ratings.averageRating;
         let noOfReviews = itinerary.ratings.reviews.length;
         averageRating += (rating) / (noOfReviews + 1);
-        const review = {touristId, rating, comment};
+        const review = { touristId, rating, comment };
 
-        await Itinerary.findByIdAndUpdate(itineraryId,{$push :{"ratings.reviews": review}});
-        const newItinerary = await Itinerary.findByIdAndUpdate(itineraryId, {"ratings.averageRating": averageRating});
+        await Itinerary.findByIdAndUpdate(itineraryId, { $push: { "ratings.reviews": review } });
+        const newItinerary = await Itinerary.findByIdAndUpdate(itineraryId, { "ratings.averageRating": averageRating });
         return res.status(200).json(newItinerary);
     }
-    catch(error){
+    catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }

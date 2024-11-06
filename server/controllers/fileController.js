@@ -5,7 +5,7 @@ import advertiserModel from "../models/advertiserSchema.js";
 import touristGoverner from "../models/touristGovernorScehma.js";
 import tourist from "../models/touristSchema.js";
 import product from '../models/productSchema.js'
-import AWS from 'aws-sdk';
+import s3 from '../config/awsConfig.js'
 
 const userModels = {
     seller,
@@ -80,71 +80,48 @@ export const handleImageUpload = async (req, res) => {
 };
 
 export const handleDocumentUpload = async (req, res) => {
-    const { userType, userId, documentNames } = req.body;
+    const { userType } = req.body;
     const UserModel = userModels[userType];
+    const userID = req.params.id;
 
-    cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET
-    });
+    console.log(req.body.userType);
+    console.log(req.files);
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
-    console.log(req.body);
-    //const userExists = await UserModel.exists({ _id: userId });
-    const userExists = await UserModel.findById(userId);
+    //const userExists = await UserModel.exists({ _id: userID });
+    const userExists = await UserModel.findById(userID);
     if (!userExists) {
         return res.status(404).json({ message: 'User ID does not exist' });
     }
     // console.log(JSON.parse(req.body.documents));
-    console.log(req.files['documents'])
-    if (!req.files || !req.files['documents']) {
+    if (!req.files || req.files.length === 0) {
         return res.status(400).json({ message: 'No documents uploaded.' });
     }
     try {
         const documents = [];
+        const files = req.files;
         let i = 0;
-        for (const file of req.files['documents']) {
-            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
-            const publicId = sanitizedPublicId;
-            //console.log(userExists.uploadedFiles);
-            const result = await new Promise((resolve, reject) => {
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: 'raw',
-                        public_id: publicId,
-                        overwrite: true,
-                    },
-                    (error, result) => {
-                        if (error) {
-                            return reject(error);
-                        }
-                        resolve(result);
-                    }
-                );
+        const uploadPromises = files.map(file => {
+            const params = {
+                Bucket: 'my-pdf-storage',  // Your bucket name
+                Key: file.originalname,    // Use the original file name or generate a unique name
+                Body: file.buffer,
+                ContentType: 'application/pdf',
+                             // Set to 'private' to restrict access
+            };
+            return s3.upload(params).promise();  // Returns a promise
+        });
 
-                uploadStream.end(file.buffer);
-            });
+        // Resolve all upload promises and return their results
+        const promises = await Promise.all(uploadPromises);
+        console.log(promises);
 
-            const generatePDFUrl =
-                cloudinary.url(result.sec, {
-                    resource_type: 'raw', // Ensures Cloudinary treats it as a file and not an image
-                    format: 'pdf',
-                    secure: true      // Forces the file to be served as PDF format
-                });
+        const uploadedURLS = promises.map(result => result.Location);
+        return res.status(200).json({ message: 'Documents uploaded successfully', uploadedURLS });
 
-
-
-            console.log(generatePDFUrl);
-
-            documents.push({ name: documentNames[i], url: generatePDFUrl });
-            i++;
-        }
-        //console.log(userExists.uploadedFiles);
-
-        const updatedUser = await UserModel.findByIdAndUpdate(userId, {
+        const updatedUser = await UserModel.findByIdAndUpdate(userID, {
             uploadedFiles: {
                 images: userExists.uploadedFiles.images,
                 documents: documents,
@@ -156,8 +133,9 @@ export const handleDocumentUpload = async (req, res) => {
             return res.status(404).json({ message: 'User not found or update failed' });
         }
 
-        res.status(200).json({ message: 'Documents uploaded successfully', documents });
-    } catch (error) {
+    }
+
+    catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ message: 'Server Error' });
     }
