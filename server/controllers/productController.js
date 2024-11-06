@@ -145,7 +145,7 @@ export const editProduct = async (req, res) => {
         }
         catch (error) {
             console.error("Error during image upload to Cloudinary:", error);
-            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+            // return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
         }
 
 
@@ -169,12 +169,12 @@ export const editProduct = async (req, res) => {
         catch (error) {
             console.log(error);
         }
-
+        let newproduct = {};
         if (imagesUrls.length == 0) {
-            const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
         }
         else {
-            const newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls }, { new: true }).populate('seller_id');
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls }, { new: true }).populate('seller_id');
         }
 
         return res.status(200).json(newproduct);
@@ -270,6 +270,7 @@ export const searchProduct = async (req, res) => {
 }
 //get max price of product
 export const getMaxPrice = async (req, res) => {
+    const currency = req.query.currency;
     try {
         // Fetch the max price of all unarchived products
 
@@ -278,6 +279,10 @@ export const getMaxPrice = async (req, res) => {
         ]);
         if (result.length === 0) {
             res.json({ maxPrice: 0 });
+        }
+        if (currency) {
+            const conversionRate = await getConversionRate(currency);
+            result[0].maxPrice *= conversionRate;
         }
         res.json(result[0]);
 

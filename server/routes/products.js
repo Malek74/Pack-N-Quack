@@ -13,6 +13,5 @@ router.get("/maxProductPrice", getMaxPrice);
 router.get("/allSwQ", allProductSwQ);
 router.get("/eachSwQ/:name", eachProductSwQ);
 
-
 export default router;
 

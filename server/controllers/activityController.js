@@ -148,7 +148,7 @@ export const deleteActivity = async (req, res) => {
 //     const categoryID = req.body.categoryID;
 //     const tagID = req.body.tagID;
 //     let a;
-    
+
 //     switch (searchBy) {
 //         case "name":
 //             a = await activityModel.find({ name: name });
@@ -238,12 +238,12 @@ export const searchActivity = async (req, res) => {
                 }
                 return activity;
             });
-                
-        activities = activities.filter(activity => !activity.flagged);
 
-        if (activities.length === 0) {
-            return res.status(404).json({ message: 'Activities not found' });
-        }
+            activities = activities.filter(activity => !activity.flagged);
+
+            if (activities.length === 0) {
+                return res.status(404).json({ message: 'Activities not found' });
+            }
 
 
             res.status(200).json(activities);
@@ -262,12 +262,12 @@ export const getUpcomingActivities = async (req, res) => {
     try {
         const prefCurrency = req.query.currency;
         const conversionRate = await getConversionRate(prefCurrency);
-        let today = new Date(); 
+        let today = new Date();
         console.log("Today's date:", today);
 
         // Use let instead of const for reassigning the activities variable
-        let activities = await activityModel.find({ 
-            date: { $gte: today }, 
+        let activities = await activityModel.find({
+            date: { $gte: today },
             // flagged: false,
         }).populate('advertiserID categoryID tags');
 
@@ -283,7 +283,6 @@ export const getUpcomingActivities = async (req, res) => {
         });
 
 
-        
         console.log("Fetched Activities:", activities);
 
         // Check if activities are empty
@@ -311,8 +310,7 @@ export const postReview = async (req, res) => {
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
         }
-        if (activity.flagged)
-        {
+        if (activity.flagged) {
             return res.status(404).json({ message: 'Activity is flagged' });
         }
         activity.ratings.reviews.push({ touristID, comment, rating });
@@ -336,13 +334,15 @@ export const filterAndSortActivities = async (req, res) => {
     const { tags, name, budgetMin, budgetMax, category, sortPrice, sortRating, rating, dateMin, dateMax } = req.body;
 
     console.log("Request body:", req.body);
-    let query = { }; 
+    let query = {};
+    const currency = req.query.currency;
+    const conversionRate = await getConversionRate(currency);
 
     // Handle budget filtering
     if (budgetMin !== undefined && budgetMax !== undefined) {
         query.$or = [
-            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin, $lte: budgetMax } }] },
-            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin } }, { maxPrice: { $lte: budgetMax } }] }
+            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin / conversionRate, $lte: budgetMax / conversionRate } }] },
+            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin / conversionRate } }, { maxPrice: { $lte: budgetMax / conversionRate } }] }
         ];
     }
 
@@ -380,7 +380,7 @@ export const filterAndSortActivities = async (req, res) => {
 
     try {
         let activities;
-        
+
         // Sort and fetch activities based on specified criteria
         if (sortPrice || sortRating) {
             const sortOptions = {};
@@ -406,6 +406,9 @@ export const filterAndSortActivities = async (req, res) => {
             activities = await activityModel.find(query).populate('advertiserID categoryID tags');
         }
         activities = activities.filter(activity => !activity.flagged);
+        activities = activities.map(activity => {
+            activity.price = activity.price * conversionRate;
+        });
         console.log("Filtered and sorted activities:", activities);
         return res.status(200).json(activities);
     } catch (error) {
@@ -417,7 +420,7 @@ export const filterAndSortActivities = async (req, res) => {
 export const getMyActivities = async (req, res) => {
     const id = req.params.id;
     try {
-        const activities = await activityModel.find({ advertiserID: id,flagged:false }).populate('advertiserID categoryID tags');
+        const activities = await activityModel.find({ advertiserID: id, flagged: false }).populate('advertiserID categoryID tags');
         if (activities.lemgth === 0) {
             return res.status(404).json({ message: 'No activities found' });
         }
@@ -443,7 +446,7 @@ export const viewSingleActivity = async (req, res) => {
 
 export const Flagg = async (req, res) => {
     const activityID = req.params.id;
-    const flagger = req.body.flagger; 
+    const flagger = req.body.flagger;
 
     try {
         let activity = await activity.findById(activityID);
@@ -452,12 +455,12 @@ export const Flagg = async (req, res) => {
             return res.status(404).json({ message: "No activity found with ID " + activityID });
         }
 
-        
+
         if (flagger === false && activity.flagged === true) {
             return res.status(400).json({ message: "Cannot unflag an already flagged activity" });
         } else {
-            activity.flagged = flagger; 
-            await activity.save();     
+            activity.flagged = flagger;
+            await activity.save();
         }
 
         res.status(200).json(activity);
