@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,8 +16,12 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { DialogClose } from "@radix-ui/react-dialog";
+import ImageUploader from "../shared/ImageUploader";
+
 export default function ProductForm({ onRefresh, adderId }) {
   const { toast } = useToast();
+  const [imagesUploaded, setImagesUploaded] = useState([]);
+
   // Define schema for validation
   const productFormSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
@@ -43,33 +48,36 @@ export default function ProductForm({ onRefresh, adderId }) {
   });
 
   // Handle form submission
-  function onSubmit(values) {
-    console.log(values);
-    axios
-      .post("/api/products/", {
-        name: values.name,
-        price: values.price,
-        available_quantity: values.quantity,
-        description: values.description,
-        id: adderId,
-      })
-      .then((response) => {
-        console.log("Product created successfully:", response.data);
-        toast({
-          title: "Product created succesfully!",
-        });
-        onRefresh();
-        // onTagCreate(); // Call the parent function to refresh the table
-      })
-      .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Product could not be created",
-          description: error.response.data.message,
-        });
-        console.error(error);
-        console.log(error);
+  async function onSubmit(values) {
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("price", values.price);
+    formData.append("available_quantity", values.quantity);
+    formData.append("description", values.description);
+    formData.append("id", adderId);
+
+    imagesUploaded.forEach((image, index) => {
+      formData.append(`images[${index}]`, image); // Append each image
+    });
+
+    try {
+      const response = await axios.post("/api/products/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      toast({
+        title: "Product created successfully!",
+      });
+      onRefresh();
+      setImagesUploaded([]);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Product could not be created",
+        description: error.response?.data?.message,
+      });
+    }
   }
 
   return (
@@ -88,7 +96,6 @@ export default function ProductForm({ onRefresh, adderId }) {
               <FormControl>
                 <Input placeholder="Enter the name" {...field} />
               </FormControl>
-              {/* <FormDescription>Name of the product being sold.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -102,14 +109,8 @@ export default function ProductForm({ onRefresh, adderId }) {
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter the price"
-                  type="number"
-                  {...field}
-                  valueAsNumber
-                />
+                <Input placeholder="Enter the price" type="number" {...field} />
               </FormControl>
-              {/* <FormDescription>Price of the product in EGP.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -129,7 +130,6 @@ export default function ProductForm({ onRefresh, adderId }) {
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>Set the available quantity of the product.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -145,11 +145,18 @@ export default function ProductForm({ onRefresh, adderId }) {
               <FormControl>
                 <Textarea placeholder="Enter the description" {...field} />
               </FormControl>
-              {/* <FormDescription>Provide a brief description of the product.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Image Uploader */}
+        <ImageUploader
+          imagesUploaded={imagesUploaded}
+          setImagesUploaded={setImagesUploaded}
+          shouldHandleSave={false} // Set to true if you want to save immediately
+        />
+
         <DialogClose className="place-self-end">
           <Button className="place-self-end" type="submit">
             Submit

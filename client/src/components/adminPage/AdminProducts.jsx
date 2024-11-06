@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { useUser } from "@/context/UserContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FilterButtons from "../shared/FilterButtons";
 import PriceSlider from "../shared/PriceSlider";
@@ -32,6 +32,7 @@ import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
 
 export default function AdminProducts() {
+  const { prefCurrency } = useUser();
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,7 +59,7 @@ export default function AdminProducts() {
             : `isArchived=false`;
         axios
           .get(
-            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}`
           )
           .then((response) => {
             setProducts(response.data);
@@ -76,7 +77,7 @@ export default function AdminProducts() {
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
-      .get(`api/products/maxProductPrice`)
+      .get(`api/products/maxProductPrice&currency=${prefCurrency}`)
       .then((response) => {
         setMaxPrice(response.data.maxPrice + 200);
         setSliderRange([0, response.data.maxPrice]);
