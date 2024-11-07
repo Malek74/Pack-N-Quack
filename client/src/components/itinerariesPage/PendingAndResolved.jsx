@@ -10,6 +10,8 @@ import {
   import React from 'react'
   import { useState, useEffect } from "react";
   import {Link} from 'react-router-dom';
+
+  import axios from "axios";
   
   const PendingAndResolved = ({status, id}) => {
 
@@ -36,7 +38,7 @@ import {
 </DropdownMenuTrigger>
 
     <DropdownMenuContent>
-      <DropdownMenuItem onClick = {changeStatus()} className = {`${status === "pending" ? "text-green-500" : "text-orange-500"}`}>{status === "resolved" ? "pending" : "resolved"}</DropdownMenuItem>
+      <DropdownMenuItem  onClick={() => changeStatus(id)} className = {`${status === "pending" ? "text-green-500" : "text-orange-500"}`}>{status === "resolved" ? "pending" : "resolved"}</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
   

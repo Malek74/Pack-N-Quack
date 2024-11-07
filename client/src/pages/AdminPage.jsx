@@ -40,10 +40,23 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Complaints from "@/components/adminPage/complaints";
+import OneComplain from "@/components/adminPage/OneComplain";
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("Users");
+  const [currentComplaint, setCurrentComplaint] = useState({});
+  
 
+  const openComplaint = (complaint) => {
+    //link to the complaint with the values int the complaint map
+    setCurrentComplaint(complaint);
+    console.log("Opened complaint -> ", complaint);
+    console.log("currentComplaint -> ",currentComplaint)
+    setActiveSection("Single Complaint");
+  }
+
+
+  
   // Function to render the correct component based on the active section
   const renderSection = () => {
     switch (activeSection) {
@@ -62,7 +75,9 @@ export default function AdminPage() {
       case "Products":
         return <AdminProducts />;
       case "Complaints":
-        return <Complaints />;
+        return <Complaints openComplaint = {openComplaint} />;
+      case "Single Complaint":
+        return <OneComplain complaint = {currentComplaint} />;
       default:
         return <AdminDashboard />;
     }
@@ -183,11 +198,12 @@ export default function AdminPage() {
                   variant="ghost"
                   onClick={() => setActiveSection("Complaints")}
                   className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Complaints"
+                    (activeSection === "Complaints" || activeSection === "Single Complaint")
                       ? "bg-muted text-primary"
                       : "text-muted-foreground hover:text-primary"
                   }`}
                 >
+                  {/* change to complaint icon */}
                   <Package className="h-4 w-4" />
                   Complaints
                 </Button>
@@ -220,9 +236,19 @@ export default function AdminPage() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{activeSection}</BreadcrumbPage>
+                  <BreadcrumbPage>{(activeSection === "Single Complaint")? "Complaints" : activeSection}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbItem>
+              {(activeSection === "Single Complaint") && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{currentComplaint.title}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbItem>
+              </>
+            )}
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex gap-4">
