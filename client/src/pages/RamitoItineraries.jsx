@@ -6,44 +6,26 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import RamitoItinerariesCard from "@/components/ramitoItineraries/ramitoCard";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import Loading from "@/components/shared/Loading";
+import ItineraryFilters from "@/components/itinerariesPage/ItineraryFilters";
+//import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
 
 export default function RamitoItineraries() {
   const [isLoading, setIsLoading] = useState(true);
+
   const [fetchedItineraries, setFetchedItineraries] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [language, setLanguage] = useState("");
-  const [fetchedItineraryTags, setFetchedItineraryTags] = useState([]);
-  const [fetchedItinerariesParams, setFetchedItinerariesParams] = useState({
-    name: "",
-    language: "",
-  });
+  //const [selectedTags, setSelectedTags] = useState([]);
+
+  const [fetchedItinerariesParams, setFetchedItinerariesParams] = useState({});
 
   useEffect(() => {
-    setFetchedItinerariesParams({ name: searchTerm, language: language });
-  }, [language, searchTerm]);
-
-  useEffect(() => {
-    const fetchItineraryTags = async () => {
-      try {
-        const response = await axios.get("/api/itineraryTags");
-        setFetchedItineraryTags(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchItineraryTags();
-  }, []);
+    setFetchedItinerariesParams({
+      name: searchTerm,
+    });
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchItineraries = async () => {
@@ -73,41 +55,9 @@ export default function RamitoItineraries() {
         />
       </div>
 
-      <div className="flex w-screen self-center justify-center gap-10 p-10 pt-0">
-        <Select
-          value={language}
-          onValueChange={(value) => setLanguage(value === "all" ? "" : value)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Languages</SelectLabel>
-              <SelectItem value="all">Any</SelectItem>
-              <SelectItem value="English">English</SelectItem>
-              <SelectItem value="Spanish">Spanish</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={language}
-          onValueChange={(value) => setLanguage(value === "all" ? "" : value)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Languages</SelectLabel>
-              <SelectItem value="all">Any</SelectItem>
-              <SelectItem value="English">English</SelectItem>
-              <SelectItem value="Spanish">Spanish</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      <ItineraryFilters
+        setFetchedItinerariesParams={setFetchedItinerariesParams}
+      />
 
       {isLoading && (
         <div className="flex justify-center items-center">
