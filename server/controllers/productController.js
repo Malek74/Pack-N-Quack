@@ -29,8 +29,10 @@ export const getProductByID = async (req, res) => {
 //create product
 export const createProduct = async (req, res) => {
 
-    const userID = req.body.id;
+    const userID = req.params.id;
     console.log("SellerID: " + userID);
+    console.log(req);
+
     const { name, price, description, available_quantity, } = req.body;
     if (!name || !price || !description || !available_quantity) {
         return res.status(400).json({ message: "Please fill all fields" });
@@ -52,9 +54,9 @@ export const createProduct = async (req, res) => {
 
     const imagesUrls = [];
 
-    // Upload each image to Cloudinary
-    for (const file of req.files.uploadImages) { // Access files using 'uploadImages'
-        try {
+    try {
+
+        for (const file of req.files['images']) {
             const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
             const publicId = sanitizedPublicId;
 
@@ -67,7 +69,6 @@ export const createProduct = async (req, res) => {
                     },
                     (error, result) => {
                         if (error) {
-                            console.error("Cloudinary upload error:", error);
                             return reject(error);
                         }
                         resolve(result);
@@ -77,34 +78,36 @@ export const createProduct = async (req, res) => {
                 uploadStream.end(file.buffer);
             });
 
-            imagesUrls.push(result.secure_url)
-        }
-        catch (error) {
-            console.error("Error during image upload to Cloudinary:", error);
-            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+            imagesUrls.push(result.secure_url);
         }
 
-        if (!isAdmin) {
-            try {
+    }
+    catch (error) {
+        console.error("Error during image upload to Cloudinary:", error);
+        return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+    }
 
-                const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id, picture: imagesUrls }));
-                return res.status(200).json(newproduct);
-            } catch (error) {
-                return res.status(400).json({ error: error.message });
-            }
+    if (!isAdmin) {
+        try {
+
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id, picture: imagesUrls }));
+            return res.status(200).json(newproduct);
+        } catch (error) {
+            return res.status(400).json({ error: error.message });
         }
-        else {
-            try {
-                console.log("Admin Product");
-                const sellerUsername = await seller.findById(userID).username;
-                const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
-                return res.status(200).json(newproduct);
-            } catch (error) {
-                return res.status(400).json({ error: error.message });
-            }
+    }
+    else {
+        try {
+            console.log("Admin Product");
+            const sellerUsername = await seller.findById(userID).username;
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
+            return res.status(200).json(newproduct);
+        } catch (error) {
+            return res.status(400).json({ error: error.message });
         }
     }
 }
+
 
 export const editProduct = async (req, res) => {
     const { id } = req.params;
@@ -171,10 +174,11 @@ export const editProduct = async (req, res) => {
         }
         let newproduct = {};
         if (imagesUrls.length == 0) {
-            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price }, { new: true }).populate('seller_id');
+            console.log("No images provided");
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, isArchived: isArchived }, { new: true }).populate('seller_id');
         }
         else {
-            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls }, { new: true }).populate('seller_id');
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls, isArchived: isArchived }, { new: true }).populate('seller_id');
         }
 
         return res.status(200).json(newproduct);
@@ -271,20 +275,24 @@ export const searchProduct = async (req, res) => {
 //get max price of product
 export const getMaxPrice = async (req, res) => {
     const currency = req.query.currency;
+    console.log('Currency:', currency);
+
     try {
         // Fetch the max price of all unarchived products
-
-        const result = await product.aggregate([
-            { $group: { _id: null, maxPrice: { $max: "$price" } } }
-        ]);
+        const result = await product.find().sort({ price: -1 }).limit(1).select('price');
         if (result.length === 0) {
             res.json({ maxPrice: 0 });
         }
+
         if (currency) {
             const conversionRate = await getConversionRate(currency);
-            result[0].maxPrice *= conversionRate;
+            console.log('Conversion Rate:', conversionRate);
+            console.log('Max Price:', result[0].price);
+            result[0].price *= conversionRate;
+            console.log('Converted Max Price:', result[0].price);
         }
-        res.json(result[0]);
+        return res.json(result[0].price);
+
 
     } catch (error) {
         console.error('Error fetching max price:', error);
@@ -350,9 +358,9 @@ export const getProducts = async (req, res) => {
                 query.price.$gte = 0;
             }
             if (maxPrice) {
-                query.price.$lte = parseInt(maxPrice / conversionRate);
+                query.price.$lte = parseInt(maxPrice * conversionRate);
             } else {
-                query.price.$lte = Number.MAX_SAFE_INTEGER / conversionRate;
+                query.price.$lte = Number.MAX_SAFE_INTEGER * conversionRate;
             }
         }
 

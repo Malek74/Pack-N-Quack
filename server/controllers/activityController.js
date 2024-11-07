@@ -341,8 +341,8 @@ export const filterAndSortActivities = async (req, res) => {
     // Handle budget filtering
     if (budgetMin !== undefined && budgetMax !== undefined) {
         query.$or = [
-            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin / conversionRate, $lte: budgetMax / conversionRate } }] },
-            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin / conversionRate } }, { maxPrice: { $lte: budgetMax / conversionRate } }] }
+            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin * conversionRate, $lte: budgetMax * conversionRate } }] },
+            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin * conversionRate } }, { maxPrice: { $lte: budgetMax * conversionRate } }] }
         ];
     }
 

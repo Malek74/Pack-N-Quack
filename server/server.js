@@ -82,7 +82,7 @@ app.use('/api/booking', booking);
 app.use('/webhook', webhook);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/upload', uploadRoutes);
-app.use('/api/trasaction', purchaseRoute);
+app.use('/api/transaction', purchaseRoute);
 
 
 //const multer = require ('multer');

@@ -289,7 +289,7 @@ export const getItinerary = async (req, res) => {
         }
 
         // Set sorting options if provided
-        if (sortBy && order && order !== 'undefined' && order !== 'undefined') {
+        if (sortBy && order && order !== 'undefined' && sortBy !== 'undefined') {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
 
@@ -324,9 +324,10 @@ export const getMyItineraries = async (req, res) => {
     const id = req.params.id;
     console.log(id);
     const currency = req.query.currency
+    let conversionRate = 0;
     try {
         if (currency) {
-            const conversionRate = await getConversionRate(currency);
+            conversionRate = await getConversionRate(currency);
         }
 
         const itinerary = await Itinerary.find({

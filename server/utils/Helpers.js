@@ -236,6 +236,10 @@ export const getConversionRate = async (currency) => {
     if (currency === 'EGP') {
         return 48.5;
     }
+
+    if (currency === 'USD') {
+        return 1;
+    }
     const response = await axios.get(`https://v6.exchangerate-api.com/v6/${process.env.EXHANGE_RATE_API_KEY}/pair/USD/${currency}`);
     return response.data.conversion_rate;
 }

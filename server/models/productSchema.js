@@ -14,7 +14,7 @@ const productSchema = new Schema({
     price: {
         type: Number,
         required: true,
-        unique:true
+        unique: true
     },
     description: {
         type: String,
@@ -74,17 +74,17 @@ const productSchema = new Schema({
         type: Number,
         required: true,
     },
-    product_sales:{
+    product_sales: {
         type: Number,
         required: true,
-        default:0,
+        default: 0,
     },
-    isArchived:{
+    isArchived: {
         type: Boolean,
         required: true,
         default: false,
     },
-    uploadImages:{
+    uploadImages: {
         type: [String],
         default: [],
     }
