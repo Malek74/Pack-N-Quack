@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "./shared/RateComment";
-import RateForm from "./forms/RateForm";
+import RateComment from "../shared/RateComment";
+import RateForm from "../forms/RateForm";
 export default function TourGuides() {
   const accounts = [
     { id: 1, username: "mariam" },
@@ -25,7 +25,7 @@ export default function TourGuides() {
         <TableCell>{account.username}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm />}
+            form={<RateForm showExperience />}
             type="tourguide"
             title={account.username}
           />

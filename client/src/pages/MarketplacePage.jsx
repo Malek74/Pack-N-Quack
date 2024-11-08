@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/marketplacePage/ProductCard";
 import Activitiesbackground from "/assets/images/Background.jpg";
 import Banner from "../components/shared/BannerV2";
+import BannerImage from "/assets/images/homeBanner.png";
+
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
@@ -24,7 +26,7 @@ export default function MarketplacePage() {
   const fetchProducts = () => {
     axios
       .get(
-        `api/products?maxPrice=${priceRange[1]}&minPrice=${priceRange[0]}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}`
+        `api/products?maxPrice=${priceRange[1]}&minPrice=${priceRange[0]}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}&isArchived=false`
       )
       .then((response) => {
         setProducts(response.data);
@@ -61,7 +63,6 @@ export default function MarketplacePage() {
     fetchMaxPrice();
   }, [prefCurrency]);
 
-
   const handleFilterChange = (type, value) => {
     setSelectedFilters((prev) => ({
       ...prev,
@@ -95,7 +96,7 @@ export default function MarketplacePage() {
       <div className="relative">
         {/* Banner Section */}
         <Banner
-          background={Activitiesbackground}
+          background={BannerImage}
           alt="Hustling market"
           name="Marketplace"
         />
