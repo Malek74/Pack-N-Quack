@@ -18,7 +18,7 @@ export const addItinerary = async (req, res) => {
     const tourGuideID = req.body.tourGuideID;
     const name = req.body.title;
     const available_dates = req.body.dates;
-    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description } = req.body;
+    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description, images, coverImage } = req.body;
     let tagsIDS = []
     console.log(req.body);
     //validate that all fields are present
@@ -58,7 +58,6 @@ export const addItinerary = async (req, res) => {
         }
     }
     console.log(tags);
-
     for (let i = 0; i < tags.length; i++) {
         const tag = await itineraryTags.findOne({ tag: tags[i] });
         tagsIDS.push(tag._id);
@@ -81,6 +80,35 @@ export const addItinerary = async (req, res) => {
             },
         });
 
+        if(coverImage){
+            const uploadResult = await uploadImages(coverImage);
+            if(uploadResult.success){
+                coverImage = uploadResult.urls[0];
+            }
+            return res.status(400).json( {message : uploadResult.message} );
+        }
+
+        if(images){
+            const uploadResult = await uploadImages(images);
+            if(uploadResult.success){
+                images = uploadResult.urls;
+            }
+            return res.status(400).json( {message : uploadResult.message} );
+        }
+
+        if(days){
+            for(let i = 0; i < days.length; i++){
+                for(let j = 0; j < days[i].activities.length; j++){
+                    const uploadResult = await uploadImages(days[i].activities[j].image);
+                    if(uploadResult.success){
+                        days[i].activities[j].image = uploadResult.urls[0];
+                    }
+                    return res.status(400).json( {message : uploadResult.message} );
+                }
+            }
+        }
+
+
 
         const itinerary = new Itinerary({
             stripeID: productStripe.id,
@@ -95,6 +123,8 @@ export const addItinerary = async (req, res) => {
             accessibility: accessibility,
             tags: tagsIDS,
             description: description,
+            images: images,
+            coverImage: coverImage
         });
         const createdItinerary = await Itinerary.create(itinerary);
         return res.status(201).json(createdItinerary);
@@ -114,7 +144,7 @@ export const getItinerary = async (req, res) => {
 
     const id = req.query.id;
     const name = req.query.name;
-    const tag = req.query.tag;
+    const tags = req.query.tags;
     const maxBudget = req.query.maxBudget;
     const minBudget = req.query.minBudget;
     const minDate = req.query.minDate;
@@ -134,11 +164,14 @@ export const getItinerary = async (req, res) => {
             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
         }
 
-        if (tag) {
-            const tagID = await itineraryTags.findOne({ tag }).select('_id');
-            if (tagID) {
-                // Use $elemMatch properly to filter tags 
-                query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
+        const tagsArray = tags.split(',');
+        if (tagsArray && tagsArray.length > 0) {
+            // Find all tag IDs based on the tag names provided
+            const tagIDs = await itineraryTags.find({ tag: { $in: tagsArray } }).select('_id');
+
+            if (tagIDs.length > 0) {
+                // Use $in to filter itineraries with any of these tags
+                query.tags = { $in: tagIDs.map(tag => tag._id) };
             }
         }
 
@@ -333,7 +366,29 @@ export const getAllLanguages = async (req, res) => {
     }
 }
 
-export const addImagesToItinerary = async(req, res) => {
+export const addCoverImageToItinerary = async(req, res) => {
+    const itineraryID = req.params.id;
+    const image = req.files['images'];
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if(!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try{
+        const uploadResult = await uploadImages(image);
+        if(uploadResult.success){
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, {coverImage: uploadResult.urls[0]}, { new: true });
+            return res.status(200).json({ message: "Image uploaded successfully" , newItinerary});
+        }
+        return res.status(400).json( {message : uploadResult.message} );
+    }catch(error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const addImagesToActivity = async(req, res) => {
     const itineraryID = req.params.id;
     // console.log(req.body);
     const {dayNo, activityNo} = req.body;
@@ -348,13 +403,38 @@ export const addImagesToItinerary = async(req, res) => {
 
     try {
         const uploadResult = await uploadImages(images);
+        console.log(uploadResult.success);
         if(uploadResult.success){
             const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, {$set: {[`days.${dayNo}.activities.${activityNo}.image`]: uploadResult.urls[0]}}, { new: true });
-            return res.status(200).json({ message: "Images uploaded successfully" }, newItinerary);
+            console.log(newItinerary);
+            return res.status(200).json({ message: "Images uploaded successfully" , newItinerary});
         }
         
-        return res.status(400).json( {message : uploadResult.message} );
+        return res.status(400).json( {message : "message"} );
     }catch(error) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export const addImagesToItinerary = async(req, res) => {
+    const itineraryID = req.params.id;
+    const images = req.files['images'];
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if(!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try{
+        const uploadResult = await uploadImages(images);
+        if(uploadResult.success){
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, {$set: {images: uploadResult.urls}}, { new: true });
+            return res.status(400).json(newItinerary);
+        }
+        return res.status(400).json( {message : uploadResult.message} );
+    }
+    catch(error) {
+        return res.status(500).json({ message: error.message });
+    }   
 }

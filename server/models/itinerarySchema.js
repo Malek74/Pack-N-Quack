@@ -60,7 +60,7 @@ const itinerarySchema = new mongoose.Schema({
             },
             image: {
                 type: String,
-                required: true
+                required: false
             }
         }],
     }],
@@ -110,13 +110,25 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
     pickUpLocation: {
-        type: String,
-        required: true
+        name:{
+            type: String,
+            required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
 
     dropOffLocation: {
+        name:{
         type: String,
         required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
 
     tags: {
@@ -132,11 +144,11 @@ const itinerarySchema = new mongoose.Schema({
     },
     coverImage: {
         type: String,
-        required: true
+        required: false
     },
     images: {
         type: [String],
-        required: true
+        required: false
     },
 
 
