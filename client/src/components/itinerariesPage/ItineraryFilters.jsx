@@ -20,6 +20,8 @@ ItineraryFilters.propTypes = {
 };
 
 export default function ItineraryFilters({ setFetchedItinerariesParams }) {
+  const [isLoading, setIsLoading] = useState(true);
+
   const [sortSelectorValue, setSortSelectorValue] = useState("");
 
   const [fetchedItineraryTags, setFetchedItineraryTags] = useState([]);
@@ -28,8 +30,8 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   //const [selectedTags, setSelectedTags] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
-  const [minBudget, setMinBudget] = useState(null);
-  const [maxBudget, setMaxBudget] = useState(null);
+  const [minBudget, setMinBudget] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [order, setOrder] = useState();
@@ -79,126 +81,131 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
 
     fetchItineraryLanguages();
     fetchItineraryTags();
+    setIsLoading(false);
   }, []);
 
   return (
-    <div className="flex w-screen self-center items-end justify-center gap-10 p-10 pt-0">
-      <DateRangePickerV2
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-      />
-      <div className="flex flex-col">
-        <Input
-          type="number"
-          id="min-budget"
-          placeholder="Enter Minimum Budget"
-          min="0"
-          step="1"
-          className="w-full"
-          value={minBudget}
-          onChange={(e) => setMinBudget(e.target.value)}
+    !isLoading && (
+      <div className="flex w-screen self-center items-end justify-center gap-10 p-10 pt-0">
+        <DateRangePickerV2
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
         />
-      </div>
-      <div className="flex flex-col">
-        <Input
-          type="number"
-          id="max-budget"
-          placeholder="Enter Maximum Budget"
-          min="0"
-          step="1"
-          className="w-full"
-          value={maxBudget}
-          onChange={(e) => setMaxBudget(e.target.value)}
-        />
-      </div>
+        <div className="flex flex-col">
+          <Input
+            type="number"
+            id="min-budget"
+            placeholder="Enter Minimum Budget"
+            min="0"
+            step="1"
+            className="w-full"
+            value={minBudget}
+            onChange={(e) => setMinBudget(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col">
+          <Input
+            type="number"
+            id="max-budget"
+            placeholder="Enter Maximum Budget"
+            min="0"
+            step="1"
+            className="w-full"
+            value={maxBudget}
+            onChange={(e) => setMaxBudget(e.target.value)}
+          />
+        </div>
 
-      <Select
-        value={selectedLanguage}
-        onValueChange={(value) =>
-          setSelectedLanguage(value === "all" ? "" : value)
-        }
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a Language" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Languages</SelectLabel>
-            <SelectItem value="all">Any</SelectItem>
-            {fetchedLanguages.map((language, index) => (
-              <SelectItem key={index} value={language}>
-                {language}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={selectedTag}
-        onValueChange={(value) => setSelectedTag(value === "all" ? "" : value)}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a Tag" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Tagss</SelectLabel>
-            <SelectItem value="all">Any</SelectItem>
-            {fetchedItineraryTags.map((tag) => (
-              <SelectItem key={tag._id} value={tag.tag}>
-                {tag.tag}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={sortSelectorValue}
-        onValueChange={(value) => {
-          setSortSelectorValue(value);
-          switch (value) {
-            case "priceAsc":
-              setSortBy("price");
-              setOrder("asc");
-              break;
-            case "priceDesc":
-              setSortBy("price");
-              setOrder("desc");
-              break;
-            case "ratingAsc":
-              setSortBy("ratings.averageRating");
-              setOrder("asc");
-              break;
-            case "ratingDesc":
-              setSortBy("ratings.averageRating");
-              setOrder("desc");
-              break;
+        <Select
+          value={selectedLanguage}
+          onValueChange={(value) =>
+            setSelectedLanguage(value === "all" ? "" : value)
           }
-        }}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Sort By" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Sorting Options</SelectLabel>
-            <SelectItem value="priceAsc">Price Low to High</SelectItem>
-            <SelectItem value="priceDesc">Price High to Low</SelectItem>
-            <SelectItem value="ratingAsc">Rating Low to High</SelectItem>
-            <SelectItem value="ratingDesc">Rating High to Low</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Languages</SelectLabel>
+              <SelectItem value="all">Any</SelectItem>
+              {fetchedLanguages.map((language, index) => (
+                <SelectItem key={index} value={language}>
+                  {language}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
 
-      {/* <MultiselectDropdown
+        <Select
+          value={selectedTag}
+          onValueChange={(value) =>
+            setSelectedTag(value === "all" ? "" : value)
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a Tag" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Tagss</SelectLabel>
+              <SelectItem value="all">Any</SelectItem>
+              {fetchedItineraryTags.map((tag) => (
+                <SelectItem key={tag._id} value={tag.tag}>
+                  {tag.tag}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={sortSelectorValue}
+          onValueChange={(value) => {
+            setSortSelectorValue(value);
+            switch (value) {
+              case "priceAsc":
+                setSortBy("price");
+                setOrder("asc");
+                break;
+              case "priceDesc":
+                setSortBy("price");
+                setOrder("desc");
+                break;
+              case "ratingAsc":
+                setSortBy("ratings.averageRating");
+                setOrder("asc");
+                break;
+              case "ratingDesc":
+                setSortBy("ratings.averageRating");
+                setOrder("desc");
+                break;
+            }
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Sorting Options</SelectLabel>
+              <SelectItem value="priceAsc">Price Low to High</SelectItem>
+              <SelectItem value="priceDesc">Price High to Low</SelectItem>
+              <SelectItem value="ratingAsc">Rating Low to High</SelectItem>
+              <SelectItem value="ratingDesc">Rating High to Low</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        {/* <MultiselectDropdown
           options={fetchedItineraryTags}
           selectedOptions={selectedTags}
           setSelectedOptions={setSelectedTags}
         /> */}
-    </div>
+      </div>
+    )
   );
 }

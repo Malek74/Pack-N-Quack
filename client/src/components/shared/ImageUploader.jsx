@@ -32,6 +32,7 @@ ImageUploader.propTypes = {
   setImagesUploaded: PropTypes.func.isRequired,
   shouldHandleSave: PropTypes.bool,
   apiEndpoint: PropTypes.string,
+  single: PropTypes.bool,
 };
 
 ImageUploader.propTypes = {
@@ -47,6 +48,7 @@ ImageUploader.propTypes = {
 export default function ImageUploader({
   imagesUploaded,
   setImagesUploaded,
+  single = false,
   shouldHandleSave = false,
   apiEndpoint = "",
 }) {
@@ -118,19 +120,87 @@ export default function ImageUploader({
   return (
     <Dropzone onDrop={handleDrop}>
       {({ getRootProps, getInputProps }) => (
-        <div className="flex flex-col gap-4 justify-center items-center">
-          <div
-            {...getRootProps()}
-            className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
-          >
-            <Input {...getInputProps()} type="file" accept="image/*" />
-            <p className="text-center italic text-neutral-500">
-              Drag and quack your pics here,
-              <br />
-              or click to pack them in!
-            </p>
-          </div>
-          {imagesUploaded.length > 0 && !isLoading && (
+        <div className="flex gap-4 justify-around items-center">
+          {single && imagesUploaded.length > 0 && (
+            <div className="basis-1/2 w-[250px] h-[200px] flex justify-center items-center">
+              {imagesUploaded.map((file, index) => (
+                <div
+                  key={index}
+                  className="p-1 relative w-full h-full overflow-hidden"
+                >
+                  <AlertDialog>
+                    <AlertDialogTrigger className="absolute top-1 right-1">
+                      <ImageMinus className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Quack Goodbye to This Image?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to quack this image goodbye?
+                          Once it’s gone, it won’t waddle back!
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-500 hover:bg-red-600"
+                          onClick={() => {
+                            setImagesUploaded(
+                              imagesUploaded.filter((_, i) => i !== index)
+                            );
+                            toast({
+                              description: `The image has waddled off successfully!`,
+                            });
+                          }}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  <img
+                    src={URL.createObjectURL(file)}
+                    className="h-full w-full object-cover rounded-lg"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {single && imagesUploaded.length === 0 && (
+            <div
+              {...getRootProps()}
+              className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
+            >
+              <Input
+                {...getInputProps()}
+                type="file"
+                accept="image/*"
+                multiple={false}
+              />
+              <p className="text-center italic text-neutral-500">
+                Drag and quack your pics here,
+                <br />
+                or click to pack them in!
+              </p>
+            </div>
+          )}
+          {!single && (
+            <div
+              {...getRootProps()}
+              className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
+            >
+              <Input {...getInputProps()} type="file" accept="image/*" />
+              <p className="text-center italic text-neutral-500">
+                Drag and quack your pics here,
+                <br />
+                or click to pack them in!
+              </p>
+            </div>
+          )}
+          {imagesUploaded.length > 0 && !isLoading && !single && (
             <Carousel
               className="w-full max-w-xs"
               opts={{
@@ -186,8 +256,8 @@ export default function ImageUploader({
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
+              <CarouselPrevious type="button" />
+              <CarouselNext type="button" />
             </Carousel>
           )}
           {imagesUploaded.length > 0 && shouldHandleSave && !isLoading && (

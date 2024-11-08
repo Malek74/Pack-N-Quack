@@ -64,7 +64,7 @@ export default function DateRangePickerV2({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-4 text-center font-semibold">
+          <div className="p-2 text-center font-semibold">
             {format(startMonth, "MMMM yyyy")}
           </div>
           <Calendar
@@ -92,7 +92,7 @@ export default function DateRangePickerV2({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-4 text-center font-semibold">
+          <div className="p-2 text-center font-semibold">
             {format(endMonth, "MMMM yyyy")}
           </div>
           <Calendar

@@ -19,6 +19,7 @@ import HotelBookingApp from "@/pages/HotelBookPage";
 import TouristDashboard from "@/pages/TouristDashboard";
 import RamitoItineraries from "@/pages/RamitoItineraries";
 import RamitoSingleItineraryPage from "@/pages/RamitoSingleItineraryPage";
+import CreateItineraryPage from "@/pages/CreateItineraryPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -39,6 +40,7 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="ramito" element={<RamitoItineraries />}></Route>
     <Route path="ramito/:id" element={<RamitoSingleItineraryPage />}></Route>
+    <Route path="createItinerary" element={<CreateItineraryPage />}></Route>
     <Route path="touristDashboard" element={<TouristDashboard />} />
     <Route
       path="*"

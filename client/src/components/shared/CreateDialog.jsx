@@ -24,7 +24,7 @@ export default function CreateDialog({ title, form }) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className=" max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create a new {title}</DialogTitle>
           <DialogDescription>

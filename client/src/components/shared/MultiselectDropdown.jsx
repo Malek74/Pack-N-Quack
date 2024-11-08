@@ -53,7 +53,9 @@ export default function MultiselectDropdown({
               checked={selectedOptions.some((item) => item._id === option._id)}
               onCheckedChange={() => handleOptionToggle(option)}
             >
-              <span className="flex items-center">{option.tag}</span>
+              <span key={option._id} className="flex items-center">
+                {option.tag}
+              </span>
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -63,7 +65,7 @@ export default function MultiselectDropdown({
           {selectedOptions.map((option) => (
             <Badge
               variant="secondary"
-              key={option.id}
+              key={option._id}
               className="pl-2 pr-1 py-1 bg-gold text-white flex justify-between items-center hover:bg-gold"
             >
               {option.tag}

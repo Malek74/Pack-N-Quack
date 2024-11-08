@@ -6,12 +6,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import RamitoItinerariesCard from "@/components/ramitoItineraries/ramitoCard";
-
 import Loading from "@/components/shared/Loading";
 import ItineraryFilters from "@/components/itinerariesPage/ItineraryFilters";
+import { useNavigate } from "react-router-dom";
 //import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
 
 export default function RamitoItineraries() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
   const [fetchedItineraries, setFetchedItineraries] = useState([]);
@@ -84,6 +85,10 @@ export default function RamitoItineraries() {
       )}
       <Button onClick={() => console.log(fetchedItineraries[0])}>
         Print Itineraries
+      </Button>
+
+      <Button onClick={() => navigate("/createItinerary")}>
+        Create Itineraries
       </Button>
     </div>
   );
