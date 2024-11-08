@@ -7,7 +7,9 @@ import {
     deleteTourist,
     getMyprefernces,
     getMyBookings,
-    redeemPoints
+    redeemPoints,
+    viewMyTourGuides,
+    viewMyItineraries
 } from '../controllers/touristController.js';
 
 
@@ -21,5 +23,7 @@ router.delete('/:id', deleteTourist);
 router.get('/myPreferences/:id', getMyprefernces);
 router.get('/myBookings/:id', getMyBookings);
 router.post('/redeemPoints/:id', redeemPoints);
+router.get('/mytourguides/:id', viewMyTourGuides);
+router.get('/myitineraries/:id', viewMyItineraries);
 
 export default router;
