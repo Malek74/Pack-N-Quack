@@ -10,18 +10,50 @@ import {
 import { Button } from '../ui/button';
 import ChatMessage from '../shared/ChatMessage';
 import MessageInput from '../shared/MessageInput';
+import axios from 'axios';
 
 
 
 
-const OneComplain = ({complaint}) => {
-    console.log("Complaintttt",complaint);
+const OneComplain = ({complaint, onRefresh}) => {
+  function formatDate(isoDateString) {
+    const date = new Date(isoDateString);
+    
+    // Format the date
+    const formattedDate = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  
+    // Format the time
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  
+    return `${formattedDate}, ${formattedTime}`;
+  }
+
+    const onSubmitReply = (reply) =>{
+      console.log("rep?", reply)
+      axios
+      .put(`/api/complaints/reply/${complaint._id}`,reply)
+      .then((response) => {
+        console.log("msggggg ", response.data)
+        onRefresh();
+      })
+      .catch((error) => {
+        console.error("There was an error changing the status:", error); 
+      });
+    };
   return (
     <div className="flex flex-col sm:gap-4 sm:py-4">
     <Card x-chunk="dashboard-06-chunk-0">
       <CardHeader>
         <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
-        <CardDescription>{complaint.date}</CardDescription>
+        <CardDescription>{formatDate(complaint.date)}</CardDescription>
       </CardHeader>
       <CardContent>
         {" "}
@@ -33,14 +65,14 @@ const OneComplain = ({complaint}) => {
             <div className="flex flex-col">
                 {/* <p>{complaint.body}</p> */}
                 <ChatMessage message={complaint.body} direction={"left"} />
-                {complaint.replies && 
-                complaint.replies.map((reply) => (
+                {complaint.reply && 
+                complaint.reply.map((reply) => (
                     <ChatMessage message={reply} direction={"right"} />
                 ))}
                 
             </div>
             {/* onClick will popOut a dialog/form to write or maybe feedback like chat */}
-            <MessageInput />
+            <MessageInput onSubmit={onSubmitReply}/>
         </div>
         
       </CardContent>

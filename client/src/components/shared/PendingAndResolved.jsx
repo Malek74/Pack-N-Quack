@@ -13,16 +13,17 @@ import {
 
   import axios from "axios";
   
-  const PendingAndResolved = ({status, id}) => {
+  const PendingAndResolved = ({status, id, onRefresh}) => {
 
     const changeStatus = async (id) => {
         
         let newStatus = status === "resolved" ? "pending" : "resolved";
         console.log("stat changed to ", newStatus);
         axios
-        .put(`/api/admin/complaints/${id}`, newStatus)
+        .put(`/api/admins/complaints/${newStatus}/${id}`)
         .then((response) => {
           console.log(response.data);
+          onRefresh();
         })
         .catch((error) => {
           console.error("There was an error changing the status:", error); 

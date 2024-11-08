@@ -102,6 +102,18 @@ export default function Header() {
               <DropDownMenuTourist />
             </li>
           </Button>
+
+          <Button asChild variant="link">
+            <li>
+              <Link
+                to="/complaints"
+                className={isActive("/complaints") ? "text-yellow-500" : ""}
+              >
+                My Complaints
+              </Link>
+            </li>
+          </Button>
+
         </ul>
 
         {/* Sign In and Sign Up on the right */}

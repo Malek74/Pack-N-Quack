@@ -10,7 +10,6 @@ import {
   import { useState, useEffect } from "react";
   import axios from "axios";
   import { useToast } from "@/hooks/use-toast";
-  import DeleteButton from "../shared/DeleteButton";
   import {
     Card,
     CardContent,
@@ -19,14 +18,12 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
-import PendingAndResolved from "../shared/PendingAndResolved";
-import { Button } from "@mui/material";
-  export default function Complaints({openComplaint}) {
-    const { toast } = useToast();
+  import { useNavigate } from "react-router-dom";
+
+//   const navigate = useNavigate();
+
+  export default function Complaints() {
     const [complaints, setComplaints] = useState([]);
-
-    const onRefresh = () => {};
-
     const fetchComplaints = () => {
       axios
         .get("api/admins/complaints")
@@ -39,30 +36,12 @@ import { Button } from "@mui/material";
         });
     };
 
-    function formatDate(isoDateString) {
-      const date = new Date(isoDateString);
-      
-      // Format the date
-      const formattedDate = date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    
-      // Format the time
-      const formattedTime = date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    
-      return `${formattedDate}, ${formattedTime}`;
-    }
+
    
   
     useEffect(() => {
       fetchComplaints(); // Initial fetch when component mounts
-    }, [onRefresh]);
+    }, []);
 
     // const openComplaint = (complaint) => {
     //   //link to the complaint with the values int the complaint map
@@ -72,6 +51,8 @@ import { Button } from "@mui/material";
     //   setActiveSection("Single Complaint");
       
     // }
+
+
 
     const dummyComplaints = [
       {
@@ -142,7 +123,7 @@ import { Button } from "@mui/material";
   
   
     return (
-      <div className="flex flex-col sm:gap-4 sm:py-4">
+      <div className="flex flex-col sm:gap-4 sm:py-4 px-[5.4rem]">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
             <CardTitle>Complaints</CardTitle>
@@ -151,7 +132,7 @@ import { Button } from "@mui/material";
           <CardContent>
             {" "}
             <Table>
-              <TableCaption>A list of complaints.</TableCaption>
+              <TableCaption>A list of my complaints.</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
@@ -160,12 +141,12 @@ import { Button } from "@mui/material";
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {complaints &&
-                  complaints.map((complaint) => (
-                    <TableRow key={complaint._id}>
-                      <TableCell onClick={() => openComplaint(complaint)}>{complaint.title}</TableCell>
-                      <TableCell onClick={() => openComplaint(complaint)}>{formatDate(complaint.date)}</TableCell>
-                      <TableCell><PendingAndResolved status={complaint.status} id = {complaint._id} onRefresh={onRefresh}/></TableCell>
+                {dummyComplaints &&
+                  dummyComplaints.map((complaint) => (
+                    <TableRow key={complaint._id}  onClick={() => {navigate(`/complaintDetails/${complaint._id}`)}}>
+                      <TableCell>{complaint.title}</TableCell>
+                      <TableCell>{complaint.date}</TableCell>
+                      <TableCell  className={`${complaint.status === "resolved" ? "text-green-500 border-green-500" : "text-orange-500 border-orange-500"}`}>{complaint.status}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

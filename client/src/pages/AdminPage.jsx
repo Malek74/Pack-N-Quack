@@ -43,8 +43,10 @@ import Complaints from "@/components/adminPage/complaints";
 import OneComplain from "@/components/adminPage/OneComplain";
 export default function AdminPage() {
   const navigate = useNavigate();
+  //complaints page stuff
   const [activeSection, setActiveSection] = useState("Users");
   const [currentComplaint, setCurrentComplaint] = useState({});
+  
   
 
   const openComplaint = (complaint) => {

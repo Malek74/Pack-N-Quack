@@ -14,6 +14,8 @@ import MarketplacePage from "@/pages/MarketplacePage";
 import RegistrationPage from "@/pages/RegistrationPage";
 import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary";
 import NotFoundPage from "@/components/errorBoundary/NotFoundPage";
+import ComplaintsPageTourist from "@/pages/ComplaintsPageTourist";
+import ComplaintDetailsPageTourist from "@/pages/ComplaintDetailsPageTourist";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -28,6 +30,8 @@ const routes = createRoutesFromElements(
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
     <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
+    <Route path="complaints" element={<ComplaintsPageTourist />} />
+    <Route path="complaintDetails/:id" element={<ComplaintDetailsPageTourist />} />
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route
       path="*"
