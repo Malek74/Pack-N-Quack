@@ -9,7 +9,8 @@ import {
     getMyBookings,
     redeemPoints,
     viewMyTourGuides,
-    viewMyItineraries
+    viewMyItineraries,
+    viewMyActivities
 } from '../controllers/touristController.js';
 
 
@@ -25,5 +26,6 @@ router.get('/myBookings/:id', getMyBookings);
 router.post('/redeemPoints/:id', redeemPoints);
 router.get('/mytourguides/:id', viewMyTourGuides);
 router.get('/myitineraries/:id', viewMyItineraries);
+router.get('/myactivities/:id', viewMyActivities);
 
 export default router;

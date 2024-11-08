@@ -202,6 +202,7 @@ export const redeemPoints = async (req, res) => {
 
 }
 
+//TODO: edit so that the Itinerary status is confirmed
 export const viewMyTourGuides = async (req, res) => {
     const touristID = req.params.id;
     if (!touristID) {
@@ -216,18 +217,17 @@ export const viewMyTourGuides = async (req, res) => {
                                     { _id: { $in: myBookings.map(booking => booking.itineraryID) } }
                                     );
 
-        // const myActivities = await activityModel.find({ _id: { $in: myBookings.map(booking => booking.activityID) } });
         const myItineraryTourGuides = await TourGuide.find(
                                         { _id: { $in: myItineraries.map(itinerary => itinerary.tourGuideID) } })
                                         .select('username email _id');
 
-        // const myActivityTourGuides = await TourGuide.find({ _id: { $in: myActivities.map(activity => activity.tourGuideID) } });
         return res.status(200).json(myItineraryTourGuides);
     }catch(error){
         return res.status(500).json({ message: error.message });
     }
 }
 
+//TODO: edit so that the Itinerary status is confirmed
 export const viewMyItineraries = async (req, res) => {
     const touristID = req.params.id;
     if (!touristID) {
@@ -243,6 +243,25 @@ export const viewMyItineraries = async (req, res) => {
                                     );
 
         return res.status(200).json(myItineraries);
+    }catch(error){
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+//TODO: edit so that the Activity status is confirmed
+export const viewMyActivities = async (req, res) => {
+    const touristID = req.params.id;
+    if (!touristID) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+    }
+    try{
+        const myBookings = await Booking.find(
+            {touristID: touristID, date: { $gte: new Date() } }
+        );
+        const myActivities = await activityModel.find(
+            { _id: { $in: myBookings.map(booking => booking.activityID) } }
+        );
+        return res.status(200).json(myActivities);
     }catch(error){
         return res.status(500).json({ message: error.message });
     }
