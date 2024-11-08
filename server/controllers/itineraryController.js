@@ -5,6 +5,7 @@ import tourist from '../models/touristSchema.js';
 import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
+import { uploadImages } from '../utils/Helpers.js';
 
 
 
@@ -329,5 +330,31 @@ export const getAllLanguages = async (req, res) => {
         return res.status(200).json(languages);
     } catch (error) {
         return res.status(404).json({ message: error.message });
+    }
+}
+
+export const addImagesToItinerary = async(req, res) => {
+    const itineraryID = req.params.id;
+    // console.log(req.body);
+    const {dayNo, activityNo} = req.body;
+    const images = req.files['images'];
+    // console.log(images);
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if(!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try {
+        const uploadResult = await uploadImages(images);
+        if(uploadResult.success){
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, {$set: {[`days.${dayNo}.activities.${activityNo}.image`]: uploadResult.urls[0]}}, { new: true });
+            return res.status(200).json({ message: "Images uploaded successfully" }, newItinerary);
+        }
+        
+        return res.status(400).json( {message : uploadResult.message} );
+    }catch(error) {
+        return res.status(500).json({ message: error.message });
     }
 }
