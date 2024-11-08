@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProductCard from "@/components/marketplacePage/ProductCard";
 import Activitiesbackground from "/assets/images/Background.jpg";
 import BannerImage from "/assets/images/homeBanner.png";
@@ -6,9 +6,17 @@ import Banner from "../components/shared/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
+import axios from "axios";
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [preferedFirstCategory] = "";
+  const [preferedSecondCategory] = "";
+  const [preferedFirstTag] = "";
+  const [preferedSecondTag] = "";
+  const [activities, setActivities] = useState([]);
+  const [places, setPlaces] = useState([]);
+  const [itineraries, setItineraries] = useState([]);
 
   const products = [
     {
@@ -102,6 +110,46 @@ export default function HomePage() {
       description: "Another product example",
     },
   ];
+
+
+  useEffect(() => {
+    const fetchActivites = async () => {
+      try {
+        const response = await axios.post("/api/activity/filterSort",
+          {
+            category: preferedFirstCategory, category2: preferedSecondCategory,
+            tags: preferedFirstTag, tags2: preferedSecondTag
+          });
+        console.log(response.data);
+        setActivities(response.data);
+        console.log(selectedRange);
+
+        console.log(selectedFilters["Sort By"]);
+
+      } catch (error) {
+        console.error(error);
+      }
+
+    };
+    const fetchData = async () => {
+      try {
+        const fetchedTags = await axios.get("/api/activity/tag");
+        const fetchedCategories = await axios.get("/api/activity/category");
+        setTags(fetchedTags.data);
+        setCategories(fetchedCategories.data);
+        buttons[1].options = fetchedCategories.data.map((category) => category.name);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchActivites();
+    fetchData();
+
+  }, [searchTerm, minPrice, maxPrice, selectedFilters, selectedTags, count, selectedRange]);
+
+
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())

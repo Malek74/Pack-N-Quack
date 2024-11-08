@@ -9,9 +9,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import FlightBookingForm from "../forms/flightBookingForm";
-import CreateDialog from "../shared/CreateDialog";
-
-
 
 
 
@@ -88,11 +85,8 @@ const FlightResults = ({ flights, onSelect, handleBooking }) => {
                             ))
                             }
                             <TableCell className="text-right">
-                                {/* <Button className="bg-skyblue hover:bg-sky-800 h-min"
-                                    onClick={() => onSelect(flight)}
-                                >Select Flight</Button> */}
-                                <FlightBookingForm flight={flight} onBook={handleBooking} onSelect={onSelect} />
 
+                                <FlightBookingForm flight={flight} onBook={handleBooking} onSelect={onSelect} />
 
                             </TableCell>
                         </TableRow>

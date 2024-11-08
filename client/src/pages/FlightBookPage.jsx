@@ -1,7 +1,6 @@
 import { useState } from "react";
 import FlightSearchForm from "@/components/forms/flightSearchForm";
 import FlightResults from "@/components/bookingFlights/flightResult";
-import FlightBookingForm from "@/components/forms/flightBookingForm";
 import axios from "axios";
 import {
     Card,
@@ -9,16 +8,18 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import CreateDialog from "@/components/shared/CreateDialog";
+import Loading from "@/components/shared/Loading";
 
 const FlightBookingApp = () => {
     const [flights, setFlights] = useState([]);
     const [selectedFlight, setSelectedFlight] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    //const [selectedFlightPrice, setSelectedFlightPrice] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const userID = "6725442e98359339d8b821f0";
     const searchFlights = async (originLocationCode, destinationLocationCode, departureDate) => {
         //    departureDate = "2025-08-01";
         //  console.log(originLocationCode, destinationLocationCode, departureDate);
+        setLoading(true);
         try {
             const response = await axios.post('/api/bookFlight', {
                 "originLocationCode": originLocationCode,
@@ -34,18 +35,32 @@ const FlightBookingApp = () => {
         } catch (error) {
             console.error("Error searching flights:", error);
             return null;
+        } finally {
+            setLoading(false); // Set loading to false after operation completes
         }
     };
-
-    const bookFlight = async (flightOffer, travelerInfo) => {
+    // const getPrice = async (flight) => {
+    //     try {
+    //         const response = await axios.post('api/bookFlight/flightPrice', { flight: JSON.stringify(flight) });
+    //         console.log("entered");
+    //         console.log("Flight Price:", response.data);
+    //         setSelectedFlightPrice(response.data);
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Error getting flight price:", error);
+    //     }
+    // }
+    const bookFlight = async (id, flightOffer, numTickets) => {
         try {
-            const response = await axios.post('/api/book', {
-                data: {
-                    type: "flight-order",
-                    flightOffers: [flightOffer],
-                    travelers: [travelerInfo],
-                },
+            const response = await axios.post(`/api/bookFlight/book/${id}`, {
+                price: flightOffer.price.total,
+                currency: flightOffer.price.currency,
+                numTickets: numTickets,
+                origin: flightOffer.itineraries[0].segments[0].departure.iataCode,
+                destination: flightOffer.itineraries[0].segments[flightOffer.itineraries[0].segments.length - 1].arrival.iataCode,
             });
+            window.location.href = response.data.url;
+
             console.log("Booking successful:", response.data);
         } catch (error) {
             console.error("Error booking flight:", error);
@@ -65,44 +80,34 @@ const FlightBookingApp = () => {
 
     const handleSelectFlight = (flight) => {
         setSelectedFlight(flight);
-        setIsDialogOpen(true); // Open the dialog when a flight is selected
         console.log(selectedFlight);
+        // const FullPrice = getPrice(flight);
+        // setSelectedFlightPrice(FullPrice);
+        // console.log("Price got");
+        // console.log(selectedFlightPrice);
     };
 
 
-    const handleBooking = (travelerInfo) => {
+
+    const handleBooking = (numTickets) => {
         if (selectedFlight) {
-            const flightBookingData = {
-                ...travelerInfo,
-                flightOffer: selectedFlight,
-            };
-            bookFlight(flightBookingData); // Book the selected flight with traveler info
-            console.log("Booking confirmed!", flightBookingData);
+
+            bookFlight(userID, selectedFlight, numTickets); // Book the selected flight with traveler info
         } else {
             console.log("No flight selected.");
         }
     };
 
     return (
-        <div className=" flex justify-center m-8 w-full">
+        <div className=" flex justify-center m-8 w-auto">
             <Card>
                 <CardHeader>
                     <CardTitle>Book a Flight</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <FlightSearchForm onSearch={handleSearch} />
-
-                    <FlightResults flights={flights} onSelect={handleSelectFlight} handleBooking={handleBooking} />
-
-                    {/* {selectedFlight && isDialogOpen &&
-
-                        <FlightBookingForm
-                            flight={selectedFlight}
-                            onBook={handleBooking}
-
-                            onClose={() => setIsDialogOpen(false)}
-                        />
-                    } */}
+                    <div className="flex justify-center "> {loading && <Loading />}</div>
+                    < FlightResults flights={flights} onSelect={handleSelectFlight} handleBooking={handleBooking} />
                 </CardContent>
             </Card>
         </div>

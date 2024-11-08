@@ -1,8 +1,8 @@
 import { useState } from "react";
 import HotelSearchForm from "@/components/forms/hotelSearchForm";
 import HotelResults from "@/components/bookingHotels/hotelResult";
-import HotelBookingForm from "@/components/forms/hotelBookingForm";
 import axios from "axios";
+import Loading from "@/components/shared/Loading";
 import {
     Card,
     CardContent,
@@ -13,65 +13,45 @@ import {
 const HotelBookingApp = () => {
     const [hotels, setHotels] = useState([]);
     const [selectedHotel, setSelectedHotel] = useState(null);
+    const [selectedHotelDetails, setSelectedHotelDetails] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const searchHotels = async (cityName) => {
         console.log(cityName);
+        setLoading(true);
         try {
             const response = await axios.post('/api/hotels', {
                 "cityName": cityName
             });
             console.log(cityName);
             console.log("Hotel Search Results:", response.data);
+            setHotels(response.data);
             return response.data;
         } catch (error) {
             console.error("Error searching hotels:", error);
             return null;
+        } finally {
+            setLoading(false);
         }
     };
+
+    const showHotelDetails = (hotel) => {
+        try {
+            const response = axios.post('/api/hotels/rooms', {
+                hotelId: hotel.hotelId
+            });
+            console.log("Hotel Details:", response.data);
+            setSelectedHotelDetails(response.data);
+        } catch (error) {
+            console.error("Error showing hotel details:", error);
+        }
+    }
 
     const bookHotel = async (hotelOffer) => {
         try {
             const response = await axios.post('/api/bookhotel',
                 {
-                    data: {
-                        type: "hotel-order",
-                        hotelOffers: [hotelOffer],
-                        travelers: [
-                            {
-                                id: "1",
-                                dateOfBirth: "1982-01-16",
-                                name: {
-                                    firstName: "JORGE",
-                                    lastName: "GONZALES",
-                                },
-                                gender: "MALE",
-                                contact: {
-                                    emailAddress: "jorge.gonzales833@telefonica.es",
-                                    phones: [
-                                        {
-                                            deviceType: "MOBILE",
-                                            countryCallingCode: "34",
-                                            number: "480080076",
-                                        },
-                                    ],
-                                },
-                                documents: [
-                                    {
-                                        documentType: "PASSPORT",
-                                        birthPlace: "Madrid",
-                                        issuanceLocation: "Madrid",
-                                        issuanceDate: "2015-04-14",
-                                        number: "00000000",
-                                        expiryDate: "2025-04-14",
-                                        issuanceCountry: "ES",
-                                        validityCountry: "ES",
-                                        nationality: "ES",
-                                        holder: true,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
+                    hotelId: hotelOffer.hotelId
                 });
             console.log("Booking successful:", response.data);
         } catch (error) {
@@ -82,19 +62,20 @@ const HotelBookingApp = () => {
 
 
     // Simulating hotel search API response
-    const handleSearch = (originLocationCode, destinationLocationCode, departureDate, adults) => {
+    const handleSearch = (cityName) => {
         // const mockhotels = [
         //     { origin, destination, departureDate, price: 200 },
         //     { origin, destination, departureDate, price: 250 },
         //     { origin, destination, departureDate, price: 180 },
         // ];
-        const searchedhotels = searchHotels(originLocationCode, destinationLocationCode, departureDate, adults);
+        const searchedhotels = searchHotels(cityName);
         setHotels(searchedhotels);
         setSelectedHotel(null); // Reset selection if new search is performed
     };
 
     const handleSelecthotel = (hotel) => {
         setSelectedHotel(hotel);
+        //    showHotelDetails(hotel);
     };
 
 
@@ -115,10 +96,11 @@ const HotelBookingApp = () => {
                 </CardHeader>
                 <CardContent>
                     <HotelSearchForm onSearch={handleSearch} />
+                    <div className="flex justify-center"> {loading && <Loading />}</div>
 
-                    <HotelResults hotels={hotels} onSelect={handleSelecthotel} />
+                    <HotelResults hotels={hotels} onBook={handleBooking} onSelect={handleSelecthotel} selectedHotelDetails={selectedHotelDetails} />
 
-                    {selectedHotel && <HotelBookingForm hotel={selectedHotel} onBook={handleBooking} />}
+                    {/* {selectedHotel && <HotelBookingForm hotel={selectedHotel} onBook={handleBooking} />} */}
                 </CardContent>
             </Card>
         </div>

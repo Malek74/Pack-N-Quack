@@ -355,6 +355,7 @@ export default function NewTouristForm(props) {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Preferred Category</FormLabel>
+              <FormDescription>Select your two prefered categories </FormDescription>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -472,6 +473,148 @@ export default function NewTouristForm(props) {
                               className={cn(
                                 "ml-auto h-4 w-4",
                                 category === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* First Tag Field */}
+        <FormField
+          control={form.control}
+          name="preferedFirstTag"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Preferred Tag</FormLabel>
+              <FormDescription>Select your two prefered tags </FormDescription>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? tags.find(
+                          (tag) => tag === field.value
+                        )
+                        : "Select tag"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search tag..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No tag found.</CommandEmpty>
+                      <CommandGroup>
+                        {tags.map((tag) => (
+                          <CommandItem
+                            value={tag}
+                            key={tag}
+                            onSelect={() => {
+                              // Update the nationality field immediately
+                              form.setValue("tag", tag, {
+                                shouldValidate: true,
+                              });
+
+                              // Trigger validation on the nationality field to update it instantly
+                              form.trigger("tag");
+                            }}
+                          >
+                            {tag}
+                            <CheckIcon
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                tag === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Second Category Field */}
+        <FormField
+          control={form.control}
+          name="preferedSecondTag"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? tags.find(
+                          (tag) => tag === field.value
+                        )
+                        : "Select tag"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search tag..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No tag found.</CommandEmpty>
+                      <CommandGroup>
+                        {tags.map((tag) => (
+                          <CommandItem
+                            value={tag}
+                            key={tag}
+                            onSelect={() => {
+                              // Update the tag field immediately
+                              form.setValue("tag", tag, {
+                                shouldValidate: true,
+                              });
+
+                              // Trigger validation on the tag field to update it instantly
+                              form.trigger("tag");
+                            }}
+                          >
+                            {tag}
+                            <CheckIcon
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                tag === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
