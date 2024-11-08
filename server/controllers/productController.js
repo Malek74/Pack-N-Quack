@@ -4,6 +4,9 @@ import seller from "../models/sellerSchema.js";
 import Stripe from "stripe";
 import { convertPrice, getConversionRate } from "../utils/Helpers.js";
 import cloudinary from '../utils/cloudinary.js';
+import PurchasedItem from "../models/purchasedSchema.js";
+import Tourist from "../models/touristSchema.js";
+
 
 //get product by ID
 export const getProductByID = async (req, res) => {
@@ -315,7 +318,6 @@ export const allProductSwQ = async (req, res) => {
 };
 
 
-
 export const eachProductSwQ = async (req, res) => {
     const name = req.params.name;
     try {
@@ -327,8 +329,6 @@ export const eachProductSwQ = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
-
 
 export const getProducts = async (req, res) => {
     const name = req.query.name;
@@ -400,6 +400,31 @@ export const getProducts = async (req, res) => {
         return res.status(500).json({ message: error.message }); // Handle server errors
     }
 };
+
+export const getMyProducts = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        //fetch tourist
+        const tourist = await Tourist.findById(id);
+
+        //check if user exists
+        if (!tourist) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        //fetch products bought by the user
+        const boughtProducts = await PurchasedItem.find({ user: id }).select('items.items').populate('items.productId');
+
+
+        //return products
+        return res.status(200).json(boughtProducts);
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
+}
 
 
 /*//get all products

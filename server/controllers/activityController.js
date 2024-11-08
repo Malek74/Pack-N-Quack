@@ -433,8 +433,19 @@ export const getMyActivities = async (req, res) => {
 export const viewSingleActivity = async (req, res) => {
     const id = req.params.id;
     const prefCurrency = req.query.currency;
+    let conversionRate;
     try {
+
+        if (prefCurrency) {
+             conversionRate = await getConversionRate(prefCurrency);
+        }
+
         const activity = await activityModel.findById(id).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        if (conversionRate) {
+            
+        }
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
         }

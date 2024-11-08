@@ -1,5 +1,5 @@
 import express from "express";
-import { getProducts, createProduct, getMaxPrice, getProductByID, updateProduct, searchProduct, editProduct, deleteProduct, allProductSwQ, eachProductSwQ } from "../controllers/productController.js";
+import { getProducts, createProduct, getMaxPrice, getProductByID, updateProduct, searchProduct, getMyProducts, editProduct, deleteProduct, allProductSwQ, eachProductSwQ } from "../controllers/productController.js";
 import { upload } from "../middleware/multer.js";
 
 const router = express.Router();
@@ -13,6 +13,8 @@ router.delete("/delete/:id", deleteProduct);
 router.get("/maxProductPrice", getMaxPrice);
 router.get("/allSwQ", allProductSwQ);
 router.get("/eachSwQ/:name", eachProductSwQ);
+router.get("/myProducts/:id", getMyProducts);
+
 
 export default router;
 
