@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "@/components/marketplacePage/ProductCard";
 import Activitiesbackground from "/assets/images/Background.jpg";
-import BannerImage from "/assets/images/homeBanner.png";
+import BannerImage from "/assets/images/homeBanner2.jpg";
 import Banner from "../components/shared/BannerV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
 import ActivityCard from "@/components/activityPage/ActivityCard";
-import ItineraryCard from "@/components/itinerariesPage/ItineraryCard";
+import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import { set } from "date-fns";
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const userID = "672f5db6360e0500b33a89e5";
+  const userID = "672f8e2c142c1410c5243616";
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
   // const products = [
@@ -128,11 +128,18 @@ export default function HomePage() {
 
   }, [searchTerm]);
 
+  const filteredActivities = activities
+    ? activities.filter((activity) =>
+      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    : [];
 
+  const filteredItineraries = itineraries
+    ? itineraries.filter((itinerary) =>
+      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    : [];
 
-  // const filteredProducts = products.filter((product) =>
-  //   product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
 
   return (
     <div className="flex flex-col px-16">
@@ -140,19 +147,19 @@ export default function HomePage() {
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-          alt="Hustling market"
-          name="Live your dream destinations."
-          textAlign="left"
-          description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+        //    alt="Hustling market"
+        //    name="Live your dream destinations."
+        //    textAlign="left"
+        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for something fun to do!"} />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-        {Array.isArray(activities) ? (
-          activities.map((activity) => (
+      <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-center">
+        {Array.isArray(filteredActivities) && (
+          filteredActivities.map((activity) => (
             <ActivityCard
               key={activity.activityID}
               img={activity.coverImagePath}
@@ -173,25 +180,21 @@ export default function HomePage() {
 
             />
           ))
-        ) : (
-          <p>No activities found</p>
         )}
-        {Array.isArray(itineraries) ? (
-          itineraries.map((itinerary, index) => (
-            <ItineraryCard
-              key={index}
+        {Array.isArray(filteredItineraries) && (
+          filteredItineraries.map((itinerary) => (
+            <RamitoItinerariesCard
+              key={itinerary._id}
+              id={itinerary._id}
+              image={itinerary.image}
               name={itinerary.name}
               description={itinerary.description}
+              tags={itinerary.tags}
               price={itinerary.price}
-              rating={itinerary.rating}
-              reviewsCount={itinerary.reviewsCount}
-              img={itinerary.img}
-              seller={itinerary.seller}
-              id={itinerary._id}
+              rating={itinerary.ratings.averageRating}
+              numberOfReviews={itinerary.ratings.reviews.length}
             />
           ))
-        ) : (
-          <p>No itineraries found</p>
         )}
       </div>
     </div>

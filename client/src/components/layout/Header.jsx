@@ -4,6 +4,7 @@ import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import DropDownMenuProfile from "./components/DropDownMenuProfile";
 import logo from "/assets/icons/logo.png";
+import DropDownMenuBook from "./components/DropDownMenuBook";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
 
@@ -81,10 +82,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuProfile location={location} />
@@ -97,10 +98,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/historicalTourists")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historicalTourists")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuTourist />
@@ -113,13 +114,13 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
-              <DropDownMenuProfile location={location} />
+              <DropDownMenuBook location={location} />
             </li>
           </Button>
 

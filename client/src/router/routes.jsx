@@ -20,6 +20,7 @@ import SingleHistoricalPage from "@/pages/SingleHistoricalPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
 import TouristDashboard from "@/pages/TouristDashboard";
+import Transportation from "@/pages/TransportationPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -37,14 +38,16 @@ const routes = createRoutesFromElements(
     <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
     <Route path="activity/:id" element={<SingleActivityPage />} />
     <Route path="place/:name" element={<SingleHistoricalPage />} />
-    <Route path="Pointsandloyality" element={<PointsAndLoyalty />}/>
-    <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary> } />
+    <Route path="Pointsandloyality" element={<PointsAndLoyalty />} />
+    <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
+    <Route path="transportation/:idAdv" element={<Transportation />}></Route>
+    <Route path="transportation" element={<Transportation />}></Route>
 
-<Route path="touristDashboard" element={<TouristDashboard />} />
-    <Route 
+    <Route path="touristDashboard" element={<TouristDashboard />} />
+    <Route
       path="*"
       element={
         <ErrorBoundary>
