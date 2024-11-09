@@ -9,7 +9,10 @@ import {
     getMyBookings,
     redeemPoints,
     getMyFlights,
-    getMyHotels
+    getMyHotels,
+    viewMyTourGuides,
+    viewMyItineraries,
+    viewMyActivities
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints } from '../controllers/complaintController.js';
 
@@ -28,5 +31,8 @@ router.get('/complaints/:id', viewMyComplaints);
 router.post('/complaints', createComplaint);
 router.get('/myFlights/:id', getMyFlights);
 router.get('/myHotels/:id', getMyHotels);
+router.get('/mytourguides/:id', viewMyTourGuides);
+router.get('/myitineraries/:id', viewMyItineraries);
+router.get('/myactivities/:id', viewMyActivities);
 
 export default router;

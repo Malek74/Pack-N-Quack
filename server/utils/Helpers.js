@@ -8,6 +8,10 @@ import tourist from '../models/touristSchema.js';
 import activityModel from "../models/activitySchema.js";
 import product from "../models/productSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
+// import cloudinary from '../utils/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
+
+import dotenv from 'dotenv';
 import axios from "axios";
 import { json } from "express";
 
@@ -243,4 +247,44 @@ export const getConversionRate = async (currency) => {
     }
     const response = await axios.get(`https://v6.exchangerate-api.com/v6/${process.env.EXHANGE_RATE_API_KEY}/pair/USD/${currency}`);
     return response.data.conversion_rate;
+}
+export const uploadImages = async (filesArray) => {
+    const imagesUrls = [];
+    cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Replace with your Cloudinary cloud name
+    api_key: process.env.CLOUDINARY_API_KEY,        // Replace with your API Key
+    api_secret: process.env.CLOUDINARY_API_SECRET,  // Replace with your API Secret
+});
+
+    try {
+        for (const file of filesArray) {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url);
+        }
+        
+        return { success: true, urls: imagesUrls };
+    } catch (error) {
+        console.error("Error uploading images:", error.message);
+        return { success: false, message: error.message };
+    }
 }

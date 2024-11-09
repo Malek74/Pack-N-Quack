@@ -5,6 +5,8 @@ import Tourist from '../models/touristSchema.js';
 import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
+import { uploadImages } from '../utils/Helpers.js';
+import activityTag from '../models/activityTagSchema.js';
 import { getConversionRate } from '../utils/Helpers.js';
 import cloudinary from '../utils/cloudinary.js';
 
@@ -14,14 +16,15 @@ import cloudinary from '../utils/cloudinary.js';
 //@route POST api/itinerary
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
-
     //fetch data from request body
     const tourGuideID = req.body.tourGuideID;
-    const name = req.body.title;
-    const available_dates = req.body.dates;
-    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description, isActive } = req.body;
+    const name = req.body.name;
+    const { language, price, accessibility, tags, description, available_dates } = req.body;
+    const days = JSON.parse(req.body.days);
+    const pickUpLocation = JSON.parse(req.body.pickUpLocation);
+    const dropOffLocation = JSON.parse(req.body.dropOffLocation);
+    const { images, coverImage, activityImages } = req.files;
     let tagsIDS = []
-    console.log(req.body);
     //validate that all fields are present
     if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility || !isActive) {
         if (!name) {
@@ -39,9 +42,11 @@ export const addItinerary = async (req, res) => {
         if (!price) {
             return res.status(400).json({ "message": "Price is missing" });
         }
+        //console.log(available_dates)
         if (!available_dates) {
             return res.status(400).json({ "message": "Available dates is missing" });
         }
+        console.log(pickUpLocation)
         if (!pickUpLocation) {
             return res.status(400).json({ "message": "Pick up location is missing" });
         }
@@ -61,19 +66,13 @@ export const addItinerary = async (req, res) => {
             return res.status(400).json({ "message": "Actiivity of itinerary is missing" });
         }
     }
-    console.log(tags);
 
     for (let i = 0; i < tags.length; i++) {
         const tag = await itineraryTags.findOne({ tag: tags[i] });
         tagsIDS.push(tag._id);
     }
 
-    console.log(tagsIDS);
-
-
     try {
-
-
         //create product on stripe
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const productStripe = await stripe.products.create({
@@ -84,45 +83,78 @@ export const addItinerary = async (req, res) => {
                 unit_amount: price * 100,
             },
         });
+        let coverImageUrl = "";
+        if (coverImage) {
+            const uploadResult = await uploadImages(coverImage);
+            console.log(uploadResult)
+            if (uploadResult.success) {
+                coverImageUrl = uploadResult.urls[0];
+                console.log("3amal dyh")
+            } else {
+                return res.status(400).json({ message: uploadResult.message });
+            }
+        }
 
+        let imagesUrls = []
+        if (images) {
+            const uploadResult = await uploadImages(images);
+            if (uploadResult.success) {
+                imagesUrls = uploadResult.urls;
+            } else {
+                return res.status(400).json({ message: uploadResult.message });
+            }
+        }
+        let updatedDays = {}
+        if (activityImages) {
+            const activityImagesUrls = (await uploadImages(activityImages)).urls
 
-        //add images
-        try {
-            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
-            const publicId = sanitizedPublicId;
+            let activityCount = 0;
 
-            const result = await new Promise((resolve, reject) => {
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: 'image',
-                        public_id: publicId,
-                        overwrite: true,
-                    },
-                    (error, result) => {
-                        if (error) {
-                            console.error("Cloudinary upload error:", error);
-                            return reject(error);
-                        }
-                        resolve(result);
-                    }
-                );
-
-                uploadStream.end(file.buffer);
+            updatedDays = days.map(day => {
+                return {
+                    ...day,
+                    activities: day.activities.map(activity => {
+                        // Replace the image attribute with the next URL from the array
+                        const updatedActivity = {
+                            ...activity,
+                            image: activityImagesUrls[activityCount],
+                        };
+                        // Increment the URL index, wrapping around if necessary
+                        activityCount++;
+                        return updatedActivity;
+                    })
+                };
             });
 
-            imagesUrls.push(result.secure_url)
-        }
-        catch (error) {
-            console.error("Error during image upload to Cloudinary:", error);
-            return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+
+            // let dayCount = 0;
+            // for(let i = 0; i<activityImagesUrls.length; i++){
+            //     days[dayCount].activity[i].image = activityImagesUrls[i]
+            //     if( i+1 % days.length === 0 ){
+            //         dayCount++
+            //     }
+            // }
         }
 
+
+
+
+        // for(let i = 0; i < days.length; i++){
+        //     for(let j = 0; j < days[i].activities.length; j++){
+        //         const uploadResult = await uploadImages(days[i].activities[j].image);
+        //         if(uploadResult.success){
+        //             days[i].activities[j].image = uploadResult.urls[0];
+        //         }
+        //         return res.status(400).json( {message : uploadResult.message} );
+        //     }
+        // }
+        // }
 
         const itinerary = new Itinerary({
             stripeID: productStripe.id,
             name: name,
             tourGuideID: tourGuideID,
-            days: days,
+            days: updatedDays,
             language: language,
             price: price,
             available_dates: available_dates,
@@ -131,13 +163,15 @@ export const addItinerary = async (req, res) => {
             accessibility: accessibility,
             tags: tagsIDS,
             description: description,
-            isActive: isActive,
+            isActive: true,
+            images: imagesUrls,
+            coverImage: coverImageUrl
         });
         const createdItinerary = await Itinerary.create(itinerary);
+
         return res.status(201).json(createdItinerary);
     }
     catch (error) {
-        console.log(error);
         return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
 
@@ -227,7 +261,7 @@ export const getItinerary = async (req, res) => {
 
     const id = req.query.id;
     const name = req.query.name;
-    const tag = req.query.tag;
+    const tags = req.query.tags;
     const maxBudget = req.query.maxBudget;
     const minBudget = req.query.minBudget;
     const minDate = req.query.minDate;
@@ -257,11 +291,16 @@ export const getItinerary = async (req, res) => {
         if (name) {
             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
         }
+        if (tags) {
+            const tagsArray = tags.split(',');
+            if (tagsArray && tagsArray.length > 0) {
+                // Find all tag IDs based on the tag names provided
+                const tagIDs = await itineraryTags.find({ tag: { $in: tagsArray } }).select('_id');
 
-        if (tag) {
-            const tagID = await itineraryTags.findOne({ tag }).select('_id');
-            if (tagID) {
-                query.tags = { $elemMatch: { $eq: tagID._id } };
+                if (tagIDs.length > 0) {
+                    // Use $in to filter itineraries with any of these tags
+                    query.tags = { $in: tagIDs.map(tag => tag._id) };
+                }
             }
         }
 
@@ -706,3 +745,76 @@ export const rateIternary = async (req, res) => {
 }
 
 
+
+export const addCoverImageToItinerary = async (req, res) => {
+    const itineraryID = req.params.id;
+    const image = req.files['images'];
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if (!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try {
+        const uploadResult = await uploadImages(image);
+        if (uploadResult.success) {
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { coverImage: uploadResult.urls[0] }, { new: true });
+            return res.status(200).json({ message: "Image uploaded successfully", newItinerary });
+        }
+        return res.status(400).json({ message: uploadResult.message });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const addImagesToActivity = async (req, res) => {
+    const itineraryID = req.params.id;
+    // console.log(req.body);
+    const { dayNo, activityNo } = req.body;
+    const images = req.files['images'];
+    // console.log(images);
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if (!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try {
+        const uploadResult = await uploadImages(images);
+        console.log(uploadResult.success);
+        if (uploadResult.success) {
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { [`days.${dayNo}.activities.${activityNo}.image`]: uploadResult.urls[0] } }, { new: true });
+            console.log(newItinerary);
+            return res.status(200).json({ message: "Images uploaded successfully", newItinerary });
+        }
+
+        return res.status(400).json({ message: "message" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const addImagesToItinerary = async (req, res) => {
+    const itineraryID = req.params.id;
+    const images = req.files['images'];
+
+    const itinerary = await Itinerary.findById(itineraryID);
+
+    if (!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    try {
+        const uploadResult = await uploadImages(images);
+        if (uploadResult.success) {
+            const newItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { images: uploadResult.urls } }, { new: true });
+            return res.status(400).json(newItinerary);
+        }
+        return res.status(400).json({ message: uploadResult.message });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
