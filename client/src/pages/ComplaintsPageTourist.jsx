@@ -19,6 +19,8 @@ import {
     CardTitle,
   } from "@/components/ui/card";
   import { useNavigate } from "react-router-dom";
+import ComplaintForm from "@/components/forms/ComplaintForm";
+import CreateDialog from "@/components/shared/CreateDialog";
 
 //   const navigate = useNavigate();
 
@@ -128,6 +130,11 @@ import {
           <CardHeader>
             <CardTitle>Complaints</CardTitle>
             <CardDescription>Manage all complaints.</CardDescription>
+            <CreateDialog
+          title="Complaint"
+          form={<ComplaintForm />}
+        />
+            
           </CardHeader>
           <CardContent>
             {" "}
