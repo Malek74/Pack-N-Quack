@@ -8,13 +8,21 @@ import product from "../models/productSchema.js";
 //@route GET /api/transportation
 export const getTransportation = async (req, res) => {
     const currency = req.query.currency;
+    const advertiserID = req.query.advertiserID;
+    let transportation = [];
 
     try {
         const conversionRate = await getConversionRate(currency);
-        const transportation = await Transportation.find({}).populate('advertiserID');
+        if (advertiserID && advertiserID != "" && advertiserID != "undefined") {
+            transportation = await Transportation.find({ advertiserID: advertiserID }).populate('advertiserID');
+        }
+        else {
+            transportation = await Transportation.find().populate('advertiserID');
+        }
         transportation.forEach((transport) => { transport.price = transport.price * conversionRate });
         return res.status(200).json(transportation);
     } catch (error) {
+        console.log(error);
         return res.status(404).json({ message: error.message });
     }
 }

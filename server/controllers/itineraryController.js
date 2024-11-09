@@ -26,7 +26,8 @@ export const addItinerary = async (req, res) => {
     const { images, coverImage, activityImages } = req.files;
     let tagsIDS = []
     //validate that all fields are present
-    if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility || !isActive) {
+    console.log(req.body)
+    if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
         if (!name) {
             return res.status(400).json({ "message": "Name is missing" });
         }
@@ -62,14 +63,14 @@ export const addItinerary = async (req, res) => {
         if (!description) {
             return res.status(400).json({ "message": "Description is missing" });
         }
-        if (!isActive) {
-            return res.status(400).json({ "message": "Actiivity of itinerary is missing" });
-        }
+
     }
 
     for (let i = 0; i < tags.length; i++) {
         const tag = await itineraryTags.findOne({ tag: tags[i] });
-        tagsIDS.push(tag._id);
+        if (tag) {
+            tagsIDS.push(tag._id);
+        }
     }
 
     try {
@@ -89,9 +90,8 @@ export const addItinerary = async (req, res) => {
             console.log(uploadResult)
             if (uploadResult.success) {
                 coverImageUrl = uploadResult.urls[0];
-                console.log("3amal dyh")
             } else {
-                return res.status(400).json({ message: uploadResult.message });
+                return res.status(400).json({ message: imagesUrls.message });
             }
         }
 
@@ -157,7 +157,7 @@ export const addItinerary = async (req, res) => {
             days: updatedDays,
             language: language,
             price: price,
-            available_dates: available_dates,
+            available_dates: (available_dates.filter(date => date !== "")),
             pickUpLocation: pickUpLocation,
             dropOffLocation: dropOffLocation,
             accessibility: accessibility,
@@ -450,59 +450,9 @@ export const deleteItinerary = async (req, res) => {
     }
 }
 
-// export const updateItinerary = async (req, res) => {
-//     const itineraryID = req.params.id;
-//     const name = req.body.title;
-//     console.log("This is the request body:" + req.body);
-
-//     const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility } = req.body;
-//     const updatedFields = {};
-
-//     try {
-//         let itinerary = await Itinerary.findById(itineraryID);
-
-//         if (!itinerary) {
-//             return res.status(404).json({ message: "No itineraries found " + itinerary });
-//         }
-
-//         if (itinerary.bookings != 0) {
-//             res.status(404).json({ message: "Cannot update itinerary with bookings" })
-//         }
-
-//         const updatedFields = {};
-//         if (name) updatedFields.name = req.body.title;
-//         if (days) updatedFields.days = req.body.days;
-//         if (language) updatedFields.language = req.body.language;
-//         if (price) updatedFields.price = req.body.price;
-//         if (available_dates) updatedFields.available_dates = req.body.available_dates;
-//         if (pickUpLocation) updatedFields.pickUpLocation = req.body.pickUpLocation;
-//         if (dropOffLocation) updatedFields.dropOffLocation = req.body.dropOffLocation;
-//         if (accessibility) updatedFields.accessibility = req.body.accessibility;
-
-
-//         // if (activities) {
-//         //     updatedFields.$push = { activities: newActivity };
-//         // }
-
-//         console.log("updated Fields: " + updatedFields);
-
-//         // Update the itinerary using the updatedFields object
-//         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: updatedFields }, { new: true, runValidators: true });
-
-//         // Send the updated itinerary back in the response
-//         res.status(200).json(updatedItinerary);
-
-//     } catch (error) {
-//         res.status(401).json({ message: "itinerary deosn't exist:" + error.message });
-//         console.log(error);
-//     }
-
-
-// }
-
 export const getItineraryById = async (req, res) => {
     const id = req.params.id;
-    console.log(id);
+    const currency = req.query.currency;
 
     if (!id) {
         return res.status(400).json({ message: "Itinerary ID is required." });
@@ -510,8 +460,11 @@ export const getItineraryById = async (req, res) => {
     try {
 
         const itinerary = await Itinerary.findById(id).populate("tags tourGuideID");
-        const conversionRate = await getConversionRate(req.query.currency);
+        if (currency) {
+            const conversionRate = await getConversionRate(currency);
+            itinerary.price = itinerary.price * conversionRate;
 
+        }
         if (!itinerary) {
             return res.status(404).json({ message: "Itinerary not found ." });
         }
@@ -519,13 +472,10 @@ export const getItineraryById = async (req, res) => {
             return res.status(404).json({ message: "Itinerary is flagged." });
         }
 
-        if (conversionRate) {
-            itinerary.price = itinerary.price * conversionRate;
-        }
-
         return res.status(200).json(itinerary);
 
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -598,11 +548,11 @@ export const getAllLanguages = async (req, res) => {
 
 export const updateItinerary = async (req, res) => {
     const itineraryID = req.params.id;
-    const name = req.body.title;
-    console.log("This is the request body:" + req.body);
 
-    const { days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, isActive } = req.body;
-    const updatedFields = {};
+
+    const { name, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, isActive, images, activityImages, tags, description } = req.body;
+    console.log(req.body);
+    console.log(req.files);
 
     try {
         let itinerary = await Itinerary.findById(itineraryID);
@@ -611,21 +561,62 @@ export const updateItinerary = async (req, res) => {
             return res.status(404).json({ message: "No itineraries found " + itinerary });
         }
 
-        const numsOfBookings = await Booking.find({ itineraryID: req.params.id }).count();
+        const numsOfBookings = await Booking.find({ itineraryID: req.params.id });
+        console.log(numsOfBookings);
 
-        if (numsOfBookings != 0) {
+        if (numsOfBookings.length != 0) {
             res.status(404).json({ message: "Cannot update itinerary with bookings" })
+        }
+        let newImages = [];
+
+        const imagesToUpload = req.files['images'];
+        console.log(imagesToUpload);
+        if (imagesToUpload) {
+
+            const imagesUrls = await uploadImages(imagesToUpload);
+            if (imagesUrls.success) {
+                newImages.push(...images);
+                newImages.push(...imagesUrls.urls);
+            } else {
+                return res.status(400).json({ message: imagesUrls.message });
+            }
+        }
+        let newCoverImage = "";
+        if (req.files['coverImage']) {
+            const coverImageToUpload = req.files['coverImage'];
+            const coverImageUrl = await uploadImages(coverImageToUpload);
+            console.log(coverImageUrl);
+            console.log("HENA");
+            if (coverImageUrl.success) {
+                newCoverImage = coverImageUrl.urls[0];
+            } else {
+                return res.status(400).json({ message: coverImageUrl.message });
+            }
+            console.log(newCoverImage);
+        }
+        let tagsIDS = []
+        const tagsArray = tags.filter(tag => tag !== "");
+        for (let i = 0; i < tagsArray.length; i++) {
+            const tag = await itineraryTags.findOne({ tag: tagsArray[i] });
+            if (tag) {
+                tagsIDS.push(tag._id);
+            }
         }
 
         const updatedFields = {};
         if (name) updatedFields.name = req.body.title;
-        if (days) updatedFields.days = req.body.days;
+        if (days) updatedFields.days = JSON.parse(req.body.days);
         if (language) updatedFields.language = req.body.language;
         if (price) updatedFields.price = req.body.price;
-        if (available_dates) updatedFields.available_dates = req.body.available_dates;
-        if (pickUpLocation) updatedFields.pickUpLocation = req.body.pickUpLocation;
-        if (dropOffLocation) updatedFields.dropOffLocation = req.body.dropOffLocation;
+        if (available_dates) updatedFields.available_dates = (req.body.available_dates).filter(date => date !== "");
+        if (pickUpLocation) updatedFields.pickUpLocation = JSON.parse(req.body.pickUpLocation);
+        if (dropOffLocation) updatedFields.dropOffLocation = JSON.parse(req.body.dropOffLocation);
         if (accessibility) updatedFields.accessibility = req.body.accessibility;
+        if (newImages.length != 0) updatedFields.images = newImages.filter(image => image !== "");
+        if (activityImages) updatedFields.activityImages = activityImages.filter(image => image !== "");
+        if (tags) updatedFields.tags = tagsIDS;
+        if (newCoverImage != "") updatedFields.coverImage = newCoverImage;
+        if (description) updatedFields.description = description;
 
 
         if (itinerary.bookings == 0 & isActive == false) {
@@ -643,7 +634,8 @@ export const updateItinerary = async (req, res) => {
         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { ...updatedFields } }, { new: true, runValidators: true });
 
         // Send the updated itinerary back in the response
-        res.status(200).json(updatedItinerary);
+        return res.status(200).json(updatedItinerary);
+
 
     } catch (error) {
         res.status(401).json({ message: "Itinerary doesn't exist:" + error.message });
