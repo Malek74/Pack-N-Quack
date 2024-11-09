@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import HotelBookingForm from "../forms/hotelBookingForm";
 
-const HotelResults = ({ hotels, onSelect, handleBooking, selectedHotelDetails }) => {
+const HotelResults = ({ hotels, onSelect, onBook, selectedHotelDetails, handleShowDetails, loading }) => {
     if (!hotels || hotels.length === 0) {
         return <p>No hotels available.</p>;
     }
@@ -38,7 +38,7 @@ const HotelResults = ({ hotels, onSelect, handleBooking, selectedHotelDetails })
                                 {/* <Button className="bg-skyblue hover:bg-sky-800 h-min"
                                     onClick={() => onSelect(flight)}
                                 >Select Flight</Button> */}
-                                <HotelBookingForm hotel={hotel} onBook={handleBooking} onSelect={onSelect} selectedHotelDetails={selectedHotelDetails} />
+                                <HotelBookingForm hotel={hotel} onBook={onBook} onSelect={onSelect} selectedHotelDetails={selectedHotelDetails} handleShowDetails={handleShowDetails} loading={loading} />
 
 
                             </TableCell>

@@ -39,17 +39,7 @@ const FlightBookingApp = () => {
             setLoading(false); // Set loading to false after operation completes
         }
     };
-    // const getPrice = async (flight) => {
-    //     try {
-    //         const response = await axios.post('api/bookFlight/flightPrice', { flight: JSON.stringify(flight) });
-    //         console.log("entered");
-    //         console.log("Flight Price:", response.data);
-    //         setSelectedFlightPrice(response.data);
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error("Error getting flight price:", error);
-    //     }
-    // }
+
     const bookFlight = async (id, flightOffer, numTickets) => {
         try {
             const response = await axios.post(`/api/bookFlight/book/${id}`, {

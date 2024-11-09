@@ -24,7 +24,6 @@ import {
 export default function FlightBookingForm({ flight, onBook, onSelect }) {
 
 
-
     const formSchema = z.object({
         numTickets: z.preprocess((val) => Number(val), z.number())
 
@@ -32,7 +31,7 @@ export default function FlightBookingForm({ flight, onBook, onSelect }) {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            numTickets: "",
+            numTickets: 1,
         },
     });
 
