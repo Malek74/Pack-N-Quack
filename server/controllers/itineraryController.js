@@ -365,7 +365,7 @@ export const getItineraryById = async (req, res) => {
     }
 
     try {
-        const itineraryExists = await Itinerary.findById(id).populate("tags");
+        const itineraryExists = await Itinerary.findById(id).populate("tags").populate("tourGuideID");
 
         if (!itineraryExists) {
             return res.status(404).json({ message: "Itinerary not found." });
