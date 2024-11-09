@@ -6,6 +6,7 @@ import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
 import { uploadImages } from '../utils/Helpers.js';
+import activityTag from '../models/activityTagSchema.js';
 
 
 
@@ -13,14 +14,17 @@ import { uploadImages } from '../utils/Helpers.js';
 //@route POST api/itinerary
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
-    console.log(req);
+    console.log(req.files)
+    console.log("end of files")
+    console.log(req.files['coverImage'])
+    console.log("end of cover Images")
+    console.log(req.body);
+    console.log("end of body")
     //fetch data from request body
     const tourGuideID = req.body.tourGuideID;
-    const name = req.body.title;
-    const available_dates = req.body.dates;
-    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description, images, coverImage } = req.body;
+    const name = req.body.name;
+    const { days, language, price, pickUpLocation, dropOffLocation, accessibility, tags, description, images, coverImage, activityImages,available_dates } = req.body;
     let tagsIDS = []
-    console.log(req.body);
     //validate that all fields are present
     if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
         if (!name) {
@@ -38,9 +42,11 @@ export const addItinerary = async (req, res) => {
         if (!price) {
             return res.status(400).json({ "message": "Price is missing" });
         }
+        //console.log(available_dates)
         if (!available_dates) {
             return res.status(400).json({ "message": "Available dates is missing" });
         }
+        console.log(pickUpLocation)
         if (!pickUpLocation) {
             return res.status(400).json({ "message": "Pick up location is missing" });
         }
@@ -57,13 +63,13 @@ export const addItinerary = async (req, res) => {
             return res.status(400).json({ "message": "Description is missing" });
         }
     }
-    console.log(tags);
+    const tagstoLoop = tags.split(',')
     for (let i = 0; i < tags.length; i++) {
         const tag = await itineraryTags.findOne({ tag: tags[i] });
-        tagsIDS.push(tag._id);
+        console.log(tag)
     }
-
-    console.log(tagsIDS);
+    console.log(tagsIDS)
+    console.log("end of days")
 
 
     try {
@@ -96,17 +102,39 @@ export const addItinerary = async (req, res) => {
             return res.status(400).json( {message : uploadResult.message} );
         }
 
-        if(days){
-            for(let i = 0; i < days.length; i++){
-                for(let j = 0; j < days[i].activities.length; j++){
-                    const uploadResult = await uploadImages(days[i].activities[j].image);
-                    if(uploadResult.success){
-                        days[i].activities[j].image = uploadResult.urls[0];
-                    }
-                    return res.status(400).json( {message : uploadResult.message} );
+        if(activityImages){
+            const activityImagesUrls = (await uploadImages(activityImages)).urls
+            let activityCount = 0;
+            for(let day = 0; day < days.length && activityCount < activityImagesUrls.length ;i++){
+                for(let activity = 0; activity < day.activities.length; activity++){
+                    days[day].activities[activity].image = activityCount
+                    activityCount++;
                 }
             }
+            
+            
+            // let dayCount = 0;
+            // for(let i = 0; i<activityImagesUrls.length; i++){
+            //     days[dayCount].activity[i].image = activityImagesUrls[i]
+            //     if( i+1 % days.length === 0 ){
+            //         dayCount++
+            //     }
+            // }
         }
+            
+
+
+
+            // for(let i = 0; i < days.length; i++){
+            //     for(let j = 0; j < days[i].activities.length; j++){
+            //         const uploadResult = await uploadImages(days[i].activities[j].image);
+            //         if(uploadResult.success){
+            //             days[i].activities[j].image = uploadResult.urls[0];
+            //         }
+            //         return res.status(400).json( {message : uploadResult.message} );
+            //     }
+            // }
+        // }
 
 
 
@@ -131,7 +159,6 @@ export const addItinerary = async (req, res) => {
         return res.status(201).json(createdItinerary);
     }
     catch (error) {
-        console.log(error);
         return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
 
