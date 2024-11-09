@@ -26,8 +26,14 @@ const formSchema = z.object({
   description: z.string().min(1, "Please enter a description"),
   language: z.string().min(1, "Language is required"),
   price: z.coerce.number().min(1, "Price is required"),
-  pickUpLocation: z.string().min(1, "Pick-up location is required"),
-  dropOffLocation: z.string().min(1, "Drop-off location is required"),
+  pickUpLocation: z.object({
+    name: z.string().min(1, "Pick-up location is required"),
+    googleMapLink: z.string().url("Invalid URL"),
+  }),
+  dropOffLocation: z.object({
+    name: z.string().min(1, "Drop-off location is required"),
+    googleMapLink: z.string().url("Invalid URL"),
+  }),
   accessibility: z.string().min(1, "Accessibility is required"),
   available_dates: z
     .array(z.string().min(1, "Date is required"))
@@ -35,6 +41,8 @@ const formSchema = z.object({
   tags: z
     .array(z.string().min(1, "Tag is required"))
     .min(1, "At least one tag is required"),
+  coverImage: z.string().min(1, "Cover image is required"),
+  images: z.array(z.string().min(1, "Image is required")),
   days: z
     .array(
       z.object({
@@ -50,6 +58,7 @@ const formSchema = z.object({
                 endTime: z.string().min(1, "End time is required"),
               }),
               description: z.string().min(1, "Description is required"),
+              image: z.array(z.string().min(1, "Image is required")),
             })
           )
           .min(1, "Each day must have at least one activity"),
@@ -66,8 +75,8 @@ export default function CreateItineraryForm() {
       description: "",
       language: "",
       price: "",
-      pickUpLocation: "",
-      dropOffLocation: "",
+      pickUpLocation: { name: "", googleMapLink: "" },
+      dropOffLocation: { name: "", googleMapLink: "" },
       accessibility: "",
       available_dates: [],
       tags: [],
@@ -81,6 +90,7 @@ export default function CreateItineraryForm() {
               googleMapLink: "",
               duration: { startTime: "", endTime: "" },
               description: "",
+              image: [],
             },
           ],
         },
@@ -103,6 +113,7 @@ export default function CreateItineraryForm() {
           googleMapLink: "",
           duration: { startTime: "", endTime: "" },
           description: "",
+          image: [],
         },
       ],
     },
@@ -133,6 +144,7 @@ export default function CreateItineraryForm() {
       googleMapLink: "",
       duration: { startTime: "", endTime: "" },
       description: "",
+      image: [],
     });
     setDays(updatedDays);
   };
@@ -153,6 +165,7 @@ export default function CreateItineraryForm() {
           googleMapLink: "",
           duration: { startTime: "", endTime: "" },
           description: "",
+          image: [],
         },
       ], // Start with one default activity
     };
@@ -184,11 +197,45 @@ export default function CreateItineraryForm() {
     ); // Map to the date strings)
 
     form.setValue("days", days);
-  }, [selectedTags, form, dates, days]);
 
-  const onSubmit = (values) => {
-    console.log("HII");
-    console.log(values);
+    form.setValue("coverImage", coverImage[0]);
+
+    form.setValue("images", itineraryImages);
+  }, [selectedTags, form, dates, days, coverImage, itineraryImages]);
+
+  const onSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append("coverImage", values.coverImage);
+      for (let index = 0; index < itineraryImages.length; index++) {
+        formData.append("images", itineraryImages[index]);
+      }
+      days.forEach((day) => {
+        day.activities.forEach((activity) => {
+          formData.append("activityImages", activity.image[0]);
+        });
+      });
+      formData.append("name", values.name);
+      formData.append("description", values.description);
+      formData.append(
+        "dropOffLocation",
+        JSON.stringify(values.dropOffLocation)
+      );
+      formData.append("accessibility", values.accessibility);
+      values.available_dates.map((date) =>
+        formData.append("available_dates", date)
+      );
+      values.tags.map((tag) => formData.append("tags", tag));
+      formData.append("days", JSON.stringify(values.days));
+      formData.append("language", values.language);
+      formData.append("price", values.price);
+      formData.append("pickUpLocation", JSON.stringify(values.pickUpLocation));
+      formData.append("tourGuideID", "66fb241366ea8f57d59ec6db");
+      const response = await axios.post("/api/itinerary/", formData);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     !isLoading && (
@@ -196,6 +243,23 @@ export default function CreateItineraryForm() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label>Itinerary Cover Image</Label>
+                <ImageUploader
+                  single
+                  imagesUploaded={coverImage}
+                  setImagesUploaded={setCoverImage}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label>Itinerary Images</Label>
+                <ImageUploader
+                  imagesUploaded={itineraryImages}
+                  setImagesUploaded={setItineraryImages}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="name"
@@ -229,13 +293,13 @@ export default function CreateItineraryForm() {
 
               <FormField
                 control={form.control}
-                name="pickUpLocation"
+                name="pickUpLocation.name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pick-Up Location</FormLabel>
+                    <FormLabel>Pick-Up Location Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter the pick-up location"
+                        placeholder="Enter the Pick-Up location name"
                         {...field}
                       />
                     </FormControl>
@@ -246,13 +310,47 @@ export default function CreateItineraryForm() {
 
               <FormField
                 control={form.control}
-                name="dropOffLocation"
+                name="pickUpLocation.googleMapLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Drop-Off Location</FormLabel>
+                    <FormLabel>Pick-Up Google Map Link</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter the drop-off location"
+                        placeholder="Enter the Pick-Up Google Map link"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dropOffLocation.name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Drop-Off Location Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter the Drop-Off location name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dropOffLocation.googleMapLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Drop-Off Google Map Link</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter the Drop-Off Google Map link"
                         {...field}
                       />
                     </FormControl>
@@ -324,22 +422,19 @@ export default function CreateItineraryForm() {
                 )}
               />
 
-              <div className="flex flex-col gap-2">
-                <Label>Itinerary Cover Image</Label>
-                <ImageUploader
-                  single
-                  imagesUploaded={coverImage}
-                  setImagesUploaded={setCoverImage}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Itinerary Images</Label>
-                <ImageUploader
-                  imagesUploaded={itineraryImages}
-                  setImagesUploaded={setItineraryImages}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Language</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the language" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -349,6 +444,7 @@ export default function CreateItineraryForm() {
                     <CardTitle>Day {index + 1}</CardTitle>
                     <Button
                       variant="destructive"
+                      type="button"
                       onClick={() => removeDay(index)}
                       disabled={days.length === 1}
                     >
@@ -459,6 +555,20 @@ export default function CreateItineraryForm() {
                               }
                             />
                           </div>
+
+                          <Label>Activity Image</Label>
+                          <ImageUploader
+                            single
+                            imagesUploaded={activity.image}
+                            setImagesUploaded={(images) => {
+                              handleActivityChange(
+                                index,
+                                activityIndex,
+                                "image",
+                                images
+                              );
+                            }}
+                          />
                         </div>
                       </div>
                     ))}
