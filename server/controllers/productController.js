@@ -56,7 +56,6 @@ export const createProduct = async (req, res) => {
     const isSeller = await seller.findById(userID);
 
     const imagesUrls = [];
-
     try {
 
         for (const file of req.files['images']) {

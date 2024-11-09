@@ -189,6 +189,7 @@ export const checkUserExists = async (userId, userType) => {
 };
 export const addLoyaltyPoints = async (touristID, price) => {
     const subscriber = await tourist.findById(touristID);
+    console.log(subscriber);
     const currLevel = subscriber.level;
 
     let pointsToAdd = 0;

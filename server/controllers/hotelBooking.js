@@ -46,8 +46,7 @@ export const listHotels = async (req, res) => {
 }
 
 export const listHotelRooms = async (req, res) => {
-    const { hotelID, adults, checkInDate, checkOutDate } = req.body;
-
+    console.log(hotelID, adults, checkInDate, checkOutDate);
     const amadeus = new Amadeus({
         clientId: process.env.AMADEUS_API_KEY,
         clientSecret: process.env.AMADEUS_API_SECRET

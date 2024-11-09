@@ -19,9 +19,10 @@ export const confirmPayment = async (req, res) => {
             bookedEvent.touristID = touristID;
             bookedEvent.stripeSessionID = session.id;
             bookedEvent.status = "confirmed";
-
+            const type = session.metadata.type;
+            console.log(type);
             try {
-                if (session.metadata.type = "event") {
+                if (type === "event") {
                     //fetch event booked
                     if (eventType == "activity") {
                         eventBooked = await activityModel.findById(eventID);
@@ -40,7 +41,8 @@ export const confirmPayment = async (req, res) => {
 
                     return res.status(200).json(saveBooking);
                 }
-                else if (session.metadata.type = "flight") {
+                else if (type === "flight") {
+                    console.log("Flight MetData: ", session.metadata);
                     //save flight booking to database
                     const touristId = session.metadata.tourist_id;
                     console.log(touristId);

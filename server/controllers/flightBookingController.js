@@ -244,7 +244,6 @@ export const bookFlight = async (req, res) => {
   try {
     //fetch tourist
     const tourist = await Tourist.findById(touristID);
-    console.log(tourist);
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -253,7 +252,6 @@ export const bookFlight = async (req, res) => {
     //convert price to USD using exchange rate api
     const priceConverted = parseInt(price * conversionRate);
 
-    console.log(priceConverted);
 
     //create product on stripe
     const productStripe = await stripe.products.create({
@@ -265,7 +263,7 @@ export const bookFlight = async (req, res) => {
       },
     });
 
-    console.log(numTickets.numTickets)
+    console.log(productStripe);
 
     //create checkout session 
     const session = await stripe.checkout.sessions.create({
@@ -277,7 +275,7 @@ export const bookFlight = async (req, res) => {
             unit_amount: priceConverted * 100,
             product_data: {
               name: `${originCity} to ${destinationCity}`,
-              description: `Have a quacking flight to ${destination}`,
+              description: `Have a quacking flight to ${destinationCity}`,
             }
           },
           quantity: parseInt(numTickets.numTickets),
@@ -295,9 +293,9 @@ export const bookFlight = async (req, res) => {
         type: "flight"
       }
     });
+    console.log(session);
 
-    console.log(session.url);
-    res.redirect(303, session.url);
+    return res.status(200).json({ url: session.url });
 
 
   } catch (error) {

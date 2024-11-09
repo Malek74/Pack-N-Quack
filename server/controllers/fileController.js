@@ -119,7 +119,6 @@ export const handleDocumentUpload = async (req, res) => {
         console.log(promises);
 
         const uploadedURLS = promises.map(result => result.Location);
-        return res.status(200).json({ message: 'Documents uploaded successfully', uploadedURLS });
 
         const updatedUser = await UserModel.findByIdAndUpdate(userID, {
             uploadedFiles: {
@@ -132,6 +131,7 @@ export const handleDocumentUpload = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found or update failed' });
         }
+        return res.status(200).json({ message: 'Documents uploaded successfully', uploadedURLS });
 
     }
 
