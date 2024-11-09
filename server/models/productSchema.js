@@ -83,10 +83,7 @@ const productSchema = new Schema({
         required: true,
         default: false,
     },
-    uploadImages: {
-        type: [String],
-        default: [],
-    }
+
 });
 
 const product = model("Product", productSchema);

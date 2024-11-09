@@ -27,40 +27,40 @@ export const viewComplaintById = async (req, res) => {
 
 export const viewMyComplaints = async (req, res) => {
     const userId = req.params.id;
-    if(!userId){
-        return res.status(400).json({message:"User ID is required"});
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
     }
-    try{
+    try {
         const user = await touristModel.findById(userId);
-        if(!user){
-            return res.status(400).json({message:"User not found"});
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
         }
-        const complaints = await complaintModel.find({issuerID:userId});
+        const complaints = await complaintModel.find({ issuerID: userId });
         return res.status(200).json(complaints);
-    }catch(error){
-        return res.status(404).json({message:error.message});
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
     }
 }
 
 export const createComplaint = async (req, res) => {
-    const {issuerID, title, body} = req.body;
-    
-    if(!issuerID){
-        return res.status(400).json({message:"Issuer ID is required"});
+    const { issuerID, title, body } = req.body;
+
+    if (!issuerID) {
+        return res.status(400).json({ message: "Issuer ID is required" });
     }
-    if(!title){
-        return res.status(400).json({message:"Title is required"});
+    if (!title) {
+        return res.status(400).json({ message: "Title is required" });
     }
-    if(!body){
-        return res.status(400).json({message:"Body is required"});
+    if (!body) {
+        return res.status(400).json({ message: "Body is required" });
     }
     const issuerExists = await touristModel.findById(issuerID);
     if (!issuerExists) {
-        return res.status(400).json({message: "Issuer not found"});
+        return res.status(400).json({ message: "Issuer not found" });
     }
 
     try {
-        const newComplaint = await complaintModel.create({issuerID, title, body});
+        const newComplaint = await complaintModel.create({ issuerID, title, body });
         return res.status(200).json(newComplaint);
     } catch (error) {
         return res.status(400).json({ message: error.message });
@@ -69,46 +69,48 @@ export const createComplaint = async (req, res) => {
 
 export const markComplaintResolved = async (req, res) => {
     const { id } = req.params;
-    if(!id){
-        return res.status(400).json({message:"Complaint ID is required"});
+    if (!id) {
+        return res.status(400).json({ message: "Complaint ID is required" });
     }
     try {
-        const complaint = await complaintModel.findByIdAndUpdate(id,{status:"resolved"},{new:true});
-        res.status(200).json(complaint);    
+        const complaint = await complaintModel.findByIdAndUpdate(id, { status: "resolved" }, { new: true });
+        res.status(200).json(complaint);
     }
-    catch(error){
+    catch (error) {
         return res.status(400).json({ message: error.message });
     }
 }
 
 export const markComplaintPending = async (req, res) => {
     const { id } = req.params;
-    if(!id){
-        return res.status(400).json({message:"Complaint ID is required"});
+    if (!id) {
+        return res.status(400).json({ message: "Complaint ID is required" });
     }
     try {
-        const complaint = await complaintModel.findByIdAndUpdate(id,{status:"pending"},{new:true});
+        const complaint = await complaintModel.findByIdAndUpdate(id, { status: "pending" }, { new: true });
         res.status(200).json(complaint);
     }
-    catch(error){
+    catch (error) {
         return res.status(400).json({ message: error.message });
     }
 }
 
 export const replyToComplaint = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const reply = req.body.reply;
-    if(!id){
-        return res.status(400).json({message:"Complaint ID is required"});
+    console.log(reply);
+    if (!id) {
+        return res.status(400).json({ message: "Complaint ID is required" });
     }
-    if(!reply){
-        return res.status(400).json({message:"Reply is required"});
+    if (!reply) {
+        return res.status(400).json({ message: "Reply is required" });
     }
     try {
-        const complaint = await complaintModel.findByIdAndUpdate(id,{$push:{reply:reply}},{new:true});
+        const complaint = await complaintModel.findByIdAndUpdate(id, { $push: { reply: reply } }, { new: true });
         return res.status(200).json(complaint);
     }
-    catch(error){
+    catch (error) {
+        console.log(error);
         return res.status(400).json({ message: error.message });
     }
 }

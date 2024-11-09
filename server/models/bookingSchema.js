@@ -14,10 +14,18 @@ const bookingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Activity', // Reference the Activity model
     },
+    w: {
+        type: Schema.Types.ObjectId,
+        ref: 'Transportation', // Reference the Transportation model
+    },
     date: {
         type: Date,
         default: Date.now
 
+    },
+    price: {
+        type: Number,
+        required: true
     },
 
 }, { timestamps: true });

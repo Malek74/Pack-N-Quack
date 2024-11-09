@@ -3,7 +3,7 @@ import { bookEvent, cancelBooking, flaggedEvents, requestDeleteAccount } from ".
 
 const router = express.Router();
 
-router.post('bookEvent/:id', bookEvent);
+router.post('/bookEvent/:id', bookEvent);
 router.post("/cancelBooking/:id", cancelBooking);
 router.put("/flagg", flaggedEvents);
 router.post("/delete", requestDeleteAccount);

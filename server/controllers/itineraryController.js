@@ -1,7 +1,7 @@
 import Itinerary from '../models/itinerarySchema.js';
 import itineraryTags from '../models/itineraryTagsSchema.js';
 import product from '../models/productSchema.js';
-import tourist from '../models/touristSchema.js';
+import Tourist from '../models/touristSchema.js';
 import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
 import Booking from "../models/bookingsSchema.js";
@@ -643,23 +643,33 @@ export const Flagg = async (req, res) => {
             return res.status(404).json({ message: "No itinerary found with ID " + itineraryID });
         }
 
-
         if (flagger === false && itinerary.flagged === true) {
             return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
-        } else {
-            itinerary.flagged = flagger;
-            await itinerary.save();
         }
 
+        //flag itinerary
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flagger } }, { new: true, runValidators: true });
 
-        res.status(200).json(itinerary);
+
+        let isbooked = await Booking.find({ itineraryID: itineraryID });
+        if (isbooked.length > 0) {
+            if (flagger == true) {
+                for (let i = 0; i < isbooked.length; i++) {
+                    const user = await Tourist.findById(isbooked[i].touristID);
+                    if (user) {
+                        //update wallet in user
+                        const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + itinerary.price } }, { new: true, runValidators: true });
+                    }
+                }
+            }
+        }
+        return res.status(200).json(updatedItinerary);
 
     } catch (error) {
         res.status(500).json({ message: "Error updating itinerary: " + error.message });
         console.log(error);
     }
 };
-
 
 export const rateIternary = async (req, res) => {
     const { touristId, rating, comment } = req.body;

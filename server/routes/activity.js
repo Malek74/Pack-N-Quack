@@ -30,6 +30,6 @@ router.post("/filterSort", filterAndSortActivities);
 // Get My activities
 router.get("/my/:id", getMyActivities);
 
-router.put("/:id", Flagg);
+router.put("/flag/:id", Flagg);
 router.get("/activityDetails/:id", viewSingleActivity);
 export default router;

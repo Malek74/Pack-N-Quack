@@ -10,11 +10,12 @@ import Itinerary from "../models/itinerarySchema.js";
 import Places from "../models/PlacesSchema.js";
 import Stripe from "stripe";
 import Booking from "../models/bookingsSchema.js";
+import AmadeusBooking from "../models/amadeusBooking.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
-    const { email, username, password, mobile, dob, nationality, role, jobTitle, name } = req.body;
-
+    const { email, username, password, mobile, dob, nationality, role, jobTitle, name, preferedFirstTag, preferedSecondTag, preferedFirstCategory, preferedSecondCategory } = req.body;
+    console.log(req.body);
     try {
         // Check if the email or username is already taken by any user
         const isEmailTaken = await emailExists(email);
@@ -37,9 +38,13 @@ export const createTourist = async (req, res) => {
             phone: mobile,
         });
 
+        const preferredActivities = [preferedFirstCategory, preferedSecondCategory];
+        const preferredItineraries = [preferedFirstTag, preferedSecondTag];
+        console.log(preferredActivities);
+        console.log(preferredItineraries);
 
         // If both email and username are unique, create a new tourist
-        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name, stripeID: customer.id });
+        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name, stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries } });
         res.status(200).json(newTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -119,7 +124,7 @@ export const deleteTourist = async (req, res) => {
 export const getMyBookings = async (req, res) => {
     try {
         const myBookings = await Booking.find({ touristID: req.params.id });
-
+        console.log(myBookings);
         return res.status(200).json(myBookings);
     }
     catch (error) {
@@ -136,29 +141,28 @@ export const getMyprefernces = async (req, res) => {
         const tourist = await Tourist.findById(id);
         const prefereredActivities = await tourist.preferences.preferredActivities;
         const prefereredItineraries = await tourist.preferences.preferredItineraries;
-        const preferredPlaces = await tourist.preferences.preferredPlaces;
 
         let activities = [];
         let itineraries = [];
-        let places = [];
 
         console.log(prefereredActivities);
         console.log(prefereredItineraries);
-        console.log(preferredPlaces);
 
         //get activities based on tags
-        activities.push(... await activityModel.find({ 'categoryID': { $in: prefereredActivities } }));
+        activities.push(... await activityModel.find({ 'tags': { $in: prefereredItineraries } }));
 
         //get itineraries based on tags
         itineraries.push(... await Itinerary.find({ 'tags': { $in: prefereredItineraries } }));
 
-        //get places based on tags
-        places.push(... await Places.find({ 'tags': { $in: place._id } }));
+        //get activities based on categories
+        itineraries.push(... await activityModel.find({ 'categoryID': { $in: prefereredActivities } }));
+
+
 
         const result = {
             activites: activities,
             itineraries: itineraries,
-            places: places
+            //    places: places
         };
         console.log(result);
 
@@ -200,4 +204,30 @@ export const redeemPoints = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 
+}
+
+export const getMyFlights = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const myBookings = await AmadeusBooking.find({ touristID: id, flightData: { $exists: true }, hotelData: { $exists: false } });
+        return res.status(200).json(myBookings);
+
+    }
+    catch (error) {
+        return res.status(400).send({ message: error.message });
+    }
+}
+
+export const getMyHotels = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const myBookings = await AmadeusBooking.find({ touristID: id, flightData: { $exists: false }, hotelData: { $exists: true } });
+        return res.status(200).json(myBookings);
+
+    }
+    catch (error) {
+        return res.status(400).send({ message: error.message });
+    }
 }

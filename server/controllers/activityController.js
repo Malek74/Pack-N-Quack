@@ -6,6 +6,7 @@ import { query } from "express";
 import stripe from 'stripe';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { getConversionRate } from "../utils/Helpers.js";
+import Booking from "../models/bookingsSchema.js";
 
 // @desc Get all activities
 // @route GET /api/activity
@@ -305,6 +306,8 @@ export const getUpcomingActivities = async (req, res) => {
 export const postReview = async (req, res) => {
     const id = req.params.id;
     const { touristID, comment, rating } = req.body;
+    console.log(req.body);
+
     try {
         const activity = await activityModel.findById(id);
         if (!activity) {
@@ -323,6 +326,7 @@ export const postReview = async (req, res) => {
         await activity.save();
         res.status(200).json(activity);
     } catch (error) {
+        console.error("Error posting review:", error);
         res.status(404).json({ message: error.message });
     }
 }
@@ -437,18 +441,20 @@ export const viewSingleActivity = async (req, res) => {
     try {
 
         if (prefCurrency) {
-             conversionRate = await getConversionRate(prefCurrency);
+            conversionRate = await getConversionRate(prefCurrency);
         }
 
         const activity = await activityModel.findById(id).populate('advertiserID categoryID tags');
 
         //change price to preferred currency
         if (conversionRate) {
-            
+            activity.price = activity.price * conversionRate;
         }
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
         }
+
+
         return res.status(200).json(activity);
     } catch (error) {
         return res.status(404).json({ message: error.message });
@@ -459,25 +465,44 @@ export const Flagg = async (req, res) => {
     const activityID = req.params.id;
     const flagger = req.body.flagger;
 
+
     try {
-        let activity = await activity.findById(activityID);
+        let activity = await activityModel.findById(activityID);
 
         if (!activity) {
-            return res.status(404).json({ message: "No activity found with ID " + activityID });
+            return res.status(404).json({ message: "No itinerary found with ID " + activityID });
         }
-
 
         if (flagger === false && activity.flagged === true) {
-            return res.status(400).json({ message: "Cannot unflag an already flagged activity" });
-        } else {
-            activity.flagged = flagger;
-            await activity.save();
+            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
         }
 
-        res.status(200).json(activity);
+        //flag itinerary
+        const updatedActivity = await activityModel.findByIdAndUpdate(activityID, { $set: { flagged: flagger } }, { new: true, runValidators: true });
+
+
+        let isbooked = await Booking.find({ activityID: activity._id });
+        if (isbooked.length > 0) {
+            if (flagger == true) {
+                for (let i = 0; i < isbooked.length; i++) {
+                    const user = await Tourist.findById(isbooked[i].touristID);
+                    if (user) {
+                        //update wallet in user
+                        if (activity.priceType == 'fixed') {
+                            const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + activity.price } }, { new: true, runValidators: true });
+                        }
+
+                        if (activity.priceType == 'range') {
+                            const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + activity.minPrice } }, { new: true, runValidators: true });
+                        }
+                    }
+                }
+            }
+        }
+        return res.status(200).json(updatedActivity);
 
     } catch (error) {
-        res.status(500).json({ message: "Error updating activity: " + error.message });
+        res.status(500).json({ message: "Error updating Activity: " + error.message });
         console.log(error);
     }
 };

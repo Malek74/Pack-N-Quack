@@ -1,4 +1,7 @@
 import Amadeus from "amadeus";
+import Stripe from 'stripe';
+import { getConversionRate } from "../utils/Helpers.js";
+import Tourist from "../models/touristSchema.js";
 
 const cities = [
     { "city": "New York", "iata_code": "JFK" },
@@ -46,23 +49,27 @@ export const listHotels = async (req, res) => {
 }
 
 export const listHotelRooms = async (req, res) => {
-    console.log(hotelID, adults, checkInDate, checkOutDate);
+    const { hotelID, adults, checkInDate, checkOutDate } = req.body;
+
     const amadeus = new Amadeus({
         clientId: process.env.AMADEUS_API_KEY,
         clientSecret: process.env.AMADEUS_API_SECRET
     });
 
     console.log("Parameters received:", { hotelID, adults, checkInDate, checkOutDate });
+
     let response = {};
     try {
+
         response = await amadeus.shopping.hotelOffersSearch.get({
             hotelIds: hotelID,
             adults: adults,
-            checkInDate: checkInDate,
-            checkOutDate: checkOutDate
+            checkInDate: checkInDate.substring(0, 10),
+            checkOutDate: checkOutDate.substring(0, 10)
         });
 
         const data = JSON.parse(response.body).data;
+
         if (data.length === 0) {
             return res.status(404).json({ message: "No rooms available for the selected dates" });
         }
@@ -71,7 +78,7 @@ export const listHotelRooms = async (req, res) => {
         let rooms = []
         for (let i = 0; i < roomData.length; i++) {
             const room = {
-                hotel: roomData[i].hotel.name,
+                hotel: data[0].hotel.name,
                 type: roomData[i].room.typeEstimated.category,
                 beds: roomData[i].room.typeEstimated.beds,
                 bedType: roomData[i].room.typeEstimated.bedType,
@@ -82,9 +89,7 @@ export const listHotelRooms = async (req, res) => {
             rooms.push(room);
         }
 
-        return res.json(rooms);
-
-
+        return res.status(200).json(rooms);
 
     } catch (error) {
         // Log the full error for debugging
@@ -95,7 +100,8 @@ export const listHotelRooms = async (req, res) => {
             if (codeError == 3664) return res.status(404).json({ message: "No rooms available for the selected dates" });
 
         } catch (error) {
-            return res.status(404).json({ message: error.message });
+            console.log("EREROR");
+            return res.status(404).json({ message: "This Hotel is currently unavailable." });
         }
 
 
@@ -103,4 +109,71 @@ export const listHotelRooms = async (req, res) => {
 };
 
 export const bookRoom = async (req, res) => {
+    const { price, numOfDays, hotel, currency, room } = req.body;
+    const touristID = req.params.id;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    let conversionRate = 0;
+    console.log("Parameters received:", { price, numOfDays, hotel, currency, room });
+
+    try {
+        conversionRate = await getConversionRate(currency);
+        //fetch tourist
+        const tourist = await Tourist.findById(touristID);
+
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+
+        //convert price to USD using exchange rate api
+        const priceConverted = parseInt(price * conversionRate);
+
+        //create product on stripe
+        const productStripe = await stripe.products.create({
+            name: `Booking in${hotel.hotel}`,
+            description: `We wish you a quacking stay in ${hotel.hotel}`,
+            default_price_data: {
+                currency: "usd",
+                unit_amount: priceConverted * 100,
+            },
+        });
+
+        //create checkout session 
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price_data: {
+                        currency: "usd",
+                        unit_amount: priceConverted * 100,
+                        product_data: {
+                            name: `Booking in${hotel.hotel}`,
+                            description: `We wish you a quacking stay in ${hotel.hotel}`,
+                        }
+                    },
+                    quantity: parseInt(numOfDays),
+                },
+            ],
+            mode: 'payment',
+            success_url: 'https://www.google.com/', //todo:add correct link
+            cancel_url: 'https://www.amazon.com/',  //todo:add correct link
+            metadata: {
+                tourist_id: touristID,
+                hotel: hotel.hotel,
+                price: price,
+                type: hotel.type,
+                description: hotel.description.text,
+                type: "hotel",
+                bedType: hotel.bedType,
+                beds: hotel.beds
+            }
+        });
+
+
+        return res.status(200).json({ url: session.url });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error booking Hotel", error: error.message });
+    }
 }

@@ -9,19 +9,20 @@ const amadeusBookingSchema = new Schema({
         required: true,
     },
     hotelData: {
-        hotel: { type: String, required: true },
-        type: { type: String, required: true },
-        beds: { type: Number, required: true },
-        bedType: { type: String, required: true },
-        description: { type: String, required: true },
-        price: { type: Number, required: true }
+
+        hotel: { type: String, required: false },
+        type: { type: String, required: false },
+        beds: { type: Number, required: false },
+        bedType: { type: String, required: false },
+        description: { type: String, required: false },
+        price: { type: Number, required: false },
     },
 
     flightData: {
-        flight: { type: String, required: true },
-        departure: { type: String, required: true },
-        arrival: { type: String, required: true },
-        price: { type: Number, required: true }
+        flight: { type: String, required: false },
+        departure: { type: String, required: false },
+        arrival: { type: String, required: false },
+        price: { type: Number, required: false },
     },
     stripeSessionID: {
         type: String,

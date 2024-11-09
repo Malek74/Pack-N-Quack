@@ -21,7 +21,7 @@ import complaint from './routes/complaint.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
-import  PasswordChangeRequest  from './routes/changePass.js';
+import PasswordChangeRequest from './routes/changePass.js';
 import uploadRoutes from './routes/fileRoutes.js';
 import purchaseRoute from './routes/purchaseRoute.js'
 import shareMail from './routes/shareEmail.js';
@@ -30,6 +30,8 @@ import currency from './routes/currency.js';
 import booking from './routes/booking.js';
 import webhook from './routes/webhook.js';
 import hotelRoutes from './routes/hotelRoutes.js';
+import transportation from './routes/transportationRoutes.js';
+
 
 config();
 const app = express();
@@ -83,6 +85,8 @@ app.use('/webhook', webhook);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/transaction', purchaseRoute);
+app.use('/api/complaints', complaint);
+app.use('/api/transportation', transportation);
 
 
 //const multer = require ('multer');
@@ -101,4 +105,4 @@ app.use('/api/transaction', purchaseRoute);
 
 // app.post ('api/upload',upload.single('file'),(req,res)=>{
 //     res.json(req.file);
-// })app.use('/api/complaints',complaint)
+// })

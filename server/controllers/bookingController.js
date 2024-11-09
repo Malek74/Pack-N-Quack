@@ -12,7 +12,7 @@ export const bookEvent = async (req, res) => {
 
     const touristID = req.params.id;
     const { eventType, eventID, payByWallet, numOfTickets } = req.body;
-
+    console.log(req.body);
     let event = {}
     try {
 
@@ -25,41 +25,49 @@ export const bookEvent = async (req, res) => {
         }
 
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        const product = await stripe.products.retrieve(event.stripeID);
+        const product = await stripe.products.retrieve(event.stripeProductID);
         const tourist = await Tourist.findById(touristID);
-        const walletAmount = (event.price * numOfTickets) - tourist.wallet;
+        console.log(tourist);
+        let amountToPay = 0;
+        if (payByWallet) {
+            amountToPay = (event.price * numOfTickets) - tourist.wallet;
+        }
+        else {
+            amountToPay = event.price;
+        }
 
         //create price to be paid after deducting wallet amount        
         const price = await stripe.prices.create({
             currency: 'usd',
             product: product.id,
-            unit_amount: walletAmount * 100,
+            unit_amount: amountToPay * 100,
         });
+
 
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
-                price: payByWallet ? price.id : product.default_price,
+                price: price.id,
                 quantity: numOfTickets,
             }],
             mode: 'payment',
-            success_url: 'https://www.google.com/', //todo:add correct link
+            success_url: 'http://localhost:5173/BookActivities', //todo:add correct link
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
             metadata: {
                 eventID: eventID,
                 eventType: eventType,
                 touristID: touristID,
-                amountByWallet: walletAmount,
-                type: "event"
+                type: "event",
+
             }
         });
 
 
-        res.redirect(303, session.url);
-
+        return res.status(200).json({ url: session.url });
     }
     catch (error) {
+        console.log(error);
         return res.status(400).json({ error: error.message });
     }
 
@@ -69,7 +77,7 @@ export const cancelBooking = async function (req, res) {
 
     const touristID = req.params.id;
     const { eventType, eventID } = req.body;
-
+    console.log(req.body);
 
     if (!eventType || !eventID) {
         return res.status(400).json({ error: 'Please provide event type and event ID.' });
@@ -79,17 +87,16 @@ export const cancelBooking = async function (req, res) {
     try {
 
         //fetch event
-        if (eventType == "activity") {
-            event = await activityModel.findById(eventID);
-            booking = await Booking.findOne({ touristID: touristID, activityId: eventID, });
+        const booking = await Booking.findById(eventID);
 
+        if (eventType == "activity") {
+            event = await activityModel.findById(booking.activityID);
+            console.log(event);
         }
         else if (eventType == "itinerary") {
             console.log(eventID);
             console.log(touristID);
-            event = await Itinerary.findById(eventID);
-            booking = await Booking.findOne({ itineraryID: eventID, touristID: touristID, });
-
+            event = await Itinerary.findById(booking.itineraryID);
         }
 
         //check current time is 48 hours before the event
@@ -118,13 +125,12 @@ export const cancelBooking = async function (req, res) {
 
 
         return res.status(200).json(tourist);
-
-
-
+        
         res.redirect(303, session.url);
 
     }
     catch (error) {
+        console.log(error);
         return res.status(400).json({ error: error.message });
     }
 

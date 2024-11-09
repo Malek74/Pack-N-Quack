@@ -69,7 +69,6 @@ export const buyItem = async (req, res) => {
 
 export const rateProduct = async (req, res) => {
     const { userId, productId, rating, review } = req.body;
-    console.log(req.body);
     try {
 
         //check that product exists
@@ -95,13 +94,31 @@ export const rateProduct = async (req, res) => {
             return res.status(400).json({ message: "Rating must be between 0 and 5" });
         }
 
+
         //update the rating and review
         const updatedRecord = await PurchasedItem.findOneAndUpdate(
             { user: userId, "items.productId": productId },
             { $set: { "items.$.rating": rating, "items.$.review": review } },
             { new: true }
         );
-        console.log(updatedRecord);
+      
+        const averageRating = ((productExist.ratings.averageRating * productExist.ratings.reviews.length) + rating )/ (1 + productExist.ratings.reviews.length);
+        const reviewToAdd = { userID: userId, rating: rating, review: review };
+
+
+
+        //update ratings
+        await Product.findByIdAndUpdate(
+
+            productId,
+            {
+                $set: {
+                    "ratings.averageRating": averageRating,
+                    "ratings.reviews": [...productExist.ratings.reviews, reviewToAdd]
+                }
+            },
+            { new: true }
+        )
         return res.status(200).json(updatedRecord);
     } catch (error) {
         return res.status(500).json({ message: error.message });

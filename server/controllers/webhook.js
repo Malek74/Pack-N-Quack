@@ -2,6 +2,7 @@ import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import { addLoyaltyPoints } from "../utils/Helpers.js";
 import AmadeusBooking from "../models/amadeusBooking.js";
+import Booking from "../models/bookingsSchema.js";
 
 export const confirmPayment = async (req, res) => {
     const event = req.body;
@@ -21,16 +22,19 @@ export const confirmPayment = async (req, res) => {
             bookedEvent.status = "confirmed";
             const type = session.metadata.type;
             console.log(type);
+            console.log(session.metadata);
             try {
                 if (type === "event") {
                     //fetch event booked
                     if (eventType == "activity") {
                         eventBooked = await activityModel.findById(eventID);
+
                         bookedEvent.activityID = eventBooked._id;
                     }
                     else if (eventType == "itinerary") {
                         eventBooked = await Itinerary.findById(eventID);
                         bookedEvent.itineraryID = eventBooked._id;
+                        bookedEvent.price = eventBooked.price;
                     }
 
                     //add loyalty points
@@ -42,7 +46,6 @@ export const confirmPayment = async (req, res) => {
                     return res.status(200).json(saveBooking);
                 }
                 else if (type === "flight") {
-                    console.log("Flight MetData: ", session.metadata);
                     //save flight booking to database
                     const touristId = session.metadata.tourist_id;
                     console.log(touristId);
@@ -57,11 +60,45 @@ export const confirmPayment = async (req, res) => {
                         touristID: touristId,
                         stripeSessionID: session.id
                     });
-
+                    console.log(flightBooking);
                     return res.status(200).json(flightBooking);
+                }
+                else if (type === "hotel") {
+                    console.log("Hotel MetData: ", session.metadata);
+                    //save flight booking to database
+                    const touristId = session.metadata.tourist_id;
+
+                    const hotelBooking = await AmadeusBooking.create({
+                        hotelData: {
+                            name: session.metadata.hotel,
+                            price: session.metadata.price,
+                            type: session.metadata.type,
+                            bedType: session.metadata.bedType,
+                            description: session.metadata.description,
+                            price: session.metadata.price,
+                            beds: session.metadata.beds
+                        },
+                        touristID: touristId,
+                        stripeSessionID: session.id
+                    });
+                    console.log(hotelBooking);
+                    return res.status(200).json(hotelBooking);
+                }
+                else if (type === "transportation") {
+                    //save transportation booking to database
+                    const touristId = session.metadata.tourist_id;
+                    const eventID = session.metadata.eventID;
+                    const price = session.metadata.price;
+                    const transportationBooking = await Booking.create({
+                        touristID: touristId,
+                        stripeSessionID: session.id,
+                        transportationID: eventID,
+                        price: price,
+                    });
                 }
             }
             catch (error) {
+                console.log(error);
                 return res.status(404).json({ message: error.message });
             }
             //todo:send an email to the tourist

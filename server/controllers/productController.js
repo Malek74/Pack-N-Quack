@@ -295,7 +295,6 @@ export const getMaxPrice = async (req, res) => {
         }
         return res.json(result[0].price);
 
-
     } catch (error) {
         console.error('Error fetching max price:', error);
         throw new Error('Failed to get max price');
@@ -402,7 +401,7 @@ export const getProducts = async (req, res) => {
 
 export const getMyProducts = async (req, res) => {
     const id = req.params.id;
-
+    const prefCurrency = req.query.currency;
     try {
         //fetch tourist
         const tourist = await Tourist.findById(id);
@@ -415,9 +414,20 @@ export const getMyProducts = async (req, res) => {
         //fetch products bought by the user
         const boughtProducts = await PurchasedItem.find({ user: id }).select('items.items').populate('items.productId');
 
+        if (prefCurrency) {
+            const conversionRate = await getConversionRate(prefCurrency);
+            const convertedProducts = boughtProducts.map(product => {
+                product.items = product.items.map(item => {
+                    item.price *= conversionRate;
+                    return item;
+                });
+                return product;
+            });
+            return res.status(200).json(convertedProducts[0].items);
+        }
 
         //return products
-        return res.status(200).json(boughtProducts);
+        return res.status(200).json(boughtProducts[0].items);
     }
     catch (error) {
         return res.status(400).json({ error: error.message });
