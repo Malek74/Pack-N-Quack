@@ -14,24 +14,14 @@ import activityTag from '../models/activityTagSchema.js';
 //@route POST api/itinerary
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
-    // console.log(req.files)
-    // console.log("end of files")
-    // console.log(req.files['coverImage'])
-    // console.log("end of cover Images")
-    // console.log(req.body);
-    // console.log("end of body")
     //fetch data from request body
     const tourGuideID = req.body.tourGuideID;
     const name = req.body.name;
-    const { language, price, accessibility, tags, description, images, coverImage, activityImages, available_dates } = req.body;
+    const { language, price, accessibility, tags, description, available_dates } = req.body;
     const days = JSON.parse(req.body.days);
     const pickUpLocation = JSON.parse(req.body.pickUpLocation);
     const dropOffLocation = JSON.parse(req.body.dropOffLocation);
-    console.log(days)
-    console.log(days[0].activities[0].image); // "Coffee Date"
-    console.log(days[0].activities[0].duration.startTime); // "10:00"
-    console.log(pickUpLocation)
-    console.log(dropOffLocation)
+    const { images, coverImage, activityImages } = req.files;
     let tagsIDS = []
     //validate that all fields are present
     if (!tourGuideID || !name || !days || !language || !price || !available_dates || !tags || !pickUpLocation || !dropOffLocation || !accessibility) {
@@ -71,18 +61,13 @@ export const addItinerary = async (req, res) => {
             return res.status(400).json({ "message": "Description is missing" });
         }
     }
-    const tagstoLoop = tags
+
     for (let i = 0; i < tags.length; i++) {
         const tag = await itineraryTags.findOne({ tag: tags[i] });
-        console.log(tag)
+        tagsIDS.push(tag._id);
     }
-    console.log(tagsIDS)
-    console.log("end of days")
-
 
     try {
-
-
         //create product on stripe
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const productStripe = await stripe.products.create({
@@ -93,32 +78,48 @@ export const addItinerary = async (req, res) => {
                 unit_amount: price * 100,
             },
         });
-
+        let coverImageUrl = "";
         if (coverImage) {
             const uploadResult = await uploadImages(coverImage);
+            console.log(uploadResult)
             if (uploadResult.success) {
-                coverImage = uploadResult.urls[0];
+                coverImageUrl = uploadResult.urls[0];
+                console.log("3amal dyh")
+            } else {
+                return res.status(400).json({ message: uploadResult.message });
             }
-            return res.status(400).json({ message: uploadResult.message });
         }
 
+        let imagesUrls = []
         if (images) {
             const uploadResult = await uploadImages(images);
             if (uploadResult.success) {
-                images = uploadResult.urls;
+                imagesUrls = uploadResult.urls;
+            } else {
+                return res.status(400).json({ message: uploadResult.message });
             }
-            return res.status(400).json({ message: uploadResult.message });
         }
-
+        let updatedDays = {}
         if (activityImages) {
             const activityImagesUrls = (await uploadImages(activityImages)).urls
+
             let activityCount = 0;
-            for (let day = 0; day < days.length && activityCount < activityImagesUrls.length; i++) {
-                for (let activity = 0; activity < day.activities.length; activity++) {
-                    days[day].activities[activity].image = activityCount
-                    activityCount++;
-                }
-            }
+
+            updatedDays = days.map(day => {
+                return {
+                    ...day,
+                    activities: day.activities.map(activity => {
+                        // Replace the image attribute with the next URL from the array
+                        const updatedActivity = {
+                            ...activity,
+                            image: activityImagesUrls[activityCount],
+                        };
+                        // Increment the URL index, wrapping around if necessary
+                        activityCount++;
+                        return updatedActivity;
+                    })
+                };
+            });
 
 
             // let dayCount = 0;
@@ -148,7 +149,7 @@ export const addItinerary = async (req, res) => {
             stripeID: productStripe.id,
             name: name,
             tourGuideID: tourGuideID,
-            days: days,
+            days: updatedDays,
             language: language,
             price: price,
             available_dates: available_dates,
@@ -157,8 +158,8 @@ export const addItinerary = async (req, res) => {
             accessibility: accessibility,
             tags: tagsIDS,
             description: description,
-            images: images,
-            coverImage: coverImage
+            images: imagesUrls,
+            coverImage: coverImageUrl
         });
         const createdItinerary = await Itinerary.create(itinerary);
 
@@ -197,15 +198,16 @@ export const getItinerary = async (req, res) => {
         if (name) {
             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
         }
+        if (tags) {
+            const tagsArray = tags.split(',');
+            if (tagsArray && tagsArray.length > 0) {
+                // Find all tag IDs based on the tag names provided
+                const tagIDs = await itineraryTags.find({ tag: { $in: tagsArray } }).select('_id');
 
-        const tagsArray = tags.split(',');
-        if (tagsArray && tagsArray.length > 0) {
-            // Find all tag IDs based on the tag names provided
-            const tagIDs = await itineraryTags.find({ tag: { $in: tagsArray } }).select('_id');
-
-            if (tagIDs.length > 0) {
-                // Use $in to filter itineraries with any of these tags
-                query.tags = { $in: tagIDs.map(tag => tag._id) };
+                if (tagIDs.length > 0) {
+                    // Use $in to filter itineraries with any of these tags
+                    query.tags = { $in: tagIDs.map(tag => tag._id) };
+                }
             }
         }
 
