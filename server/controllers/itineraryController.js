@@ -13,7 +13,7 @@ import { uploadImages } from '../utils/Helpers.js';
 //@route POST api/itinerary
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
-
+    console.log(req);
     //fetch data from request body
     const tourGuideID = req.body.tourGuideID;
     const name = req.body.title;
@@ -127,6 +127,7 @@ export const addItinerary = async (req, res) => {
             coverImage: coverImage
         });
         const createdItinerary = await Itinerary.create(itinerary);
+        
         return res.status(201).json(createdItinerary);
     }
     catch (error) {
