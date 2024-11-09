@@ -11,15 +11,13 @@ import axios from "axios";
 const SingleItineraryPage = () => {
   const { id } = useParams();
   const [itinerary, setItinerary] = useState([]);
-
+  const [marina, setMarina] = useState(false)
   useEffect(() => {
-    console.log("ahndhasdnjas");
     const fetchItinerary = async () => {
       try {
         const response = await axios.get(`/api/itinerary/viewItinerary/${id}`);
         console.log(response.data);
         setItinerary(response.data);
-        // setItinerariesDB(response.data)
       } catch (error) {
         console.error(error);
       }
@@ -159,6 +157,7 @@ const SingleItineraryPage = () => {
   return (
     <div className="flex flex-col gap-y-10 py-8 px-[5.6rem]">
       <ItineraryCard
+        id={itinerary._id}
         title={itinerary.name}
         description={itinerary.description}
         price={itinerary.price}
