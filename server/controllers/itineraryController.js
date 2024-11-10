@@ -125,30 +125,7 @@ export const addItinerary = async (req, res) => {
                     })
                 };
             });
-
-
-            // let dayCount = 0;
-            // for(let i = 0; i<activityImagesUrls.length; i++){
-            //     days[dayCount].activity[i].image = activityImagesUrls[i]
-            //     if( i+1 % days.length === 0 ){
-            //         dayCount++
-            //     }
-            // }
         }
-
-
-
-
-        // for(let i = 0; i < days.length; i++){
-        //     for(let j = 0; j < days[i].activities.length; j++){
-        //         const uploadResult = await uploadImages(days[i].activities[j].image);
-        //         if(uploadResult.success){
-        //             days[i].activities[j].image = uploadResult.urls[0];
-        //         }
-        //         return res.status(400).json( {message : uploadResult.message} );
-        //     }
-        // }
-        // }
 
         const itinerary = new Itinerary({
             stripeID: productStripe.id,
@@ -549,10 +526,11 @@ export const getAllLanguages = async (req, res) => {
 export const updateItinerary = async (req, res) => {
     const itineraryID = req.params.id;
 
-
-    const { name, days, language, price, available_dates, pickUpLocation, dropOffLocation, accessibility, isActive, images, activityImages, tags, description } = req.body;
-    console.log(req.body);
-    console.log(req.files);
+    const { name, language, price, available_dates, accessibility, isActive, images, activityImages, tags, description, newActivityImageIndex } = req.body;
+    const days = JSON.parse(req.body.days);
+    const pickUpLocation = JSON.parse(req.body.pickUpLocation);
+    const dropOffLocation = JSON.parse(req.body.dropOffLocation);
+    //console.log(req.files);
 
     try {
         let itinerary = await Itinerary.findById(itineraryID);
@@ -562,7 +540,7 @@ export const updateItinerary = async (req, res) => {
         }
 
         const numsOfBookings = await Booking.find({ itineraryID: req.params.id });
-        console.log(numsOfBookings);
+
 
         if (numsOfBookings.length != 0) {
             res.status(404).json({ message: "Cannot update itinerary with bookings" })
@@ -570,9 +548,8 @@ export const updateItinerary = async (req, res) => {
         let newImages = [];
 
         const imagesToUpload = req.files['images'];
-        console.log(imagesToUpload);
-        if (imagesToUpload) {
 
+        if (imagesToUpload) {
             const imagesUrls = await uploadImages(imagesToUpload);
             if (imagesUrls.success) {
                 newImages.push(...images);
@@ -581,6 +558,51 @@ export const updateItinerary = async (req, res) => {
                 return res.status(400).json({ message: imagesUrls.message });
             }
         }
+
+        let newActivityImages = [];
+        let updatedDays = {}
+        const activityImagesToUpload = req.files['activityImages'];
+        console.log(activityImages)
+        if (activityImagesToUpload) {
+            const imagesUrls = await uploadImages(activityImagesToUpload);
+            if (imagesUrls.success) {
+                newActivityImages.push(...imagesUrls.urls);
+            } else {
+                return res.status(400).json({ message: imagesUrls.message });
+            }
+            const newActivityImagesIndex = newActivityImageIndex.filter(x => x !== "");
+            let oldActivityCount = 0;
+            let newActivityCount = 0;
+
+            const oldActivityImagesUrls = activityImages != "" ? activityImages.filter(x => x !== "") : [];
+            updatedDays = days.map((day, dayIndex) => {
+                return {
+                    ...day,
+                    activities: day.activities.map((activity, activityIndex) => {
+                        const [dIndex, aIndex] = newActivityImagesIndex[newActivityCount].split(",");
+
+                        if (dIndex == dayIndex && aIndex == activityIndex) {
+                            const newUpdatedActivity = {
+                                ...activity,
+                                image: newActivityImages[newActivityCount],
+                            };
+                            newActivityCount++;
+                            return newUpdatedActivity;
+                        } else {
+                            // Replace the image attribute with the next URL from the array
+                            const oldUpdatedActivity = {
+                                ...activity,
+                                image: oldActivityImagesUrls[oldActivityCount],
+                            };
+                            // Increment the URL index, wrapping around if necessary
+                            oldActivityCount++;
+                            return oldUpdatedActivity;
+                        }
+                    })
+                };
+            });
+        }
+
         let newCoverImage = "";
         if (req.files['coverImage']) {
             const coverImageToUpload = req.files['coverImage'];
@@ -605,7 +627,7 @@ export const updateItinerary = async (req, res) => {
 
         const updatedFields = {};
         if (name) updatedFields.name = req.body.title;
-        if (days) updatedFields.days = JSON.parse(req.body.days);
+        if (days) updatedFields.days = activityImagesToUpload ? updatedDays : days;
         if (language) updatedFields.language = req.body.language;
         if (price) updatedFields.price = req.body.price;
         if (available_dates) updatedFields.available_dates = (req.body.available_dates).filter(date => date !== "");
