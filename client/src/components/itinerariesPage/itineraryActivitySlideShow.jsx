@@ -29,7 +29,7 @@ export default function ItineraryActivitySlideShow({ cardData }) {
   const currentCard = cardData[currentIndex];
 
   return (
-    <Card className="w-full max-w-3xl mx-auto overflow-hidden rounded-lg">
+    <Card className="w-full max-w-3xl overflow-hidden rounded-lg">
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
           <div className="w-full sm:w-1/2">

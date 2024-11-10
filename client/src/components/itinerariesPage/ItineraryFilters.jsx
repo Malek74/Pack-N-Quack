@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import PropTypes from "prop-types";
 import DateRangePickerV2 from "@/components/shared/DateRangePickerV2";
-//import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
+import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
 
 ItineraryFilters.propTypes = {
   setFetchedItinerariesParams: PropTypes.func,
@@ -28,8 +28,8 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
   const [fetchedLanguages, setFetchedLanguages] = useState([]);
 
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  //const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  //const [selectedTag, setSelectedTag] = useState("");
   const [minBudget, setMinBudget] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
   const [startDate, setStartDate] = useState(null);
@@ -40,7 +40,7 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
   useEffect(() => {
     setFetchedItinerariesParams({
       language: selectedLanguage,
-      tag: selectedTag,
+      tags: selectedTags.map((tag) => tag.tag),
       minBudget: minBudget,
       maxBudget: maxBudget,
       minDate: startDate,
@@ -50,7 +50,7 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
     });
   }, [
     selectedLanguage,
-    selectedTag,
+    selectedTags,
     minBudget,
     maxBudget,
     startDate,
@@ -86,7 +86,7 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
 
   return (
     !isLoading && (
-      <div className="flex w-screen self-center items-end justify-center gap-10 p-10 pt-0">
+      <div className="flex w-screen self-center items-start justify-center gap-10 p-10 pt-0">
         <DateRangePickerV2
           startDate={startDate}
           setStartDate={setStartDate}
@@ -140,27 +140,11 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
           </SelectContent>
         </Select>
 
-        <Select
-          value={selectedTag}
-          onValueChange={(value) =>
-            setSelectedTag(value === "all" ? "" : value)
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a Tag" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Tagss</SelectLabel>
-              <SelectItem value="all">Any</SelectItem>
-              {fetchedItineraryTags.map((tag) => (
-                <SelectItem key={tag._id} value={tag.tag}>
-                  {tag.tag}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <MultiselectDropdown
+          options={fetchedItineraryTags}
+          selectedOptions={selectedTags}
+          setSelectedOptions={setSelectedTags}
+        />
 
         <Select
           value={sortSelectorValue}
@@ -199,12 +183,6 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
             </SelectGroup>
           </SelectContent>
         </Select>
-
-        {/* <MultiselectDropdown
-          options={fetchedItineraryTags}
-          selectedOptions={selectedTags}
-          setSelectedOptions={setSelectedTags}
-        /> */}
       </div>
     )
   );

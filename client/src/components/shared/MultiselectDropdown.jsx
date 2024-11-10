@@ -39,7 +39,7 @@ export default function MultiselectDropdown({
     <div className="flex flex-col items-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="mb-2">
+          <Button variant="outline">
             Select tags
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>

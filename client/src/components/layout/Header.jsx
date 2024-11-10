@@ -90,7 +90,7 @@ export default function Header() {
           <Button asChild variant="link">
             <li
               className={
-                isActive("/itineraries")
+                isActive("/itinerariesTourists")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
                   ? "text-yellow-500"

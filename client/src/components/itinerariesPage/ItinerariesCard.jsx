@@ -3,8 +3,9 @@ import { Card } from "../ui/card";
 import { Label } from "../ui/label";
 import { Rating } from "../shared/Rating";
 import { useNavigate } from "react-router-dom";
+import { Activity, FlagOff } from "lucide-react";
 
-RamitoItinerariesCard.propTypes = {
+ItinerariesCard.propTypes = {
   id: PropTypes.string,
   name: PropTypes.string,
   description: PropTypes.string,
@@ -13,8 +14,12 @@ RamitoItinerariesCard.propTypes = {
   rating: PropTypes.number,
   numberOfReviews: PropTypes.number,
   coverImage: PropTypes.string,
+  touristClicked: PropTypes.bool,
+  isFlagged: PropTypes.bool,
+  isActive: PropTypes.bool,
+  tourGuideClicked: PropTypes.bool,
 };
-export default function RamitoItinerariesCard({
+export default function ItinerariesCard({
   id,
   name,
   description,
@@ -23,14 +28,18 @@ export default function RamitoItinerariesCard({
   rating,
   numberOfReviews,
   coverImage,
+  touristClicked,
+  tourGuideClicked,
+  isFlagged = false,
+  isActive = true,
 }) {
   const navigate = useNavigate();
   return (
     <Card
       className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[550px] h-[450px]"
       onClick={() => {
-        console.log(id);
-        navigate(`/ramito/${id}`);
+        if (touristClicked) navigate(`/itinerariesTourists/${id}`);
+        if (tourGuideClicked) navigate(`/itinerariesTourGuide/${id}`);
       }}
     >
       <img
@@ -42,8 +51,24 @@ export default function RamitoItinerariesCard({
       />
       <div className="p-4">
         <div className="flex flex-col gap-2">
-          <Label className="text-lg font-semibold">{name}</Label>
-          <p className="text-sm text-neutral-400 text-pretty leading-tight">
+          <div className="flex justify-between">
+            <Label className="text-lg font-semibold">{name}</Label>
+            <div className="flex gap-2">
+              {isFlagged && (
+                <FlagOff
+                  size={36}
+                  className="border border-red-600 rounded-full bg-red-600 text-white p-1"
+                />
+              )}
+              {!isActive && (
+                <Activity
+                  size={36}
+                  className="border border-red-600 rounded-full bg-red-600 text-white p-1"
+                />
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-neutral-400 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
             {description}
           </p>
           <div className="flex justify-between">

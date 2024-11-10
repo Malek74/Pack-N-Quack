@@ -1,25 +1,18 @@
 import SearchBar from "@/components/shared/SearchBar";
 import Banner from "../components/shared/Banner";
 import BannerImage from "/assets/images/romanBanner.jpg";
-//import RamitoItinerariesCard from "@/components/ramitoItineraries/ramitoCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import RamitoItinerariesCard from "@/components/ramitoItineraries/ramitoCard";
+import ItinerariesCard from "@/components/ItinerariesPage/ItinerariesCard";
 import Loading from "@/components/shared/Loading";
-import ItineraryFilters from "@/components/itinerariesPage/ItineraryFilters";
-import { useNavigate } from "react-router-dom";
-//import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
+import ItineraryFilters from "@/components/ItinerariesPage/ItineraryFilters";
 
-export default function RamitoItineraries() {
-  const navigate = useNavigate();
+export default function ItinerariesTouristsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [fetchedItineraries, setFetchedItineraries] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
-  //const [selectedTags, setSelectedTags] = useState([]);
-
   const [fetchedItinerariesParams, setFetchedItinerariesParams] = useState({});
 
   useEffect(() => {
@@ -48,7 +41,7 @@ export default function RamitoItineraries() {
   return (
     <div className="flex flex-col w-screen p-14 pb-0">
       <div className="relative">
-        <Banner background={BannerImage} name="Ramito Itineraries" />
+        <Banner background={BannerImage} name="Itineraries" />
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -66,10 +59,10 @@ export default function RamitoItineraries() {
         </div>
       )}
       {!isLoading && (
-        <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-10 px-14">
+        <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-10 px-14 mb-36">
           {fetchedItineraries &&
             fetchedItineraries.map((itinerary) => (
-              <RamitoItinerariesCard
+              <ItinerariesCard
                 key={itinerary._id}
                 id={itinerary._id}
                 image={itinerary.image}
@@ -80,17 +73,15 @@ export default function RamitoItineraries() {
                 rating={itinerary.ratings.averageRating}
                 numberOfReviews={itinerary.ratings.reviews.length}
                 coverImage={itinerary.coverImage || null}
+                touristClicked
               />
             ))}
         </div>
       )}
-      <Button onClick={() => console.log(fetchedItineraries[0])}>
-        Print Itineraries
-      </Button>
 
-      <Button onClick={() => navigate("/createItinerary")}>
+      {/* <Button onClick={() => navigate("/createItinerary")}>
         Create Itineraries
-      </Button>
+      </Button> */}
     </div>
   );
 }

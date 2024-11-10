@@ -6,13 +6,60 @@ import { Label } from "@/components/ui/label";
 import Loading from "@/components/shared/Loading";
 import { Rating } from "@/components/shared/Rating";
 import { format } from "date-fns";
-import ItineraryActivitySlideShow from "@/components/itinerariesPage/itineraryActivitySlideShow";
+import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryActivitySlideShow";
 import Maps from "@/components/shared/Maps";
+import { Activity, Trash2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 
-export default function RamitoSingleItineraryPage() {
+export default function SingleItineraryTourGuidePage() {
   const { id } = useParams();
   const [isloading, setIsLoading] = useState(true);
   const [fetchedItinerary, setFetchedItinerary] = useState({});
+  const [itineraryActive, setItineraryActive] = useState();
+  const navigate = useNavigate();
+
+  const handleToggleActive = () => {
+    setItineraryActive(!itineraryActive);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/api/itinerary/${id}`);
+      navigate(-1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const toggleActiveItinerary = async () => {
+      try {
+        await axios.put(`/api/itinerary/toggleActive/${id}`, {
+          isActive: itineraryActive,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    toggleActiveItinerary();
+  }, [id, itineraryActive]);
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -23,6 +70,7 @@ export default function RamitoSingleItineraryPage() {
         });
         console.log(response.data);
         setFetchedItinerary(response.data);
+        setItineraryActive(response.data.isActive);
         setIsLoading(false);
       } catch (error) {
         console.error(error);
@@ -40,10 +88,71 @@ export default function RamitoSingleItineraryPage() {
       <div className="flex flex-col w-screen gap-8">
         <ImageSlideshow images={fetchedItinerary.images} />
         <div className="flex justify-between px-28">
-          <div className="flex flex-col w-[40%] gap-4">
-            <Label className="text-3xl font-bold">
-              {fetchedItinerary.name}
-            </Label>
+          <div className="flex flex-col w-[60%] gap-6">
+            <div className="flex justify-between">
+              <Label className="text-3xl font-bold">
+                {fetchedItinerary.name}
+              </Label>
+              <div className="flex justify-end gap-4">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Activity
+                        size={42}
+                        className={
+                          itineraryActive
+                            ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
+                            : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                        }
+                        onClick={() => {
+                          handleToggleActive();
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-lg">
+                        {itineraryActive
+                          ? "The itinerary is active, Click to toggle"
+                          : "The itinerary is inactive, Click to toggle"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <AlertDialog>
+                  <AlertDialogTrigger className="">
+                    <Trash2
+                      size={42}
+                      className={
+                        "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                      }
+                    />
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Quack Goodbye to This Itinerary?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to quack this itinerary goodbye?
+                        Once it’s gone, it won’t waddle back!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600"
+                        onClick={() => {
+                          handleDelete(); // Corrected typo
+                        }}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
             <p className="text-lg text-neutral-600">
               {fetchedItinerary.description}
             </p>
@@ -79,7 +188,7 @@ export default function RamitoSingleItineraryPage() {
               </div>
             </div>
             <div className="flex justify-between">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-[40%]">
                 <Label className="text-2xl font-bold">Pick-Up Location</Label>
                 <div className="flex justify-between">
                   <p className="text-lg text-neutral-600">
@@ -90,7 +199,7 @@ export default function RamitoSingleItineraryPage() {
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-[40%]">
                 <Label className="text-2xl font-bold">Drop-Off Location</Label>
                 <div className="flex justify-between">
                   <p className="text-lg text-neutral-600">

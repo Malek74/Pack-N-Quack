@@ -1,6 +1,6 @@
 import Banner from "@/components/shared/BannerV2";
 import BannerImage from "/assets/images/romanBanner.jpg";
-import CreateItineraryForm from "@/components/itinerariesPage/CreateItineraryForm";
+import CreateItineraryForm from "@/components/ItinerariesPage/CreateItineraryForm";
 
 export default function CreateItineraryPage() {
   return (
