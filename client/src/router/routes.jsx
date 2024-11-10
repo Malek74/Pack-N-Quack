@@ -21,7 +21,8 @@ import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
 import TouristDashboard from "@/pages/TouristDashboard";
 import Transportation from "@/pages/TransportationPage";
-
+import SingleTransportationPage from "@/pages/SingleTransportationPage";
+import Booked from "@/pages/BookedPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -43,9 +44,10 @@ const routes = createRoutesFromElements(
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
-    <Route path="transportation/:idAdv" element={<Transportation />}></Route>
-    <Route path="transportation" element={<Transportation />}></Route>
-
+    <Route path="transportations/:idAdv" element={<Transportation />}></Route>
+    <Route path="transportations" element={<Transportation />}></Route>
+    <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
+    <Route path="booked/" element={<Booked />}></Route>
     <Route path="touristDashboard" element={<TouristDashboard />} />
     <Route
       path="*"

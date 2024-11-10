@@ -39,9 +39,7 @@ export default function TransportationEditForm(props) {
 
     const [discounts, setDiscounts] = useState([]); // State to hold user-added discounts
     const [newDiscount, setNewDiscount] = useState(''); // State for new discount input
-    const [categories, setCategories] = useState([]);
-    const [selectedPriceType, setSelectedPriceType] = useState(props.priceType);
-    const [tags, setTags] = useState([]);
+
 
     // Handle adding a new discount
     const handleAddDiscount = () => {
@@ -52,18 +50,6 @@ export default function TransportationEditForm(props) {
     };
 
 
-
-    const fetchData = async () => {
-        try {
-            const fetchedTags = await axios.get("/api/transportation/tag");
-            const fetchedCategories = await axios.get("/api/transportation/category");
-            setTags(fetchedTags.data);
-            setCategories(fetchedCategories.data);
-            form.setValue("booking", discounts);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
 
     function cleanObject(obj) {
@@ -85,32 +71,28 @@ export default function TransportationEditForm(props) {
     }
 
     const transportationForm = z.object({
-        name: z.string().min(1, { message: "Name is required" }),
+        advertiserName: z.string().min(1, { message: "Name is required" }),
         date: z.string(),
-        location: z.string(),
-        googleMapLink: z.string(),
-        price: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        minPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        maxPrice: z.coerce.number().min(0, { message: "Price must be a positive number." }),
-        priceType: z.string(),
-        categoryID: z.string(),
-        tags: z.array(z.string()).nonempty({ message: "At least one tag is required" }),
+        type: z.enum(
+            ["Bus", "Taxi", "Train"],
+            "Please select a Transportation Type."
+        ),
+        from: z.string().min(1, { message: "Location is required" }),
+        to: z.string().min(1, { message: "Location is required" }),
+        price: z.coerce.number().min(1, { message: "Price must be a positive number." }),
         isBookingOpen: z.boolean(),
         specialDiscounts: z.string(),
+
     }).optional;
     const form = useForm({
         resolver: zodResolver(transportationForm),
         defaultValues: {
-            name: "",
+            advertiserName: "",
             date: "",
-            location: "",
-            googleMapLink: "",
+            from: "",
+            to: "",
             price: "",
-            minPrice: "",
-            maxPrice: "",
-            priceType: "",
-            categoryID: "",
-            tags: "",
+            type: "",
             isBookingOpen: false,
             specialDiscounts: ""
         },
@@ -122,7 +104,7 @@ export default function TransportationEditForm(props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button onClick={() => fetchData()} className="bg-transparent" ><Pencil /></Button>
+                <Button className="bg-transparent" ><Pencil /></Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
@@ -135,12 +117,36 @@ export default function TransportationEditForm(props) {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col">
                         <FormField
                             control={form.control}
-                            name="name"
+                            name="advertiserName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Transportation Name</FormLabel>
+                                    <FormLabel>Advertiser Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.name} {...field} />
+                                        <Input placeholder={props.advertiserName} {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="type"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Transportation Type</FormLabel>
+                                    <FormControl>
+                                        <Select onValueChange={(value) => {
+                                            field.onChange(value);
+                                        }}>
+                                            <SelectTrigger className="w-48">
+                                                <SelectValue placeholder="Select Transportation Type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Bus">Bus</SelectItem>
+                                                <SelectItem value="Train">Train</SelectItem>
+                                                <SelectItem value="Taxi">Taxi</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -165,12 +171,12 @@ export default function TransportationEditForm(props) {
                         />
                         <FormField
                             control={form.control}
-                            name="location"
+                            name="from"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Location</FormLabel>
+                                    <FormLabel>From</FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.location} {...field} />
+                                        <Input placeholder={props.from} {...field} />
                                     </FormControl>
 
                                     <FormMessage />
@@ -180,146 +186,32 @@ export default function TransportationEditForm(props) {
 
                         <FormField
                             control={form.control}
-                            name="googleMapLink"
+                            name="to"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Google Maps Link</FormLabel>
+                                    <FormLabel>To</FormLabel>
                                     <FormControl>
-                                        <Input placeholder={props.mapsSrc} {...field} />
+                                        <Input placeholder={props.to} {...field} />
                                     </FormControl>
+
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
-                            name="priceType"
+                            name="price"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Price Type</FormLabel>
+                                    <FormLabel>Price</FormLabel>
                                     <FormControl>
-                                        <Select onValueChange={(value) => {
-                                            field.onChange(value);
-                                            setSelectedPriceType(value);  // Set the selected price type
-                                        }}>
-                                            <SelectTrigger className="w-48">
-                                                <SelectValue placeholder={props.priceType} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="fixed">Fixed</SelectItem>
-                                                <SelectItem value="range">Range</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                        <Input placeholder={props.price} {...field} />
                                     </FormControl>
+
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-
-                        {/* Conditionally render based on priceType */}
-                        {selectedPriceType === "fixed" && (
-                            <FormField
-                                control={form.control}
-                                name="price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Ticket Price</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder={props.price} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
-
-                        {selectedPriceType === "range" && (
-                            <>
-                                <FormField
-                                    control={form.control}
-                                    name="minPrice"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Min Price</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder={props.minPrice} {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="maxPrice"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Max Price</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder={props.maxPrice} {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </>
-                        )}
-
-                        <FormField
-                            control={form.control}
-                            name="categoryID"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Category</FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                field.onChange(value);  // Pass the value to the form control
-                                                // console.log("Selected Category: ", value);  // Log the selected value
-                                            }}
-                                        >
-                                            <SelectTrigger className="w-48" onValueChange={field.onChange}>
-                                                <SelectValue placeholder={props.category}  {...field} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map((category) => (
-                                                    <SelectItem value={category.name} key={category._id}>{category.name} </SelectItem>
-                                                ))}
-
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="tags"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Tags</FormLabel>
-                                    <FormControl>
-                                        <Multiselect
-                                            className="w-max"
-                                            isObject={false}
-                                            options={tags.map(tag => tag.name)}  // Populate options with tag names
-                                            onSelect={(selectedList) => {
-                                                // Update the field value with the selected tags array
-                                                field.onChange(selectedList);
-                                                // console.log("Selected Tags: ", selectedList);
-                                            }}
-                                            onRemove={(selectedList) => {
-                                                // Update the field value when tags are removed
-                                                field.onChange(selectedList);
-                                                // console.log("Updated Tags After Removal: ", selectedList);
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
                         <FormField
                             control={form.control}
                             name="isBookingOpen"

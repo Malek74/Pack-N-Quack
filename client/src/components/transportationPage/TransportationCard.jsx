@@ -10,8 +10,8 @@ export default function transportationCard(props) {
 
     const date = new Date(props.time);
     const openTransportationPage = () => {
-        console.log(props.id)
-        navigate(`/transportation/${props.id}`);
+        console.log(props.transportationID)
+        navigate(`/transportation/${props.transportationID}`);
     };
     return (
 
