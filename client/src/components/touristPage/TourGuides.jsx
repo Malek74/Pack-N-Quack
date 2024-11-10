@@ -8,24 +8,33 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "../shared/RateComment";
-import RateForm from "../forms/RateForm";
+import RateComment from "./shared/RateComment";
+import RateForm from "./forms/RateForm";
+import { useEffect, useState } from "react";
+import axios from "axios";
 export default function TourGuides() {
-  const accounts = [
-    { id: 1, username: "mariam" },
-    { id: 2, username: "ramito" },
-    { id: 3, username: "manjp" },
-    { id: 4, username: "miro" },
-  ];
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get("/api/tourGuide");
+        setAccounts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchAccounts();
+  }, []);
 
   const tableRows = accounts.map((account) => {
     return (
       <TableRow key={account.id}>
-        <TableCell className="font-medium">{account.id}</TableCell>
+        <TableCell className="font-medium">{account._id}</TableCell>
         <TableCell>{account.username}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm showExperience />}
+            form={<RateForm tourGuideId={account._id} type="tourguide" />}
             type="tourguide"
             title={account.username}
           />

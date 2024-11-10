@@ -8,23 +8,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "../shared/RateComment";
-import RateForm from "../forms/RateForm";
+import RateComment from "./shared/RateComment";
+import RateForm from "./forms/RateForm";
+import { useEffect, useState } from "react";
+import axios from "axios";
 export default function ItinerariesMade() {
-  const accounts = [
-    { name: "family-friendly" },
-    { name: "historical" },
-    { name: "indoors" },
-    { name: "Nature" },
-  ];
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get("/api/itinerary");
+        setAccounts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchAccounts();
+  }, []);
 
   const tableRows = accounts.map((account) => {
     return (
-      <TableRow key={account.id}>
+      <TableRow key={account._id}>
         <TableCell className="font-medium">{account.name}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm />}
+            form={<RateForm itineraryId={account._id} type="itineraries" />}
             type="itineraries"
             title={account.name}
           />
