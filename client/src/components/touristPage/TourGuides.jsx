@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "./shared/RateComment";
-import RateForm from "./forms/RateForm";
+import RateComment from "../shared/RateComment";
+import RateForm from "../forms/RateForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 export default function TourGuides() {
@@ -34,7 +34,13 @@ export default function TourGuides() {
         <TableCell>{account.username}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm tourGuideId={account._id} type="tourguide" />}
+            form={
+              <RateForm
+                tourGuideId={account._id}
+                type="tourguide"
+                showExperience
+              />
+            }
             type="tourguide"
             title={account.username}
           />

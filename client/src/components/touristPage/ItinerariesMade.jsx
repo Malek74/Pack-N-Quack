@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "./shared/RateComment";
-import RateForm from "./forms/RateForm";
+import RateComment from "../shared/RateComment";
+import RateForm from "../forms/RateForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 export default function ItinerariesMade() {
@@ -33,7 +33,13 @@ export default function ItinerariesMade() {
         <TableCell className="font-medium">{account.name}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm itineraryId={account._id} type="itineraries" />}
+            form={
+              <RateForm
+                itineraryId={account._id}
+                type="itineraries"
+                showExperience
+              />
+            }
             type="itineraries"
             title={account.name}
           />

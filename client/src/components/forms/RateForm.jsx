@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { RatingInput } from "../shared/RatingsInput";
 import PropTypes from "prop-types";
-import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 // Define zod schema for comment and rating
 const schema = z.object({
