@@ -149,90 +149,12 @@ export const addItinerary = async (req, res) => {
         return res.status(201).json(createdItinerary);
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({ message: "Error creating itinerary", error: error.message });
     }
 
 };
 
-//@desc get a single itinerary by id, category, or tag
-//@route GET api/itinerary
-// export const getItinerary = async (req, res) => {
-
-
-//     const id = req.query.id;
-//     const name = req.query.name;
-//     const tag = req.query.tag;
-//     const maxBudget = req.query.maxBudget;
-//     const minBudget = req.query.minBudget;
-//     const minDate = req.query.minDate;
-//     const maxDate = req.query.maxDate;
-//     const language = req.query.language;
-
-
-//     const sortBy = req.query.sortBy;
-//     const order = req.query.order;
-
-//     let query = {}; // Create an object to build your query
-//     let sortOptions = {};
-
-//     try {
-//         // Build query based on input parameters
-//         if (name) {
-//             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
-//         }
-
-//         if (tag) {
-//             const tagID = await itineraryTags.findOne({ tag }).select('_id');
-//             if (tagID) {
-//                 // Use $elemMatch properly to filter tags 
-//                 query.tags = { $elemMatch: { $eq: tagID._id } }; // Check if tagID._id is included in the tags array
-//             }
-//         }
-
-//         if (minBudget || maxBudget) {
-//             query.price = {};
-//             if (minBudget) {
-//                 query.price.$gte = minBudget;
-//             }
-//             if (maxBudget) {
-//                 query.price.$lte = maxBudget;
-//             }
-//         }
-
-//         if (minDate || maxDate) {
-//             query.available_dates = { $elemMatch: {} };
-//             if (minDate) {
-//                 query.available_dates.$elemMatch.$gte = new Date(minDate); // Convert to Date object
-//             }
-//             if (maxDate) {
-//                 query.available_dates.$elemMatch.$lte = new Date(maxDate); // Convert to Date object
-//             }
-//         }
-
-//         if (language) {
-//             query.language = language; // Filter by language if provided
-//         }
-//         console.log(sortBy);
-//         // Set sorting options if provided
-//         if (sortBy && order) {
-//             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
-//         }
-
-//         console.log('Query:', query);
-//         console.log('Sort Options:', sortOptions);
-
-//         // Fetch the itinerary using the built query
-//         let itinerary = await Itinerary.find(query).sort(sortOptions).populate('tags');
-
-//         if (itinerary.length === 0) {
-//             return res.status(404).json({ message: "Itinerary doesn't exist" });
-//         }
-
-//         return res.status(200).json(itinerary);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message }); // Handle server errors
-//     }
-// };
 
 export const getItinerary = async (req, res) => {
 
@@ -308,14 +230,14 @@ export const getItinerary = async (req, res) => {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
 
+        query.isActive = true;
+        query.flagged = false;
         // Fetch itineraries with filters and sort options
         let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags tourGuideID');
         console.log(itineraries)
         if (itineraries.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
         }
-
-        itineraries = itineraries.filter(itinerary => itinerary.isActive === true && itinerary.flagged === false);
 
         if (conversionRate) {
 

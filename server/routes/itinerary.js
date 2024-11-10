@@ -5,7 +5,7 @@ import { addItinerary, deleteItinerary, getMaxPrice, getItinerary, updateItinera
 
 const router = express.Router();
 
-router.post("/:id", upload.fields([{ name: 'images', maxCount: 20 }, { name: 'coverImage', maxCount: 1 }, { name: "activityImages", maxcount: 10 }]), addItinerary);
+router.post("/", upload.fields([{ name: 'images', maxCount: 20 }, { name: 'coverImage', maxCount: 1 }, { name: "activityImages", maxcount: 10 }]), addItinerary);
 router.get("/", getItinerary);
 router.delete("/:id", deleteItinerary);
 router.put("/:id", upload.fields([{ name: 'images', maxCount: 20 }, { name: 'coverImage', maxCount: 1 }, { name: "activityImages", maxcount: 10 }]), updateItinerary);

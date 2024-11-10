@@ -110,7 +110,7 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
     pickUpLocation: {
-        name:{
+        name: {
             type: String,
             required: true
         },
@@ -121,9 +121,9 @@ const itinerarySchema = new mongoose.Schema({
     },
 
     dropOffLocation: {
-        name:{
-        type: String,
-        required: true
+        name: {
+            type: String,
+            required: true
         },
         googleMapLink: {
             type: String,
@@ -159,12 +159,11 @@ const itinerarySchema = new mongoose.Schema({
     },
     isActive: {
         type: Boolean,
-        default: true, 
+        default: true,
     },
     flagged: {
         type: Boolean,
-        required: true,
-        default: false, 
+        default: false,
     },
 });
 
