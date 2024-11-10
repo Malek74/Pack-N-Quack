@@ -15,6 +15,25 @@ export const getComplaints = async (req, res) => {
 
 }
 
+export const viewComplaints = async (req, res) => {
+    const status = req.query.status;
+    const sort = req.query.sort;
+    try {
+        let query = {};
+        let sortQuery = {};
+        if(status){
+            query.status = status;
+        }
+        if(sort){
+            sortQuery.createdAt = sort === 'asc' ? 1 : -1;
+        }
+        const complaints = await complaintModel.find(query).sort(sortQuery);
+        return res.status(200).json(complaints);   
+    }catch(error){
+        return res.status(404).json({ message: error.message });
+    }
+}
+
 export const viewComplaintById = async (req, res) => {
     const complaintId = req.params.id;
     try {
