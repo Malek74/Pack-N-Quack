@@ -30,7 +30,7 @@ export const confirmPayment = async (req, res) => {
                     //fetch event booked
                     if (eventType == "activity") {
                         eventBooked = await activityModel.findById(eventID);
-                        bookedEvent.price = eventBooked.price;
+                        bookedEvent.price = session.metadata.price;
                         bookedEvent.activityID = eventBooked._id;
                     }
                     else if (eventType == "itinerary") {

@@ -4,7 +4,7 @@ import product from '../models/productSchema.js';
 import Tourist from '../models/touristSchema.js';
 import { addLoyaltyPoints } from '../utils/Helpers.js';
 import Stripe from 'stripe';
-import Booking from "../models/bookingsSchema.js";
+import Booking from "../models/bookingSchema.js";
 import { uploadImages } from '../utils/Helpers.js';
 import activityTag from '../models/activityTagSchema.js';
 import { getConversionRate } from '../utils/Helpers.js';
@@ -158,7 +158,6 @@ export const addItinerary = async (req, res) => {
 
 export const getItinerary = async (req, res) => {
 
-    const id = req.query.id;
     const name = req.query.name;
     const tags = req.query.tags;
     const maxBudget = req.query.maxBudget;
@@ -240,12 +239,26 @@ export const getItinerary = async (req, res) => {
         }
 
         if (conversionRate) {
-
             itineraries = itineraries.map(itinerary => {
                 itinerary.price = itinerary.price * conversionRate;
                 return itinerary;
             });
         }
+        return res.status(200).json(itineraries);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAdminItineraries = async (req, res) => {
+    try {
+        let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags tourGuideID');
+        console.log(itineraries)
+        if (itineraries.length === 0) {
+            return res.status(404).json({ message: "Itinerary doesn't exist" });
+        }
+
         return res.status(200).json(itineraries);
 
     } catch (error) {
@@ -262,69 +275,36 @@ export const getMyItineraries = async (req, res) => {
     console.log(id);
     const currency = req.query.currency
     let conversionRate = 0;
+    let itineraries
     try {
         if (currency) {
             conversionRate = await getConversionRate(currency);
         }
 
-        const itinerary = await Itinerary.find({
+        itineraries = await Itinerary.find({
             tourGuideID: id,
-            $or: [{ flagged: false }, { flagged: { $exists: false } }]
         }).populate('tags tourGuideID');
 
-        if (!itinerary) {
-            return res.status(404).json({ message: "No active itineraries found" });
+        if (!itineraries) {
+            return res.status(404).json({ message: "No itineraries found" });
         }
 
         if (conversionRate) {
-            itinerary = itinerary.map(itinerary => {
+            itineraries = itineraries.map(itinerary => {
                 itinerary.price = itinerary.price * conversionRate;
                 return itinerary;
             });
         }
 
-        res.status(200).json(itinerary);
+        res.status(200).json(itineraries);
     }
     catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-// export const getMyItineraries = async (req, res) => {
-//     const id = req.params.id;
-//     console.log(id);
-
-//     try {
-//         const itineraries = await Itinerary.find({ 
-//             tourGuideID: id, 
-//             flagged: false 
-//         });
-//         res.status(200).json(itineraries);
-//     }
-//     catch (error) {
-//         res.status(401).json({ message: error.message });
-//     }
-// }
-
-
-
-// export const viewAllItineraries = async (req, res) => {
-//     try {
-//         const itineraries = await Itinerary.find(); 
-
-//         if (itineraries.length === 0) {
-//             return res.status(404).json({ message: "No active itineraries found" });
-//         }
-
-//         res.status(200).json(itineraries);
-//     } catch (error) {
-//         res.status(401).json({ message: "Error fetching itineraries." });
-//     }
-// };
-
 
 export const deleteItinerary = async (req, res) => {
-
     try {
         var itineraryToDelete = await Itinerary.findById(req.params.id);
 
@@ -417,30 +397,16 @@ export const getAllLanguages = async (req, res) => {
 };
 
 
-// export const ItineraryActivation = async (req, res) => {
-//     const itineraryID = req.params.id;
-
-//     try {
-//         const itinerary = await Itinerary.findById(itineraryID);
-
-//         if (itinerary.bookings > 0) {
-//             if (!itinerary.isActive) {
-//                 return res.status(400).json({ message: "Itinerary is already deactivated." });
-//             }
-
-//             itinerary.isActive = false;
-
-//         } else {
-
-//             itinerary.isActive = !itinerary.isActive; 
-//         }
-
-//         const updatedItinerary = await itinerary.save();
-//         return res.status(200).json({ message: "Itinerary status updated.", itinerary: updatedItinerary });
-//     } catch (error) {
-//         return res.status(500).json({ message: "Error updating itinerary status", error: error.message });
-//     }
-// };
+export const toggleItineraryActive = async (req, res) => {
+    const itineraryID = req.params.id;
+    const { isActive } = req.body;
+    try {
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { isActive: isActive } }, { new: true, runValidators: true });
+        return res.status(200).json({ message: "Itinerary status updated.", itinerary: updatedItinerary });
+    } catch (error) {
+        return res.status(500).json({ message: "Error updating itinerary status", error: error.message });
+    }
+};
 
 
 
@@ -500,25 +466,28 @@ export const updateItinerary = async (req, res) => {
                 return {
                     ...day,
                     activities: day.activities.map((activity, activityIndex) => {
-                        const [dIndex, aIndex] = newActivityImagesIndex[newActivityCount].split(",");
+                        if (newActivityCount < newActivityImagesIndex.length) {
+                            const [dIndex, aIndex] = newActivityImagesIndex[newActivityCount].split(",");
 
-                        if (dIndex == dayIndex && aIndex == activityIndex) {
-                            const newUpdatedActivity = {
-                                ...activity,
-                                image: newActivityImages[newActivityCount],
-                            };
-                            newActivityCount++;
-                            return newUpdatedActivity;
-                        } else {
-                            // Replace the image attribute with the next URL from the array
-                            const oldUpdatedActivity = {
-                                ...activity,
-                                image: oldActivityImagesUrls[oldActivityCount],
-                            };
-                            // Increment the URL index, wrapping around if necessary
-                            oldActivityCount++;
-                            return oldUpdatedActivity;
+                            if (dIndex == dayIndex && aIndex == activityIndex) {
+                                const newUpdatedActivity = {
+                                    ...activity,
+                                    image: newActivityImages[newActivityCount],
+                                };
+                                newActivityCount++;
+                                console.log(newUpdatedActivity);
+                                return newUpdatedActivity;
+                            }
                         }
+                        // Replace the image attribute with the next URL from the array
+                        const oldUpdatedActivity = {
+                            ...activity,
+                            image: oldActivityImagesUrls[oldActivityCount],
+                        };
+                        // Increment the URL index, wrapping around if necessary
+                        oldActivityCount++;
+                        return oldUpdatedActivity;
+
                     })
                 };
             });

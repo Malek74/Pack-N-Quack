@@ -70,7 +70,7 @@ export const bookEvent = async (req, res) => {
                 eventType: eventType,
                 touristID: touristID,
                 type: "event",
-
+                price: amountToPay
             }
         });
 
