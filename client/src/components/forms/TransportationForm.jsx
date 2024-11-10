@@ -76,7 +76,6 @@ export default function TransportationForm(props) {
     }
     async function onSubmit(values) {
 
-        console.log(discounts);
         values.specialDiscounts = discounts;
         console.log(values);
         const cleanedValues = cleanObject(values); // Clean the submitted values

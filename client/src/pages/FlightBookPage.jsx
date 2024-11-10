@@ -48,6 +48,7 @@ const FlightBookingApp = () => {
                 numTickets: numTickets,
                 origin: flightOffer.itineraries[0].segments[0].departure.iataCode,
                 destination: flightOffer.itineraries[0].segments[flightOffer.itineraries[0].segments.length - 1].arrival.iataCode,
+                date: flightOffer.itineraries[0].segments[0].departure.at,
             });
             window.location.href = response.data.url;
 

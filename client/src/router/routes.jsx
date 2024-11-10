@@ -30,7 +30,8 @@ import EditItineraryPage from "@/pages/EditItineraryPage";
 import ItinerariesTourGuidePage from "@/pages/ItinerariesTourGuidePage";
 import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
 import Transportation from "@/pages/TransportationPage";
-
+import SingleTransportationPage from "@/pages/SingleTransportationPage";
+import Booked from "@/pages/BookedPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -76,14 +77,19 @@ const routes = createRoutesFromElements(
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
-    <Route path="transportation/:idAdv" element={<Transportation />}></Route>
-    <Route path="transportation" element={<Transportation />}></Route>
+    <Route path="transportations/:idAdv" element={<Transportation />}></Route>
+    <Route path="transportations" element={<Transportation />}></Route>
+    <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
+    
+
     <Route path="touristDashboard" element={<TouristDashboard />}>
       <Route path="profile" element={<MyProfilePage />} />
       <Route path="tour-guides" element={<TourGuides />} />
+      <Route path="booked" element={<Booked />}></Route>
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
+       
     </Route>
 
     <Route

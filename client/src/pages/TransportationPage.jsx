@@ -15,38 +15,7 @@ export default function Transportation() {
     const [transportationCreated, setTransportationCreated] = useState();
     let tourist = true;
     { idAdv ? tourist = false : tourist = true }
-    const mockTransportation = [{
-        _id: "1",
-        coverImagePath: Transportationsbackground2,
-        advertiserName: "GO Bus",
-        type: "Bus",
-        date: "2024-12-01 10:00 AM",
-        from: "Alexandria",
-        to: "Cairo",
-        price: 100,
-        isBookingOpen: true,
-        specialDiscounts: ["20% for earlybirds"]
-    }, {
-        _id: "2",
-        coverImagePath: Transportationsbackground2,
-        advertiserName: "London Cab",
-        type: "Taxi",
-        date: "2024-11-29 12:00 PM",
-        from: "Cairo",
-        to: "Gouna",
-        price: 300,
-        specialDiscounts: ["20% for students", "30% for seniors"],
-    }, {
-        _id: "3",
-        coverImagePath: Transportationsbackground2,
-        advertiserName: "Uber",
-        type: "Taxi",
-        date: "2024-12-31 08:00 AM",
-        from: "Cairo",
-        to: "Aswan",
-        price: 200,
-        isBookingOpen: true
-    }]
+
     const addTransportation = async (values) => {
         try {
             const { advertiserName, date, type, from, to, price, isBookingOpen, specialDiscounts } = values;
