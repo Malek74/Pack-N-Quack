@@ -6,7 +6,7 @@ import axios from "axios";
 import ItinerariesCard from "@/components/ItinerariesPage/ItinerariesCard";
 import Loading from "@/components/shared/Loading";
 import ItineraryFilters from "@/components/ItinerariesPage/ItineraryFilters";
-
+import { useUser } from "@/context/UserContext";
 export default function ItinerariesTouristsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -14,6 +14,7 @@ export default function ItinerariesTouristsPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [fetchedItinerariesParams, setFetchedItinerariesParams] = useState({});
+  const { prefCurrency } = useUser();
 
   useEffect(() => {
     setFetchedItinerariesParams({
@@ -26,7 +27,7 @@ export default function ItinerariesTouristsPage() {
       try {
         setIsLoading(true);
         const response = await axios.get("/api/itinerary", {
-          params: fetchedItinerariesParams,
+          params: { ...fetchedItinerariesParams, currency: prefCurrency },
         });
         setFetchedItineraries(response.data);
         setIsLoading(false);
@@ -36,7 +37,7 @@ export default function ItinerariesTouristsPage() {
     };
 
     fetchItineraries();
-  }, [fetchedItinerariesParams]);
+  }, [fetchedItinerariesParams, prefCurrency]);
 
   return (
     <div className="flex flex-col w-screen p-14 pb-0">

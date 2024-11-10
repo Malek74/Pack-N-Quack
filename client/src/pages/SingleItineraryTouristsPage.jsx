@@ -8,18 +8,18 @@ import { Rating } from "@/components/shared/Rating";
 import { format } from "date-fns";
 import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryActivitySlideShow";
 import Maps from "@/components/shared/Maps";
-
+import { useUser } from "@/context/UserContext";
 export default function SingleItineraryTouristsPage() {
   const { id } = useParams();
   const [isloading, setIsLoading] = useState(true);
   const [fetchedItinerary, setFetchedItinerary] = useState({});
-
+  const { prefCurrency } = useUser();
   useEffect(() => {
     const fetchItinerary = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(`/api/itinerary/viewItinerary/${id}`, {
-          params: { currency: "EGP" },
+          params: { currency: prefCurrency },
         });
         console.log(response.data);
         setFetchedItinerary(response.data);
@@ -29,7 +29,7 @@ export default function SingleItineraryTouristsPage() {
       }
     };
     fetchItinerary();
-  }, [id]);
+  }, [id, prefCurrency]);
 
   return (
     (isloading && (

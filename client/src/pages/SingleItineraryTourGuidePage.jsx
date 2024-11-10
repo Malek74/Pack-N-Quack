@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
 
 export default function SingleItineraryTourGuidePage() {
   const { id } = useParams();
@@ -34,6 +35,7 @@ export default function SingleItineraryTourGuidePage() {
   const [fetchedItinerary, setFetchedItinerary] = useState({});
   const [itineraryActive, setItineraryActive] = useState();
   const navigate = useNavigate();
+  const { prefCurrency } = useUser();
 
   const handleToggleActive = () => {
     setItineraryActive(!itineraryActive);
@@ -66,7 +68,7 @@ export default function SingleItineraryTourGuidePage() {
       try {
         setIsLoading(true);
         const response = await axios.get(`/api/itinerary/viewItinerary/${id}`, {
-          params: { currency: "EGP" },
+          params: { currency: prefCurrency },
         });
         console.log(response.data);
         setFetchedItinerary(response.data);
@@ -77,7 +79,7 @@ export default function SingleItineraryTourGuidePage() {
       }
     };
     fetchItinerary();
-  }, [id]);
+  }, [id, prefCurrency]);
 
   return (
     (isloading && (

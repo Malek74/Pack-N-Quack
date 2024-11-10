@@ -7,6 +7,7 @@ import Loading from "@/components/shared/Loading";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
 
 export default function ItinerariesTourGuidePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -15,6 +16,7 @@ export default function ItinerariesTourGuidePage() {
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const { prefCurrency } = useUser();
 
   useEffect(() => {
     const fetchItineraries = async () => {
@@ -22,7 +24,7 @@ export default function ItinerariesTourGuidePage() {
         setIsLoading(true);
         console.log(id);
         const response = await axios.get(`/api/itinerary/myItineraries/${id}`, {
-          params: { currency: "USD" },
+          params: { currency: prefCurrency },
         });
         setFetchedItineraries(response.data);
         setIsLoading(false);
@@ -32,7 +34,7 @@ export default function ItinerariesTourGuidePage() {
     };
 
     fetchItineraries();
-  }, [id]);
+  }, [id, prefCurrency]);
 
   return (
     <div className="flex flex-col w-screen p-14 pb-0">

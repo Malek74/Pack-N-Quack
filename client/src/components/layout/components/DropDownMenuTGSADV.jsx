@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const DropDownMenuProfile = () => {
+const DropDownMenuTGSADV = () => {
   const [label, setLabel] = useState("What to do?");
   useEffect(() => {
     switch (location.pathname) {
@@ -47,4 +47,4 @@ const DropDownMenuProfile = () => {
   );
 };
 
-export default DropDownMenuComponent;
+export default DropDownMenuTGSADV;
