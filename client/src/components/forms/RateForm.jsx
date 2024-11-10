@@ -14,7 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RatingInput } from "../shared/RatingsInput";
-import { useToast } from "@/hooks/use-toast";
+import PropTypes from "prop-types";
+import axios from "axios";
+
 // Define zod schema for comment and rating
 const schema = z.object({
   comment: z.string(),
@@ -23,6 +25,12 @@ const schema = z.object({
     .min(1, "Please provide a rating")
     .max(5, "Rating cannot be more than 5"),
 });
+RateForm.propTypes = {
+  tourGuideId: PropTypes.string,
+  itineraryId: PropTypes.string,
+  activityId: PropTypes.string,
+  type: PropTypes.string,
+};
 
 export default function RateForm(props) {
   const { toast } = useToast();
@@ -37,26 +45,43 @@ export default function RateForm(props) {
     },
   });
   const duckImages = [
-    { id: 1, src: "/assets/images/angryDuck.jpeg", label: "Not Good" },
-    { id: 2, src: "/assets/images/neutralDuck.jpeg", label: "Neutral" },
+    { id: 1, src: "/assets/images/angryDuck.png", label: "Not Good" },
+    { id: 2, src: "/assets/images/neutralDuck.png", label: "Neutral" },
     {
       id: 3,
-      src: "/assets/images/happyDuck.jpeg",
+      src: "/assets/images/happyDuck.png",
       label: "Really Good",
     },
   ];
 
   // Handle form submission
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     switch (props.type) {
       case "tourguide":
         // Logic for tour guide user type
-        console.log("Handle actions for a tour guide");
+        console.log(values);
+        try {
+          await axios.post(`/api/tourGuide/rate/${props.tourGuideId}`, {
+            touristId: "6702cde57d7e2444d9713d8d",
+            comment: values.comment,
+            rating: values.rating,
+          });
+        } catch (error) {
+          console.error(error);
+        }
         break;
 
       case "itineraries":
-        // Logic for admin user type
-        console.log("Handle actions for an admin");
+        console.log(values);
+        try {
+          await axios.post(`/api/itinerary/rate/${props.itineraryId}`, {
+            touristId: "6702cde57d7e2444d9713d8d",
+            comment: values.comment,
+            rating: values.rating,
+          });
+        } catch (error) {
+          console.error(error);
+        }
         break;
 
       case "products":
@@ -87,7 +112,16 @@ export default function RateForm(props) {
 
       case "activity":
         // Logic for travel agency user type
-        console.log("Handle actions for an agency");
+        console.log(values);
+        try {
+          await axios.post(`/api/activity/review/${props.activityId}`, {
+            touristID: "6725442e98359339d8b821f0",
+            comment: values.comment,
+            rating: values.rating,
+          });
+        } catch (error) {
+          console.error(error);
+        }
         break;
     }
   };
@@ -98,7 +132,7 @@ export default function RateForm(props) {
     form.setValue("rating", selectedRating); // Update rating in form values
   };
   const handleExperienceChange = (selectedExprience) => {
-    setRating(selectedExprience);
+    setExperience(selectedExprience);
   };
 
   return (
