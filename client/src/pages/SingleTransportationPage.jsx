@@ -10,7 +10,7 @@ export default function SingleTransportationPage() {
   const { id } = useParams();
   const [transportation, setTransportation] = useState(null); // State to hold transportation data
   const [numberOfTickets, setNumberOfTickets] = useState(1);
-  const userID = "672f8e2c142c1410c5243616";
+  const userID = "6725442e98359339d8b821f0";
   const fetchTransportation = async () => {
     try {
       const response = await axios.get(`/api/transportation/${id}`,
@@ -69,7 +69,7 @@ export default function SingleTransportationPage() {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-gray-50 min-h-screen gap-3">
-      <img className="w-full rounded-lg shadow-lg mb-4" src={img} alt={name} />
+      <img className="w-[30rem] rounded-lg shadow-lg mb-4" src={img} alt={name} />
       <h1 className="font-semibold text-3xl text-gray-800 mb-2">{name}</h1>
       <span className="text-gold text-xl">{type}</span>
       <h4 className="text-base text-gray-600 mb-2">

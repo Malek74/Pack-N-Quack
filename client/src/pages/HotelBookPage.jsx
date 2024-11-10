@@ -9,6 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { set } from "date-fns";
 
 const HotelBookingApp = () => {
     const [hotels, setHotels] = useState([]);
@@ -16,6 +17,8 @@ const HotelBookingApp = () => {
     const [selectedHotelDetails, setSelectedHotelDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
+    const [checkInDate, setCheckInDate] = useState(null);
+    const [checkOutDate, setCheckOutDate] = useState(null);
     const userID = "6725442e98359339d8b821f0";
 
     const searchHotels = async (cityName) => {
@@ -49,6 +52,8 @@ const HotelBookingApp = () => {
             });
             console.log("Hotel Details:", response.data);
             setSelectedHotelDetails(response.data);
+            setCheckInDate(checkInDate);
+            setCheckOutDate(checkOutDate);
             console.log(selectedHotelDetails);
             return response.data;
         } catch (error) {
@@ -60,13 +65,18 @@ const HotelBookingApp = () => {
 
     const bookHotel = async (room, numOfDays) => {
         console.log(room);
+        console.log(checkInDate);
+        console.log(checkOutDate);
         try {
             const response = await axios.post(`/api/hotels/bookRoom/${userID}`,
                 {
                     price: room.price,
                     numOfDays: numOfDays,
                     currency: "USD",
-                    hotel: room
+                    hotel: room,
+                    checkIn: checkInDate,
+                    checkOut: checkOutDate,
+                    name: room.hotel
 
                 });
             window.location.href = response.data.url;
@@ -95,6 +105,8 @@ const HotelBookingApp = () => {
         try {
             const details = await showHotelDetails(selectedHotel.hotelId, checkInDate, checkOutDate, adults);
             setSelectedHotelDetails(details);
+            setCheckInDate(checkInDate);
+            setCheckOutDate(checkOutDate);
             console.log(details);
             console.log(selectedHotelDetails);
         }
