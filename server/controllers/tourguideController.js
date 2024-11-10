@@ -1,5 +1,5 @@
 import tourGuide from '../models/tourGuideSchema.js';
-import { usernameExists, emailExists } from './Helpers.js';
+import { usernameExists, emailExists } from '../utils/Helpers.js';
 
 //@desc Create a new tour guide
 //@route POST /api/tourGuide

@@ -86,6 +86,8 @@ export const addItinerary = async (req, res) => {
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
 export const getItinerary = async (req, res) => {
+
+
     const id = req.query.id;
     const name = req.query.name;
     const tag = req.query.tag;
@@ -282,5 +284,30 @@ export const getItineraryById = async (req, res) => {
 
     } catch (error) {
         res.status(404).json({ message: error.message });
+    }
+}
+
+export const getMaxPrice = async (req, res) => {
+    try {
+        const maxPrice = await Itinerary.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    maxPrice: { $max: "$price" }
+                }
+            }
+        ]);
+        return res.status(200).json(maxPrice[0]?.maxPrice || 0);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+export const getAllLanguages = async (req, res) => {
+    try {
+        const languages = await Itinerary.distinct('language');
+        return res.status(200).json(languages);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
     }
 }

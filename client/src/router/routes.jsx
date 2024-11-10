@@ -12,6 +12,9 @@ import MarketplacePage from "@/pages/MarketplacePage";
 import RegistrationPage from "@/pages/RegistrationPage";
 import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary";
 import NotFoundPage from "@/components/errorBoundary/NotFoundPage";
+import SingleActivityPage from "@/pages/SingleActivityPage";
+import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
+import SingleHistoricalPage from "@/pages/SingleHistoricalPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
 import TouristDashboard from "@/pages/TouristDashboard";
@@ -22,6 +25,7 @@ import CreateItineraryPage from "@/pages/CreateItineraryPage";
 import EditItineraryPage from "@/pages/EditItineraryPage";
 import ItinerariesTourGuidePage from "@/pages/ItinerariesTourGuidePage";
 import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
+import Transportation from "@/pages/TransportationPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -34,9 +38,7 @@ const routes = createRoutesFromElements(
     <Route path="RegistrationPage" element={<RegistrationPage />} />
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
-    <Route path="componentTest" element={<ComponentTestPage />} />
-    <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
-    <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
+
     <Route
       path="itinerariesTourists"
       element={<ItinerariesTouristsPage />}
@@ -55,6 +57,24 @@ const routes = createRoutesFromElements(
     ></Route>
     <Route path="createItinerary" element={<CreateItineraryPage />}></Route>
     <Route path="editItinerary/:id" element={<EditItineraryPage />}></Route>
+
+    <Route path="activity/:id" element={<SingleActivityPage />} />
+    <Route path="place/:name" element={<SingleHistoricalPage />} />
+    <Route path="Pointsandloyality" element={<PointsAndLoyalty />} />
+    <Route
+      path="*"
+      element={
+        <ErrorBoundary>
+          <NotFoundPage />
+        </ErrorBoundary>
+      }
+    />
+    <Route path="componentTest" element={<ComponentTestPage />} />
+    <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
+    <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
+    <Route path="transportation/:idAdv" element={<Transportation />}></Route>
+    <Route path="transportation" element={<Transportation />}></Route>
+
     <Route path="touristDashboard" element={<TouristDashboard />} />
     <Route
       path="*"

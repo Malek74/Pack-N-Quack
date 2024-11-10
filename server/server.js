@@ -20,6 +20,7 @@ import activityTag from './routes/activityTag.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
+import uploadImg from './routes/uploadImg.js';
 
 config();
 const app = express();
@@ -63,4 +64,4 @@ app.use('/api/advertisers', advertisers);
 app.use('/api/activity', activity)
 app.use('/api/activity/category', activityCategory)
 app.use('/api/activity/tag', activityTag)
-
+app.use('/api/upload',uploadImg)

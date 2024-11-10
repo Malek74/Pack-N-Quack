@@ -2,7 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
+import DropDownMenuProfile from "./components/DropDownMenuProfile";
 import logo from "/assets/icons/logo.png";
+import DropDownMenuBook from "./components/DropDownMenuBook";
+
+import ComboboxCurrency from "./components/ComboboxCurrency";
+
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
 
@@ -77,13 +82,13 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
-              <DropDownMenuComponent location={location} />
+              <DropDownMenuProfile location={location} />
             </li>
           </Button>
 
@@ -93,19 +98,37 @@ export default function Header() {
                 isActive("/itinerariesTourists")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/historicalTourists")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historicalTourists")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuTourist />
             </li>
           </Button>
+
+          <Button asChild variant="link">
+            <li
+              className={
+                isActive("/itineraries")
+                  ? "text-yellow-500"
+                  : isActive("/activities")
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
+              }
+            >
+              <DropDownMenuBook location={location} />
+            </li>
+          </Button>
+
         </ul>
 
         {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
+          <ComboboxCurrency />
           <Button asChild variant="ghost">
             <li>
               <Link to="/login">Log in</Link>

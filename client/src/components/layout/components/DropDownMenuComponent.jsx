@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const DropDownMenuComponent = () => {
+const DropDownMenuProfile = () => {
   const [label, setLabel] = useState("What to do?");
   useEffect(() => {
     switch (location.pathname) {

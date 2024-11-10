@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
 export default function MyProfilePage() {
@@ -49,6 +50,7 @@ export default function MyProfilePage() {
         hotline,
         website,
         email,
+        isAccepted,
         username,
       } = profile;
 
@@ -297,7 +299,9 @@ export default function MyProfilePage() {
         nationality,
         role,
         jobTitle,
-        wallet,
+        wallet=0,
+        loyaltyPoints = 10000,
+      badge = "Bronze",
         createdAt,
         updatedAt,
         username,
@@ -332,7 +336,17 @@ export default function MyProfilePage() {
               <h3 className="text-sm font-semibold">Wallet Balance</h3>
               <p className="text-sm text-muted-foreground">${wallet}</p>
             </div>
+                {/* loyaltyPoints */}
+                <div>
+              <h3 className="text-sm font-semibold">Loyality Points</h3>
+              <p className="text-sm text-muted-foreground">${loyaltyPoints}</p>
+            </div>
 
+           {/* bagde */}
+           <div>
+              <h3 className="text-sm font-semibold">Badge</h3>
+              <p className="text-sm text-muted-foreground">{badge}</p>
+            </div>
             {/* Contact Information */}
             <div>
               <h3 className="text-sm font-semibold">Contact Information</h3>
@@ -375,6 +389,7 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            <PointsAndLoyalty profileData={profile} /> 
           </CardContent>
         </Card>
       );

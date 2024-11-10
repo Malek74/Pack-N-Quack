@@ -1,6 +1,6 @@
 
 import touristGoverner from '../models/touristGovernorScehma.js';
-import { usernameExists } from './Helpers.js';
+import { usernameExists } from '../utils/Helpers.js';
 
 
 export const createTouristGovernor = async (req, res) => {

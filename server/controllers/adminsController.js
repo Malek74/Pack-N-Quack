@@ -4,7 +4,7 @@ import tourGuide from "../models/tourGuideSchema.js";
 import seller from "../models/sellerSchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import touristGoverner from "../models/touristGovernorScehma.js";
-import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../controllers/Helpers.js';
+import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 import tourist from "../models/touristSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 

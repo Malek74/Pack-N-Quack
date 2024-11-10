@@ -62,6 +62,10 @@ export default function RegistrationPage() {
         nationality: values.nationality, // Default value for nationality
         role: values.status, // Default value for status dropdown
         dob: values.dob, // Default value for date of birth
+        preferedFirstTag: values.preferedFirstTag,
+        preferedSecondTag: values.preferedSecondTag,
+        preferedFirstCategory: values.preferedFirstCategory,
+        preferedSecondCategory: values.preferedSecondCategory,
       })
       .then((response) => {
         console.log("Tourist created successfully", response.data);
@@ -82,7 +86,7 @@ export default function RegistrationPage() {
 
   const createNewTourguideSellerAdvertiser = (values) => {
     console.log("axios");
-    const endpoint = values.status === "Advertiser" ? "advertisers" : values.status==="Seller" ? "sellers" : "tourGuide"
+    const endpoint = values.status === "Advertiser" ? "advertisers" : values.status === "Seller" ? "sellers" : "tourGuide"
     axios
       .post(`/api/${endpoint}/`, {
         username: values.username, // Default value for username
@@ -130,7 +134,7 @@ export default function RegistrationPage() {
         <div>
           <Button onClick={() => setType("")}>Back</Button>
 
-          <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser}/>
+          <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser} />
         </div>
       )}
     </div>
