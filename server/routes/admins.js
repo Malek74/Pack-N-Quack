@@ -6,6 +6,7 @@ import advertiserModel from "../models/advertiserSchema.js";
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 import { protect } from "../middleware/authenticator.js";
+import {getComplaints, viewComplaintById, markComplaintPending, markComplaintResolved, viewComplaints} from "../controllers/complaintController.js";
 
 const router = express.Router();
 config();
@@ -43,5 +44,10 @@ router.post("/login", async (req, res) => {
 router.get("/verify", protect, (req, res) => {
     res.status(200).json(req.user);
 });
+
+router.get("/complaints", viewComplaints);
+router.get("/complaints/:id", viewComplaintById);
+router.put("/complaints/pending/:id", markComplaintPending);
+router.put("/complaints/resolved/:id", markComplaintResolved);
 
 export default router;
