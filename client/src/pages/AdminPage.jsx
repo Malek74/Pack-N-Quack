@@ -17,6 +17,7 @@ import {
   UserRoundPen,
   CircleUser,
   TentTree,
+  Angry,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AdminsList from "@/components/adminPage/AdminsList";
@@ -39,9 +40,20 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import ItinerariesView from "@/components/adminPage/ItinerariesView";
+import Complaints from "@/components/adminPage/complaints";
+import OneComplain from "@/components/adminPage/OneComplain";
 export default function AdminPage() {
   const navigate = useNavigate();
+
+  //complaints page stuff ///////
   const [activeSection, setActiveSection] = useState("Users");
+  const [currentComplaint, setCurrentComplaint] = useState({});
+
+  const openComplaint = (complaint) => {
+    setCurrentComplaint(complaint);
+    setActiveSection("Single Complaint");
+  };
+  /////////////////////////////////
 
   // Function to render the correct component based on the active section
   const renderSection = () => {
@@ -62,6 +74,10 @@ export default function AdminPage() {
         return <AdminProducts />;
       case "Itineraries":
         return <ItinerariesView />;
+      case "Complaints":
+        return <Complaints openComplaint={openComplaint} />;
+      case "Single Complaint":
+        return <OneComplain complaintID={currentComplaint._id} />;
       default:
         return <AdminDashboard />;
     }
@@ -190,6 +206,19 @@ export default function AdminPage() {
                   <TentTree className="h-4 w-4" />
                   Itineraries
                 </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setActiveSection("Complaints")}
+                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
+                    activeSection === "Complaints" ||
+                    activeSection === "Single Complaint"
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
+                >
+                  <Angry className="h-4 w-4" />
+                  Complaints
+                </Button>
               </div>
               <div className="pt-4">
                 <Button
@@ -219,9 +248,23 @@ export default function AdminPage() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{activeSection}</BreadcrumbPage>
+                  <BreadcrumbPage>
+                    {activeSection === "Single Complaint"
+                      ? "Complaints"
+                      : activeSection}
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbItem>
+              {activeSection === "Single Complaint" && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{currentComplaint.title}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbItem>
+                </>
+              )}
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex gap-4">

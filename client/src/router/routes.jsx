@@ -22,7 +22,6 @@ import ItinerariesMade from "@/components/touristPage/ItinerariesMade";
 import ActivityAttended from "@/components/touristPage/ActivityAttended";
 import OrderHistory from "@/components/touristPage/OrderHistory";
 import TouristDashboard from "@/pages/TouristDashboard";
-// Itineraries
 import ItinerariesTouristsPage from "@/pages/ItinerariesTouristsPage";
 import SingleItineraryTouristsPage from "@/pages/SingleItineraryTouristsPage";
 import CreateItineraryPage from "@/pages/CreateItineraryPage";
@@ -32,6 +31,8 @@ import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
 import Transportation from "@/pages/TransportationPage";
 import SingleItineraryAdminPage from "@/pages/SingleItineraryAdminPage";
 
+import ComplaintsPageTourist from "@/pages/ComplaintsPageTourist";
+import ComplaintDetailsPageTourist from "@/pages/ComplaintDetailsPageTourist";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -69,6 +70,8 @@ const routes = createRoutesFromElements(
 
     <Route path="activity/:id" element={<SingleActivityPage />} />
     <Route path="place/:name" element={<SingleHistoricalPage />} />
+    <Route path="complaints" element={<ComplaintsPageTourist />} />
+    <Route path="complaintDetails/:id" element={<ComplaintDetailsPageTourist />} />
     <Route path="Pointsandloyality" element={<PointsAndLoyalty />} />
     <Route
       path="*"

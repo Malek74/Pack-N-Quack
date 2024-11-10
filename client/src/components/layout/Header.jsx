@@ -14,6 +14,11 @@ export default function Header() {
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
 
+  const isComplaintsDetailsActive = () => {
+    const pattern = /^\/complaintDetails\/.+$/;
+    return pattern.test(location.pathname);
+  };
+
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">

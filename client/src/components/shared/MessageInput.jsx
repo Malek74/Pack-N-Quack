@@ -1,0 +1,48 @@
+import React, { useState } from 'react';
+
+function MessageInput({ onSubmit }) {
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (message.trim()) {
+      onSubmit(message);
+      setMessage('');
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    // Check if Enter is pressed without the Shift key
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevents new line in the textarea
+      handleSubmit(e); // Calls the submit function
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center p-2 bg-blue-200 rounded-lg">
+      <textarea
+        placeholder="Write a message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        rows="1"
+        className="flex-grow p-2 text-gray-700 bg-transparent outline-none placeholder-gray-500 resize-none overflow-hidden"
+        style={{ maxHeight: '150px' }} // Limit the max height
+      />
+      <button type="submit" className="ml-2 text-blue-500 hover:text-blue-700">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      </button>
+    </form>
+  );
+}
+
+export default MessageInput;
