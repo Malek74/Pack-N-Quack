@@ -253,7 +253,7 @@ export const getItinerary = async (req, res) => {
 
 export const getAdminItineraries = async (req, res) => {
     try {
-        let itineraries = await Itinerary.find(query).sort(sortOptions).populate('tags tourGuideID');
+        let itineraries = await Itinerary.find({}).populate('tags tourGuideID');
         console.log(itineraries)
         if (itineraries.length === 0) {
             return res.status(404).json({ message: "Itinerary doesn't exist" });
@@ -346,9 +346,9 @@ export const getItineraryById = async (req, res) => {
         if (!itinerary) {
             return res.status(404).json({ message: "Itinerary not found ." });
         }
-        if (itinerary.flagged === true) {
-            return res.status(404).json({ message: "Itinerary is flagged." });
-        }
+        // if (itinerary.flagged === true) {
+        //     return res.status(404).json({ message: "Itinerary is flagged." });
+        // }
 
         return res.status(200).json(itinerary);
 
@@ -516,7 +516,7 @@ export const updateItinerary = async (req, res) => {
         }
 
         const updatedFields = {};
-        if (name) updatedFields.name = req.body.title;
+        if (name) updatedFields.name = req.body.name;
         if (days) updatedFields.days = activityImagesToUpload ? updatedDays : days;
         if (language) updatedFields.language = req.body.language;
         if (price) updatedFields.price = req.body.price;
@@ -577,7 +577,7 @@ export const addActivity = async (req, res) => {
 
 export const Flagg = async (req, res) => {
     const itineraryID = req.params.id;
-    const flagger = req.body.flagger;
+    const flag = req.body.flag;
 
     try {
         let itinerary = await Itinerary.findById(itineraryID);
@@ -586,17 +586,17 @@ export const Flagg = async (req, res) => {
             return res.status(404).json({ message: "No itinerary found with ID " + itineraryID });
         }
 
-        if (flagger === false && itinerary.flagged === true) {
+        if (flag === false && itinerary.flagged === true) {
             return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
         }
 
         //flag itinerary
-        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flagger } }, { new: true, runValidators: true });
+        const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flag } }, { new: true, runValidators: true });
 
 
         let isbooked = await Booking.find({ itineraryID: itineraryID });
         if (isbooked.length > 0) {
-            if (flagger == true) {
+            if (flag == true) {
                 for (let i = 0; i < isbooked.length; i++) {
                     const user = await Tourist.findById(isbooked[i].touristID);
                     if (user) {
