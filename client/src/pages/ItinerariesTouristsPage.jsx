@@ -1,5 +1,5 @@
 import SearchBar from "@/components/shared/SearchBar";
-import Banner from "../components/shared/Banner";
+import Banner from "@/components/shared/BannerV2";
 import BannerImage from "/assets/images/romanBanner.jpg";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -40,8 +40,8 @@ export default function ItinerariesTouristsPage() {
   }, [fetchedItinerariesParams, prefCurrency]);
 
   return (
-    <div className="flex flex-col w-screen p-14 pb-0">
-      <div className="relative">
+    <div className="flex flex-col w-screen p-14">
+      <div className="relative mb-10">
         <Banner background={BannerImage} name="Itineraries" />
         <SearchBar
           searchTerm={searchTerm}
