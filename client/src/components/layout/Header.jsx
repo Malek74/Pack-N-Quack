@@ -143,7 +143,6 @@ export default function Header() {
                   : ""
               }
             >
-              <DropDownMenuProfile location={location} />
             </li>
           </Button>
         </ul>

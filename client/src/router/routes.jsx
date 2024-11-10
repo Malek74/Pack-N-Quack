@@ -30,14 +30,22 @@ import ItinerariesTourGuidePage from "@/pages/ItinerariesTourGuidePage";
 import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
 import Transportation from "@/pages/TransportationPage";
 import SingleItineraryAdminPage from "@/pages/SingleItineraryAdminPage";
-
 import ComplaintsPageTourist from "@/pages/ComplaintsPageTourist";
 import ComplaintDetailsPageTourist from "@/pages/ComplaintDetailsPageTourist";
+import GovernorsList from "@/components/adminPage/GovernorsList";
+import AdminsList from "@/components/adminPage/AdminsList";
+import ActivityCategory from "@/components/adminPage/ActivityCategory";
+import ActivityTags from "@/components/adminPage/ActivityTags";
+import ItineraryTags from "@/components/adminPage/ItineraryTags";
+import AdminProducts from "@/components/adminPage/AdminProducts";
+import ItinerariesView from "@/components/adminPage/ItinerariesView";
+import Complaints from "@/components/adminPage/Complaints";
+import OneComplain from "@/components/adminPage/OneComplain";
+import AccountDashboard from "@/components/adminPage/AdminDashboard";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
     <Route path="profile" element={<MyProfilePage />} />
-    <Route path="admin" element={<AdminPage />} />
     <Route path="activities/:idAdv" element={<ActivitiesPage />} />
     <Route path="historical/:idTG" element={<HistoricalPage />} />
     <Route path="marketplace" element={<MarketplacePage />} />
@@ -71,8 +79,6 @@ const routes = createRoutesFromElements(
     <Route path="activity/:id" element={<SingleActivityPage />} />
     <Route path="place/:name" element={<SingleHistoricalPage />} />
     <Route path="complaints" element={<ComplaintsPageTourist />} />
-    <Route path="complaintDetails/:id" element={<ComplaintDetailsPageTourist />} />
-    <Route path="Pointsandloyality" element={<PointsAndLoyalty />} />
     <Route
       path="*"
       element={
@@ -86,12 +92,33 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportation/:idAdv" element={<Transportation />}></Route>
     <Route path="transportation" element={<Transportation />}></Route>
+
+    <Route path="admin" element={<AdminPage />}>
+      <Route path="users" element={<AccountDashboard />} />
+      <Route path="tourism-governors" element={<GovernorsList />} />
+      <Route path="admins" element={<AdminsList />} />
+      <Route path="activity-categories" element={<ActivityCategory />} />
+      <Route path="activity-tags" element={<ActivityTags />} />
+      <Route path="itinerary-tags" element={<ItineraryTags />} />
+      <Route path="products" element={<AdminProducts />} />
+      <Route path="itineraries" element={<ItinerariesView />} />
+      <Route path="complaints" element={<Complaints />} />
+      <Route path="complaints/:complaintID" element={<OneComplain />} />
+    </Route>
+
     <Route path="touristDashboard" element={<TouristDashboard />}>
       <Route path="profile" element={<MyProfilePage />} />
       <Route path="tour-guides" element={<TourGuides />} />
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
+      <Route path="complaints" element={<ComplaintsPageTourist />} />
+      <Route path="rewards" element={<PointsAndLoyalty />} />
+      {/* <Route path="bookings" element={<Booked />} /> */}
+      <Route
+        path="complaints/:id"
+        element={<ComplaintDetailsPageTourist />}
+      />
     </Route>
   </Route>
 );

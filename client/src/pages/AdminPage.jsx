@@ -1,8 +1,4 @@
-import { useState } from "react";
-import AdminDashboard from "@/components/adminPage/AdminDashboard";
-import ActivityCategory from "@/components/adminPage/ActivityCategory";
-import ItineraryTags from "@/components/adminPage/ItineraryTags";
-import ActivityTags from "@/components/adminPage/ActivityTags";
+
 import { Link } from "react-router-dom";
 import logo from "/assets/icons/logo.png";
 
@@ -20,10 +16,7 @@ import {
   Angry,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import AdminsList from "@/components/adminPage/AdminsList";
-import AdminProducts from "@/components/adminPage/AdminProducts";
-import GovernorsList from "@/components/adminPage/GovernorsList";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 
 import {
   DropdownMenu,
@@ -39,48 +32,71 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import ItinerariesView from "@/components/adminPage/ItinerariesView";
-import Complaints from "@/components/adminPage/complaints";
-import OneComplain from "@/components/adminPage/OneComplain";
+import { useState } from "react";
+const sidebarItems = [
+  {
+    label: "Manage Accounts",
+    icon: UserRoundPen,
+    section: "Users",
+    path: "users",
+  },
+  {
+    label: "Tourism Governors",
+    icon: UserRoundPlus,
+    section: "Tourism Governors",
+    path: "tourism-governors",
+  },
+  {
+    label: "Admins",
+    icon: UserRoundPlus,
+    section: "Admins",
+    path: "admins",
+  },
+  {
+    label: "Activity Categories",
+    icon: TableOfContents,
+    section: "Activity Categories",
+    path: "activity-categories",
+  },
+  {
+    label: "Activity Tags",
+    icon: Tags,
+    section: "Activity Tags",
+    path: "activity-tags",
+  },
+  {
+    label: "Itinerary Tags",
+    icon: Tags,
+    section: "Itinerary Tags",
+    path: "itinerary-tags",
+  },
+  {
+    label: "Products",
+    icon: Package,
+    section: "Products",
+    path: "products",
+  },
+  {
+    label: "Itineraries",
+    icon: TentTree,
+    section: "Itineraries",
+    path: "itineraries",
+  },
+  {
+    label: "Complaints",
+    icon: Angry,
+    section: "Complaints",
+    path: "complaints",
+  },
+];
+
 export default function AdminPage() {
   const navigate = useNavigate();
-
-  //complaints page stuff ///////
   const [activeSection, setActiveSection] = useState("Users");
-  const [currentComplaint, setCurrentComplaint] = useState({});
 
-  const openComplaint = (complaint) => {
-    setCurrentComplaint(complaint);
-    setActiveSection("Single Complaint");
-  };
-  /////////////////////////////////
-
-  // Function to render the correct component based on the active section
-  const renderSection = () => {
-    switch (activeSection) {
-      case "Users":
-        return <AdminDashboard />;
-      case "Tourism Governors":
-        return <GovernorsList />;
-      case "Admins":
-        return <AdminsList />;
-      case "Activity Categories":
-        return <ActivityCategory />;
-      case "Activity Tags":
-        return <ActivityTags />;
-      case "Itinerary Tags":
-        return <ItineraryTags />;
-      case "Products":
-        return <AdminProducts />;
-      case "Itineraries":
-        return <ItinerariesView />;
-      case "Complaints":
-        return <Complaints openComplaint={openComplaint} />;
-      case "Single Complaint":
-        return <OneComplain complaintID={currentComplaint._id} />;
-      default:
-        return <AdminDashboard />;
-    }
+  const handleSectionChange = (section, path) => {
+    setActiveSection(section);
+    navigate(path);
   };
 
   return (
@@ -93,8 +109,8 @@ export default function AdminPage() {
               to="/admin"
               className="text-lg font-bold flex items-center gap-3"
             >
-              <img src={logo} className="w-6" />
-              Pack n' Quack
+              <img src={logo} className="w-6" alt="logo" />
+              <h1>Pack n' Quack</h1>
             </Link>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
               <Bell className="h-4 w-4" />
@@ -104,121 +120,22 @@ export default function AdminPage() {
 
           <div className="flex flex-1">
             <nav className="flex flex-1 flex-col items-start px-2 text-sm font-medium lg:px-4">
-              {/* <h1>Admin</h1> */}
               <div className="flex flex-col">
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Users")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Users"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <UserRoundPen className="h-4 w-4" />
-                  Manage Accounts
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Tourism Governors")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Tourism Governors"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <UserRoundPlus className="h-4 w-4" />
-                  Tourism Governors
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Admins")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Admins"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <UserRoundPlus className="h-4 w-4" />
-                  Admins
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Activity Categories")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Activity Categories"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <TableOfContents className="h-4 w-4" />
-                  Activity Categories
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Activity Tags")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Activity Tags"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <Tags className="h-4 w-4" />
-                  Activity Tags
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Itinerary Tags")}
-                  className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Itinerary Tags"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <Tags className="h-4 w-4" />
-                  Itinerary Tags
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Products")}
-                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Products"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <Package className="h-4 w-4" />
-                  Products
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Itineraries")}
-                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Itineraries"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <TentTree className="h-4 w-4" />
-                  Itineraries
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveSection("Complaints")}
-                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
-                    activeSection === "Complaints" ||
-                    activeSection === "Single Complaint"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  <Angry className="h-4 w-4" />
-                  Complaints
-                </Button>
+                {sidebarItems.map(({ label, icon: Icon, section, path }) => (
+                  <Button
+                    key={section}
+                    variant="ghost"
+                    onClick={() => handleSectionChange(section, path)}
+                    className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                      activeSection === section
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </Button>
+                ))}
               </div>
               <div className="pt-4">
                 <Button
@@ -236,8 +153,10 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+      {/* Main content */}
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+          {/* Breadcrumb */}
           <Breadcrumb className="flex-1 hidden md:flex">
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -247,21 +166,17 @@ export default function AdminPage() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbItem>
-                  <BreadcrumbPage>
-                    {activeSection === "Single Complaint"
-                      ? "Complaints"
-                      : activeSection}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
+                <BreadcrumbPage>
+                  {activeSection === "Single Complaint"
+                    ? "Complaints"
+                    : activeSection}
+                </BreadcrumbPage>
               </BreadcrumbItem>
               {activeSection === "Single Complaint" && (
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{currentComplaint.title}</BreadcrumbPage>
-                    </BreadcrumbItem>
+                    <BreadcrumbPage>{currentComplaint.title}</BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
               )}
@@ -297,9 +212,10 @@ export default function AdminPage() {
             </DropdownMenu>
           </div>
         </header>
-        <div className="px-8">{renderSection()}</div>
+        <div className="px-8">
+          <Outlet />
+        </div>
       </div>
-      {/* Main content */}
     </div>
   );
 }

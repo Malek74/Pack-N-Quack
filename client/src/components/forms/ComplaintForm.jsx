@@ -16,7 +16,7 @@ import axios from "axios";
 import { DialogClose } from "../ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "../ui/textarea";
-export default function ComplaintForm({onRefresh}) {
+export default function ComplaintForm({ onRefresh }) {
   const { toast } = useToast();
   const complaintFormSchema = z.object({
     title: z
@@ -25,15 +25,15 @@ export default function ComplaintForm({onRefresh}) {
       .max(50, { message: "Title must be 50 characters or less." }),
 
     body: z
-    .string()
-    .min(4, { message: "Description must be at least 4 characters long." })
-    .max(4000, { message: "Description must be 4000 characters or less." }),
+      .string()
+      .min(4, { message: "Description must be at least 4 characters long." })
+      .max(4000, { message: "Description must be 4000 characters or less." }),
   });
   const form = useForm({
     resolver: zodResolver(complaintFormSchema),
     defaultValues: {
-     title:"",
-     body:""
+      title: "",
+      body: "",
     },
   });
 
@@ -41,35 +41,37 @@ export default function ComplaintForm({onRefresh}) {
     const date = new Date();
     return date.toLocaleDateString();
   }
- 
+
   function onSubmit(values) {
-    console.log("we are submitting complaint -----> ",{title: values.title,
-        body: values.body,
-        issuerID: "6702cde57d7e2444d9713d8d",
-        date: getCurrentDate()});
+    console.log("we are submitting complaint -----> ", {
+      title: values.title,
+      body: values.body,
+      issuerID: "6702cde57d7e2444d9713d8d",
+      date: getCurrentDate(),
+    });
     axios
-    .post("api/tourist/complaints", {
+      .post("api/tourist/complaints", {
         title: values.title,
         body: values.body,
         issuerID: "6702cde57d7e2444d9713d8d",
-        date: getCurrentDate()
-    })
-    .then((response) => {
+        date: getCurrentDate(),
+      })
+      .then((response) => {
         toast({
-        title: "Complaint sent!",
+          title: "Complaint sent!",
+          variant: "success",
         });
         onRefresh(response.data);
-    })
-    .catch((error) => {
+      })
+      .catch((error) => {
         toast({
-        variant: "destructive",
-        title: "There was an issue with the complaint request",
-        description: error.response.data.message,
+          variant: "destructive",
+          title: "There was an issue with the complaint request",
+          description: error.response.data.message,
         });
         console.error(error);
         console.log(error);
-    });
-    
+      });
   }
 
   return (
@@ -105,7 +107,6 @@ export default function ComplaintForm({onRefresh}) {
             </FormItem>
           )}
         />
-
 
         <DialogClose asChild className="place-self-end">
           <Button type="submit">Submit</Button>
