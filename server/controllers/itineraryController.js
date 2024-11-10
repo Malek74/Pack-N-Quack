@@ -269,10 +269,9 @@ export const getItinerary = async (req, res) => {
             query.name = { $regex: name, $options: 'i' }; // Filter by name if provided
         }
         if (tags) {
-            const tagsArray = tags.split(',');
-            if (tagsArray && tagsArray.length > 0) {
+            if (tags && tags.length > 0) {
                 // Find all tag IDs based on the tag names provided
-                const tagIDs = await itineraryTags.find({ tag: { $in: tagsArray } }).select('_id');
+                const tagIDs = await itineraryTags.find({ tag: { $in: tags } }).select('_id');
 
                 if (tagIDs.length > 0) {
                     // Use $in to filter itineraries with any of these tags
