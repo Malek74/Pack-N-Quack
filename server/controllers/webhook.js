@@ -10,7 +10,6 @@ export const confirmPayment = async (req, res) => {
     let eventBooked = {}
     console.log(event);
 
-
     switch (event.type) {
         case 'checkout.session.completed':
 
@@ -32,13 +31,14 @@ export const confirmPayment = async (req, res) => {
                         eventBooked = await activityModel.findById(eventID);
                         bookedEvent.price = session.metadata.price;
                         bookedEvent.activityID = eventBooked._id;
+
                     }
                     else if (eventType == "itinerary") {
                         eventBooked = await Itinerary.findById(eventID);
                         bookedEvent.itineraryID = eventBooked._id;
                         bookedEvent.price = eventBooked.price;
                     }
-
+                    bookedEvent.stripeSessionID = session.id;
                     //add loyalty points
                     addLoyaltyPoints(touristID, session.amount_total / 100);
 

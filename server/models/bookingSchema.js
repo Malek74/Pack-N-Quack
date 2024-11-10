@@ -27,7 +27,10 @@ const bookingSchema = new Schema({
         type: Number,
         required: true
     },
-
+    stripeSessionID: {
+        type: String,
+        required: true
+    }
 }, { timestamps: true });
 
 const Booking = model("Booking", bookingSchema);

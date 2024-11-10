@@ -12,7 +12,6 @@ export const bookEvent = async (req, res) => {
 
     const touristID = req.params.id;
     const { eventType, eventID, payByWallet, numOfTickets } = req.body;
-    console.log(req.body);
     let event = {}
     try {
 
@@ -27,7 +26,6 @@ export const bookEvent = async (req, res) => {
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const product = await stripe.products.retrieve(event.stripeProductID);
         const tourist = await Tourist.findById(touristID);
-        console.log(tourist);
         let amountToPay = 0;
         if (payByWallet) {
             amountToPay = (event.price * numOfTickets) - tourist.wallet;
@@ -70,7 +68,7 @@ export const bookEvent = async (req, res) => {
                 eventType: eventType,
                 touristID: touristID,
                 type: "event",
-                price: amountToPay
+                price: event.price * numOfTickets
             }
         });
 

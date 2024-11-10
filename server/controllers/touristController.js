@@ -140,7 +140,7 @@ export const getMyBookings = async (req, res) => {
             const myTransportation = await Booking.find({ touristID: req.params.id, activityID: null, itineraryID: null }).populate('transportationID');
             const myFlights = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: true }, hotelData: { $exists: false } });
             const myHotels = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: false }, hotelData: { $exists: true } });
-            return res.status(200).json({ transporations: myTransportation, flights: myFlights, hotels: myHotels });
+            return res.status(200).json({ transportations: myTransportation, flights: myFlights, hotels: myHotels });
         }
 
     }
