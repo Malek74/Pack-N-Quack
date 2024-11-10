@@ -94,12 +94,14 @@ export default function ImageUploader({
 
       setIsLoading(true);
       // Send the FormData object via axios
-      // const response = await axios.post(apiEndpoint, formData, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data", // Make sure to set this header
-      //   },
-      // });
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const response = await axios.post(apiEndpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Make sure to set this header
+        },
+      });
+
+      console.log(response);
+      //await new Promise((resolve) => setTimeout(resolve, 3000));
       toast({
         description: `All your quacks are packed! ${imagesUploaded.length} pictures uploaded successfully!`,
         variant: "success",
@@ -110,7 +112,7 @@ export default function ImageUploader({
       // console.log(response);
     } catch (error) {
       toast({
-        description: "Something went wrong. The ducks could not be packed.",
+        description: "Something went wrong. The images were not uploaded.",
         variant: "destructive",
       });
       console.error(error);
@@ -231,11 +233,11 @@ export default function ImageUploader({
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Quack Goodbye to This Image?
+                              Delete this image?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to quack this image goodbye?
-                              Once it’s gone, it won’t waddle back!
+                              Are you sure you want to delete this image? Once
+                              deleted, it cannot be recovered.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

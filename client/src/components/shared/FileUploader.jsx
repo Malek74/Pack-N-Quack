@@ -2,13 +2,6 @@ import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import { Input } from "@/components/ui/input";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -19,16 +12,28 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ImageMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import {
+  FileText,
+  FileImage,
+  FileVideo,
+  FileAudio,
+  FileX2,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 FileUploader.propTypes = {
   filesUploaded: PropTypes.array,
+  fileToUpload: PropTypes.string,
   setFilesUploaded: PropTypes.func,
 };
 
-export default function FileUploader({ filesUploaded, setFilesUploaded }) {
+export default function FileUploader({
+  filesUploaded,
+  setFilesUploaded,
+  fileToUpload,
+}) {
   const { toast } = useToast();
 
   const documentFileSchema = z.object({
@@ -58,97 +63,151 @@ export default function FileUploader({ filesUploaded, setFilesUploaded }) {
 
     if (invalidFiles.length > 0) {
       toast({
-        description: "Please only upload image files.",
+        description: "Please only upload document files.",
         variant: "destructive",
       });
     } else {
       setFilesUploaded([...filesUploaded, ...acceptedFiles]);
       toast({
-        description: `All your quacks are packed! ${acceptedFiles.length} pictures uploaded successfully!`,
+        description: `All your quacks are packed! ${acceptedFiles.length} documents uploaded successfully!`,
         variant: "success",
       });
     }
   };
+  const getFileIcon = (fileExtension) => {
+    switch (fileExtension) {
+      case "pdf":
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-red-500"
+          />
+        ); // You can replace FileCheck2 with another relevant icon
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+        return (
+          <FileImage
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-blue-500"
+          />
+        );
+      case "doc":
+      case "docx":
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-blue-700"
+          />
+        );
+      case "mp4":
+      case "mkv":
+        return (
+          <FileVideo
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-green-500"
+          />
+        );
+      case "mp3":
+      case "wav":
+        return (
+          <FileAudio
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-purple-500"
+          />
+        );
+      default:
+        return (
+          <FileText
+            absoluteStrokeWidth={true}
+            size={88}
+            className="text-neutral-700"
+          />
+        );
+    }
+  };
 
   return (
-    <Dropzone onDrop={handleDrop}>
+    <Dropzone multiple={false} onDrop={handleDrop}>
       {({ getRootProps, getInputProps }) => (
         <div className="flex flex-col gap-4 justify-center items-center">
-          <div
-            {...getRootProps()}
-            className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
-          >
-            <Input
-              {...getInputProps()}
-              type="file"
-              accept=".pdf,.doc,.docx,.txt"
-            />
-            <p className="text-center italic text-neutral-500">
-              Drag and quack your documents here,
-              <br />
-              or click to pack them in!
-            </p>
-          </div>
-          {filesUploaded.length > 0 && (
-            <Carousel
-              className="w-full max-w-xs"
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-            >
-              <CarouselContent>
-                {filesUploaded.map((file, index) => (
-                  <CarouselItem
-                    key={index}
-                    className="basis-1/2 w-[250px] h-[200px] flex justify-center items-center"
-                  >
-                    <div className="p-1 relative w-full h-full overflow-hidden">
-                      <AlertDialog>
-                        <AlertDialogTrigger className="absolute top-1 right-1">
-                          <ImageMinus className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Quack Goodbye to This Image?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to quack this image goodbye?
-                              Once it’s gone, it won’t waddle back!
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-500 hover:bg-red-600"
-                              onClick={() => {
-                                setFilesUploaded(
-                                  filesUploaded.filter((_, i) => i !== index)
-                                );
-                                toast({
-                                  description: `The image has waddled off successfully!`,
-                                });
-                              }}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+          <div className="flex gap-4 justify-between items-center w-full">
+            <span className="text-xl">{`Upload ${fileToUpload}: `}</span>
+            {filesUploaded.length == 0 ? (
+              <div
+                {...getRootProps()}
+                className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
+              >
+                <Input
+                  {...getInputProps()}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt"
+                />
+                <p className="text-center italic text-neutral-500">
+                  Drag and quack your documents here,
+                  <br />
+                  or click to pack them in!
+                </p>
+              </div>
+            ) : (
+              filesUploaded.map((file, index) => (
+                <div
+                  key={index}
+                  className="basis-1/2 w-[250px] h-[200px] flex justify-center items-center"
+                >
+                  <div className="p-1 relative w-full h-full overflow-hidden">
+                    <AlertDialog>
+                      <AlertDialogTrigger className="absolute top-1 right-1">
+                        <FileX2 className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete this document?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this document? Once
+                            deleted, it cannot be recovered.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-red-500 hover:bg-red-600"
+                            onClick={() => {
+                              setFilesUploaded(
+                                filesUploaded.filter((_, i) => i !== index)
+                              );
+                              toast({
+                                description: `The document has waddled off successfully!`,
+                              });
+                            }}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
 
-                      <img
-                        src={file.type}
-                        className="h-full w-full object-cover rounded-lg"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          )}
+                    <Card>
+                      <CardContent className="flex flex-col items-center justify-center p-4">
+                        {getFileIcon(file.name.split(".").pop().toLowerCase())}
+                        <p className="w-full text-center text-ellipsis overflow-hidden whitespace-nowrap">
+                          {file.name}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
     </Dropzone>
