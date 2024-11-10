@@ -71,13 +71,14 @@ export const searchFlight = async (req, res) => {
 //@desc Confirm flight price
 export const confirmFlightPrice = async (req, res) => {
   const searchData = (req.body.flight);
+  const currency= req.body.currency || "USD";
 
   const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
     clientSecret: process.env.AMADEUS_API_SECRET
   });
   try {
-    const conversionRate = await getConversionRate(req.query.currency);
+    const conversionRate = await getConversionRate(currency);
     const response = await amadeus.shopping.flightOffers.pricing.post(
       {
         data: {

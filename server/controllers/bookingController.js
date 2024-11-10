@@ -2,7 +2,7 @@ import activityModel from "../models/activitySchema.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
 import { addLoyaltyPoints, refundMoney } from "../utils/Helpers.js";
-import Booking from "../models/bookingsSchema.js";
+import Booking from "../models/bookingSchema.js";
 import Activity from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
@@ -44,6 +44,17 @@ export const bookEvent = async (req, res) => {
         });
 
 
+        let success_url = "";
+
+        if (eventType == "activity") {
+            success_url = "http://localhost:5173/BookActivities";
+        }
+        else if (eventType == "itinerary") {
+            success_url = "http://localhost:5173/BookItineraries";
+        }
+        else {
+            success_url = "http://localhost:5173/booked";
+        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -52,7 +63,7 @@ export const bookEvent = async (req, res) => {
                 quantity: numOfTickets,
             }],
             mode: 'payment',
-            success_url: 'http://localhost:5173/BookActivities', //todo:add correct link
+            success_url: success_url,
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
             metadata: {
                 eventID: eventID,
@@ -85,9 +96,9 @@ export const cancelBooking = async function (req, res) {
     let event = {}
     let booking = {}
     try {
-
         //fetch event
         const booking = await Booking.findById(eventID);
+        console.log(booking);
 
         if (eventType == "activity") {
             event = await activityModel.findById(booking.activityID);
@@ -125,7 +136,7 @@ export const cancelBooking = async function (req, res) {
 
 
         return res.status(200).json(tourist);
-        
+
         res.redirect(303, session.url);
 
     }

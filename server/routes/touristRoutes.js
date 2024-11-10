@@ -25,7 +25,7 @@ router.put('/:id', updateTourist); // Update
 router.get('/', getTourists)
 router.delete('/:id', deleteTourist);
 router.get('/myPreferences/:id', getMyprefernces);
-router.get('/myBookings/:id', getMyBookings);
+router.post('/myBookings/:id', getMyBookings);
 router.post('/redeemPoints/:id', redeemPoints);
 router.get('/complaints/:id', viewMyComplaints);
 router.post('/complaints', createComplaint);

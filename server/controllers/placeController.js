@@ -67,7 +67,7 @@ export const createPlace = async (req, res) => {
 // Read Place function
 export const readPlace = async (req, res) => {
     const { name } = req.params;
-    const prefCurrency = req.query.currency;
+    const prefCurrency = req.query.currency || "USD";
 
 
     if (!prefCurrency) {
@@ -147,7 +147,7 @@ export const getAllPlaces = async (req, res) => {
         // Find all places in the database
         const places = await Places.find().populate('tags'); // Populate tags if you want tag details as well
 
-        const conversionRate = await getConversionRate(req.query.currency);
+        const conversionRate = await getConversionRate(req.query.currency || "USD");
 
         // Iterate through the places and convert the prices to the preferred currency
         for (let i = 0; i < places.length; i++) {
@@ -187,7 +187,7 @@ export const SearchForPlace = async (req, res) => {
     console.log(req.body)
     try {
         let query = {};
-        const conversionRate = await getConversionRate(req.query.currency);
+        const conversionRate = await getConversionRate(req.query.currency || "USD");
 
         // If name is provided, add it to the match criteria
         if (name) {
@@ -238,7 +238,7 @@ export const FilterPlacesByTag = async (req, res) => {
             return res.status(400).json({ message: "Invalid tag format. Provide a tag in the format: name_tag,options." });
         }
 
-        const conversionRate = await getConversionRate(req.query.currency);
+        const conversionRate = await getConversionRate(req.query.currency || "USD");
 
         // Split the tag into name_tag and options
         const [name_tag, options] = tag.split(',').map(item => item.trim());
@@ -279,7 +279,7 @@ export const getMyPlaces = async (req, res) => {
     const tgID = req.params.name
     console.log(tgID)
     try {
-        const conversionRate = await getConversionRate(req.query.currency);
+        const conversionRate = await getConversionRate(req.query.currency || "USD");
 
         const places = await Places.find({ touristGovenorID: tgID }).populate('tags');
         console.log(places)

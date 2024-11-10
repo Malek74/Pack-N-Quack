@@ -14,7 +14,7 @@ const bookingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Activity', // Reference the Activity model
     },
-    w: {
+    transportationID: {
         type: Schema.Types.ObjectId,
         ref: 'Transportation', // Reference the Transportation model
     },

@@ -2,11 +2,14 @@ import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import { addLoyaltyPoints } from "../utils/Helpers.js";
 import AmadeusBooking from "../models/amadeusBooking.js";
-import Booking from "../models/bookingsSchema.js";
+import Booking from "../models/bookingSchema.js";
+import Transportation from "../models/transportationSchema.js";
 
 export const confirmPayment = async (req, res) => {
     const event = req.body;
     let eventBooked = {}
+    console.log(event);
+
 
     switch (event.type) {
         case 'checkout.session.completed':
@@ -21,14 +24,13 @@ export const confirmPayment = async (req, res) => {
             bookedEvent.stripeSessionID = session.id;
             bookedEvent.status = "confirmed";
             const type = session.metadata.type;
-            console.log(type);
-            console.log(session.metadata);
+            console.log("Metadata: ", session.metadata);
             try {
                 if (type === "event") {
                     //fetch event booked
                     if (eventType == "activity") {
                         eventBooked = await activityModel.findById(eventID);
-
+                        bookedEvent.price = eventBooked.price;
                         bookedEvent.activityID = eventBooked._id;
                     }
                     else if (eventType == "itinerary") {
@@ -42,7 +44,8 @@ export const confirmPayment = async (req, res) => {
 
                     //save booking entry to database
                     const saveBooking = await Booking.create(bookedEvent);
-
+                    console.log("Saved Booking: ");
+                    console.log(saveBooking);
                     return res.status(200).json(saveBooking);
                 }
                 else if (type === "flight") {
@@ -86,15 +89,21 @@ export const confirmPayment = async (req, res) => {
                 }
                 else if (type === "transportation") {
                     //save transportation booking to database
-                    const touristId = session.metadata.tourist_id;
+                    const touristId = session.metadata.touristID;
                     const eventID = session.metadata.eventID;
                     const price = session.metadata.price;
-                    const transportationBooking = await Booking.create({
+                    const transport = await Transportation.findById(eventID);
+                    console.log(transport._id);
+                    const transportationBooking = {
                         touristID: touristId,
                         stripeSessionID: session.id,
-                        transportationID: eventID,
+                        transportationID: transport._id,
                         price: price,
-                    });
+                        status: "confirmed"
+                    };
+                    const saveBooking = await Booking.create(transportationBooking);
+                    console.log("Saved Booking: ");
+                    console.log(saveBooking);
                 }
             }
             catch (error) {

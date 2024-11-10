@@ -6,12 +6,12 @@ import { query } from "express";
 import stripe from 'stripe';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { getConversionRate } from "../utils/Helpers.js";
-import Booking from "../models/bookingsSchema.js";
+import Booking from "../models/bookingSchema.js";
 
 // @desc Get all activities
 // @route GET /api/activity
 export const getActivities = async (req, res) => {
-    const prefCurrency = req.query.currency;
+    const prefCurrency = req.query.currency || "USD";
     const conversionRate = await getConversionRate(prefCurrency);
 
     try {
@@ -184,7 +184,7 @@ export const searchActivity = async (req, res) => {
     const categoryID = req.body.categoryID;
     const tagID = req.body.tagID;
     let activities;
-    const currency = req.query.currency;
+    const currency = req.query.currency || "USD";
     const conversionRate = await getConversionRate(currency);
 
     switch (searchBy) {
@@ -261,7 +261,7 @@ export const searchActivity = async (req, res) => {
 // @route GET /api/activity/upcoming
 export const getUpcomingActivities = async (req, res) => {
     try {
-        const prefCurrency = req.query.currency;
+        const prefCurrency = req.query.currency || "USD";
         const conversionRate = await getConversionRate(prefCurrency);
         let today = new Date();
         console.log("Today's date:", today);
@@ -339,7 +339,7 @@ export const filterAndSortActivities = async (req, res) => {
 
     console.log("Request body:", req.body);
     let query = {};
-    const currency = req.query.currency;
+    const currency = req.query.currency || "USD";
     const conversionRate = await getConversionRate(currency);
 
     // Handle budget filtering
@@ -436,7 +436,7 @@ export const getMyActivities = async (req, res) => {
 
 export const viewSingleActivity = async (req, res) => {
     const id = req.params.id;
-    const prefCurrency = req.query.currency;
+    const prefCurrency = req.query.currency || "USD";
     let conversionRate;
     try {
 

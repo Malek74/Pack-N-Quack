@@ -9,7 +9,7 @@ import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import Places from "../models/PlacesSchema.js";
 import Stripe from "stripe";
-import Booking from "../models/bookingsSchema.js";
+import Booking from "../models/bookingSchema.js";
 import AmadeusBooking from "../models/amadeusBooking.js";
 
 // Creating Tourist for Registration
@@ -122,10 +122,27 @@ export const deleteTourist = async (req, res) => {
 }
 
 export const getMyBookings = async (req, res) => {
+
+    const id = req.params.id;
+    const eventType = req.body.eventType;
+    console.log(req.body);
     try {
-        const myBookings = await Booking.find({ touristID: req.params.id });
-        console.log(myBookings);
-        return res.status(200).json(myBookings);
+
+        if (eventType == "activity") {
+            const myBookings = await Booking.find({ touristID: req.params.id, itineraryID: null }).populate('activityID');
+            return res.status(200).json(myBookings);
+        }
+        else if (eventType == "itinerary") {
+            const myBookings = await Booking.find({ touristID: req.params.id, activityID: null }).populate('itineraryID');
+            return res.status(200).json(myBookings);
+        }
+        else if (eventType == "transportation") {
+            const myTransportation = await Booking.find({ touristID: req.params.id, activityID: null, itineraryID: null }).populate('transportationID');
+            const myFlights = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: true }, hotelData: { $exists: false } });
+            const myHotels = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: false }, hotelData: { $exists: true } });
+            return res.status(200).json({ transporations: myTransportation, flights: myFlights, hotels: myHotels });
+        }
+
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
@@ -239,21 +256,21 @@ export const viewMyTourGuides = async (req, res) => {
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
-    try{
+    try {
         const myBookings = await Booking.find(
-                                        { touristID: touristID, date: { $gte: new Date() } }
-                                        );
+            { touristID: touristID, date: { $gte: new Date() } }
+        );
 
         const myItineraries = await Itinerary.find(
-                                    { _id: { $in: myBookings.map(booking => booking.itineraryID) } }
-                                    );
+            { _id: { $in: myBookings.map(booking => booking.itineraryID) } }
+        );
 
         const myItineraryTourGuides = await TourGuide.find(
-                                        { _id: { $in: myItineraries.map(itinerary => itinerary.tourGuideID) } })
-                                        .select('username email _id');
+            { _id: { $in: myItineraries.map(itinerary => itinerary.tourGuideID) } })
+            .select('username email _id');
 
         return res.status(200).json(myItineraryTourGuides);
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
@@ -264,17 +281,17 @@ export const viewMyItineraries = async (req, res) => {
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
-    try{
+    try {
         const myBookings = await Booking.find(
-                                        { touristID: touristID, date: { $gte: new Date() } }
-                                        );
+            { touristID: touristID, date: { $gte: new Date() } }
+        );
 
         const myItineraries = await Itinerary.find(
-                                    { _id: { $in: myBookings.map(booking => booking.itineraryID) } }
-                                    );
+            { _id: { $in: myBookings.map(booking => booking.itineraryID) } }
+        );
 
         return res.status(200).json(myItineraries);
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
@@ -285,15 +302,15 @@ export const viewMyActivities = async (req, res) => {
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
-    try{
+    try {
         const myBookings = await Booking.find(
-            {touristID: touristID, date: { $gte: new Date() } }
+            { touristID: touristID, date: { $gte: new Date() } }
         );
         const myActivities = await activityModel.find(
             { _id: { $in: myBookings.map(booking => booking.activityID) } }
         );
         return res.status(200).json(myActivities);
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }

@@ -7,7 +7,7 @@ import product from "../models/productSchema.js";
 //@desc Get all transportation
 //@route GET /api/transportation
 export const getTransportation = async (req, res) => {
-    const currency = req.query.currency;
+    const currency = req.query.currency || "USD";
     const advertiserID = req.query.advertiserID;
     let transportation = [];
 
@@ -30,7 +30,10 @@ export const getTransportation = async (req, res) => {
 //@desc Get transportation by id
 //@route GET /api/transportation/:id
 export const getTransportationById = async (req, res) => {
-    const currency = req.query.currency;
+    const currency = req.query.currency || "USD" || "USD";
+    const id = req.params.id;
+
+    console.log(id);
 
     try {
         const conversionRate = await getConversionRate(currency);
@@ -38,6 +41,7 @@ export const getTransportationById = async (req, res) => {
         transportation.price = transportation.price * conversionRate;
         return res.status(200).json(transportation);
     } catch (error) {
+        console.log(error);
         return res.status(404).json({ message: error.message });
     }
 }
@@ -100,7 +104,7 @@ export const bookTransportation = async (req, res) => {
         }
 
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        const product = await stripe.products.retrieve(event.stripeProductID);
+        const product = await stripe.products.retrieve(event.stripeID);
         const tourist = await Tourist.findById(touristID);
         if (!tourist) {
             return res.status(404).json({ error: 'Tourist not found' });
@@ -120,7 +124,7 @@ export const bookTransportation = async (req, res) => {
                 quantity: numOfTickets,
             }],
             mode: 'payment',
-            success_url: 'https://www.google.com', //todo:add correct link
+            success_url: 'http://localhost:5173/booked', //todo:add correct link
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
             metadata: {
                 eventID: eventID,

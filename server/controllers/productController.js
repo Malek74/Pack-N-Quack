@@ -276,7 +276,7 @@ export const searchProduct = async (req, res) => {
 }
 //get max price of product
 export const getMaxPrice = async (req, res) => {
-    const currency = req.query.currency;
+    const currency = req.query.currency || "USD";
     console.log('Currency:', currency);
 
     try {
@@ -334,7 +334,7 @@ export const getProducts = async (req, res) => {
     const minPrice = req.query.minPrice;
     const sortBy = req.query.sortBy;
     const order = req.query.order;
-    const prefCurrency = req.query.currency;
+    const prefCurrency = req.query.currency || "USD";
     console.log('Pref Currency:', prefCurrency);
     const isArchived = req.query.isArchived;
     console.log('Is Archived:', isArchived);
@@ -401,7 +401,7 @@ export const getProducts = async (req, res) => {
 
 export const getMyProducts = async (req, res) => {
     const id = req.params.id;
-    const prefCurrency = req.query.currency;
+    const prefCurrency = req.query.currency || "USD";
     try {
         //fetch tourist
         const tourist = await Tourist.findById(id);
