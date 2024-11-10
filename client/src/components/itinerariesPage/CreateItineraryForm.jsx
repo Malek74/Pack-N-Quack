@@ -20,6 +20,9 @@ import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import ImageUploader from "../shared/ImageUploader";
+import Loading from "../shared/Loading";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -118,6 +121,8 @@ export default function CreateItineraryForm() {
       ],
     },
   ]);
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const removeDay = (index) => {
     const updatedDays = [...days];
     updatedDays.splice(index, 1);
@@ -174,15 +179,21 @@ export default function CreateItineraryForm() {
 
   useEffect(() => {
     const fetchItineraryTags = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get("/api/itiernaryTags");
         setTagsOptions(response.data);
       } catch (error) {
         console.error(error);
+        toast({
+          variant: "destructive",
+          title: error.response.data.message,
+          description: error.response.data.error,
+        });
       }
+      setIsLoading(false);
     };
     fetchItineraryTags();
-    setIsLoading(false);
   }, []);
 
   // Sync the selectedTags state with the form value
@@ -233,14 +244,27 @@ export default function CreateItineraryForm() {
       formData.append("price", values.price);
       formData.append("pickUpLocation", JSON.stringify(values.pickUpLocation));
       formData.append("tourGuideID", "66fb241366ea8f57d59ec6db");
+      setIsLoading(true);
       const response = await axios.post("/api/itinerary/", formData);
-      console.log(response);
+      setIsLoading(false);
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Itinerary created successfully",
+      });
+      navigate(`/itinerariesTourGuide/${response.data._id}`);
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: error.response.data.message,
+        description: error.response.data.error,
+      });
     }
   };
   return (
-    !isLoading && (
+    (!isLoading && (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-4">
@@ -604,6 +628,10 @@ export default function CreateItineraryForm() {
           </div>
         </form>
       </Form>
+    )) || (
+      <div className="flex justify-center items-center h-full w-full">
+        <Loading size="xl" />
+      </div>
     )
   );
 }

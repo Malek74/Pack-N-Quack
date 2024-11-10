@@ -15,10 +15,9 @@ import {
   UserRoundPlus,
   Globe,
   UserRoundPen,
-  Search,
   CircleUser,
+  TentTree,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
 import AdminsList from "@/components/adminPage/AdminsList";
 import AdminProducts from "@/components/adminPage/AdminProducts";
@@ -39,6 +38,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ItinerariesView from "@/components/adminPage/ItinerariesView";
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("Users");
@@ -60,6 +60,8 @@ export default function AdminPage() {
         return <ItineraryTags />;
       case "Products":
         return <AdminProducts />;
+      case "Itineraries":
+        return <ItinerariesView />;
       default:
         return <AdminDashboard />;
     }
@@ -175,6 +177,18 @@ export default function AdminPage() {
                 >
                   <Package className="h-4 w-4" />
                   Products
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setActiveSection("Itineraries")}
+                  className={`flex items-center gap-3 justify-start rounded-lg px-3 py-2 transition-all ${
+                    activeSection === "Itineraries"
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
+                >
+                  <TentTree className="h-4 w-4" />
+                  Itineraries
                 </Button>
               </div>
               <div className="pt-4">

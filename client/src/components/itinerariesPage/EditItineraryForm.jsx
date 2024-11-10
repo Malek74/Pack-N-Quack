@@ -21,7 +21,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import ImageUploader from "../shared/ImageUploader";
 import { useParams } from "react-router-dom";
-
+import Loading from "../shared/Loading";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Please enter a description"),
@@ -71,7 +73,8 @@ const formSchema = z.object({
 export default function EditItineraryForm() {
   const [itinerary, setItinerary] = useState(null);
   const { id } = useParams();
-
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -170,15 +173,21 @@ export default function EditItineraryForm() {
 
   useEffect(() => {
     const fetchItineraryTags = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get("/api/itiernaryTags");
         setTagsOptions(response.data);
       } catch (error) {
         console.error(error);
+        toast({
+          variant: "destructive",
+          title: error.response.data.message,
+          description: error.response.data.error,
+        });
       }
+      setIsLoading(false);
     };
     fetchItineraryTags();
-    setIsLoading(false);
   }, []);
 
   // Sync the selectedTags state with the form value
@@ -240,12 +249,25 @@ export default function EditItineraryForm() {
       formData.append("price", values.price);
       formData.append("pickUpLocation", JSON.stringify(values.pickUpLocation));
       formData.append("tourGuideID", "66fb241366ea8f57d59ec6db");
-
+      setIsLoading(true);
       const response = await axios.put(`/api/itinerary/${id}`, formData);
       console.log(response);
+      setIsLoading(false);
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Itinerary updated successfully!",
+      });
+      navigate(`/itinerariesTourGuide/${response.data._id}`);
     } catch (error) {
       console.error(error);
+      toast({
+        variant: "destructive",
+        title: error.response.data.message,
+        description: error.response.data.error,
+      });
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -294,7 +316,7 @@ export default function EditItineraryForm() {
   }, [id, form]);
 
   return (
-    !isLoading && (
+    (!isLoading && (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-4">
@@ -662,6 +684,10 @@ export default function EditItineraryForm() {
           </div>
         </form>
       </Form>
+    )) || (
+      <div className="flex justify-center items-center h-full w-full">
+        <Loading size="xl" />
+      </div>
     )
   );
 }

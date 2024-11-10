@@ -30,6 +30,7 @@ import EditItineraryPage from "@/pages/EditItineraryPage";
 import ItinerariesTourGuidePage from "@/pages/ItinerariesTourGuidePage";
 import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
 import Transportation from "@/pages/TransportationPage";
+import SingleItineraryAdminPage from "@/pages/SingleItineraryAdminPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -59,6 +60,10 @@ const routes = createRoutesFromElements(
       path="itinerariesTourGuide/:id"
       element={<SingleItineraryTourGuidePage />}
     ></Route>
+    <Route
+      path="itinerariesAdmin/:id"
+      element={<SingleItineraryAdminPage />}
+    ></Route>
     <Route path="createItinerary" element={<CreateItineraryPage />}></Route>
     <Route path="editItinerary/:id" element={<EditItineraryPage />}></Route>
 
@@ -85,15 +90,6 @@ const routes = createRoutesFromElements(
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
     </Route>
-
-    <Route
-      path="*"
-      element={
-        <ErrorBoundary>
-          <NotFoundPage />
-        </ErrorBoundary>
-      }
-    />
   </Route>
 );
 
