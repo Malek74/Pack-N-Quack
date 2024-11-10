@@ -8,6 +8,12 @@ import tourist from '../models/touristSchema.js';
 import activityModel from "../models/activitySchema.js";
 import product from "../models/productSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
+// import cloudinary from '../utils/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
+
+import dotenv from 'dotenv';
+import axios from "axios";
+import { json } from "express";
 
 //@desc check if username exists in the database
 //@param username
@@ -69,7 +75,6 @@ export const usernameExists = async (username) => {
     }
 };
 
-
 //@desc check if email exists in the database
 //@param email
 //@return boolean
@@ -130,7 +135,6 @@ export const emailExists = async (email) => {
     }
 };
 
-
 export const refundMoney = async (itineraryID) => {
 
     //fetch itinerary
@@ -159,4 +163,84 @@ export const deleteProducts = async (sellerID) => {
 export const deleteActivities = async (advertiserID) => {
     const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: advertiserID });
     console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
+}
+
+export const addLoyaltyPoints = async (touristID, price) => {
+    const subscriber = await tourist.findById(touristID);
+    const currLevel = subscriber.level;
+
+    let pointsToAdd = 0 ;
+    let newPoints = 0 ;
+
+    switch (currLevel) {
+        case 1:
+            pointsToAdd = price * 0.5;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+            if (newPoints >= 100000) {
+                subscriber.level = 2;
+            }
+
+            break;
+        case 2:
+            pointsToAdd = price * 1;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+            if (newPoints >= 200000) {
+                subscriber.level = 3;
+            }
+
+            break;
+        case 3:
+            pointsToAdd = price * 1.5;
+            newPoints = subscriber.loyaltyPoints + pointsToAdd;
+            break;
+
+        default:
+            break;
+    }
+    console.log("New Points: ", newPoints);
+    console.log("Points To Add: ", pointsToAdd);
+    subscriber.loyaltyPoints = newPoints;
+    console.log(subscriber);
+    await subscriber.save();
+}
+
+export const uploadImages = async (filesArray) => {
+    const imagesUrls = [];
+    cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Replace with your Cloudinary cloud name
+    api_key: process.env.CLOUDINARY_API_KEY,        // Replace with your API Key
+    api_secret: process.env.CLOUDINARY_API_SECRET,  // Replace with your API Secret
+});
+
+    try {
+        for (const file of filesArray) {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url);
+        }
+        
+        return { success: true, urls: imagesUrls };
+    } catch (error) {
+        console.error("Error uploading images:", error.message);
+        return { success: false, message: error.message };
+    }
 }

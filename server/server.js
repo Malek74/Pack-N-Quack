@@ -22,7 +22,12 @@ import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
 import uploadImg from './routes/uploadImg.js';
-
+import shareMail from './routes/shareEmail.js';
+import flightBooking from './routes/flightBooking.js';
+import currency from './routes/currency.js';
+import booking from './routes/booking.js';
+import webhook from './routes/webhook.js';
+import hotelRoutes from './routes/hotelRoutes.js';
 
 config();
 const app = express();
@@ -64,7 +69,13 @@ app.use('/api/touristGovernor', touristGoverner);
 app.use('/api/itiernaryTags', itineraryTag);
 app.use('/api/advertisers', advertisers);
 app.use('/api/activity', activity)
-app.use('/api/activity/category', activityCategory)
-app.use('/api/activity/tag', activityTag)
-app.use('/api/upload',uploadImg)
-app.use('/api/complaints',complaint)
+app.use('/api/activity/category', activityCategory);
+app.use('/api/activity/tag', activityTag);
+app.use('/api/upload', uploadImg);
+app.use('/api/share/', shareMail);
+app.use('/api/bookFlight', flightBooking);
+app.use('/api/currencies', currency);
+app.use('/api/booking', booking);
+app.use('/webhook', webhook);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/complaints', complaint);

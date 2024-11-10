@@ -57,6 +57,10 @@ const itinerarySchema = new mongoose.Schema({
             description: {
                 type: String,
                 default: ''
+            },
+            image: {
+                type: String,
+                required: false
             }
         }],
     }],
@@ -66,7 +70,7 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
 
-    
+
     ratings: {
         averageRating: {
             type: Number,
@@ -106,18 +110,27 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
     pickUpLocation: {
-        type: String,
-        required: true
+        name:{
+            type: String,
+            required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
 
     dropOffLocation: {
+        name:{
         type: String,
         required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
-    bookings: {
-        type: Number,
-        default: 0
-    },
+
     tags: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -125,10 +138,21 @@ const itinerarySchema = new mongoose.Schema({
         }],
         default: []
     },
-    subscribers: [{
-        type: [Schema.Types.ObjectId],
-        ref: 'Tourist'
-    }],
+    stripeID: {
+        type: String,
+        required: true
+    },
+    coverImage: {
+        type: String,
+        required: false
+    },
+    images: {
+        type: [String],
+        required: false
+    },
+
+
+
     accessibility: {
         type: String,
         required: true

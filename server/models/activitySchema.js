@@ -19,6 +19,11 @@ const activitySchema = new Schema({
         type: String,
         required: true
     },
+    subscribers: [{
+        type: [Schema.Types.ObjectId],
+        ref: 'Tourist'
+    }],
+
     googleMapLink: {
         type: String,
         required: true
@@ -95,7 +100,16 @@ const activitySchema = new Schema({
         type: String,
         required: true,
         default: "/assets/images/Background.jpg"
-    }
+    },
+    stripeProductID: {
+        type: String,
+        required: true
+    },
+
+    stripePriceID: {
+        type: String,
+        required: true
+    },
 })
 
 const activityModel = model("Activity", activitySchema);

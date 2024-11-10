@@ -25,6 +25,10 @@ const productSchema = new Schema({
         type: String,
     },
 
+    stripeID: {
+        type: String,
+    },
+
     seller_id: {
         type: Schema.Types.ObjectId,
         ref: 'Seller', // Reference the seller model

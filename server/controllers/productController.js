@@ -1,7 +1,7 @@
 import adminModel from "../models/adminSchema.js";
 import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
-
+import Stripe from "stripe";
 
 //get product by ID
 export const getProductByID = async (req, res) => {
@@ -31,12 +31,25 @@ export const createProduct = async (req, res) => {
         return res.status(400).json({ message: "Please fill all fields" });
     }
 
+    //create product on stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const productStripe = await stripe.products.create({
+        name: name,
+        description: description,
+        default_price_data: {
+            currency: "usd",
+            unit_amount: price * 100,
+        },
+    });
+
     const isAdmin = await adminModel.findById(userID);
     const isSeller = await seller.findById(userID);
 
+
     if (!isAdmin) {
         try {
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID }));
+
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id }));
             return res.status(200).json(newproduct);
         } catch (error) {
             return res.status(400).json({ error: error.message });
@@ -47,7 +60,7 @@ export const createProduct = async (req, res) => {
             console.log("Admin Product");
 
             const sellerUsername = await seller.findById(userID).username;
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID }));
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id }));
             return res.status(200).json(newproduct);
         } catch (error) {
             return res.status(400).json({ error: error.message });
@@ -62,6 +75,17 @@ export const editProduct = async (req, res) => {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
+
+        //create product on stripe
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const productStripe = await stripe.products.create({
+            description: description,
+            default_price_data: {
+                currency: "usd",
+                unit_amount: price * 100,
+            },
+        });
+
         const newproduct = await product.findByIdAndUpdate(id, { description, price }, { new: true }).populate('seller_id');
         console.log(newproduct)
         return res.status(200).json(newproduct);
@@ -69,12 +93,13 @@ export const editProduct = async (req, res) => {
         return res.status(400).json({ error: error.message });
     }
 }
+
 //update product by ID
 export const updateProduct = async (req, res) => {
     const id = req.params.id;
     const { name, picture, price, description, seller_id, ratings, reviews, available_quantity } = req.body;
 
-    
+
 
     const oldproduct = await product.findById(id);
     if (!oldproduct) {
@@ -103,6 +128,18 @@ export const updateProduct = async (req, res) => {
                 return res.status(400).json({ message: "Please provide a valid quantity" });
             }
         }
+
+        //create product on stripe
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const productStripe = await stripe.products.create({
+            name: name,
+            description: description,
+            default_price_data: {
+                currency: "usd",
+                unit_amount: price * 100,
+            },
+        });
+
         const newproduct = await product.findByIdAndUpdate(id, { $set: newInfo }, { new: true }).populate('seller_id');
         return res.status(200).json(newproductt);
 
