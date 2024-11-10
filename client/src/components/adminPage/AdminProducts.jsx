@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { useUser } from "@/context/UserContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FilterButtons from "../shared/FilterButtons";
 import PriceSlider from "../shared/PriceSlider";
@@ -32,6 +32,7 @@ import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
 
 export default function AdminProducts() {
+  const { prefCurrency } = useUser();
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +43,8 @@ export default function AdminProducts() {
   const [sliderRange, setSliderRange] = useState([0, 1000000]); // Temporary slider range
   const [selectedFilters, setSelectedFilters] = useState({});
   const [loading, setLoading] = useState(true);
-  // Create a debounced version of fetchProducts using useMemo to ensure it persists across renders
+
+
   const debouncedFetchProducts = useMemo(
     () =>
       debounce(() => {
@@ -58,7 +60,7 @@ export default function AdminProducts() {
             : `isArchived=false`;
         axios
           .get(
-            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}`
           )
           .then((response) => {
             setProducts(response.data);
@@ -68,15 +70,15 @@ export default function AdminProducts() {
             console.error(error);
           });
         setLoading(false);
-      }, 100), // Debounce with 500ms delay
+      }, 50), // Debounce with 500ms delay
 
-    [priceRange, searchTerm, selectedFilters, maxPrice, tab]
+    [priceRange, searchTerm, selectedFilters, maxPrice, tab, prefCurrency]
   );
 
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
-      .get(`api/products/maxProductPrice`)
+      .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
         setMaxPrice(response.data.maxPrice + 200);
         setSliderRange([0, response.data.maxPrice]);
@@ -91,7 +93,15 @@ export default function AdminProducts() {
     if (maxPrice !== null) {
       debouncedFetchProducts(); // Use the debounced function
     }
-  }, [searchTerm, maxPrice, priceRange, selectedFilters, tab]);
+  }, [
+    searchTerm,
+    maxPrice,
+    priceRange,
+    selectedFilters,
+    tab,
+    prefCurrency,
+    debouncedFetchProducts,
+  ]);
 
   // Fetch maxPrice when component mounts
   useEffect(() => {
@@ -120,6 +130,7 @@ export default function AdminProducts() {
         price: product.price,
         description: product.description,
         isArchived: archive,
+        images: product.images,
       })
       .then(() => {
         toast({
@@ -295,9 +306,11 @@ export default function AdminProducts() {
         <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
           <Tabs
             defaultValue="all"
-            onValueChange={(value) =>
-              setTab(value) + setProducts([]) + console.log(value)
-            }
+            onValueChange={(value) => {
+              setTab(value);
+              setProducts([]);
+              console.log(value);
+            }}
           >
             <div className="flex items-center justify-center">
               <div className="flex justify-center gap-4 mb-4 items-center">
@@ -347,7 +360,7 @@ export default function AdminProducts() {
                   form={
                     <ProductForm
                       onRefresh={debouncedFetchProducts}
-                      adderId="670304850bf9fdbd2db01e47"
+                      adderId="6706596fd394ab3a8816c3d5"
                     />
                   }
                 />

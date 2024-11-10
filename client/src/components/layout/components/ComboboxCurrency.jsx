@@ -48,7 +48,7 @@ export function ComboboxCurrency() {
           className="w-[100px] justify-between"
         >
           {prefCurrency
-            ? currencies.find((currency) => currency[0] === prefCurrency)?.[0]
+            ? currencies.find((currency) => currency[0] === prefCurrency)?.[0] || "EGP"
             : "Select currency..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

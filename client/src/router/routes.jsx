@@ -1,10 +1,8 @@
 import { createRoutesFromElements, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
 import Layout from "@/components/layout/Layout";
-import ItinerariesPage from "@/pages/ItinerariesPage";
 import MyProfilePage from "@/pages/MyProfilePage";
 import AdminPage from "@/pages/AdminPage";
-import SingleItineraryPage from "@/pages/SingleItineraryPage";
 import ComponentTestPage from "@/pages/ComponentTestPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import HistoricalPage from "@/pages/HistoricalPage";
@@ -19,15 +17,24 @@ import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
 import SingleHistoricalPage from "@/pages/SingleHistoricalPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
+import TourGuides from "@/components/touristPage/TourGuides";
+import ItinerariesMade from "@/components/touristPage/ItinerariesMade";
+import ActivityAttended from "@/components/touristPage/ActivityAttended";
+import OrderHistory from "@/components/touristPage/OrderHistory";
 import TouristDashboard from "@/pages/TouristDashboard";
+// Itineraries
+import ItinerariesTouristsPage from "@/pages/ItinerariesTouristsPage";
+import SingleItineraryTouristsPage from "@/pages/SingleItineraryTouristsPage";
+import CreateItineraryPage from "@/pages/CreateItineraryPage";
+import EditItineraryPage from "@/pages/EditItineraryPage";
+import ItinerariesTourGuidePage from "@/pages/ItinerariesTourGuidePage";
+import SingleItineraryTourGuidePage from "@/pages/SingleItineraryTourGuidePage";
 import Transportation from "@/pages/TransportationPage";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
-    <Route path="about" element={<SingleItineraryPage />} />
-    <Route path="itineraries" element={<ItinerariesPage />} />
     <Route path="profile" element={<MyProfilePage />} />
     <Route path="admin" element={<AdminPage />} />
     <Route path="activities/:idAdv" element={<ActivitiesPage />} />
@@ -36,19 +43,55 @@ const routes = createRoutesFromElements(
     <Route path="RegistrationPage" element={<RegistrationPage />} />
     <Route path="activitiesTourists" element={<ActivitiesTourists />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
-    <Route path="itineraryfullpage/:id" element={<SingleItineraryPage />} />
+
+    <Route
+      path="itinerariesTourists"
+      element={<ItinerariesTouristsPage />}
+    ></Route>
+    <Route
+      path="itinerariesTourists/:id"
+      element={<SingleItineraryTouristsPage />}
+    ></Route>
+    <Route
+      path="itineraries/:id"
+      element={<ItinerariesTourGuidePage />}
+    ></Route>
+    <Route
+      path="itinerariesTourGuide/:id"
+      element={<SingleItineraryTourGuidePage />}
+    ></Route>
+    <Route path="createItinerary" element={<CreateItineraryPage />}></Route>
+    <Route path="editItinerary/:id" element={<EditItineraryPage />}></Route>
+
     <Route path="activity/:id" element={<SingleActivityPage />} />
     <Route path="place/:name" element={<SingleHistoricalPage />} />
     <Route path="Pointsandloyality" element={<PointsAndLoyalty />} />
-    <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
+    <Route
+      path="*"
+      element={
+        <ErrorBoundary>
+          <NotFoundPage />
+        </ErrorBoundary>
+      }
+    />
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>
     <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
-    <Route path="booked/" element={<Booked />}></Route>
-    <Route path="touristDashboard" element={<TouristDashboard />} />
+    
+
+    <Route path="touristDashboard" element={<TouristDashboard />}>
+      <Route path="profile" element={<MyProfilePage />} />
+      <Route path="tour-guides" element={<TourGuides />} />
+      <Route path="booked" element={<Booked />}></Route>
+      <Route path="itineraries-made" element={<ItinerariesMade />} />
+      <Route path="activity-attended" element={<ActivityAttended />} />
+      <Route path="order-history" element={<OrderHistory />} />
+       
+    </Route>
+
     <Route
       path="*"
       element={

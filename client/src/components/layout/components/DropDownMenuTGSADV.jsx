@@ -10,41 +10,41 @@ import {
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const DropDownMenuTourist = () => {
+const DropDownMenuTGSADV = () => {
   const [label, setLabel] = useState("What to do?");
   useEffect(() => {
     switch (location.pathname) {
-      case "/itinerariesTourists":
+      case "/itineraries":
         setLabel("Itineraries");
         break;
-      case "/activitiesTourists":
+      case "/activities":
         setLabel("Activities");
         break;
-      case "/historicalTourists":
+      case "/historical":
         setLabel("Historical");
         break;
       default:
-        setLabel("As a Tourist");
+        setLabel("What to do?");
     }
   }, [location.pathname]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{label}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>As a Tourist</DropdownMenuLabel>
+        <DropdownMenuLabel>What to do?</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link to="/itinerariesTourists">Itineraries</Link>
+          <Link to="/itineraries/66fb241366ea8f57d59ec6db">Itineraries</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link to="/activitiesTourists">Activities</Link>
+          <Link to="/activities">Activities</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link to="/historicalTourists">Historical</Link>
+          <Link to="/historical">Historical</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
 
-export default DropDownMenuTourist;
+export default DropDownMenuTGSADV;

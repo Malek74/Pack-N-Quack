@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/marketplacePage/ProductCard";
 import Activitiesbackground from "/assets/images/Background.jpg";
 import Banner from "../components/shared/BannerV2";
+import BannerImage from "/assets/images/homeBanner.png";
+
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
@@ -9,7 +11,9 @@ import FilterButton from "@/components/shared/FilterButtons";
 import PriceSlider from "../components/shared/PriceSlider";
 import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
+import { useUser } from "@/context/UserContext";
 export default function MarketplacePage() {
+  const { prefCurrency } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
@@ -22,7 +26,7 @@ export default function MarketplacePage() {
   const fetchProducts = () => {
     axios
       .get(
-        `api/products?maxPrice=${priceRange[1]}&minPrice=${priceRange[0]}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+        `api/products?maxPrice=${priceRange[1]}&minPrice=${priceRange[0]}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}&isArchived=false`
       )
       .then((response) => {
         setProducts(response.data);
@@ -37,7 +41,7 @@ export default function MarketplacePage() {
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
-      .get(`api/products/maxProductPrice`)
+      .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
         setMaxPrice(response.data.maxPrice + 200);
         setSliderRange([0, response.data.maxPrice]); // Set the range once maxPrice is fetched
@@ -52,12 +56,12 @@ export default function MarketplacePage() {
     if (maxPrice !== null) {
       fetchProducts(); // Fetch products after maxPrice is fetched
     }
-  }, [searchTerm, maxPrice, priceRange, selectedFilters]);
+  }, [searchTerm, maxPrice, priceRange, selectedFilters, prefCurrency]);
 
   // Fetch maxPrice when component mounts
   useEffect(() => {
     fetchMaxPrice();
-  }, []);
+  }, [prefCurrency]);
 
   const handleFilterChange = (type, value) => {
     setSelectedFilters((prev) => ({
@@ -92,7 +96,7 @@ export default function MarketplacePage() {
       <div className="relative">
         {/* Banner Section */}
         <Banner
-          background={Activitiesbackground}
+          background={BannerImage}
           alt="Hustling market"
           name="Marketplace"
         />

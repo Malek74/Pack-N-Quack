@@ -5,24 +5,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
-import React from 'react'
+} from "@/components/ui/dropdown-menu";
+import React from 'react';
+
 import { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const DropDownMenuComponent = () => {
-  const [label, setLabel] = useState("What to do?")
+  const [label, setLabel] = useState("What to do?");
   useEffect(() => {
     switch (location.pathname) {
-      case '/booking':
-        setLabel('Booking');
+      case "/booking":
+        setLabel("Booking");
         break;
-      case '/points':
-        setLabel('Pointa');
+      case "/points":
+        setLabel("Pointa");
         break;
       default:
-        setLabel('Profile');
+        setLabel("Profile");
     }
   }, [location.pathname]);
   return (
