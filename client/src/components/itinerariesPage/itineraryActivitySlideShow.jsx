@@ -5,7 +5,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PropTypes from "prop-types";
-import { format } from "date-fns";
+import Maps from "../shared/Maps";
 // Sample card data
 
 ItineraryActivitySlideShow.propTypes = {
@@ -34,9 +34,7 @@ export default function ItineraryActivitySlideShow({ cardData }) {
         <div className="flex flex-col sm:flex-row">
           <div className="w-full sm:w-1/2">
             <img
-              src={
-                "https://play-lh.googleusercontent.com/CnwEgFwb3YcSu9W5hBxbUfjz-jAYzXySythz30Ow1agFPebRjVsrXp-gBUvZ-tqEAirK"
-              }
+              src={currentCard.image}
               alt={currentCard.name}
               className="w-full h-48 sm:h-full object-cover"
             />
@@ -46,13 +44,13 @@ export default function ItineraryActivitySlideShow({ cardData }) {
               <h2 className="text-2xl font-bold">{currentCard.name}</h2>
               <p className="text-gray-600">{currentCard.description}</p>
               <h2 className="text-2xl font-bold">Location</h2>
-              <p className="text-gray-600">{currentCard.location}</p>
+              <div className="flex justify-between">
+                <p className="text-gray-600">{currentCard.location}</p>
+                <Maps mapsSrc={currentCard.googleMapLink} />
+              </div>
               <h2 className="text-2xl font-bold">Duration</h2>
               <p className="text-gray-600">
-                {`From ${format(
-                  currentCard.duration.startTime,
-                  "p"
-                )} to ${format(currentCard.duration.endTime, "p")}`}
+                {`From ${currentCard.duration.startTime} to ${currentCard.duration.endTime}`}
               </p>
             </div>
             <div className="flex justify-end space-x-2 mt-4">

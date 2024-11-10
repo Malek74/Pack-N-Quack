@@ -7,6 +7,7 @@ import Loading from "@/components/shared/Loading";
 import { Rating } from "@/components/shared/Rating";
 import { format } from "date-fns";
 import ItineraryActivitySlideShow from "@/components/itinerariesPage/itineraryActivitySlideShow";
+import Maps from "@/components/shared/Maps";
 
 export default function RamitoSingleItineraryPage() {
   const { id } = useParams();
@@ -37,7 +38,7 @@ export default function RamitoSingleItineraryPage() {
       </div>
     )) || (
       <div className="flex flex-col w-screen gap-8">
-        <ImageSlideshow />
+        <ImageSlideshow images={fetchedItinerary.images} />
         <div className="flex justify-between px-28">
           <div className="flex flex-col w-[40%] gap-4">
             <Label className="text-3xl font-bold">
@@ -80,15 +81,25 @@ export default function RamitoSingleItineraryPage() {
             <div className="flex justify-between">
               <div className="flex flex-col gap-1">
                 <Label className="text-2xl font-bold">Pick-Up Location</Label>
-                <p className="text-lg text-neutral-600">
-                  {fetchedItinerary.pickUpLocation}
-                </p>
+                <div className="flex justify-between">
+                  <p className="text-lg text-neutral-600">
+                    {fetchedItinerary.pickUpLocation.name}
+                  </p>
+                  <Maps
+                    mapsSrc={fetchedItinerary.pickUpLocation.googleMapLink}
+                  />
+                </div>
               </div>
               <div className="flex flex-col gap-1">
                 <Label className="text-2xl font-bold">Drop-Off Location</Label>
-                <p className="text-lg text-neutral-600">
-                  {fetchedItinerary.dropOffLocation}
-                </p>
+                <div className="flex justify-between">
+                  <p className="text-lg text-neutral-600">
+                    {fetchedItinerary.dropOffLocation.name}
+                  </p>
+                  <Maps
+                    mapsSrc={fetchedItinerary.dropOffLocation.googleMapLink}
+                  />
+                </div>
               </div>
             </div>
           </div>

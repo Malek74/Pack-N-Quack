@@ -79,6 +79,7 @@ export default function RamitoItineraries() {
                 price={itinerary.price}
                 rating={itinerary.ratings.averageRating}
                 numberOfReviews={itinerary.ratings.reviews.length}
+                coverImage={itinerary.coverImage || null}
               />
             ))}
         </div>

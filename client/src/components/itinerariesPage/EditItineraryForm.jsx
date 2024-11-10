@@ -20,6 +20,7 @@ import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import ImageUploader from "../shared/ImageUploader";
+import { useParams } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -67,34 +68,29 @@ const formSchema = z.object({
     .min(1, "At least one day is required"),
 });
 
-export default function CreateItineraryForm() {
+export default function EditItineraryForm() {
+  const [itinerary, setItinerary] = useState(null);
+  const { id } = useParams();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      language: "",
-      price: "",
-      pickUpLocation: { name: "", googleMapLink: "" },
-      dropOffLocation: { name: "", googleMapLink: "" },
-      accessibility: "",
-      available_dates: [],
-      tags: [],
-      days: [
-        {
-          day: 1,
-          activities: [
-            {
-              name: "",
-              location: "",
-              googleMapLink: "",
-              duration: { startTime: "", endTime: "" },
-              description: "",
-              image: [],
-            },
-          ],
-        },
-      ],
+      name: itinerary?.name || "",
+      description: itinerary?.description || "",
+      language: itinerary?.language || "",
+      price: itinerary?.price || 0,
+      pickUpLocation: {
+        name: itinerary?.pickUpLocation?.name || "",
+        googleMapLink: itinerary?.pickUpLocation?.googleMapLink || "",
+      },
+      dropOffLocation: {
+        name: itinerary?.dropOffLocation?.name || "",
+        googleMapLink: itinerary?.dropOffLocation?.googleMapLink || "",
+      },
+      accessibility: itinerary?.accessibility || "",
+      available_dates: itinerary?.available_dates || [],
+      tags: itinerary?.tags || [],
+      days: itinerary?.days || [],
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -207,12 +203,23 @@ export default function CreateItineraryForm() {
     try {
       const formData = new FormData();
       formData.append("coverImage", values.coverImage);
+      formData.append("images", "");
       for (let index = 0; index < itineraryImages.length; index++) {
         formData.append("images", itineraryImages[index]);
       }
-      days.forEach((day) => {
-        day.activities.forEach((activity) => {
-          formData.append("activityImages", activity.image[0]);
+      formData.append("activityImages", "");
+      formData.append("newActivityImageIndex", "");
+      days.forEach((day, dayIndex) => {
+        day.activities.forEach((activity, activityIndex) => {
+          if (Array.isArray(activity.image)) {
+            formData.append("activityImages", activity.image[0]);
+            formData.append(
+              "newActivityImageIndex",
+              `${dayIndex},${activityIndex}`
+            );
+          } else {
+            formData.append("activityImages", activity.image);
+          }
         });
       });
       formData.append("name", values.name);
@@ -233,12 +240,59 @@ export default function CreateItineraryForm() {
       formData.append("price", values.price);
       formData.append("pickUpLocation", JSON.stringify(values.pickUpLocation));
       formData.append("tourGuideID", "66fb241366ea8f57d59ec6db");
-      const response = await axios.post("/api/itinerary/", formData);
+
+      const response = await axios.put(`/api/itinerary/${id}`, formData);
       console.log(response);
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const fetchItinerary = async () => {
+      try {
+        const response = await axios.get(`/api/itinerary/viewItinerary/${id}`, {
+          params: { currency: "USD" },
+        });
+        setItinerary(response.data);
+
+        // Reset the form values once the data is fetched
+        form.reset({
+          name: response.data.name || "",
+          description: response.data.description || "",
+          language: response.data.language || "",
+          price: response.data.price || 0,
+          pickUpLocation: {
+            name: response.data.pickUpLocation?.name || "",
+            googleMapLink: response.data.pickUpLocation?.googleMapLink || "",
+          },
+          dropOffLocation: {
+            name: response.data.dropOffLocation?.name || "",
+            googleMapLink: response.data.dropOffLocation?.googleMapLink || "",
+          },
+          accessibility: response.data.accessibility || "",
+          available_dates: response.data.available_dates || [],
+          tags: response.data.tags || [],
+          days: response.data.days || [],
+        });
+
+        setDays(response.data.days || []);
+        setSelectedTags(response.data.tags || []);
+        setDates(
+          response.data.available_dates?.map((date) => new Date(date)) || []
+        );
+        setCoverImage(
+          response.data.coverImage ? [response.data.coverImage] : []
+        );
+        setItineraryImages(response.data.images || []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchItinerary();
+  }, [id, form]);
+
   return (
     !isLoading && (
       <Form {...form}>
@@ -561,14 +615,18 @@ export default function CreateItineraryForm() {
                           <Label>Activity Image</Label>
                           <ImageUploader
                             single
-                            imagesUploaded={activity.image}
+                            imagesUploaded={
+                              Array.isArray(activity.image)
+                                ? activity.image
+                                : [activity.image]
+                            } // Ensure array
                             setImagesUploaded={(images) => {
                               handleActivityChange(
                                 index,
                                 activityIndex,
                                 "image",
                                 images
-                              );
+                              ); // Convert back to string
                             }}
                           />
                         </div>

@@ -117,6 +117,15 @@ export default function ImageUploader({
     }
   };
 
+  function isValidUrl(value) {
+    try {
+      new URL(value); // Try to construct a URL object
+      return true; // It's a valid URL
+    } catch {
+      return false; // It's not a valid URL
+    }
+  }
+  console.log(imagesUploaded);
   return (
     <Dropzone onDrop={handleDrop}>
       {({ getRootProps, getInputProps }) => (
@@ -162,7 +171,7 @@ export default function ImageUploader({
                   </AlertDialog>
 
                   <img
-                    src={URL.createObjectURL(file)}
+                    src={isValidUrl(file) ? file : URL.createObjectURL(file)}
                     className="h-full w-full object-cover rounded-lg"
                   />
                 </div>
@@ -249,7 +258,9 @@ export default function ImageUploader({
                       </AlertDialog>
 
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={
+                          isValidUrl(file) ? file : URL.createObjectURL(file)
+                        }
                         className="h-full w-full object-cover rounded-lg"
                       />
                     </div>

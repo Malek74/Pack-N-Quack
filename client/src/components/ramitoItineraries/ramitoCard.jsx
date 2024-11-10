@@ -5,7 +5,6 @@ import { Rating } from "../shared/Rating";
 import { useNavigate } from "react-router-dom";
 
 RamitoItinerariesCard.propTypes = {
-  // image: PropTypes.array,
   id: PropTypes.string,
   name: PropTypes.string,
   description: PropTypes.string,
@@ -13,6 +12,7 @@ RamitoItinerariesCard.propTypes = {
   price: PropTypes.number,
   rating: PropTypes.number,
   numberOfReviews: PropTypes.number,
+  coverImage: PropTypes.string,
 };
 export default function RamitoItinerariesCard({
   id,
@@ -22,11 +22,12 @@ export default function RamitoItinerariesCard({
   price,
   rating,
   numberOfReviews,
+  coverImage,
 }) {
   const navigate = useNavigate();
   return (
     <Card
-      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer"
+      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[550px] h-[450px]"
       onClick={() => {
         console.log(id);
         navigate(`/ramito/${id}`);
@@ -34,10 +35,10 @@ export default function RamitoItinerariesCard({
     >
       <img
         src={
+          coverImage ||
           "https://media.istockphoto.com/id/1406854851/vector/travel-time-vector-background-design-time-to-travel-text-in-blue-space-with-3d-tourist.jpg?s=612x612&w=0&k=20&c=GMlx-8LNNhoQdE4cbKwu2apsLcmmTKj5pq77ToAu8BM%3D"
         }
-        height={200}
-        className="rounded-lg rounded-b-none"
+        className="rounded-lg rounded-b-none h-[300px] w-full object-fill"
       />
       <div className="p-4">
         <div className="flex flex-col gap-2">
