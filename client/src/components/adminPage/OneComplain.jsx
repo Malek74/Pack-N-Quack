@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Card,
     CardContent,
@@ -11,11 +11,15 @@ import { Button } from '../ui/button';
 import ChatMessage from '../shared/ChatMessage';
 import MessageInput from '../shared/MessageInput';
 import axios from 'axios';
+import Loading from '../shared/Loading';
+import PendingAndResolved from '../shared/PendingAndResolved';
 
 
 
 
-const OneComplain = ({complaint, onRefresh}) => {
+const OneComplain = ({complaintID}) => {
+  const [statusRefresh, setStatusRefresh] = useState([]);
+
   function formatDate(isoDateString) {
     const date = new Date(isoDateString);
     
@@ -36,39 +40,65 @@ const OneComplain = ({complaint, onRefresh}) => {
     return `${formattedDate}, ${formattedTime}`;
   }
 
-    const onSubmitReply = (reply) =>{
-      console.log("rep?", reply)
-      axios
-      .put(`/api/complaints/reply/${complaint._id}`,reply)
+  const [onNewReply, setOnNewReply] = useState();
+
+  const onSubmitReply = (reply) =>{
+    console.log("rep?", reply)
+    axios
+    .put(`/api/complaints/reply/${complaintID}`,{reply: reply})
+    .then((response) => {
+      console.log("msggggg ", response.data)
+      // setComplaint(response.data);
+      setOnNewReply(response.data);
+      // onRefresh();
+    })
+    .catch((error) => {
+      console.error("There was an error changing the status:", error); 
+    });
+  };
+
+  const [complaint,setComplaint] = useState();
+  
+
+  const fetchComplaint = () => {
+    axios
+      .get(`api/admins/complaints/${complaintID}`)
       .then((response) => {
-        console.log("msggggg ", response.data)
-        onRefresh();
+        setComplaint(response.data);
+        console.log("complaint fetched ---> ",response.data);
       })
       .catch((error) => {
-        console.error("There was an error changing the status:", error); 
+        console.error(error);
       });
-    };
+  };
+
+  useEffect(() => {
+    fetchComplaint(); // Initial fetch when component mounts
+  }, [onNewReply, statusRefresh]);
+
+
+ 
   return (
-    <div className="flex flex-col sm:gap-4 sm:py-4">
+    complaint? <div className="flex flex-col sm:gap-4 sm:py-4">
     <Card x-chunk="dashboard-06-chunk-0">
       <CardHeader>
-        <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
+        <div className = "flex justify-between">
+          <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
+          <PendingAndResolved status={complaint.status} id = {complaint._id} setStatusRefresh={setStatusRefresh}/>
+        </div>
         <CardDescription>{formatDate(complaint.date)}</CardDescription>
       </CardHeader>
       <CardContent>
         {" "}
         <div className='flex flex-col gap-6'>
-            {/* <div className = 'flex flex-row justify-between'>
-                <h1 className='text-3xl font-semibold'>{complaint.title}</h1>
-                <h3>{complaint.date}</h3>
-            </div> */}
             <div className="flex flex-col">
-                {/* <p>{complaint.body}</p> */}
                 <ChatMessage message={complaint.body} direction={"left"} />
+
                 {complaint.reply && 
                 complaint.reply.map((reply) => (
                     <ChatMessage message={reply} direction={"right"} />
                 ))}
+
                 
             </div>
             {/* onClick will popOut a dialog/form to write or maybe feedback like chat */}
@@ -82,7 +112,7 @@ const OneComplain = ({complaint, onRefresh}) => {
         </div>
       </CardFooter>
     </Card>
-  </div>
+  </div> : <div className = "flex justify-center items-center flex-1"><Loading /></div>
   )
 }
 

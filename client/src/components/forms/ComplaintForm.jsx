@@ -22,12 +22,12 @@ export default function ComplaintForm({onRefresh}) {
     title: z
       .string()
       .min(3, { message: "Title must be at least 3 characters long." })
-      .max(20, { message: "Title must be 20 characters or less." }),
+      .max(50, { message: "Title must be 50 characters or less." }),
 
     body: z
     .string()
     .min(4, { message: "Description must be at least 4 characters long." })
-    .max(20, { message: "Description must be 20 characters or less." }),
+    .max(4000, { message: "Description must be 4000 characters or less." }),
   });
   const form = useForm({
     resolver: zodResolver(complaintFormSchema),
@@ -43,17 +43,22 @@ export default function ComplaintForm({onRefresh}) {
   }
  
   function onSubmit(values) {
+    console.log("we are submitting complaint -----> ",{title: values.title,
+        body: values.body,
+        issuerID: "6702cde57d7e2444d9713d8d",
+        date: getCurrentDate()});
     axios
-    .post(`api/${endpoint}/`, {
+    .post("api/tourist/complaints", {
         title: values.title,
         body: values.body,
+        issuerID: "6702cde57d7e2444d9713d8d",
         date: getCurrentDate()
     })
-    .then(() => {
+    .then((response) => {
         toast({
         title: "Complaint sent!",
         });
-        onRefresh();
+        onRefresh(response.data);
     })
     .catch((error) => {
         toast({
@@ -89,7 +94,7 @@ export default function ComplaintForm({onRefresh}) {
 
         <FormField
           control={form.control}
-          name="Body"
+          name="body"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
@@ -100,8 +105,9 @@ export default function ComplaintForm({onRefresh}) {
             </FormItem>
           )}
         />
-        
-        <DialogClose className="place-self-end">
+
+
+        <DialogClose asChild className="place-self-end">
           <Button type="submit">Submit</Button>
         </DialogClose>
       </form>

@@ -17,6 +17,7 @@ import {
   UserRoundPen,
   Search,
   CircleUser,
+  Angry
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
@@ -43,20 +44,16 @@ import Complaints from "@/components/adminPage/complaints";
 import OneComplain from "@/components/adminPage/OneComplain";
 export default function AdminPage() {
   const navigate = useNavigate();
-  //complaints page stuff
+
+  //complaints page stuff ///////
   const [activeSection, setActiveSection] = useState("Users");
   const [currentComplaint, setCurrentComplaint] = useState({});
-  
-  
 
   const openComplaint = (complaint) => {
-    //link to the complaint with the values int the complaint map
     setCurrentComplaint(complaint);
-    console.log("Opened complaint -> ", complaint);
-    console.log("currentComplaint -> ",currentComplaint)
     setActiveSection("Single Complaint");
   }
-
+/////////////////////////////////
 
   
   // Function to render the correct component based on the active section
@@ -79,7 +76,7 @@ export default function AdminPage() {
       case "Complaints":
         return <Complaints openComplaint = {openComplaint} />;
       case "Single Complaint":
-        return <OneComplain complaint = {currentComplaint} />;
+        return <OneComplain complaintID  = {currentComplaint._id} />;
       default:
         return <AdminDashboard />;
     }
@@ -206,7 +203,7 @@ export default function AdminPage() {
                   }`}
                 >
                   {/* change to complaint icon */}
-                  <Package className="h-4 w-4" />
+                  <Angry className="h-4 w-4" />
                   Complaints
                 </Button>
               </div>

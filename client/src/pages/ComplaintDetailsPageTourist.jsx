@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Card,
     CardContent,
@@ -9,37 +9,72 @@ import {
   } from "@/components/ui/card";
 
 import ChatMessage from '@/components/shared/ChatMessage';
+import { useParams } from 'react-router-dom';
+import Loading from '@/components/shared/Loading';
+import axios from 'axios';
 
 
 
 
+const ComplaintDetailsPageTourist = () => {
+    const [complaint, setComplaint] = useState();
+    const { id } = useParams();
+    function formatDate(isoDateString) {
+      const date = new Date(isoDateString);
+      
+      // Format the date
+      const formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    
+      // Format the time
+      const formattedTime = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    
+      return `${formattedDate}, ${formattedTime}`;
+    }
 
-const ComplaintDetailsPageTourist = ({complaint}) => {
-    console.log("Complaintttt",complaint);
-  return (
-    <div className="flex flex-col sm:gap-4 sm:py-4">
+    const fetchComplaint= () => {
+      console.log("we are fetching noww");
+      axios
+        .get(`api/tourist/myComplaints/${id}`)
+        .then((response) => {
+          setComplaint(response.data);
+          console.log("Just got fetchedd -> ",response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
+    useEffect(() => {
+      fetchComplaint(); // Initial fetch when component mounts
+    }, []);
+
+  return (complaint? <div className="flex flex-col sm:gap-4 sm:py-4 px-[5.4rem]">
     <Card x-chunk="dashboard-06-chunk-0">
       <CardHeader>
-        <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
-        <CardDescription>{complaint.date}</CardDescription>
+        <div className='flex justify-between'>
+          <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
+          <p  className={`${complaint.status === "resolved" ? "text-green-500 border-green-500" : "text-orange-500 border-orange-500"}`}>{complaint.status}</p>
+        </div>
+        <CardDescription>{formatDate(complaint.date)}</CardDescription>
       </CardHeader>
       <CardContent>
         {" "}
         <div className='flex flex-col gap-6'>
-            {/* <div className = 'flex flex-row justify-between'>
-                <h1 className='text-3xl font-semibold'>{complaint.title}</h1>
-                <h3>{complaint.date}</h3>
-            </div> */}
             <div className="flex flex-col">
-                {/* <p>{complaint.body}</p> */}
-                <ChatMessage message={complaint.body} direction={"left"} />
-                {complaint.replies && 
-                complaint.replies.map((reply) => (
-                    <ChatMessage message={reply} direction={"right"} />
-                ))}
-                
+                <ChatMessage message={complaint.body} direction={"right"} />
+                {complaint.reply && 
+                complaint.reply.map((reply) => (
+                    <ChatMessage message={reply} direction={"left"} />
+                ))} 
             </div>
-            
         </div>
         
       </CardContent>
@@ -49,7 +84,7 @@ const ComplaintDetailsPageTourist = ({complaint}) => {
         </div>
       </CardFooter>
     </Card>
-  </div>
+  </div> : <div className = "flex justify-center items-center flex-1"><Loading /></div>
   )
 }
 

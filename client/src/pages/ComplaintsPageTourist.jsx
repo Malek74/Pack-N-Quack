@@ -22,13 +22,14 @@ import {
 import ComplaintForm from "@/components/forms/ComplaintForm";
 import CreateDialog from "@/components/shared/CreateDialog";
 
-//   const navigate = useNavigate();
+ 
 
   export default function Complaints() {
+    const navigate = useNavigate();
     const [complaints, setComplaints] = useState([]);
     const fetchComplaints = () => {
       axios
-        .get("api/admins/complaints")
+        .get("api/tourist/complaints/6702cde57d7e2444d9713d8d") //get id from context here
         .then((response) => {
           setComplaints(response.data);
           console.log(response.data);
@@ -39,90 +40,33 @@ import CreateDialog from "@/components/shared/CreateDialog";
     };
 
 
-   
+    const [onRefresh, setOnRefresh] = useState();
   
     useEffect(() => {
       fetchComplaints(); // Initial fetch when component mounts
-    }, []);
+    }, [onRefresh]);
 
-    // const openComplaint = (complaint) => {
-    //   //link to the complaint with the values int the complaint map
-    //   setCurrentComplaint(complaint);
-    //   console.log("Opened complaint -> ", complaint);
-    //   console.log("currentComplaint -> ",currentComplaint)
-    //   setActiveSection("Single Complaint");
+    function formatDate(isoDateString) {
+      const date = new Date(isoDateString);
       
-    // }
-
-
-
-    const dummyComplaints = [
-      {
-        _id: "1",
-        title: "Delayed Response",
-        body: "The response time was very slow.",
-        date: "2024-10-01",
-        status: "pending",
-        replies: [
-          "We're looking into the issue and will get back to you soon.",
-          "Thank you for your patience.",
-          "We have escalated the issue to our team."
-        ],
-        _issuerID: "user123",
-      },
-      {
-        _id: "2",
-        title: "Incorrect Billing",
-        body: "I was overcharged for my subscription.",
-        date: "2024-10-05",
-        status: "resolved",
-        replies: [
-          "The billing issue has been resolved. Sorry for the inconvenience."
-        ],
-        _issuerID: "user456",
-      },
-      {
-        _id: "3",
-        title: "Service Outage",
-        body: "The service was down for over 2 hours.",
-        date: "2024-10-10",
-        status: "pending",
-        replies: [
-          "We are investigating the cause of the outage and will update you shortly.",
-          "Our team is working on restoring the service.",
-          "We apologize for the downtime and will ensure it doesn't happen again."
-        ],
-        _issuerID: "user789",
-      },
-      {
-        _id: "4",
-        title: "Unhelpful Support",
-        body: "The support team did not resolve my issue.",
-        date: "2024-10-12",
-        status: "resolved",
-        replies: [
-          "We apologize for the lack of support. We are reviewing your case.",
-          "A senior support agent will contact you shortly.",
-          "Thank you for your feedback, we will improve our support."
-        ],
-        _issuerID: "user101",
-      },
-      {
-        _id: "5",
-        title: "Account Suspension",
-        body: "My account was suspended without notice.",
-        date: "2024-10-15",
-        status: "pending",
-        replies: [
-          "Your account suspension is under review. Please expect an update soon.",
-          "We are working to resolve this as quickly as possible."
-        ],
-        _issuerID: "user202",
-      },
-    ];
+      // Format the date
+      const formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
     
+      // Format the time
+      const formattedTime = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
     
-  
+      return `${formattedDate}, ${formattedTime}`;
+    }
+
+    
   
     return (
       <div className="flex flex-col sm:gap-4 sm:py-4 px-[5.4rem]">
@@ -132,7 +76,7 @@ import CreateDialog from "@/components/shared/CreateDialog";
             <CardDescription>Manage all complaints.</CardDescription>
             <CreateDialog
           title="Complaint"
-          form={<ComplaintForm />}
+          form={<ComplaintForm onRefresh = {setOnRefresh}/>}
         />
             
           </CardHeader>
@@ -148,11 +92,11 @@ import CreateDialog from "@/components/shared/CreateDialog";
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dummyComplaints &&
-                  dummyComplaints.map((complaint) => (
+                {complaints &&
+                  complaints.map((complaint) => (
                     <TableRow key={complaint._id}  onClick={() => {navigate(`/complaintDetails/${complaint._id}`)}}>
                       <TableCell>{complaint.title}</TableCell>
-                      <TableCell>{complaint.date}</TableCell>
+                      <TableCell>{formatDate(complaint.date)}</TableCell>
                       <TableCell  className={`${complaint.status === "resolved" ? "text-green-500 border-green-500" : "text-orange-500 border-orange-500"}`}>{complaint.status}</TableCell>
                     </TableRow>
                   ))}

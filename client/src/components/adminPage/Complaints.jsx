@@ -21,15 +21,19 @@ import {
   } from "@/components/ui/card";
 import PendingAndResolved from "../shared/PendingAndResolved";
 import { Button } from "@mui/material";
+import FilterButtons from "../shared/FilterButtons";
   export default function Complaints({openComplaint}) {
     const { toast } = useToast();
     const [complaints, setComplaints] = useState([]);
+    const [selectedFilters, setSelectedFilters] = useState({});
+   
 
-    const onRefresh = () => {};
+    const [statusRefresh, setStatusRefresh] = useState([]);
 
     const fetchComplaints = () => {
+      console.log("fetching w/ query ", `api/admins/complaints?sortBy=${selectedFilters["Sort By Date"]}&statusFilter=${selectedFilters["Status"]}`);
       axios
-        .get("api/admins/complaints")
+        .get(`api/admins/complaints?sortBy=${selectedFilters["Sort By Date"]}&statusFilter=${selectedFilters["Status"]}`)
         .then((response) => {
           setComplaints(response.data);
           console.log(response.data);
@@ -62,91 +66,40 @@ import { Button } from "@mui/material";
   
     useEffect(() => {
       fetchComplaints(); // Initial fetch when component mounts
-    }, [onRefresh]);
+    }, [statusRefresh, selectedFilters]);
 
-    // const openComplaint = (complaint) => {
-    //   //link to the complaint with the values int the complaint map
-    //   setCurrentComplaint(complaint);
-    //   console.log("Opened complaint -> ", complaint);
-    //   console.log("currentComplaint -> ",currentComplaint)
-    //   setActiveSection("Single Complaint");
-      
-    // }
+    const handleFilterChange = (type, value) => {
+      setSelectedFilters((prev) => ({
+        ...prev,
+        [type]: value, // Update the selected value based on the type
+      }));
+      console.log(type, value);
+    };
 
-    const dummyComplaints = [
+    let buttons = [
       {
-        _id: "1",
-        title: "Delayed Response",
-        body: "The response time was very slow.",
-        date: "2024-10-01",
-        status: "pending",
-        replies: [
-          "We're looking into the issue and will get back to you soon.",
-          "Thank you for your patience.",
-          "We have escalated the issue to our team."
+        type: "Sort By Date", // This will create a "Sort By" dropdown
+        options: [
+          { label: "Acscending", value: "asc" },
+          { label: "Descending", value: "desc" },
         ],
-        _issuerID: "user123",
       },
       {
-        _id: "2",
-        title: "Incorrect Billing",
-        body: "I was overcharged for my subscription.",
-        date: "2024-10-05",
-        status: "resolved",
-        replies: [
-          "The billing issue has been resolved. Sorry for the inconvenience."
+        type: "Status", // This will create a "Sort By" dropdown
+        options: [
+          { label: "Pending", value: "pending" },
+          { label: "Resolved", value: "resolved" },
         ],
-        _issuerID: "user456",
-      },
-      {
-        _id: "3",
-        title: "Service Outage",
-        body: "The service was down for over 2 hours.",
-        date: "2024-10-10",
-        status: "pending",
-        replies: [
-          "We are investigating the cause of the outage and will update you shortly.",
-          "Our team is working on restoring the service.",
-          "We apologize for the downtime and will ensure it doesn't happen again."
-        ],
-        _issuerID: "user789",
-      },
-      {
-        _id: "4",
-        title: "Unhelpful Support",
-        body: "The support team did not resolve my issue.",
-        date: "2024-10-12",
-        status: "resolved",
-        replies: [
-          "We apologize for the lack of support. We are reviewing your case.",
-          "A senior support agent will contact you shortly.",
-          "Thank you for your feedback, we will improve our support."
-        ],
-        _issuerID: "user101",
-      },
-      {
-        _id: "5",
-        title: "Account Suspension",
-        body: "My account was suspended without notice.",
-        date: "2024-10-15",
-        status: "pending",
-        replies: [
-          "Your account suspension is under review. Please expect an update soon.",
-          "We are working to resolve this as quickly as possible."
-        ],
-        _issuerID: "user202",
-      },
-    ];
+      } 
+    ]
     
-    
-  
-  
     return (
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
             <CardTitle>Complaints</CardTitle>
             <CardDescription>Manage all complaints.</CardDescription>
+            <FilterButtons buttons={buttons} onFilterChange={handleFilterChange} />
           </CardHeader>
           <CardContent>
             {" "}
@@ -165,7 +118,7 @@ import { Button } from "@mui/material";
                     <TableRow key={complaint._id}>
                       <TableCell onClick={() => openComplaint(complaint)}>{complaint.title}</TableCell>
                       <TableCell onClick={() => openComplaint(complaint)}>{formatDate(complaint.date)}</TableCell>
-                      <TableCell><PendingAndResolved status={complaint.status} id = {complaint._id} onRefresh={onRefresh}/></TableCell>
+                      <TableCell><PendingAndResolved status={complaint.status} id = {complaint._id} setStatusRefresh={setStatusRefresh}/></TableCell>
                     </TableRow>
                   ))}
               </TableBody>
