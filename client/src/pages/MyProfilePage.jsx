@@ -1,8 +1,10 @@
 import TouristProfile from "@/components/forms/TouristProfile";
 import TourGuideProfile from "@/components/forms/TourGuideProfile";
 import AdvertiserProfile from "@/components/forms/AdvertiserProfile";
-import SellerProfile from "@/components/forms/SellerProfile";
+import SellerProfileD from "@/components/forms/SellerProfile";
 import CreateDialog from "@/components/shared/CreateDialog";
+import ChangePassword from "@/components/forms/ChangePassword";
+import RequestAccDelete from "@/components/forms/RequestAccDelete";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
+import DeleteButton from "@/components/shared/DeleteButton";
 import { useUser } from "@/context/UserContext";
 export default function MyProfilePage() {
   const { toast } = useToast();
@@ -131,6 +134,7 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
           </CardContent>
         </Card>
       );
@@ -229,6 +233,7 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
           </CardContent>
         </Card>
       );
@@ -272,7 +277,7 @@ export default function MyProfilePage() {
               <p className="text-sm text-muted-foreground">{username}</p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Edit profile action Buttons */}
             <div className="flex space-x-2">
               <CreateDialog
                 form={
@@ -283,6 +288,7 @@ export default function MyProfilePage() {
                 }
               />
             </div>
+            {renderDeleteAccountChangePassword()}
           </CardContent>
         </Card>
       );
@@ -387,20 +393,50 @@ export default function MyProfilePage() {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end items-center space-x-4 mt-4">
+            {/* Edit profile action Button */}
+            <div className="flex space-x-2">
               <CreateDialog
                 form={
                   <TouristProfile profile={profile} onRefresh={fetchProfile} />
                 }
               />
             </div>
-            <PointsAndLoyalty profileData={profile} />
+
+            {renderDeleteAccountChangePassword()}
           </CardContent>
         </Card>
       );
     }
     return null;
+  }
+
+  function renderDeleteAccountChangePassword() {
+    return (
+      <div>
+        {/* Edit password action Button */}
+        <div className="flex space-x-2">
+          <CreateDialog
+            changePassword
+            form={
+              <ChangePassword
+                profile={profile}
+                userType={usertype}
+                onRefresh={fetchProfile}
+              />
+            }
+          />
+        </div>
+
+        {/* Request account to be deleted action Button */}
+        <div className="flex space-x-2">
+          <RequestAccDelete
+            onRefresh={fetchProfile}
+            userId={userId}
+            userType={usertype}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
