@@ -11,6 +11,7 @@ import ActivityCard from "@/components/activityPage/ActivityCard";
 import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import { set } from "date-fns";
 
+import { ShareButton } from "@/components/shared/ShareButton";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const userID = "672f8e2c142c1410c5243616";
@@ -109,37 +110,35 @@ export default function HomePage() {
   //   },
   // ];
 
-
   useEffect(() => {
-
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/tourist/myPreferences/${userID}`);
+        const response = await axios.get(
+          `/api/tourist/myPreferences/${userID}`
+        );
         console.log(response.data);
         setActivities(response.data.activities);
         setItineraries(response.data.itineraries);
-        set
+        set;
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchData();
-
   }, [searchTerm]);
 
   const filteredActivities = activities
     ? activities.filter((activity) =>
-      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
-      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
-
 
   return (
     <div className="flex flex-col px-16">
@@ -147,18 +146,22 @@ export default function HomePage() {
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-        //    alt="Hustling market"
-        //    name="Live your dream destinations."
-        //    textAlign="left"
-        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+          //    alt="Hustling market"
+          //    name="Live your dream destinations."
+          //    textAlign="left"
+          //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={"Look for something fun to do!"} />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder={"Look for something fun to do!"}
+        />
       </div>
 
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-center">
-        {Array.isArray(filteredActivities) && (
+        {Array.isArray(filteredActivities) &&
           filteredActivities.map((activity) => (
             <ActivityCard
               key={activity.activityID}
@@ -177,11 +180,9 @@ export default function HomePage() {
               booking={activity.isBookingOpen}
               discounts={activity.specialDiscounts}
               rating={activity.ratings.averageRating}
-
             />
-          ))
-        )}
-        {Array.isArray(filteredItineraries) && (
+          ))}
+        {Array.isArray(filteredItineraries) &&
           filteredItineraries.map((itinerary) => (
             <RamitoItinerariesCard
               key={itinerary._id}
@@ -194,8 +195,10 @@ export default function HomePage() {
               rating={itinerary.ratings.averageRating}
               numberOfReviews={itinerary.ratings.reviews.length}
             />
-          ))
-        )}
+          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
+          <ShareButton />
+        </div>
       </div>
     </div>
   );

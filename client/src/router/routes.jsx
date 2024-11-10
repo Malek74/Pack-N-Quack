@@ -17,6 +17,10 @@ import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
 import SingleHistoricalPage from "@/pages/SingleHistoricalPage";
 import FlightBookingApp from "@/pages/FlightBookPage";
 import HotelBookingApp from "@/pages/HotelBookPage";
+import TourGuides from "@/components/touristPage/TourGuides";
+import ItinerariesMade from "@/components/touristPage/ItinerariesMade";
+import ActivityAttended from "@/components/touristPage/ActivityAttended";
+import OrderHistory from "@/components/touristPage/OrderHistory";
 import TouristDashboard from "@/pages/TouristDashboard";
 // Itineraries
 import ItinerariesTouristsPage from "@/pages/ItinerariesTouristsPage";
@@ -74,8 +78,14 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportation/:idAdv" element={<Transportation />}></Route>
     <Route path="transportation" element={<Transportation />}></Route>
+    <Route path="touristDashboard" element={<TouristDashboard />}>
+      <Route path="profile" element={<MyProfilePage />} />
+      <Route path="tour-guides" element={<TourGuides />} />
+      <Route path="itineraries-made" element={<ItinerariesMade />} />
+      <Route path="activity-attended" element={<ActivityAttended />} />
+      <Route path="order-history" element={<OrderHistory />} />
+    </Route>
 
-    <Route path="touristDashboard" element={<TouristDashboard />} />
     <Route
       path="*"
       element={

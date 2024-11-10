@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "../ui/textarea";
 import {
@@ -13,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RatingInput } from "../shared/RatingsInput";
+import { useToast } from "@/hooks/use-toast";
 // Define zod schema for comment and rating
 const schema = z.object({
   comment: z.string(),
@@ -23,8 +25,9 @@ const schema = z.object({
 });
 
 export default function RateForm(props) {
+  const { toast } = useToast();
   const [rating, setRating] = useState(0);
-
+  const [experience, setExperience] = useState();
   // Initialize React Hook Form
   const form = useForm({
     resolver: zodResolver(schema),
@@ -44,7 +47,7 @@ export default function RateForm(props) {
   ];
 
   // Handle form submission
-  const onSubmit = () => {
+  const onSubmit = (values) => {
     switch (props.type) {
       case "tourguide":
         // Logic for tour guide user type
@@ -56,9 +59,30 @@ export default function RateForm(props) {
         console.log("Handle actions for an admin");
         break;
 
-      case "product":
-        // Logic for tourist user type
-        console.log("Handle actions for a tourist");
+      case "products":
+        axios
+          .put("/api/transaction/rate", {
+            productId: props.productId,
+            userId: props.userId,
+            rating: values.rating,
+            review: values.comment,
+          })
+          .then((response) => {
+            console.log("Category created successfully:", response.data);
+            toast({
+              title: "Category created succesfully!",
+            });
+            props.onRefresh();
+          })
+          .catch((error) => {
+            toast({
+              variant: "destructive",
+              title: "Category could not be created",
+              description: error.response.data.message,
+            });
+            console.error(error);
+            console.log(error);
+          });
         break;
 
       case "activity":
@@ -73,6 +97,9 @@ export default function RateForm(props) {
     setRating(selectedRating);
     form.setValue("rating", selectedRating); // Update rating in form values
   };
+  const handleExperienceChange = (selectedExprience) => {
+    setRating(selectedExprience);
+  };
 
   return (
     <Form {...form}>
@@ -80,44 +107,49 @@ export default function RateForm(props) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 flex flex-col"
       >
-        {/* Duck Rating Field */}
-        <FormField
-          control={form.control}
-          name="rating"
-          render={() => (
-            <FormItem>
-              <FormLabel>How was your experience?</FormLabel>
-              <FormControl>
-                <div className="flex justify-around mb-4">
-                  {duckImages.map((duck) => (
-                    <button
-                      key={duck.id}
-                      onClick={() => handleRatingChange(duck.id)}
-                      type="button"
-                      className={`flex flex-col items-center ${
-                        rating === duck.id ? "text-green-500" : "text-gray-400"
-                      }`}
-                    >
-                      <img
-                        src={duck.src}
-                        alt={duck.label}
-                        className={`w-[100px] h-[100px] ${
-                          rating === duck.id ? "border-2 border-green-500" : ""
+        {props.showExperience && (
+          <FormField
+            control={form.control}
+            name="rating"
+            render={() => (
+              <FormItem>
+                <FormLabel>How was your experience?</FormLabel>
+                <FormControl>
+                  <div className="flex justify-around mb-4">
+                    {duckImages.map((duck) => (
+                      <button
+                        key={duck.id}
+                        onClick={() => handleExperienceChange(duck.id)}
+                        type="button"
+                        className={`flex flex-col items-center ${
+                          experience === duck.id
+                            ? "text-green-500"
+                            : "text-gray-400"
                         }`}
-                      />
-                      {rating === duck.id && (
-                        <span className="text-sm mt-1 font-semibold">
-                          {duck.label}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                      >
+                        <img
+                          src={duck.src}
+                          alt={duck.label}
+                          className={`w-[100px] h-[100px] ${
+                            rating === duck.id
+                              ? "border-2 border-green-500"
+                              : ""
+                          }`}
+                        />
+                        {experience === duck.id && (
+                          <span className="text-sm mt-1 font-semibold">
+                            {duck.label}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         {/* Comment Field */}
         <FormField
           control={form.control}

@@ -8,14 +8,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "./shared/RateComment";
-import RateForm from "./forms/RateForm";
-export default function ActivityAttended() {
+import RateComment from "../shared/RateComment";
+import RateForm from "../forms/RateForm";
+export default function ItinerariesMade() {
   const accounts = [
-    { name: "Entertainment" },
-    { name: "Theatre" },
-    { name: "Concert" },
-    { name: "Playful" },
+    { name: "family-friendly" },
+    { name: "historical" },
+    { name: "indoors" },
+    { name: "Nature" },
   ];
 
   const tableRows = accounts.map((account) => {
@@ -25,7 +25,7 @@ export default function ActivityAttended() {
         <TableCell>
           <RateComment
             form={<RateForm />}
-            type="activity"
+            type="itineraries"
             title={account.name}
           />
         </TableCell>
