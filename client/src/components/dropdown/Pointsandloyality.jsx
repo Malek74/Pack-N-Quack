@@ -8,14 +8,39 @@ import BannerImage from "/assets/images/homeBanner.png";
 import Banner from "../shared/BannerV2";
 import LoyaltyPointsProgress from "./LoyaltypointsProgress";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import { useUser } from "@/context/UserContext";
 export default function PointsAndLoyalty({ profileData }) {
   const {toast} = useToast();
-
+  const {prefCurrency} = useUser();
   console.log(profileData);
-  const [walletBalance, setWalletBalance] = useState(200);
-  const [loyaltyPoints, setLoyaltyPoints] = useState(2000000);
-  const [badge, setBadge] = useState("Bronze");
+  const [walletBalance, setWalletBalance] = useState();
+  const [loyaltyPoints, setLoyaltyPoints] = useState();
+  const [badge, setBadge] = useState("");
   const [pointsToRedeem, setPointsToRedeem] = useState("");
+  const usertype = "tourist"; // This value will determine which component to render
+  const [profile, setProfile] = useState();
+  const endpoint = "tourist";
+  const userId = "6702e01d2ed9e2a0d138f58b";
+
+  const fetchProfile = () => {
+    axios
+      .get(`api/${endpoint}/${userId}`)
+      .then((response) => {
+        setProfile(response.data);
+        console.log(response.data);
+        setLoyaltyPoints(response.data.loyaltyPoints);
+        setWalletBalance(response.data.wallet);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    fetchProfile(); // Initial fetch when component mounts
+  }, [prefCurrency]);
+
 
 
   const maxPoints = {
@@ -84,7 +109,7 @@ export default function PointsAndLoyalty({ profileData }) {
       setLoyaltyPoints(loyaltyPoints - pointsToRedeemNum);
       setPointsToRedeem("");
       toast({
-        description: `Redeemed ${pointsToRedeem} points for ${redeemableValue} EGP!`,
+        description: `Redeemed ${pointsToRedeem} points for ${prefCurrency} ${redeemableValue} !`,
         variant: "success"
       })
     } else {
@@ -121,7 +146,7 @@ export default function PointsAndLoyalty({ profileData }) {
                 {/* Stack text vertically */}
                 <h2 className="text-2xl font-semibold">Wallet Balance</h2>
                 <p className="text-gray-700 text-lg">
-                  {walletBalance.toFixed(2)} EGP
+                  {prefCurrency} {walletBalance} 
                 </p>
               </div>
             </div>

@@ -31,7 +31,8 @@ import {
     <DropdownMenuContent>
       <DropdownMenuLabel>Profile</DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <DropdownMenuItem><Link to="/BookTrips">Booking & trip</Link></DropdownMenuItem>
+      <DropdownMenuItem><Link to="/BookItineraries">Booking Iternaries</Link></DropdownMenuItem>
+      <DropdownMenuItem><Link to="/BookActivities">Booking activities</Link></DropdownMenuItem>
       <DropdownMenuItem><Link to="/PointsandLoyality">Points & wallet</Link></DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

@@ -9,8 +9,12 @@ import Multiselect from "multiselect-react-dropdown"
 import { Button } from "@/components/ui/button"
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange"
 import { Input } from "@/components/ui/input"
+import { useUser } from "@/context/UserContext"
+import Loading from "@/components/shared/Loading"
 
 export default function Activities() {
+    const [isLoading,setIsLoading]= useState(true); 
+    const {prefCurrency} = useUser();
     const [searchTerm, setSearchTerm] = useState("");
     const [activities, setActivities] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -66,7 +70,7 @@ export default function Activities() {
     useEffect(() => {
         const fetchActivites = async () => {
             try {
-                const response = await axios.post("/api/activity/filterSort",
+                const response = await axios.post(`/api/activity/filterSort?currency=${prefCurrency}`,
                     {
                         name: searchTerm, budgetMin: minPrice, budgetMax: maxPrice, category: selectedFilters.Category,
                         tags: selectedTags, sortPrice: selectedFilters["Sort By"] == "price-asc" ? 1 : selectedFilters["Sort By"] == "price-desc" ? -1 : 0,
@@ -76,6 +80,7 @@ export default function Activities() {
                     });
                 console.log(response.data);
                 setActivities(response.data);
+                setIsLoading(false);
                 console.log(response.data);
                 console.log(selectedRange);
 
@@ -102,11 +107,15 @@ export default function Activities() {
         fetchActivites();
         fetchData();
 
-    }, [searchTerm, minPrice, maxPrice, selectedFilters, selectedTags, count, selectedRange]);
+    }, [searchTerm, minPrice, maxPrice, selectedFilters, selectedTags, count, selectedRange, prefCurrency]);
 
 
     return (
-
+        (isLoading && (
+            <div className="flex justify-center items-center h-[80vh]">
+              <Loading size="xl" />
+            </div>
+          )) ||(
         <div className="flex flex-col  w-screen p-14">
             {/* <Banner
                 background={Activitiesbackground}
@@ -212,6 +221,6 @@ export default function Activities() {
 
             </div>
         </div>
-
+          )
     )
 }

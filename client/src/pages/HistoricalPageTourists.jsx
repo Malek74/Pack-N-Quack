@@ -5,11 +5,12 @@ import Banner from "@/components/shared/Banner"
 import SearchBar from "@/components/shared/SearchBar"
 import EditTag from "@/components/historicalPage/SelectTag"
 import axios from "axios"
-
+import { useUser } from "@/context/UserContext"
 
 
 export default function Historical() {
-
+    const { prefCurrency } = useUser();
+    console.log(prefCurrency)
     const [filteredTags, setFilteredTags] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [places, setPlaces] = useState([]);
@@ -20,7 +21,7 @@ export default function Historical() {
     useEffect(() => {
         const fetchPlaces = async () => {
             try {
-                const response = await axios.post("/api/places/filterSort",
+                const response = await axios.post(`/api/places/filterSort?currency=${prefCurrency}`,
                     { name: searchTerm, tags: filteredTags }
                 );
                 setPlaces(response.data);
@@ -33,7 +34,7 @@ export default function Historical() {
 
         fetchPlaces()
 
-    }, [searchTerm, filteredTags]);
+    }, [searchTerm, filteredTags, prefCurrency]);
     return (
 
         <div className="flex flex-col w-screen p-14 ">

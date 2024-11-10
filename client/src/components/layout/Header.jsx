@@ -75,21 +75,7 @@ export default function Header() {
             </li>
           </Button>
 
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itineraries")
-                  ? "text-yellow-500"
-                  : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
-              }
-            >
-              <DropDownMenuProfile location={location} />
-            </li>
-          </Button>
+         
 
           <Button asChild variant="link">
             <li

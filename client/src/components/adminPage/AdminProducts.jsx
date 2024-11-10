@@ -30,11 +30,12 @@ import FilterButtons from "../shared/FilterButtons";
 import PriceSlider from "../shared/PriceSlider";
 import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
-
+import { useUser } from "@/context/UserContext";
 export default function AdminProducts() {
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { prefCurrency } = useUser();
   const [minPrice, setMinPrice] = useState(0);
   const [tab, setTab] = useState("all");
   const [maxPrice, setMaxPrice] = useState(null);
@@ -58,7 +59,7 @@ export default function AdminProducts() {
             : `isArchived=false`;
         axios
           .get(
-            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}`
           )
           .then((response) => {
             setProducts(response.data);
@@ -70,7 +71,7 @@ export default function AdminProducts() {
         setLoading(false);
       }, 100), // Debounce with 500ms delay
 
-    [priceRange, searchTerm, selectedFilters, maxPrice, tab]
+    [priceRange, searchTerm, selectedFilters, maxPrice, tab, prefCurrency]
   );
 
   // Fetch the maximum product price
@@ -91,7 +92,7 @@ export default function AdminProducts() {
     if (maxPrice !== null) {
       debouncedFetchProducts(); // Use the debounced function
     }
-  }, [searchTerm, maxPrice, priceRange, selectedFilters, tab]);
+  }, [searchTerm, maxPrice, priceRange, selectedFilters, tab, prefCurrency]);
 
   // Fetch maxPrice when component mounts
   useEffect(() => {
@@ -203,13 +204,13 @@ export default function AdminProducts() {
                           alt="Product image"
                           className="aspect-square rounded-md object-cover"
                           height="64"
-                          src={product.picture[0]}
+                          src={product.picture}
                           width="64"
                         />
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {product.sellerUsername}
+                          {product.seller_info.username}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">
