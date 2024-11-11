@@ -9,7 +9,7 @@ router.get("/", getAdvertisers);
 
 router.get("/:id", getAdvertiser);
 
-router.delete("/delete/:id", deleteAdvertiser);
+router.delete("/:id", deleteAdvertiser);
 
 router.put("/update/:id", updateAdvertiser);
 

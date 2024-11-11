@@ -16,6 +16,8 @@ const amadeusBookingSchema = new Schema({
         bedType: { type: String, required: false },
         description: { type: String, required: false },
         price: { type: Number, required: false },
+        checkIn: { type: Date, required: false },
+        checkOut: { type: Date, required: false },
     },
 
     flightData: {
@@ -23,6 +25,7 @@ const amadeusBookingSchema = new Schema({
         departure: { type: String, required: false },
         arrival: { type: String, required: false },
         price: { type: Number, required: false },
+        date: { type: Date, required: false },
     },
     stripeSessionID: {
         type: String,

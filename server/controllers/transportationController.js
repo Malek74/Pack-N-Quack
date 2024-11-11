@@ -130,8 +130,9 @@ export const bookTransportation = async (req, res) => {
                 eventID: eventID,
                 touristID: touristID,
                 type: "transportation",
-                price: numOfTickets * event.price
-
+                price: numOfTickets * event.price,
+                date: event.date,
+                numOfTickets: numOfTickets
             }
         });
         return res.status(200).json({ url: session.url });

@@ -1,6 +1,9 @@
 import tourGuide from '../models/tourGuideSchema.js';
-import { usernameExists, emailExists } from '../utils/Helpers.js';
+import { usernameExists, emailExists, deleteIteneraries } from '../utils/Helpers.js';
 import Document from '../models/documentSchema.js';
+import DeleteRequest from '../models/deleteRequests.js';
+import Itinerary from '../models/itinerarySchema.js';
+import Booking from '../models/bookingSchema.js';
 
 //@desc Create a new tour guide
 //@route POST /api/tourGuide
@@ -108,7 +111,7 @@ export const editTourGuide = async (req, res) => {
 };
 
 export const rateTourGuide = async (req, res) => {
-    const {touristId, rating, comment} = req.body;
+    const { touristId, rating, comment } = req.body;
     const tourGuideId = req.params.id;
     if (!tourGuideId) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
@@ -120,13 +123,13 @@ export const rateTourGuide = async (req, res) => {
         return res.status(400).json({ message: "Rating is required." });
     }
 
-    try{
+    try {
         const ratedTourGuide = await tourGuide.findById(tourGuideId);
         if (!ratedTourGuide) {
             return res.status(404).json({ message: "Tour Guide not found." });
         }
-        let averageRating = ratedTourGuide.ratings.averageRating;    
-        let noOfReviews = ratedTourGuide.ratings.reviews.length; 
+        let averageRating = ratedTourGuide.ratings.averageRating;
+        let noOfReviews = ratedTourGuide.ratings.reviews.length;
         averageRating += (rating) / (noOfReviews + 1);
         const review = {
             touristId: touristId,
@@ -153,7 +156,7 @@ export const acceptTerms = async (req, res) => {
         if (!updatedTourGuide) {
             return res.status(404).json({ message: "Tour Guide not found." });
         }
-      
+
         const newTourGuide = await tourGuide.findByIdAndUpdate(id, { hasAcceptedTerms: true }, { new: true });
 
         return res.status(200).json(newTourGuide);
@@ -162,5 +165,34 @@ export const acceptTerms = async (req, res) => {
     }
 }
 
+export const deleteTourGuide = async (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+    try {
+        //retrieve all itineraries of the tour guide that are active and not flagged and have dates in the future
+        const myItineraries = await Itinerary.find({ tourGuideID: id, flagged: false, date: { $elemMatch: { $gte: new Date() } } });
+        //check if any of theses itineraries have bookings
+        for (let i = 0; i < myItineraries.length; i++) {
 
+            const itirenaryBookings = await Booking.find({ itineraryID: myItineraries[i]._id, date: { $elemMatch: { $gte: new Date() } } });
+            if (itirenaryBookings.length > 0) {
+                const deleteRequest = await DeleteRequest.create({ tourGuideID: id, date: new Date(), status: "rejected" });
+                return res.status(400).json({ message: "Account cannot be deleted because it has active bookings" });
+            }
+        }
+
+
+        const deletedTourGuide = await tourGuide.findByIdAndDelete(id);
+        if (!deletedTourGuide) {
+            return res.status(404).json({ message: "Tour Guide not found." });
+        }
+        const deleteRequest = await DeleteRequest.create({ tourGuideID: id, date: new Date(), status: "accepted" });
+        deleteIteneraries(id);
+        return res.status(200).json({ message: "Tour Guide deleted successfully." });
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
 

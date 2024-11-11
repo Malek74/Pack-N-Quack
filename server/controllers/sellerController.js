@@ -1,7 +1,7 @@
 
 import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
-
+import DeleteRequest from '../models/deleteRequests.js';
 
 
 //get all sellers
@@ -86,6 +86,7 @@ export const updateSellerInfo = async (req, res) => {
 //delete by ID
 export const deleteSeller = async (req, res) => {
     const id = req.params.id;
+    console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Please provide a Seller ID" });
     }
@@ -93,6 +94,10 @@ export const deleteSeller = async (req, res) => {
         const deletedSeller = await seller.findByIdAndDelete(id);
         await deleteProducts(id);
 
+        const deleteRequest = await DeleteRequest.create({
+            sellerID: id,
+            status: "accepted"
+        });
 
         return res.status(200).json({ message: `Seller with id ${id} deleted successfully` })
     } catch (error) {
@@ -105,15 +110,15 @@ export const acceptTerms = async (req, res) => {
     if (!sellerId) {
         return res.status(400).json({ message: "Seller ID is required." });
     }
-    try{
+    try {
         const updatedSeller = await seller.findById(sellerId);
-        if(!updatedSeller){
+        if (!updatedSeller) {
             return res.status(404).json({ message: "Seller not found." });
         }
-        const newSeller = await seller.findByIdAndUpdate(sellerId, {hasAcceptedTerms: true},{new: true})
+        const newSeller = await seller.findByIdAndUpdate(sellerId, { hasAcceptedTerms: true }, { new: true })
         return res.status(200).json(newSeller);
     }
-    catch(error){
+    catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }

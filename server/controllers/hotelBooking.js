@@ -109,7 +109,8 @@ export const listHotelRooms = async (req, res) => {
 };
 
 export const bookRoom = async (req, res) => {
-    const { price, numOfDays, hotel, currency, room } = req.body;
+    const { price, numOfDays, hotel, currency, room, checkIn, checkOut, name } = req.body;
+    console.log("Parameters received:", req.body);
     const touristID = req.params.id;
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     let conversionRate = 0;
@@ -154,7 +155,7 @@ export const bookRoom = async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: 'https://www.google.com/', //todo:add correct link
+            success_url: 'http://localhost:5173/booked', //todo:add correct link
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
             metadata: {
                 tourist_id: touristID,
@@ -164,7 +165,10 @@ export const bookRoom = async (req, res) => {
                 description: hotel.description.text,
                 type: "hotel",
                 bedType: hotel.bedType,
-                beds: hotel.beds
+                beds: hotel.beds,
+                checkIn: checkIn,
+                checkOut: checkOut,
+                name: name
             }
         });
 

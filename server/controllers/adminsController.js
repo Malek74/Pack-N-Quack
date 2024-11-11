@@ -129,11 +129,11 @@ export const getAllUsers = async (req, res) => {
 
 
 export const handlePasswordChangeRequest = async (req, res) => {
-    const { requestId, action } = req.body; 
+    const { requestId, action } = req.body;
 
     if (!requestId || !['approve', 'decline'].includes(action)) {
         return res.status(400).json({ message: "Request ID and valid action (approve/decline) are required" });
-        
+
     }
 
     try {
@@ -156,13 +156,13 @@ export const handlePasswordChangeRequest = async (req, res) => {
                     break;
                 case 'Tourist':
                     userModel = tourist;
-                     break;
+                    break;
                 case 'Tour Guide':
                     userModel = tourGuide;
                     break;
                 case 'Tourism Governer':
-                     userModel = touristGoverner;
-                     break;
+                    userModel = touristGoverner;
+                    break;
                 default:
                     return res.status(400).json({ message: "Invalid user type" });
             }
@@ -209,7 +209,7 @@ export const getPendingPasswordChangeRequests = async (req, res) => {
                         userModel = touristGoverner;
                         break;
                     default:
-                        return null; 
+                        return null;
                 }
 
                 try {
@@ -251,11 +251,11 @@ export const getPendingPasswordChangeRequests = async (req, res) => {
     }
 };
 
-export const acceptOrReject =async (req,res) => {
-    const {userId,userType,flag} = req.body;
+export const acceptOrReject = async (req, res) => {
+    const { userId, userType, flag } = req.body;
     let userModel;
+    console.log(req.body);
 
-    
     switch (userType) {
         case 'Seller':
             userModel = seller;
@@ -276,18 +276,18 @@ export const acceptOrReject =async (req,res) => {
             return res.status(404).json({ message: "User doesn't exist" });
         }
 
-        const updatedUser = await userModel.findByIdAndUpdate(userId,{ $set: { "isAccepted": flag } }, { new: true })
+        const updatedUser = await userModel.findByIdAndUpdate(userId, { $set: { "isAccepted": flag } }, { new: true })
 
-        if (flag==true){
+        if (flag) {
             return res.status(200).json(updatedUser);
         }
-         else {
-            return res.status(200).json({ message: "You are not accepted." });
-            
-         }  
+        else {
+            await userModel.findByIdAndDelete(userId);
+            return res.status(200).json({ message: "User rejected and deleted." });
+        }
 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-    
+
 }
