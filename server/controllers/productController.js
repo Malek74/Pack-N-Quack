@@ -335,6 +335,7 @@ export const getProducts = async (req, res) => {
     const sortBy = req.query.sortBy;
     const order = req.query.order;
     const prefCurrency = req.query.currency || "USD";
+    const sellerID = req.query.sellerID;
     console.log('Pref Currency:', prefCurrency);
     const isArchived = req.query.isArchived;
     console.log('Is Archived:', isArchived);
@@ -360,8 +361,12 @@ export const getProducts = async (req, res) => {
             } else {
                 query.price.$lte = Number.MAX_SAFE_INTEGER * conversionRate;
             }
+            
         }
 
+        if(sellerID){
+            query.seller_id = sellerID;
+        }
         if (name) {
             query.name = { $regex: name, $options: 'i' };
         }
