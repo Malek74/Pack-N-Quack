@@ -124,7 +124,7 @@ export const bookTransportation = async (req, res) => {
                 quantity: numOfTickets,
             }],
             mode: 'payment',
-            success_url: 'http://localhost:5173/booked', //todo:add correct link
+            success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
             metadata: {
                 eventID: eventID,
