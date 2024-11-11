@@ -71,7 +71,7 @@ export const searchFlight = async (req, res) => {
 //@desc Confirm flight price
 export const confirmFlightPrice = async (req, res) => {
   const searchData = (req.body.flight);
-  const currency= req.body.currency || "USD";
+  const currency = req.body.currency || "USD";
 
   const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
@@ -231,16 +231,17 @@ export const confirmFlightPrice = async (req, res) => {
 }
 
 export const bookFlight = async (req, res) => {
-  const { price, numTickets, origin, destination, currency } = req.body;
+  const { price, numTickets, origin, destination, currency, date } = req.body;
   const touristID = req.params.id;
   const conversionRate = await getConversionRate(currency);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  console.log(price, numTickets, origin, destination, currency, date);
 
   const originCity = cities.find(city => city.iata_code === origin).city;
   const destinationCity = cities.find(city => city.iata_code === destination).city;
 
-  console.log(price, numTickets, originCity, destinationCity);
+  console.log(price, numTickets, originCity, destinationCity, date);
 
   try {
     //fetch tourist
@@ -283,7 +284,7 @@ export const bookFlight = async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'https://www.google.com/', //todo:add correct link
+      success_url: 'http://localhost:5173/booked', //todo:add correct link
       cancel_url: 'https://www.amazon.com/',  //todo:add correct link
       metadata: {
         tourist_id: touristID,
@@ -291,7 +292,8 @@ export const bookFlight = async (req, res) => {
         price: price,
         departure: origin,
         arrival: destination,
-        type: "flight"
+        type: "flight",
+        date: date
       }
     });
     console.log(session);

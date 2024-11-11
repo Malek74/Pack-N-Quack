@@ -11,7 +11,8 @@ import tourGuide from "../models/tourGuideSchema.js"
 export const bookEvent = async (req, res) => {
 
     const touristID = req.params.id;
-    const { eventType, eventID, payByWallet, numOfTickets } = req.body;
+    const { eventType, eventID, payByWallet, numOfTickets, dateSelected } = req.body;
+    console.log("Booking", req.body);
     let event = {}
     try {
 
@@ -22,17 +23,19 @@ export const bookEvent = async (req, res) => {
         else if (eventType == "itinerary") {
             event = await Itinerary.findById(eventID);
         }
-
+        let product = {};
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        const product = await stripe.products.retrieve(event.stripeProductID);
-        const tourist = await Tourist.findById(touristID);
-        let amountToPay = 0;
-        if (payByWallet) {
-            amountToPay = (event.price * numOfTickets) - tourist.wallet;
+        if (eventType == "activity") {
+            product = await stripe.products.retrieve(event.stripeProductID);
         }
         else {
-            amountToPay = event.price;
+            product = await stripe.products.retrieve(event.stripeID);
         }
+
+        const tourist = await Tourist.findById(touristID);
+        let amountToPay = 0;
+
+        amountToPay = event.price;
 
         //create price to be paid after deducting wallet amount        
         const price = await stripe.prices.create({
@@ -41,14 +44,13 @@ export const bookEvent = async (req, res) => {
             unit_amount: amountToPay * 100,
         });
 
-
         let success_url = "";
 
         if (eventType == "activity") {
             success_url = "http://localhost:5173/BookActivities";
         }
         else if (eventType == "itinerary") {
-            success_url = "http://localhost:5173/BookItineraries";
+            success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
         }
         else {
             success_url = "http://localhost:5173/booked";
@@ -68,11 +70,12 @@ export const bookEvent = async (req, res) => {
                 eventType: eventType,
                 touristID: touristID,
                 type: "event",
-                price: event.price * numOfTickets
+                price: event.price * numOfTickets,
+                numOfTickets: numOfTickets,
+                date: dateSelected || event.date
             }
         });
-
-
+        console.log("Session: ", session.url);
         return res.status(200).json({ url: session.url });
     }
     catch (error) {
@@ -86,7 +89,6 @@ export const cancelBooking = async function (req, res) {
 
     const touristID = req.params.id;
     const { eventType, eventID } = req.body;
-    console.log(req.body);
 
     if (!eventType || !eventID) {
         return res.status(400).json({ error: 'Please provide event type and event ID.' });
@@ -110,11 +112,12 @@ export const cancelBooking = async function (req, res) {
 
         //check current time is 48 hours before the event
         const currentTime = new Date();
-        const eventDate = new Date(event.date);
+        const eventDate = new Date(booking.date);
         const diffTime = eventDate - currentTime;
         const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-        if (diffDays > 48) {
+        console.log(diffDays);
+        if (diffDays <= 2) {
             return res.status(400).json({ error: 'An event cannot be canceled within 48 hours of its scheduled start time.' });
         }
 

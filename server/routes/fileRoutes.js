@@ -6,7 +6,7 @@ import { handleImageUpload, handleDocumentUpload, handleImageUploadProduct, fetc
 const router = express.Router();
 
 // Route to handle image uploads
-router.post('/images', upload.fields([{ name: 'images', maxCount: 10 }]), handleImageUpload);
+router.post('/images/:id', upload.fields([{ name: 'images', maxCount: 10 }]), handleImageUpload);
 
 // Route to handle document uploads
 router.post('/documents/:id', awsUpload.array('documents', 10), handleDocumentUpload);
@@ -14,7 +14,7 @@ router.post('/documents/:id', awsUpload.array('documents', 10), handleDocumentUp
 
 router.post('/productImage', upload.fields([{ name: 'uploadImages', maxCount: 10 }]), handleImageUploadProduct);
 
-router.post('/fetchDocuments', fetchUserDocuments);
-router.post('/fetchImages', fetchUserImages);
+router.post('/fetchDocuments/:id', fetchUserDocuments);
+router.post('/fetchImages/:id', fetchUserImages);
 
 export default router;

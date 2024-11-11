@@ -23,6 +23,10 @@ const bookingSchema = new Schema({
         default: Date.now
 
     },
+    numOfTickets: {
+        type: Number,
+        required: true
+    },
     price: {
         type: Number,
         required: true

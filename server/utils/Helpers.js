@@ -29,7 +29,7 @@ export const usernameExists = async (username) => {
             return true;
         }
 
-        // Check if user exists in advertiser collection
+        // Check if user exists in advertiserModel collection
         const advertiserExists = await advertiserModel.findOne({ username: username });
         if (advertiserExists) {
             return true;
@@ -92,7 +92,7 @@ export const emailExists = async (email) => {
             return true;
         }
 
-        // Check if email exists in advertiser collection
+        // Check if email exists in advertiserModel collection
         const advertiserExists = await advertiserModel.findOne({ email: email });
         if (advertiserExists) {
             return true;
@@ -159,7 +159,7 @@ export const deleteProducts = async (sellerID) => {
 }
 
 //todo:implement this please @youssefrfarid
-//@description: deletes all activities created by an advertiser
+//@description: deletes all activities created by an advertiserModel
 export const deleteActivities = async (advertiserID) => {
     const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: advertiserID });
     console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
@@ -251,10 +251,10 @@ export const getConversionRate = async (currency) => {
 export const uploadImages = async (filesArray) => {
     const imagesUrls = [];
     cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Replace with your Cloudinary cloud name
-    api_key: process.env.CLOUDINARY_API_KEY,        // Replace with your API Key
-    api_secret: process.env.CLOUDINARY_API_SECRET,  // Replace with your API Secret
-});
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Replace with your Cloudinary cloud name
+        api_key: process.env.CLOUDINARY_API_KEY,        // Replace with your API Key
+        api_secret: process.env.CLOUDINARY_API_SECRET,  // Replace with your API Secret
+    });
 
     try {
         for (const file of filesArray) {
@@ -281,10 +281,15 @@ export const uploadImages = async (filesArray) => {
 
             imagesUrls.push(result.secure_url);
         }
-        
+
         return { success: true, urls: imagesUrls };
     } catch (error) {
         console.error("Error uploading images:", error.message);
         return { success: false, message: error.message };
     }
+}
+
+export const deleteIteneraries = async (tourGuideId) => {
+    const itinerariesToDelete = await Itinerary.deleteMany({ tourGuideID: tourGuideId });
+    return itinerariesToDelete
 }

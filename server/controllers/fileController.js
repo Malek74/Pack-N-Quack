@@ -17,8 +17,19 @@ const userModels = {
 
 // Function to handle image uploads
 export const handleImageUpload = async (req, res) => {
-    const { userType, userId } = req.body;
-    const UserModel = userModels[userType];
+    const { userType } = req.body;
+    console.log(req.body);
+
+    const userId = req.params.id;
+    let UserModel = userModels[userType];
+    if (userType === 'advertisers') {
+        UserModel = userModels['advertiserModel'];
+    }
+    if (userType === 'sellers') {
+        UserModel = userModels['seller']
+    }
+    console.log(UserModel);
+    console.log(userId);
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
@@ -81,7 +92,15 @@ export const handleImageUpload = async (req, res) => {
 
 export const handleDocumentUpload = async (req, res) => {
     const { userType } = req.body;
-    const UserModel = userModels[userType];
+    let UserModel = userModels[userType];
+
+    if (userType === 'advertisers') {
+        UserModel = userModels['advertiserModel'];
+    }
+
+    if (userType === 'sellers') {
+        UserModel = userModels['seller']
+    }
     const userID = req.params.id;
 
     console.log(req.body.userType);
@@ -109,7 +128,7 @@ export const handleDocumentUpload = async (req, res) => {
                 Key: file.originalname,    // Use the original file name or generate a unique name
                 Body: file.buffer,
                 ContentType: 'application/pdf',
-                             // Set to 'private' to restrict access
+                // Set to 'private' to restrict access
             };
             return s3.upload(params).promise();  // Returns a promise
         });
@@ -209,8 +228,19 @@ export const handleImageUploadProduct = async (req, res) => {
 
 
 export const fetchUserDocuments = async (req, res) => {
-    const { userType, userId, documentName } = req.body;
-    const UserModel = userModels[userType];
+    const { userType, documentName } = req.body;
+    const userId = req.params.id;
+    conosle.log(req.body);
+    let UserModel = userModels[userType];
+
+    if (userType === 'advertisers') {
+        UserModel = userModels['advertiserModel'];
+    }
+    if (userType === 'sellers') {
+        UserModel = userModels['seller']
+    }
+
+    console.log(UserModel);
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
@@ -236,9 +266,18 @@ export const fetchUserDocuments = async (req, res) => {
 };
 
 export const fetchUserImages = async (req, res) => {
-    const { userType, userId } = req.body;
-    const UserModel = userModels[userType];
+    const { userType } = req.body;
+    const userId = req.params.id;
+    let UserModel = userModels[userType];
 
+    if (userType === 'advertisers') {
+        UserModel = userModels['advertiserModel'];
+    }
+    if (userType === 'sellers') {
+        UserModel = userModels['seller']
+    }
+
+    console.log(UserModel);
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }

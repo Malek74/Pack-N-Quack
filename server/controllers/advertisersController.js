@@ -1,6 +1,8 @@
 import activityModel from "../models/activitySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import { usernameExists, emailExists } from "../utils/Helpers.js";
+import DeleteRequest from "../models/deleteRequests.js";
+import Booking from "../models/bookingSchema.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;
@@ -52,7 +54,19 @@ export const getAdvertiser = async (req, res) => {
 export const deleteAdvertiser = async (req, res) => {
     const id = req.params.id;
     try {
+
+        const upcomingActivities = await activityModel.find({ advertiserID: id, date: { $gte: new Date() } });
+
+        for (let i = 0; i < upcomingActivities.length; i++) {
+            const bookings = await Booking.find({ activityID: upcomingActivities[i]._id });
+            if (bookings.length > 0) {
+                return res.status(400).json({ message: "Account cannot be deleted because it has active bookings" });
+            }
+        }
+
         const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: id });
+
+
         console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
         const deletedAdvertiser = await advertiserModel.findByIdAndDelete(id);
         res.status(200).json(deletedAdvertiser);
@@ -99,15 +113,15 @@ export const acceptTerms = async (req, res) => {
     if (!id) {
         return res.status(400).json({ message: "Advertiser ID is required." });
     }
-    try{
+    try {
         const advertiser = await advertiserModel.findById(id);
-        if(!advertiser){
+        if (!advertiser) {
             return res.status(404).json({ message: "Advertiser not found." });
         }
-        const newAdvertiser = await advertiserModel.findByIdAndUpdate(id,{hasAcceptedTerms: true}, {new: true})
+        const newAdvertiser = await advertiserModel.findByIdAndUpdate(id, { hasAcceptedTerms: true }, { new: true })
         return res.status(200).json(newAdvertiser);
     }
-    catch(error){
+    catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }

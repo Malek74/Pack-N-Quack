@@ -31,14 +31,17 @@ export const confirmPayment = async (req, res) => {
                         eventBooked = await activityModel.findById(eventID);
                         bookedEvent.price = session.metadata.price;
                         bookedEvent.activityID = eventBooked._id;
-
+                        bookedEvent.date = session.metadata.date;
                     }
                     else if (eventType == "itinerary") {
                         eventBooked = await Itinerary.findById(eventID);
                         bookedEvent.itineraryID = eventBooked._id;
                         bookedEvent.price = eventBooked.price;
+                        bookedEvent.date = session.metadata.date;
                     }
                     bookedEvent.stripeSessionID = session.id;
+                    bookedEvent.numOfTickets = session.metadata.numOfTickets;
+
                     //add loyalty points
                     addLoyaltyPoints(touristID, session.amount_total / 100);
 
@@ -59,6 +62,7 @@ export const confirmPayment = async (req, res) => {
                             price: session.metadata.price,
                             departure: session.metadata.departure,
                             arrival: session.metadata.arrival,
+                            date: session.metadata.date
                         },
                         touristID: touristId,
                         stripeSessionID: session.id
@@ -73,13 +77,15 @@ export const confirmPayment = async (req, res) => {
 
                     const hotelBooking = await AmadeusBooking.create({
                         hotelData: {
-                            name: session.metadata.hotel,
+                            hotel: session.metadata.name,
                             price: session.metadata.price,
                             type: session.metadata.type,
                             bedType: session.metadata.bedType,
                             description: session.metadata.description,
                             price: session.metadata.price,
-                            beds: session.metadata.beds
+                            beds: session.metadata.beds,
+                            checkIn: session.metadata.checkIn,
+                            checkOut: session.metadata.checkOut
                         },
                         touristID: touristId,
                         stripeSessionID: session.id
@@ -99,7 +105,8 @@ export const confirmPayment = async (req, res) => {
                         stripeSessionID: session.id,
                         transportationID: transport._id,
                         price: price,
-                        status: "confirmed"
+                        status: "confirmed",
+                        date: transport.date
                     };
                     const saveBooking = await Booking.create(transportationBooking);
                     console.log("Saved Booking: ");

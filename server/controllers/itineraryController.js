@@ -430,7 +430,7 @@ export const updateItinerary = async (req, res) => {
 
 
         if (numsOfBookings.length != 0) {
-            res.status(404).json({ message: "Cannot update itinerary with bookings" })
+            return res.status(404).json({ message: "Cannot update itinerary with bookings" })
         }
         let newImages = [];
 

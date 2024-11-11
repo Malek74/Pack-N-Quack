@@ -11,6 +11,7 @@ import Places from "../models/PlacesSchema.js";
 import Stripe from "stripe";
 import Booking from "../models/bookingSchema.js";
 import AmadeusBooking from "../models/amadeusBooking.js";
+import DeleteRequest from "../models/deleteRequests.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
@@ -113,7 +114,11 @@ export const deleteTourist = async (req, res) => {
     const { username } = req.params;
 
     try {
+
         const tourist = await Tourist.findOneAndDelete({ username });
+
+        const deleteRequest = await DeleteRequest.create({ userID: tourist._id, status: "approved" });
+
         return res.status(200).json(tourist);
     }
     catch (error) {
@@ -129,11 +134,17 @@ export const getMyBookings = async (req, res) => {
     try {
 
         if (eventType == "activity") {
-            const myBookings = await Booking.find({ touristID: req.params.id, itineraryID: null }).populate('activityID');
+            const myBookings = await Booking.find({ touristID: req.params.id, itineraryID: null, transportationID: null }).populate('activityID');
             return res.status(200).json(myBookings);
         }
         else if (eventType == "itinerary") {
-            const myBookings = await Booking.find({ touristID: req.params.id, activityID: null }).populate('itineraryID');
+            const myBookings = await Booking.find({ touristID: req.params.id, activityID: null, transportationID: null }).populate({
+                path: 'itineraryID',
+                populate: {
+                    path: 'tags', // Field in Itinerary schema to populate
+                    model: 'itineraryTags' // The model name for the referenced field
+                }
+            });
             return res.status(200).json(myBookings);
         }
         else if (eventType == "transportation") {
