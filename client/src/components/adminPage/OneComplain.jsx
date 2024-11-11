@@ -81,7 +81,7 @@ const OneComplain = () => {
             <PendingAndResolved
               status={complaint.status}
               id={complaint._id}
-              setStatusRefresh={setStatusRefresh}
+             onRefresh={fetchComplaint}
             />
           </div>
           <CardDescription>{formatDate(complaint.date)}</CardDescription>
