@@ -33,7 +33,7 @@ export const confirmPayment = async (req, res) => {
                         bookedEvent.activityID = eventBooked._id;
                         bookedEvent.date = eventBooked.date;
                         console.log("Activity Booked: ", eventBooked);
-                    
+
                     }
                     else if (eventType == "itinerary") {
                         eventBooked = await Itinerary.findById(eventID);
@@ -111,7 +111,10 @@ export const confirmPayment = async (req, res) => {
                         price: price,
                         status: "confirmed",
                         date: transport.date
+
                     };
+                    transportationBooking.stripeSessionID = session.id;
+                    transportationBooking.numOfTickets = session.metadata.numOfTickets;
                     const saveBooking = await Booking.create(transportationBooking);
                     console.log("Saved Booking: ");
                     console.log(saveBooking);

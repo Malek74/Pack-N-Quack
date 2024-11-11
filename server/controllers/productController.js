@@ -258,7 +258,7 @@ export const searchProduct = async (req, res) => {
 
     try {
         const products = await product.find({
-            name: { $regex: new RegExp(searchTerm, 'i') }
+            name: { $regex: new RegExp(searchTerm, 'i'), isArchived: false }
         }).populate('seller_id');
 
         console.log(products);
@@ -335,6 +335,7 @@ export const getProducts = async (req, res) => {
     const sortBy = req.query.sortBy;
     const order = req.query.order;
     const prefCurrency = req.query.currency || "USD";
+    const sellerID = req.query.sellerID;
     console.log('Pref Currency:', prefCurrency);
     const isArchived = req.query.isArchived;
     console.log('Is Archived:', isArchived);
@@ -360,8 +361,12 @@ export const getProducts = async (req, res) => {
             } else {
                 query.price.$lte = Number.MAX_SAFE_INTEGER * conversionRate;
             }
+            
         }
 
+        if(sellerID){
+            query.seller_id = sellerID;
+        }
         if (name) {
             query.name = { $regex: name, $options: 'i' };
         }
@@ -370,6 +375,9 @@ export const getProducts = async (req, res) => {
             if (isArchived === 'true' || isArchived === 'false') {
                 query.isArchived = isArchived === 'true';
             }
+        }
+        else {
+            query.isArchived = false; ``
         }
 
         // Set sorting options if provided
@@ -389,8 +397,6 @@ export const getProducts = async (req, res) => {
             product.price *= conversionRate;
             return product;
         })
-
-
 
         return res.json(convertedProducts);
 
@@ -413,6 +419,9 @@ export const getMyProducts = async (req, res) => {
 
         //fetch products bought by the user
         const boughtProducts = await PurchasedItem.find({ user: id }).select('items.items').populate('items.productId');
+        if (boughtProducts.length == 0) {
+            return res.status(200).json(boughtProducts);
+        }
 
         if (prefCurrency) {
             const conversionRate = await getConversionRate(prefCurrency);
@@ -434,9 +443,6 @@ export const getMyProducts = async (req, res) => {
     }
 
 }
-
-
-
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;

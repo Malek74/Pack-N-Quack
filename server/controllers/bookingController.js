@@ -56,7 +56,7 @@ export const bookEvent = async (req, res) => {
             success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
         }
         else {
-            success_url = "http://localhost:5173/booked";
+            success_url = "http://localhost:5173/touristDashboard/booked";
         }
 
         const session = await stripe.checkout.sessions.create({
@@ -75,7 +75,7 @@ export const bookEvent = async (req, res) => {
                 type: "event",
                 price: event.price * numOfTickets,
                 numOfTickets: numOfTickets,
-                date: dateSelected 
+                date: dateSelected
             }
         });
         console.log("stripe date: ", new Date(session.metadata.date));
