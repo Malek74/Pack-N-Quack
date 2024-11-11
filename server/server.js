@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 import admins from './routes/admins.js';
 import seller from './routes/seller.js';
 import products from './routes/products.js';
-import itinerary from './routes/itinerary.js'
-import tourGuide from './routes/tourGuide.js'
+import itinerary from './routes/itinerary.js';
+import tourGuide from './routes/tourGuide.js';
 import express from 'express';
 import tagRoutes from './routes/tagRoutes.js';
 import placeRoutes from './routes/placeRoutes.js';
-import touristRoutes from './routes/touristRoutes.js'
-
+import touristRoutes from './routes/touristRoutes.js';
+import multer from 'multer';
 import { isTourismGovernor } from './middleware/auth.js';
 import touristGoverner from './routes/touristGovernor.js';
 import itineraryTag from './routes/itineraryTag.js';
@@ -17,14 +17,27 @@ import advertisers from './routes/advertisers.js';
 import activity from './routes/activity.js';
 import activityCategory from './routes/activityCategory.js';
 import activityTag from './routes/activityTag.js';
+import complaint from './routes/complaint.js';
 import logger from './middleware/logger.js';
 import { config } from 'dotenv';
 import cors from 'cors';
+import PasswordChangeRequest from './routes/changePass.js';
+import uploadRoutes from './routes/fileRoutes.js';
+import purchaseRoute from './routes/purchaseRoute.js';
+import shareMail from './routes/shareEmail.js';
+import flightBooking from './routes/flightBooking.js';
+import currency from './routes/currency.js';
+import booking from './routes/booking.js';
+import webhook from './routes/webhook.js';
+import hotelRoutes from './routes/hotelRoutes.js';
+import transportation from './routes/transportationRoutes.js';
+
 
 config();
 const app = express();
 const port = process.env.PORT || 8000;
 const mongoURI = process.env.MONGO_URI;
+
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
@@ -48,9 +61,9 @@ mongoose.connect(mongoURI)
         console.error("MongoDB connection error:", err);
     });
 
+
+
 // Define Endpoints
-app.use('/api/admins', admins);
-app.use('/api/tags', tagRoutes); //tags for places
 app.use('/api/places', placeRoutes);
 app.use('/api/tourist', touristRoutes);
 app.use('/api/sellers', seller);
@@ -60,7 +73,19 @@ app.use('/api/tourGuide', tourGuide);
 app.use('/api/touristGovernor', touristGoverner);
 app.use('/api/itiernaryTags', itineraryTag);
 app.use('/api/advertisers', advertisers);
-app.use('/api/activity', activity)
-app.use('/api/activity/category', activityCategory)
-app.use('/api/activity/tag', activityTag)
-
+app.use('/api/activity', activity);
+app.use('/api/activity/category', activityCategory);
+app.use('/api/activity/tag', activityTag);
+app.use('/api/changepass', PasswordChangeRequest);
+app.use('/api/share/', shareMail);
+app.use('/api/bookFlight', flightBooking);
+app.use('/api/currencies', currency);
+app.use('/api/booking', booking);
+app.use('/webhook', webhook);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/transaction', purchaseRoute);
+app.use('/api/complaints', complaint);
+app.use('/api/admins', admins);
+app.use('/api/transportation', transportation);
+app.use('/api/itiernaryTags', tagRoutes);
