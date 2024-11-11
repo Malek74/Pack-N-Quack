@@ -42,13 +42,13 @@ export default function Booked() {
 
 
     return (
-        <>
+        <div className='container mx-auto px-4 py-8 '>
             {Array.isArray(bookedFlights) && bookedFlights.length > 0 &&
                 <div className='flex flex-col items-center justify-center place-content-center self-center '>
                     <h1 className='text-center text-3xl font-semibold my-10'>Your Booked Flights</h1>
-                    <div className='grid grid-cols-3 justify-evenly gap-5'>
+                    <div className='grid grid-cols-2 justify-evenly gap-5'>
                         {Array.isArray(bookedFlights) && bookedFlights.map((flight) => (
-                            <Card className="p-6 m-10 w-[24rem] h-auto flex flex-col" key={flight._id}>
+                            <Card className="p-6 m-10 w-[20rem] h-auto flex flex-col" key={flight._id}>
                                 <img className=" w-[20rem] rounded-lg mb-4 self-center" src={FlightImage} />
                                 <div className="flex justify-between">
                                     <div>
@@ -69,9 +69,9 @@ export default function Booked() {
             {Array.isArray(bookedHotels) && bookedHotels.length > 0 &&
                 <div className='flex flex-col items-center justify-center place-content-center self-center '>
                     <h1 className='text-center text-3xl font-semibold my-10'>Your Booked Hotels</h1>
-                    <div className='grid grid-cols-3 justify-evenly gap-5'>
+                    <div className='grid grid-cols-2 justify-evenly gap-5'>
                         {Array.isArray(bookedHotels) && bookedHotels.map((hotel) => (
-                            <Card className="p-6 m-10 w-[24rem] h-auto flex flex-col" key={hotel._id}>
+                            <Card className="p-6 m-10 w-[20rem] h-auto flex flex-col" key={hotel._id}>
                                 <img className=" w-[20rem] rounded-lg mb-4 self-center" src={HotelImage} />
                                 <div className="flex justify-between">
                                     <div>
@@ -98,21 +98,9 @@ export default function Booked() {
                 <div className='flex flex-col items-center justify-center place-content-center self-center '>
 
                     <h1 className='text-center text-3xl font-semibold my-10'>Your Booked Transportations</h1>
-                    <div className='grid grid-cols-3 justify-evenly gap-5'>
+                    <div className='grid grid-cols-2 justify-evenly gap-5'>
                         {Array.isArray(bookedTransportations) && bookedTransportations.map((transportation) => (
-                            // <TransportationCard
-                            //     key={transportation._id}
-                            //     img={TransportationImage}
-                            //     advertiserName={transportation.transportationID.name}
-                            //     type={transportation.transportationID.type}
-                            //     time={transportation.transportationID.date}
-                            //     from={transportation.transportationID.origin}
-                            //     to={transportation.transportationID.destination}
-                            //     price={transportation.transportationID.price}
-                            //     notTourist={false}
-                            //     discounts={transportation.specialDiscounts}
-                            //     transportationID={transportation._id} />
-                            <Card className="p-6 m-10 w-[24rem] h-auto flex flex-col " key={transportation._id}>
+                            <Card className="p-6 m-10 w-[20rem] h-auto flex flex-col " key={transportation._id}>
                                 <img className=" w-[20rem] rounded-lg mb-4 self-center" src={TransportationImage} />
                                 <div className="flex justify-between">
                                     <div className="flex flex-col gap-2">
@@ -134,6 +122,6 @@ export default function Booked() {
                             </Card>
                         ))}
                     </div></div >}
-        </>
+        </div>
     )
 }

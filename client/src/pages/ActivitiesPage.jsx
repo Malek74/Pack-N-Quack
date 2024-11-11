@@ -12,7 +12,7 @@ import Multiselect from "multiselect-react-dropdown";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import { Input } from "@/components/ui/input";
-
+import Loading from "@/components/shared/Loading";
 export default function Activities() {
   const { idAdv } = useParams();
   const [activities, setActivities] = useState([]);
@@ -126,14 +126,14 @@ export default function Activities() {
             selectedFilters["Sort By"] == "price-asc"
               ? 1
               : selectedFilters["Sort By"] == "price-desc"
-              ? -1
-              : 0,
+                ? -1
+                : 0,
           sortRating:
             selectedFilters["Sort By"] == "ratings-asc"
               ? 1
               : selectedFilters["Sort By"] == "ratings-desc"
-              ? -1
-              : 0,
+                ? -1
+                : 0,
           rating: selectedFilters.Ratings,
           dateMin: selectedRange.from,
           dateMax: selectedRange.to,
@@ -179,14 +179,25 @@ export default function Activities() {
     activityCreated,
   ]);
 
+
+
   return (
+
     <div className="flex flex-col justify-center w-screen px-14 my-8">
+
       <div className="relative mb-6">
-        <Banner
-          background={Activitiesbackground}
-          alt="Activities Background"
-          name="ACTIVITIES"
-        />
+        {tourist ?
+          <Banner
+            background={Activitiesbackground}
+            alt="Activities Background"
+            name="ACTIVITIES"
+          /> :
+          <Banner
+            background={Activitiesbackground}
+            alt="Activities Background"
+            name="MY ACTIVITIES"
+          />}
+
         {tourist && (
           <SearchBar
             searchTerm={searchTerm}
@@ -263,7 +274,11 @@ export default function Activities() {
       <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">
         Upcoming Actvities
       </h1>
-
+      {Array.isArray(activities) && activities.length == 0 &&
+        <div className="flex justify-center items-center">
+          <Loading size="xl" />
+        </div>
+      }
       <div className="grid grid-cols-3 justify-evenly w-screen self-center gap-y-10 px-10">
         {activities.map((activity) => (
           <ActivityCard
