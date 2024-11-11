@@ -74,7 +74,7 @@ export default function Complaints() {
           <div className="place-self-end">
             <CreateDialog
               title="Complaint"
-              form={<ComplaintForm onRefresh={setOnRefresh} />}
+              form={<ComplaintForm onRefresh={setOnRefresh} issuerID={userId} />}
             />
           </div>
         </CardHeader>

@@ -16,7 +16,7 @@ import axios from "axios";
 import { DialogClose } from "../ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "../ui/textarea";
-export default function ComplaintForm({ onRefresh }) {
+export default function ComplaintForm({ onRefresh, issuerID }) {
   const { toast } = useToast();
   const complaintFormSchema = z.object({
     title: z
@@ -53,7 +53,7 @@ export default function ComplaintForm({ onRefresh }) {
       .post("api/tourist/complaints", {
         title: values.title,
         body: values.body,
-        issuerID: "6702cde57d7e2444d9713d8d",
+        issuerID,
         date: getCurrentDate(),
       })
       .then((response) => {

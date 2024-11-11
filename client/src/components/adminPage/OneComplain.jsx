@@ -17,7 +17,6 @@ import { useParams } from "react-router-dom";
 const OneComplain = () => {
   const { complaintID } = useParams();
   console.log(complaintID)
-  const [statusRefresh, setStatusRefresh] = useState([]);
   function formatDate(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -71,7 +70,7 @@ const OneComplain = () => {
 
   useEffect(() => {
     fetchComplaint(); // Initial fetch when component mounts
-  }, [onNewReply, statusRefresh, complaintID]);
+  }, [onNewReply, complaintID]);
 
   return complaint ? (
     <div className="flex flex-col sm:gap-4 sm:py-4">
