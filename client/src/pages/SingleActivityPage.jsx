@@ -112,8 +112,9 @@ export default function SingleActivityPage() {
           numOfTickets: ticketCount,
         }
       );
-
+      console.log(response.data);
       toast({
+        title: date,
         description: "Quack-tastic! Your booking is confirmed!",
         variant: "success",
       });
