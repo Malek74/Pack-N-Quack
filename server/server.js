@@ -33,6 +33,35 @@ import hotelRoutes from './routes/hotelRoutes.js';
 import transportation from './routes/transportationRoutes.js';
 
 
+// Define Endpoints
+app.use('/api/admins', admins);
+app.use('/api/tags', tagRoutes); //tags for places
+app.use('/api/places', placeRoutes);
+app.use('/api/tourist', touristRoutes);
+app.use('/api/sellers', seller);
+app.use('/api/products', products);
+app.use('/api/itinerary', itinerary);
+app.use('/api/tourGuide', tourGuide);
+app.use('/api/touristGovernor', touristGoverner);
+app.use('/api/itiernaryTags', itineraryTag);
+app.use('/api/advertisers', advertisers);
+app.use('/api/activity', activity)
+app.use('/api/activity/category', activityCategory);
+app.use('/api/activity/tag', activityTag);
+app.use('/api/changepass', PasswordChangeRequest)
+app.use('/api/share/', shareMail);
+app.use('/api/bookFlight', flightBooking);
+app.use('/api/currencies', currency);
+app.use('/api/booking', booking);
+app.use('/webhook', webhook);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/transaction', purchaseRoute);
+app.use('/api/complaints', complaint);
+
+
+
+
 config();
 const app = express();
 const port = process.env.PORT || 8000;
@@ -60,32 +89,4 @@ mongoose.connect(mongoURI)
     .catch((err) => {
         console.error("MongoDB connection error:", err);
     });
-
-// Define Endpoints
-app.use('/api/admins', admins);
-app.use('/api/tags', tagRoutes); //tags for places
-app.use('/api/places', placeRoutes);
-app.use('/api/tourist', touristRoutes);
-app.use('/api/sellers', seller);
-app.use('/api/products', products);
-app.use('/api/itinerary', itinerary);
-app.use('/api/tourGuide', tourGuide);
-app.use('/api/touristGovernor', touristGoverner);
-app.use('/api/itiernaryTags', itineraryTag);
-app.use('/api/advertisers', advertisers);
-app.use('/api/activity', activity)
-app.use('/api/activity/category', activityCategory);
-app.use('/api/activity/tag', activityTag);
-app.use('/api/changepass', PasswordChangeRequest)
-app.use('/api/share/', shareMail);
-app.use('/api/bookFlight', flightBooking);
-app.use('/api/currencies', currency);
-app.use('/api/booking', booking);
-app.use('/webhook', webhook);
-app.use('/api/hotels', hotelRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/transaction', purchaseRoute);
-app.use('/api/complaints', complaint);
-app.use('/api/transportation', transportation);
-
 

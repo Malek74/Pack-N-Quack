@@ -15,6 +15,26 @@ export const getComplaints = async (req, res) => {
 
 }
 
+export const viewComplaints = async (req, res) => {
+    const status = req.query.statusFilter;
+    const sort = req.query.sortBy;
+    // console.log(status,sort);
+    try {
+        let query = {};
+        let sortQuery = {};
+        if(status !== 'undefined'){
+            query.status = status;
+        }
+        if(sort !== 'undefined'){
+            sortQuery.createdAt = sort === 'asc' ? 1 : -1;
+        }
+        const complaints = await complaintModel.find(query).sort(sortQuery);
+        return res.status(200).json(complaints);   
+    }catch(error){
+        return res.status(404).json({ message: error.message });
+    }
+}
+
 export const viewComplaintById = async (req, res) => {
     const complaintId = req.params.id;
     try {
@@ -43,10 +63,11 @@ export const viewMyComplaints = async (req, res) => {
 }
 
 export const createComplaint = async (req, res) => {
-    const { issuerID, title, body } = req.body;
-
-    if (!issuerID) {
-        return res.status(400).json({ message: "Issuer ID is required" });
+    const {issuerID, title, body} = req.body;
+    console.log(req.body);
+    
+    if(!issuerID){
+        return res.status(400).json({message:"Issuer ID is required"});
     }
     if (!title) {
         return res.status(400).json({ message: "Title is required" });
