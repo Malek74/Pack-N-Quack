@@ -106,14 +106,15 @@ export default function SingleActivityPage() {
         `/api/booking/bookEvent/6725442e98359339d8b821f0`,
         {
           eventType: "activity",
-          date: time,
+          date: date,
           eventID: id,
           payByWallet: false,
           numOfTickets: ticketCount,
         }
       );
-
+      console.log(response.data);
       toast({
+        title: date,
         description: "Quack-tastic! Your booking is confirmed!",
         variant: "success",
       });
@@ -121,7 +122,7 @@ export default function SingleActivityPage() {
     } catch (error) {
       console.error(error);
       toast({
-        description: "Oops! Something went wrong. Please try again.",
+        description: error.response.data.error,
         variant: "destructive",
       });
     }
