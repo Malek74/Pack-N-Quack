@@ -13,9 +13,9 @@ import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 export default function MarketplacePage() {
-  const { prefCurrency } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
+  const {prefCurrency} = useUser();
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(null); // Start as null until it's fetched
   const [priceRange, setPriceRange] = useState([0, 100000000]); // Applied price range

@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
-import DropDownMenuProfile from "./components/DropDownMenuProfile";
 import logo from "/assets/icons/logo.png";
 import DropDownMenuBook from "./components/DropDownMenuBook";
 
@@ -13,11 +12,6 @@ export default function Header() {
 
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
-
-  const isComplaintsDetailsActive = () => {
-    const pattern = /^\/complaintDetails\/.+$/;
-    return pattern.test(location.pathname);
-  };
 
   return (
     <header className="container mx-auto flex py-4">
@@ -51,7 +45,7 @@ export default function Header() {
             </li>
           </Button>
 
-          <Button asChild variant="link">
+          {/* <Button asChild variant="link">
             <li>
               <Link
                 to="/about"
@@ -60,9 +54,9 @@ export default function Header() {
                 About Us
               </Link>
             </li>
-          </Button>
+          </Button> */}
 
-          <Button asChild variant="link">
+          {/* <Button asChild variant="link">
             <li>
               <Link
                 to="/contact"
@@ -71,7 +65,8 @@ export default function Header() {
                 Contact
               </Link>
             </li>
-          </Button>
+          </Button> */}
+
           <Button asChild variant="link">
             <li>
               <Link
@@ -142,8 +137,7 @@ export default function Header() {
                   ? "text-yellow-500"
                   : ""
               }
-            >
-            </li>
+            ></li>
           </Button>
         </ul>
 

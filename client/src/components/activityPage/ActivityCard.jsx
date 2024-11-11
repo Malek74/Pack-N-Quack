@@ -4,10 +4,10 @@ import Maps from "../shared/Maps";
 import ActivityEditForm from "../forms/ActivityEditForm";
 import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { useUser } from "@/context/UserContext";
 export default function activityCard(props) {
   const navigate = useNavigate();
-
+  const {prefCurrency} = useUser();
   const date = new Date(props.time);
   const openActivityPage = () => {
     console.log(props.id)
@@ -15,7 +15,7 @@ export default function activityCard(props) {
   };
   return (
     <div
-      onClick={openActivityPage}
+      onClick={props.booking ? openActivityPage : undefined}
       className="container rounded-lg w-[25rem] h-auto p-2 shadow-md"
     >
       <div className="flex place-content-end ">
@@ -72,7 +72,7 @@ export default function activityCard(props) {
         <h4 className="flex">
           {" "}
           <span className="text-base text-skyblue drop-shadow mr-auto">
-            EGP{" "}
+            {prefCurrency}{" "}
             {props.priceType == "fixed"
               ? props.price
               : `${props.minPrice} - ${props.maxPrice}`}{" "}
