@@ -50,7 +50,7 @@ export const bookEvent = async (req, res) => {
         let success_url = "";
 
         if (eventType == "activity") {
-            success_url = "http://localhost:5173/touristDashboard/activity-bookings";
+            success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
         }
         else if (eventType == "itinerary") {
             success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
