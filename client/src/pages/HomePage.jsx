@@ -96,7 +96,7 @@ export default function HomePage() {
           ))}
         {Array.isArray(filteredItineraries) &&
           filteredItineraries.map((itinerary) => (
-            <ItineraryCard
+            <ItineraryCard className="small"
               key={itinerary._id}
               id={itinerary._id}
               coverImage={itinerary.coverImage || null}

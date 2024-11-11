@@ -18,13 +18,8 @@ export default function activityCard(props) {
   };
   return (
     <div
-<<<<<<< HEAD
-      onClick={openActivityPage}
       className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[570px] rounded-xl"
-=======
       onClick={props.booking ? openActivityPage : undefined}
-      className="container rounded-lg w-[25rem] h-auto p-2 shadow-md"
->>>>>>> 80c5c2fd2d93a1c92ab7efca87a54d037ce59946
     >
       <img className=" rounded-lg rounded-b-none h-[300px] w-full object-fill" src={props.img} />
       <div className="flex place-content-end ">
@@ -84,7 +79,6 @@ export default function activityCard(props) {
             <br />
           </p>
 
-<<<<<<< HEAD
 
           <p className="text-base">
             <b className="mr-2">Booking:</b>
@@ -117,42 +111,6 @@ export default function activityCard(props) {
                 >
                   {`#${t.name}`}
                 </Label>
-=======
-        <h4 className="flex">
-          {" "}
-          <span className="text-base text-skyblue drop-shadow mr-auto">
-            {prefCurrency}{" "}
-            {props.priceType == "fixed"
-              ? props.price
-              : `${props.minPrice} - ${props.maxPrice}`}{" "}
-          </span>
-          <span className="flex">
-            <b className="mr-1">Rating:</b> {props.rating}{" "}
-            <Star className="ml-1" color=" #E7B008" />
-          </span>
-        </h4>
-        <h4 className="text-base">
-          {" "}
-          <b className="mr-2">Booking:</b>
-          {props.booking ? "Open" : "Closed"}
-        </h4>
-        <div className="flex flex-row justify-between gap-4">
-          <div className="flex flex-col gap-y-0">
-            {" "}
-            {Array.isArray(props.discounts) &&
-              props.discounts.map((discount) => (
-                <p key={discount} className="text-base text-red-700 ">
-                  {discount}
-                </p>
-              ))}
-          </div>
-          <div className="text-right">
-            {Array.isArray(props.tags) &&
-              props.tags.map((tag) => (
-                <span key={tag._id} className="text-gray-500 ml-2">
-                  #{tag.name}
-                </span>
->>>>>>> 80c5c2fd2d93a1c92ab7efca87a54d037ce59946
               ))}
             </div>
 
