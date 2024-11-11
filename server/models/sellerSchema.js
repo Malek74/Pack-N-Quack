@@ -25,11 +25,13 @@ const sellerSchema = new Schema({
     },
     uploadedFiles: {
         images: { type: [String], default: [], required: false },
-        documents: [{
+        documents: {
+            type: [{
             name: String,
-            link: String
+            link: String,
+        }],
+        default: []
         }
-        ]
     },
     hasAcceptedTerms: {
         type: Boolean,
