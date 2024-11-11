@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { RatingInput } from "../shared/RatingsInput";
 import PropTypes from "prop-types";
+import { useToast } from "@/hooks/use-toast";
 
 // Define zod schema for comment and rating
 const schema = z.object({
@@ -155,16 +156,16 @@ export default function RateForm(props) {
                         onClick={() => handleExperienceChange(duck.id)}
                         type="button"
                         className={`flex flex-col items-center ${experience === duck.id
-                            ? "text-green-500"
-                            : "text-gray-400"
+                          ? "text-green-500"
+                          : "text-gray-400"
                           }`}
                       >
                         <img
                           src={duck.src}
                           alt={duck.label}
                           className={`w-[100px] h-[100px] ${rating === duck.id
-                              ? "border-2 border-green-500"
-                              : ""
+                            ? "border-2 border-green-500"
+                            : ""
                             }`}
                         />
                         {experience === duck.id && (

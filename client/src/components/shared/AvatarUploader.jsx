@@ -11,20 +11,29 @@ import getCroppedImg from "@/utilities/getCroppedImg"; // Helper function to get
 import axios from "axios";
 
 AvatarUploader.propTypes = {
-  size: PropTypes.number,
+  userType: PropTypes.string,
+  userId: PropTypes.string,
+  croppedImage: PropTypes.instanceOf(File),
+  setCroppedImage: PropTypes.func,
+  croppedImageUrl: PropTypes.string,
 };
 
 // TODO: Add naming like image uploaded
 // TODO: get userType and userId dynamically
 // TODO: Add avatar viewing
-export default function AvatarUploader({ size = 28 }) {
-  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-${size}`;
+export default function AvatarUploader({
+  userType,
+  userId,
+  croppedImage,
+  setCroppedImage,
+  croppedImageUrl,
+}) {
+  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-28`;
+  const imgClassName = `rounded-full object-cover`;
 
   const { toast } = useToast();
   const [avatarUploaded, setAvatarUploaded] = useState(null); // Use URL for preview
   const [isCropping, setIsCropping] = useState(false);
-  const [croppedImage, setCroppedImage] = useState(null); // To store the final cropped image
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); // URL for display
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -61,8 +70,9 @@ export default function AvatarUploader({ size = 28 }) {
         avatarUploaded,
         croppedAreaPixels
       );
+
       setCroppedImage(croppedImageFile); // Store the File for upload
-      setCroppedImageUrl(URL.createObjectURL(croppedImageFile)); // Create and store the URL for display
+      console.log("Updated", croppedImageFile); // Create and store the URL for display
       toast({
         description: "Cropped avatar saved successfully!",
         variant: "success",
@@ -77,47 +87,26 @@ export default function AvatarUploader({ size = 28 }) {
     }
   };
 
-  // const handleApiCall = async () => {
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("images", croppedImage); // Now `croppedImage` is a File
-  //     formData.append("userType", "tourGuide");
-  //     formData.append("userId", "66fb241366ea8f57d59ec6db");
-
-  //     await axios.post("/api/upload/images", formData);
-  //     toast({
-  //       description: "Avatar uploaded successfully!",
-  //       variant: "success",
-  //     });
-  //   } catch (e) {
-  //     toast({
-  //       description: "Something went wrong while uploading the avatar.",
-  //       variant: "destructive",
-  //     });
-  //     console.error(e);
-  //   }
-  // };
-  const handleApiCall2 = async () => {
+  const handleApiCall = async () => {
     try {
-      const response = await axios.post("/api/upload/fetchImages", {
-        userType: "tourGuide",
-        userId: "66fb241366ea8f57d59ec6db",
-      });
-
-      console.log(response.data);
-      setCroppedImageUrl(response.data.image);
+      const formData = new FormData();
+      formData.append("images", croppedImage); // Now `croppedImage` is a File
+      formData.append("userType", userType);
+      console.log(croppedImage);
+      await axios.post(`/api/upload/images/${userId}`, formData);
       toast({
-        description: "Avatar Downloaded successfully!",
+        description: "Avatar uploaded successfully!",
         variant: "success",
       });
     } catch (e) {
       toast({
-        description: "Something went wrong while getting the avatar.",
+        description: "Something went wrong while uploading the avatar.",
         variant: "destructive",
       });
       console.error(e);
     }
   };
+
   return (
     <div>
       <Dropzone
@@ -128,12 +117,22 @@ export default function AvatarUploader({ size = 28 }) {
       >
         {({ getRootProps, getInputProps }) => (
           <div {...getRootProps()} className={divClassName}>
-            <Input {...getInputProps()} type="file" />
-            {croppedImageUrl ? (
+            <Input {...getInputProps()} type="file" accept="image/*" />
+            {croppedImage ? (
+              <img
+                src={URL.createObjectURL(croppedImage)}
+                alt="Cropped Avatar"
+                width={112.5}
+                height={112.5}
+                className={imgClassName}
+              />
+            ) : croppedImageUrl ? (
               <img
                 src={croppedImageUrl}
                 alt="Cropped Avatar"
-                className="rounded-full object-cover w-full h-full"
+                width={112.5}
+                height={112.5}
+                className={imgClassName}
               />
             ) : (
               <p className="text-center italic text-neutral-500">
@@ -174,7 +173,9 @@ export default function AvatarUploader({ size = 28 }) {
           </DialogContent>
         </Dialog>
       )}
-      <Button onClick={() => handleApiCall2()}>Print cropped image</Button>
+      <Button type="button" onClick={() => handleApiCall()}>
+        Upload Avatar
+      </Button>
     </div>
   );
 }

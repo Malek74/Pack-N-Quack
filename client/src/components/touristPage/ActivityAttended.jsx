@@ -32,7 +32,13 @@ export default function ActivityAttended() {
         <TableCell className="font-medium">{account.name}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm activityId={account._id} type="activity" />}
+            form={
+              <RateForm
+                activityId={account._id}
+                type="activity"
+                showExperience
+              />
+            }
             type="activity"
             title={account.name}
           />

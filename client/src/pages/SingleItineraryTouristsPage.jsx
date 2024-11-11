@@ -9,6 +9,17 @@ import { format } from "date-fns";
 import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryActivitySlideShow";
 import Maps from "@/components/shared/Maps";
 import { useUser } from "@/context/UserContext";
+import { ShareButton } from "@/components/shared/ShareButton";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import BookItineraryForm from "@/components/ItinerariesPage/BookItineraryForm";
 export default function SingleItineraryTouristsPage() {
   const { id } = useParams();
   const [isloading, setIsLoading] = useState(true);
@@ -41,9 +52,37 @@ export default function SingleItineraryTouristsPage() {
         <ImageSlideshow images={fetchedItinerary.images} />
         <div className="flex justify-between px-28">
           <div className="flex flex-col w-[60%] gap-6">
-            <Label className="text-3xl font-bold">
-              {fetchedItinerary.name}
-            </Label>
+            <div className="flex justify-between">
+              <Label className="text-3xl font-bold">
+                {fetchedItinerary.name}
+              </Label>
+              <div className="flex gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <Button variant="outline">Book Itinerary</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Book {fetchedItinerary.name} ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Please fill out the booking form!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <BookItineraryForm
+                      itineraryId={fetchedItinerary._id}
+                      available_dates={fetchedItinerary.available_dates}
+                      price={fetchedItinerary.price}
+                    />
+                  </AlertDialogContent>
+                </AlertDialog>
+                <ShareButton
+                  title={fetchedItinerary.name}
+                  link={window.location.href}
+                />
+              </div>
+            </div>
             <p className="text-lg text-neutral-600">
               {fetchedItinerary.description}
             </p>
@@ -74,7 +113,7 @@ export default function SingleItineraryTouristsPage() {
               <div className="flex flex-col gap-4">
                 <Label className="text-2xl font-bold">Price</Label>
                 <p className="text-lg font-bold bg-gold p-1 px-4 text-white rounded-full">
-                  {`${fetchedItinerary.price} EGP`}
+                  {`${fetchedItinerary.price} ${prefCurrency}`}
                 </p>
               </div>
             </div>

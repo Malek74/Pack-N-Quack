@@ -33,7 +33,13 @@ export default function ItinerariesMade() {
         <TableCell className="font-medium">{account.name}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm itineraryId={account._id} type="itineraries" />}
+            form={
+              <RateForm
+                itineraryId={account._id}
+                type="itineraries"
+                showExperience
+              />
+            }
             type="itineraries"
             title={account.name}
           />

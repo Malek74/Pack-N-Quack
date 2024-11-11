@@ -1,5 +1,5 @@
 import SearchBar from "@/components/shared/SearchBar";
-import Banner from "../components/shared/Banner";
+import Banner from "@/components/shared/BannerV2";
 import BannerImage from "/assets/images/romanBanner.jpg";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -40,8 +40,8 @@ export default function ItinerariesTouristsPage() {
   }, [fetchedItinerariesParams, prefCurrency]);
 
   return (
-    <div className="flex flex-col w-screen p-14 pb-0">
-      <div className="relative">
+    <div className="flex flex-col w-screen p-14">
+      <div className="relative mb-10">
         <Banner background={BannerImage} name="Itineraries" />
         <SearchBar
           searchTerm={searchTerm}
@@ -61,22 +61,21 @@ export default function ItinerariesTouristsPage() {
       )}
       {!isLoading && (
         <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-10 px-14 mb-36">
-          {fetchedItineraries &&
-            fetchedItineraries.map((itinerary) => (
-              <ItinerariesCard
-                key={itinerary._id}
-                id={itinerary._id}
-                image={itinerary.image}
-                name={itinerary.name}
-                description={itinerary.description}
-                tags={itinerary.tags}
-                price={itinerary.price}
-                rating={itinerary.ratings.averageRating}
-                numberOfReviews={itinerary.ratings.reviews.length}
-                coverImage={itinerary.coverImage || null}
-                touristClicked
-              />
-            ))}
+          {fetchedItineraries?.map((itinerary) => (
+            <ItinerariesCard
+              key={itinerary._id}
+              id={itinerary._id}
+              image={itinerary.image}
+              name={itinerary.name}
+              description={itinerary.description}
+              tags={itinerary.tags}
+              price={itinerary.price}
+              rating={itinerary.ratings.averageRating}
+              numberOfReviews={itinerary.ratings.reviews.length}
+              coverImage={itinerary.coverImage || null}
+              touristClicked
+            />
+          ))}
         </div>
       )}
 

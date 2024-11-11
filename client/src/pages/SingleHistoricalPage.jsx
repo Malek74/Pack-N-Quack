@@ -4,16 +4,19 @@ import axios from "axios";
 import ImagesScroll from "@/components/shared/ImagesScroll";
 import Maps from "@/components/shared/Maps";
 import OpeningHours from "@/components/historicalPage/OpeningHours";
-import DatePicker from "react-datepicker";
-
+import { SampleDatePicker } from "@/components/shared/datepicker";
+import { useUser } from "@/context/UserContext";
+import { ShareButton } from "@/components/shared/ShareButton";
 export default function SingleHistoricalPage() {
   const { name } = useParams();
   const [historicalPlace, setHistoricalPlace] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null); // State for date selection
-  
+  const { prefCurrency } = useUser();
   const fetchHistoricalPlace = async () => {
     try {
-      const response = await axios.get(`/api/places/${name}`);
+      const response = await axios.get(
+        `/api/places/${name}?currency=${prefCurrency}`
+      );
       setHistoricalPlace(response.data);
     } catch (error) {
       console.error(error);
@@ -81,38 +84,29 @@ export default function SingleHistoricalPage() {
 
       {/* Prices */}
       <div className="flex gap-4 mb-4">
-        {Array.isArray(prices) && prices.map((price) => (
-          <span key={price.type} className="flex">
-            <b className="mr-1">{price.type}:</b> EGP {price.price}
-          </span>
-        ))}
+        {Array.isArray(prices) &&
+          prices.map((price) => (
+            <span key={price.type} className="flex">
+              <b className="mr-1">{price.type}:</b> EGP {price.price}
+            </span>
+          ))}
       </div>
 
       {/* Tags */}
       <div className="flex flex-wrap mb-4">
-        {Array.isArray(tags) && tags.map((tag) => (
-          <span key={tag._id} className="text-gray-500 ml-2 text-base border-b border-gray-300">
-            #{tag.name_tag}-{tag.option}
-          </span>
-        ))}
+        {Array.isArray(tags) &&
+          tags.map((tag) => (
+            <span
+              key={tag._id}
+              className="text-gray-500 ml-2 text-base border-b border-gray-300"
+            >
+              #{tag.name_tag}-{tag.option}
+            </span>
+          ))}
       </div>
 
       {/* Date Picker and Booking Button */}
-      <div className="flex flex-col items-center mt-4">
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          minDate={new Date()}
-          placeholderText="Select a booking date"
-          className="border border-gray-300 rounded p-2 mb-2"
-        />
-        <button
-          onClick={handleBooking}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Book Now
-        </button>
-      </div>
+      <ShareButton title={name} link={window.location.href} />
     </div>
   );
 }

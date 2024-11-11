@@ -34,7 +34,13 @@ export default function TourGuides() {
         <TableCell>{account.username}</TableCell>
         <TableCell>
           <RateComment
-            form={<RateForm tourGuideId={account._id} type="tourguide" />}
+            form={
+              <RateForm
+                tourGuideId={account._id}
+                type="tourguide"
+                showExperience
+              />
+            }
             type="tourguide"
             title={account.username}
           />

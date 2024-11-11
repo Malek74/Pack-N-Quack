@@ -14,7 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import PropTypes from "prop-types";
 
+ShareButton.propTypes = {
+  link: PropTypes.string,
+  title: PropTypes.string,
+};
 export function ShareButton({
   link = "https://www.google.com",
   title = "Google",

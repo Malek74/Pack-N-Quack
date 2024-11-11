@@ -8,7 +8,7 @@ import { Rating } from "@/components/shared/Rating";
 import { format } from "date-fns";
 import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryActivitySlideShow";
 import Maps from "@/components/shared/Maps";
-import { Activity, Pencil, Trash2 } from "lucide-react";
+import { Flag, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipProvider,
@@ -30,24 +30,43 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/hooks/use-toast";
 
-export default function SingleItineraryTourGuidePage() {
+export default function SingleItineraryAdminPage() {
   const { id } = useParams();
+  const { toast } = useToast();
   const [isloading, setIsLoading] = useState(true);
   const [fetchedItinerary, setFetchedItinerary] = useState({});
-  const [itineraryActive, setItineraryActive] = useState();
+  const [itineraryFlag, setItineraryFlag] = useState();
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
-  const { toast } = useToast();
-
-  const handleToggleActive = () => {
-    setItineraryActive(!itineraryActive);
+  const toggleFlagItinerary = async (value) => {
+    try {
+      await axios.put(`/api/itinerary/flag/${id}`, {
+        flag: value,
+      });
+      setItineraryFlag(value);
+      toast({
+        title: "Success",
+        description: "Itinerary flagged successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: error.response.data.message,
+        description: error.response.data.error,
+      });
+    }
+  };
+  const handleToggleFlag = () => {
+    toggleFlagItinerary(!itineraryFlag);
   };
 
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/itinerary/${id}`);
       toast({
-        variant: "default",
+        variant: "success",
         title: "Success",
         description: "Itinerary deleted successfully",
       });
@@ -61,34 +80,6 @@ export default function SingleItineraryTourGuidePage() {
       });
     }
   };
-  const handleEditItinerary = async () => {
-    navigate(`/editItinerary/${id}`);
-  };
-
-  useEffect(() => {
-    const toggleActiveItinerary = async () => {
-      try {
-        await axios.put(`/api/itinerary/toggleActive/${id}`, {
-          isActive: itineraryActive,
-        });
-        toast({
-          variant: "default",
-          title: "Success",
-          description: `Itinerary now ${
-            itineraryActive ? "active" : "inactive"
-          }`,
-        });
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: "destructive",
-          title: error.response.data.message,
-          description: error.response.data.error,
-        });
-      }
-    };
-    toggleActiveItinerary();
-  }, [id, itineraryActive]);
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -99,7 +90,7 @@ export default function SingleItineraryTourGuidePage() {
         });
         console.log(response.data);
         setFetchedItinerary(response.data);
-        setItineraryActive(response.data.isActive);
+        setItineraryFlag(response.data.flagged);
         setIsLoading(false);
       } catch (error) {
         console.error(error);
@@ -122,91 +113,65 @@ export default function SingleItineraryTourGuidePage() {
               <Label className="text-3xl font-bold">
                 {fetchedItinerary.name}
               </Label>
-              {fetchedItinerary.flagged && (
-                <Label className="text-2xl font-bold text-red-400">
-                  Actions Disabled for Flagged Itinerary
-                </Label>
-              )}
-              {!fetchedItinerary.flagged && (
-                <div className="flex justify-end gap-4">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Activity
-                          size={42}
-                          className={
-                            itineraryActive
-                              ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
-                              : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
-                          }
-                          onClick={() => {
-                            handleToggleActive();
-                          }}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-lg">
-                          {itineraryActive
-                            ? "The itinerary is active, Click to toggle"
-                            : "The itinerary is inactive, Click to toggle"}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Pencil
-                          size={42}
-                          className={
-                            "border border-gray-500 rounded-full bg-gray-500 text-white p-1 hover:bg-gray-600 hover:border-gray-600"
-                          }
-                          onClick={() => {
-                            handleEditItinerary();
-                          }}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-lg">Click to edit this itinerary</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger className="">
-                      <Trash2
+              <div className="flex justify-end gap-4">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Flag
                         size={42}
                         className={
-                          "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                          !itineraryFlag
+                            ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
+                            : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
                         }
+                        onClick={() => {
+                          handleToggleFlag();
+                        }}
                       />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Quack Goodbye to This Itinerary?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to quack this itinerary goodbye?
-                          Once it’s gone, it won’t waddle back!
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-500 hover:bg-red-600"
-                          onClick={() => {
-                            handleDelete(); // Corrected typo
-                          }}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              )}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-lg">
+                        {!itineraryFlag
+                          ? "The itinerary is not flagged, Click to toggle"
+                          : "The itinerary is flagged, Click to toggle"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <AlertDialog>
+                  <AlertDialogTrigger className="">
+                    <Trash2
+                      size={42}
+                      className={
+                        "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                      }
+                    />
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Quack Goodbye to This Itinerary?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to quack this itinerary goodbye?
+                        Once it’s gone, it won’t waddle back!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600"
+                        onClick={() => {
+                          handleDelete(); // Corrected typo
+                        }}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
             <p className="text-lg text-neutral-600">
               {fetchedItinerary.description}
@@ -238,7 +203,7 @@ export default function SingleItineraryTourGuidePage() {
               <div className="flex flex-col gap-4">
                 <Label className="text-2xl font-bold">Price</Label>
                 <p className="text-lg font-bold bg-gold p-1 px-4 text-white rounded-full">
-                  {`${fetchedItinerary.price} ${prefCurrency}`}
+                  {`${fetchedItinerary.price} EGP`}
                 </p>
               </div>
             </div>

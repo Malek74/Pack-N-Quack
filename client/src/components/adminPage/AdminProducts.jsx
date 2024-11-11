@@ -30,20 +30,17 @@ import FilterButtons from "../shared/FilterButtons";
 import PriceSlider from "../shared/PriceSlider";
 import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
-
 export default function AdminProducts() {
-  const { prefCurrency } = useUser();
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [minPrice, setMinPrice] = useState(0);
+  const { prefCurrency } = useUser();
   const [tab, setTab] = useState("all");
   const [maxPrice, setMaxPrice] = useState(null);
   const [priceRange, setPriceRange] = useState([0, 1000000]); // Applied price range
   const [sliderRange, setSliderRange] = useState([0, 1000000]); // Temporary slider range
   const [selectedFilters, setSelectedFilters] = useState({});
   const [loading, setLoading] = useState(true);
-
 
   const debouncedFetchProducts = useMemo(
     () =>
@@ -93,15 +90,7 @@ export default function AdminProducts() {
     if (maxPrice !== null) {
       debouncedFetchProducts(); // Use the debounced function
     }
-  }, [
-    searchTerm,
-    maxPrice,
-    priceRange,
-    selectedFilters,
-    tab,
-    prefCurrency,
-    debouncedFetchProducts,
-  ]);
+  }, [searchTerm, maxPrice, priceRange, selectedFilters, tab, prefCurrency]);
 
   // Fetch maxPrice when component mounts
   useEffect(() => {
@@ -214,7 +203,7 @@ export default function AdminProducts() {
                           alt="Product image"
                           className="aspect-square rounded-md object-cover"
                           height="64"
-                          src={product.picture[0]}
+                          src={product.picture}
                           width="64"
                         />
                       </TableCell>

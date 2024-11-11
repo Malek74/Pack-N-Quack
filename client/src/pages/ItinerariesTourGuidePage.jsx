@@ -1,4 +1,4 @@
-import Banner from "../components/shared/Banner";
+import Banner from "../components/shared/BannerV2";
 import BannerImage from "/assets/images/romanBanner.jpg";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -41,8 +41,11 @@ export default function ItinerariesTourGuidePage() {
       <div className="relative">
         <Banner background={BannerImage} name="My Itineraries" />
       </div>
-      <div className="flex mb-36 justify-center items-center">
-        <Button onClick={() => navigate("/createItinerary")}>
+      <div className="flex mb-8 justify-center items-center">
+        <Button
+          className="bg-gold"
+          onClick={() => navigate("/createItinerary")}
+        >
           Create Itineraries
         </Button>
       </div>

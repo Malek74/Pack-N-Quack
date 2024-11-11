@@ -1,14 +1,9 @@
-import React, { useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
-import { CheckIcon } from "lucide-react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import DialogTerms from "../shared/DialogTerms";
 import {
@@ -20,16 +15,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/shared/PhoneInput";
-import { SampleDatePicker } from "@/components/shared/datepicker";
+import { Label } from "../ui/label";
+import ImageUploader from "../shared/ImageUploader";
+import AvatarUploader from "../shared/AvatarUploader";
 
 export default function NewSellerForm(props) {
   const formSchema2 = z.object({
@@ -183,6 +174,45 @@ export default function NewSellerForm(props) {
             </FormItem>
           )}
         />
+
+        {form2.getValues("status") === "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
+
+        {form2.getValues("status") !== "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
+
+        {form2.getValues("status") !== "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
 
         <Button variant="secondary" type="submit">
           Create account
