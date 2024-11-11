@@ -258,7 +258,7 @@ export const searchProduct = async (req, res) => {
 
     try {
         const products = await product.find({
-            name: { $regex: new RegExp(searchTerm, 'i') }
+            name: { $regex: new RegExp(searchTerm, 'i'), isArchived: false }
         }).populate('seller_id');
 
         console.log(products);
@@ -371,6 +371,9 @@ export const getProducts = async (req, res) => {
                 query.isArchived = isArchived === 'true';
             }
         }
+        else {
+            query.isArchived = false; ``
+        }
 
         // Set sorting options if provided
         if (sortBy && order) {
@@ -389,8 +392,6 @@ export const getProducts = async (req, res) => {
             product.price *= conversionRate;
             return product;
         })
-
-
 
         return res.json(convertedProducts);
 
@@ -413,6 +414,9 @@ export const getMyProducts = async (req, res) => {
 
         //fetch products bought by the user
         const boughtProducts = await PurchasedItem.find({ user: id }).select('items.items').populate('items.productId');
+        if (boughtProducts.length == 0) {
+            return res.status(200).json(boughtProducts);
+        }
 
         if (prefCurrency) {
             const conversionRate = await getConversionRate(prefCurrency);
@@ -434,9 +438,6 @@ export const getMyProducts = async (req, res) => {
     }
 
 }
-
-
-
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;
