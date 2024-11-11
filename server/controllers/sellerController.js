@@ -3,7 +3,6 @@ import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 
 
-
 //get all sellers
 export const getAllSellers = async (req, res) => {
     try {
@@ -85,19 +84,23 @@ export const updateSellerInfo = async (req, res) => {
 //TODO: Add cascade deleting for items that belong to the seller
 //delete by ID
 export const deleteSeller = async (req, res) => {
-    const id = req.params.id;
-    if (!id) {
-        return res.status(400).json({ message: "Please provide a Seller ID" });
-    }
-    try {
-        const deletedSeller = await seller.findByIdAndDelete(id);
-        await deleteProducts(id);
-
-
-        return res.status(200).json({ message: `Seller with id ${id} deleted successfully` })
-    } catch (error) {
-        return res.status(400).json({ error: error.message })
-    }
+    
 }
 
-
+export const acceptTerms = async (req, res) => {
+    const sellerId = req.params.id;
+    if (!sellerId) {
+        return res.status(400).json({ message: "Seller ID is required." });
+    }
+    try {
+        const updatedSeller = await seller.findById(sellerId);
+        if (!updatedSeller) {
+            return res.status(404).json({ message: "Seller not found." });
+        }
+        const newSeller = await seller.findByIdAndUpdate(sellerId, { hasAcceptedTerms: true }, { new: true })
+        return res.status(200).json(newSeller);
+    }
+    catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
