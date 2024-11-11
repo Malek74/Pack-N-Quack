@@ -121,6 +121,9 @@ export const handleDocumentUpload = async (req, res) => {
     try {
         const documents = [];
         const files = req.files;
+        if (files.length != 2) {
+            return res.status(400).json({ message: 'Please upload all the documents' });
+        }
         let i = 0;
         const uploadPromises = files.map(file => {
             const params = {
@@ -135,22 +138,23 @@ export const handleDocumentUpload = async (req, res) => {
 
         // Resolve all upload promises and return their results
         const promises = await Promise.all(uploadPromises);
-        console.log(promises);
 
         const uploadedURLS = promises.map(result => result.Location);
+
 
         const updatedUser = await UserModel.findByIdAndUpdate(userID, {
             uploadedFiles: {
                 images: userExists.uploadedFiles.images,
-                documents: documents,
+                documents: uploadedURLS,
             }
+            
         }
             , { new: true });
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found or update failed' });
         }
-        return res.status(200).json({ message: 'Documents uploaded successfully', uploadedURLS });
+        return res.status(200).json({ message: 'Documents uploaded successfully', updatedUser });
 
     }
 
@@ -159,7 +163,6 @@ export const handleDocumentUpload = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
 
 export const handleImageUploadProduct = async (req, res) => {
     const { productId } = req.body;
@@ -226,11 +229,10 @@ export const handleImageUploadProduct = async (req, res) => {
     }
 };
 
-
 export const fetchUserDocuments = async (req, res) => {
-    const { userType, documentName } = req.body;
+    const { userType } = req.body;
     const userId = req.params.id;
-    conosle.log(req.body);
+    console.log(req.body);
     let UserModel = userModels[userType];
 
     if (userType === 'advertisers') {
@@ -240,26 +242,24 @@ export const fetchUserDocuments = async (req, res) => {
         UserModel = userModels['seller']
     }
 
-    console.log(UserModel);
-
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
 
     try {
 
-        const user = await UserModel.findById(userId).select('uploadedFiles.documents');
+        const user = await UserModel.findById(userId)
 
         if (!user || !user.uploadedFiles || !user.uploadedFiles.documents || !user.uploadedFiles.documents[documentIndex]) {
             return res.status(404).json({ message: 'Document not found for this user' });
         }
 
         //loop on the documents and get the url for 
-        const documentUrl = user.uploadedFiles.documents.find((document) => document.name === documentName).url;
 
-        return res.status(200).json({ document: documentUrl });
+        return res.status(200).json(user.uploadedFiles.documents);
+    }
 
-    } catch (error) {
+    catch (error) {
         console.error("Error serving user's document:", error);
         res.status(500).json({ message: 'Server Error' });
     }
@@ -299,3 +299,34 @@ export const fetchUserImages = async (req, res) => {
     }
 };
 
+export const fetchAllDocuments = async (req, res) => {
+    const { userType } = req.body;
+    console.log(req.body);
+    let UserModel = userModels[userType];
+
+    if (userType === 'advertisers') {
+        UserModel = userModels['advertiserModel'];
+    }
+    if (userType === 'sellers') {
+        UserModel = userModels['seller']
+    }
+
+    if (!UserModel) {
+        return res.status(400).json({ message: 'Invalid user type' });
+    }
+
+    try {
+        const users = await UserModel.find({ uploadedFiles: { $exists: true, $ne: null }, isAccepted: false });
+
+        if (!users) {
+            return res.status(404).json({ message: 'Document not found for this user' });
+        }
+
+        return res.status(200).json(users);
+
+    }
+    catch (error) {
+        console.error("Error serving user's document:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}

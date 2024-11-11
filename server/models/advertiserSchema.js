@@ -44,10 +44,8 @@ const advertiserSchema = new Schema({
     },
     uploadedFiles: {
         images: { type: [String], default: [], required: false },
-        documents: [{
-            name: String,
-            link: String
-        }
+        documents: [
+            String
         ]
     },
     hasAcceptedTerms: {
