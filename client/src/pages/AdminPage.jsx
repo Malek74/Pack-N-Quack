@@ -14,6 +14,7 @@ import {
   TentTree,
   Angry,
   Trash2,
+  File,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate, Outlet } from "react-router-dom";
@@ -46,6 +47,12 @@ const sidebarItems = [
     icon: Trash2,
     section: "Delete Requests",
     path: "delete-requests",
+  },
+  {
+    label: "Document Review",
+    icon: File,
+    section: "Document Review",
+    path: "document-review",
   },
   {
     label: "Tourism Governors",

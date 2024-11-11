@@ -46,6 +46,7 @@ import DeleteRequests from "@/components/adminPage/DeleteRequests";
 import ItineraryBookings from "@/pages/ItinerariesBookings";
 import BookActivities from "@/components/dropdown/BookActivities";
 import BookItinerary from "@/components/dropdown/BookItineraries";
+import DocumentReview from "@/components/adminPage/DocumentReview";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -82,14 +83,21 @@ const routes = createRoutesFromElements(
 
     <Route path="activity/:id" element={<SingleActivityPage />} />
     <Route path="place/:name" element={<SingleHistoricalPage />} />
-    <Route path="BookItinerary" element={<BookItinerary />}/>
-    <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary> } />
+    <Route path="BookItinerary" element={<BookItinerary />} />
+    <Route
+      path="*"
+      element={
+        <ErrorBoundary>
+          <NotFoundPage />
+        </ErrorBoundary>
+      }
+    />
     <Route path="componentTest" element={<ComponentTestPage />} />
     <Route path="bookingFlight" element={<FlightBookingApp />}></Route>
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
 
-<Route path="touristDashboard" element={<TouristDashboard />} />
-    <Route 
+    <Route path="touristDashboard" element={<TouristDashboard />} />
+    <Route
       path="*"
       element={
         <ErrorBoundary>
@@ -115,6 +123,7 @@ const routes = createRoutesFromElements(
       <Route path="complaints" element={<Complaints />} />
       <Route path="complaints/:complaintID" element={<OneComplain />} />
       <Route path="delete-requests" element={<DeleteRequests />} />
+      <Route path="document-review" element={<DocumentReview />} />
     </Route>
 
     <Route path="touristDashboard" element={<TouristDashboard />}>
@@ -122,7 +131,7 @@ const routes = createRoutesFromElements(
       <Route path="tour-guides" element={<TourGuides />} />
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
-      <Route path="activitiy-bookings" element={<BookActivities />}/>
+      <Route path="activitiy-bookings" element={<BookActivities />} />
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="complaints" element={<ComplaintsPageTourist />} />
       <Route path="rewards" element={<PointsAndLoyalty />} />

@@ -88,8 +88,9 @@ export default function HistoricalCard(props) {
             props.prices.map((price) => (
               <span key={price.type} className="flex ">
                 <b className="mr-1">{price.type}: </b>
-                {prefCurrency}
+
                 {price.price}
+                {prefCurrency}
               </span>
             ))}
         </div>

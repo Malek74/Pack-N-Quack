@@ -30,13 +30,16 @@ export default function MyProfilePage() {
   const [file1, setFile1] = useState([]);
   const [file2, setFile2] = useState([]);
 
-  const handleFileUpload = () => {
+  const handleFileUpload = async () => {
     const formData = new FormData();
-    formData.append("ID", file1[0]);
-    formData.append("Taxation Registry Card", file2[0]);
+    formData.append("documents", file1[0]);
+    formData.append("documents", file2[0]);
     formData.append("userType", userType);
     try {
-      const response = axios.post(`/api/upload/documents/${userId}`, formData);
+      const response = await axios.post(
+        `/api/upload/documents/${userId}`,
+        formData
+      );
       console.log(response);
       toast({
         title: "YAY!",

@@ -209,7 +209,7 @@ export default function AdminProducts() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {product.seller_info.username}
+                          {product.sellerUsername}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">

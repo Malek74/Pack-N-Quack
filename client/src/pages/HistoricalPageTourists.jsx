@@ -33,11 +33,6 @@ export default function Historical() {
   }, [searchTerm, filteredTags]);
   return (
     <div className="flex flex-col w-screen p-14 ">
-      {/* <Banner
-                background={Historicalbackground}
-                alt="Historical Background"
-                name="HISTORICAL PLACES & MUSEUMS"
-            /> */}
       <div className="relative mb-10">
         {/* Banner Section */}
         <Banner

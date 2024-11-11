@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 BookedItineraryCard.propTypes = {
   id: PropTypes.string,
   name: PropTypes.string,
@@ -28,6 +28,7 @@ BookedItineraryCard.propTypes = {
   bookingId: PropTypes.string,
 };
 export default function BookedItineraryCard({
+  id,
   bookingId,
   name,
   description,
@@ -47,7 +48,7 @@ export default function BookedItineraryCard({
   const imgClassName = small
     ? "rounded-lg rounded-b-none h-[200px] w-full object-fill"
     : "rounded-lg rounded-b-none h-[200px] w-full object-fill";
-
+  const navigate = useNavigate();
   const { toast } = useToast();
   const handleCancelBooking = async () => {
     try {
@@ -74,7 +75,12 @@ export default function BookedItineraryCard({
     }
   };
   return (
-    <Card className={cardClassName}>
+    <Card
+      className={cardClassName}
+      onClick={() => {
+        navigate(`/itinerariesTourists/${id}`);
+      }}
+    >
       <img
         src={
           coverImage ||
@@ -88,7 +94,8 @@ export default function BookedItineraryCard({
             <Label className="text-lg font-semibold">{name}</Label>
             <Button
               className="text-md bg-red-500 text-white hover:bg-red-600 hover:text-white"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 handleCancelBooking();
               }}
             >

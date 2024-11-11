@@ -6,6 +6,7 @@ import Maps from "@/components/shared/Maps";
 import OpeningHours from "@/components/historicalPage/OpeningHours";
 import { SampleDatePicker } from "@/components/shared/datepicker";
 import { useUser } from "@/context/UserContext";
+import { ShareButton } from "@/components/shared/ShareButton";
 export default function SingleHistoricalPage() {
   const { name } = useParams();
   const [historicalPlace, setHistoricalPlace] = useState(null);
@@ -105,15 +106,7 @@ export default function SingleHistoricalPage() {
       </div>
 
       {/* Date Picker and Booking Button */}
-      <div className="flex flex-col items-center mt-4">
-        <SampleDatePicker value={selectedDate} onChange={setSelectedDate} />
-        <button
-          onClick={handleBooking}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Book Now
-        </button>
-      </div>
+      <ShareButton title={name} link={window.location.href} />
     </div>
   );
 }
