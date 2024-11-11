@@ -30,15 +30,10 @@ const DropDownMenuComponent = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>Book</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link to="/bookingFlight">Flight</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Link to="/bookingHotel">Hotel</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Link to="/transportation">Transportation</Link>
-        </DropdownMenuItem>
+        <DropdownMenuItem><Link to="/bookingFlight">Flight</Link></DropdownMenuItem>
+        <DropdownMenuItem><Link to="/bookingHotel">Hotel</Link></DropdownMenuItem>
+        <DropdownMenuItem><Link to="/transportations">Transportation</Link></DropdownMenuItem>
+
       </DropdownMenuContent>
     </DropdownMenu>
   );

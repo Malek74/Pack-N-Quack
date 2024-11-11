@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import NewTouristForm from "@/components/forms/NewTouristForm";
 import NewSellerForm from "@/components/forms/NewSellerForm";
 import registration from "/assets/images/registration.jpg";
+import registration2 from "/assets/images/registeration2.jpg";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
@@ -80,7 +81,7 @@ export default function RegistrationPage() {
   };
   return (
     <div className="flex ">
-      <img className="h-svh" src={registration} />
+      <img className="h-svh " src={registration2} />
       {type == "" && (
         <div className="flex flex-1 justify-center items-center">
           <Button onClick={() => setType("Tourist")}>Sign up as Tourist</Button>
