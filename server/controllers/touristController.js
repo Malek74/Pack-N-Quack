@@ -267,7 +267,7 @@ export const viewMyTourGuides = async (req, res) => {
     }
     try {
         const myBookings = await Booking.find(
-            { touristID: touristID, date: { $gte: new Date() } }
+            { touristID: touristID, date: { $lte: new Date() } }
         );
 
         const myItineraries = await Itinerary.find(
@@ -292,7 +292,7 @@ export const viewMyItineraries = async (req, res) => {
     }
     try {
         const myBookings = await Booking.find(
-            { touristID: touristID, date: { $gte: new Date() } }
+            { touristID: touristID, date: { $lte: new Date() } }
         );
 
         const myItineraries = await Itinerary.find(
@@ -313,7 +313,7 @@ export const viewMyActivities = async (req, res) => {
     }
     try {
         const myBookings = await Booking.find(
-            { touristID: touristID, date: { $gte: new Date() } }
+            { touristID: touristID, date: { $lte: new Date() } }
         );
         const myActivities = await activityModel.find(
             { _id: { $in: myBookings.map(booking => booking.activityID) } }

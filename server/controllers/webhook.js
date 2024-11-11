@@ -31,7 +31,9 @@ export const confirmPayment = async (req, res) => {
                         eventBooked = await activityModel.findById(eventID);
                         bookedEvent.price = session.metadata.price;
                         bookedEvent.activityID = eventBooked._id;
-                        bookedEvent.date = session.metadata.date;
+                        bookedEvent.date = eventBooked.date;
+                        console.log("Activity Booked: ", eventBooked);
+                    
                     }
                     else if (eventType == "itinerary") {
                         eventBooked = await Itinerary.findById(eventID);
@@ -41,6 +43,8 @@ export const confirmPayment = async (req, res) => {
                     }
                     bookedEvent.stripeSessionID = session.id;
                     bookedEvent.numOfTickets = session.metadata.numOfTickets;
+
+                    console.log("Event Booked: ", eventBooked);
 
                     //add loyalty points
                     addLoyaltyPoints(touristID, session.amount_total / 100);

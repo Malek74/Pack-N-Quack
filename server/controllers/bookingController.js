@@ -15,7 +15,7 @@ export const bookEvent = async (req, res) => {
 
     const touristID = req.params.id;
     const { eventType, eventID, payByWallet, numOfTickets, dateSelected } = req.body;
-    console.log("Booking", req.body);
+    // console.log("Booking", req.body);
     let event = {}
     try {
 
@@ -75,10 +75,12 @@ export const bookEvent = async (req, res) => {
                 type: "event",
                 price: event.price * numOfTickets,
                 numOfTickets: numOfTickets,
-                date: dateSelected || event.date
+                date: dateSelected 
             }
         });
-        console.log("Session: ", session.url);
+        console.log("stripe date: ", new Date(session.metadata.date));
+        console.log("date selected: ", req.body.dateSelected);
+        // console.log("Session: ", session.url);
         return res.status(200).json({ url: session.url });
     }
     catch (error) {
