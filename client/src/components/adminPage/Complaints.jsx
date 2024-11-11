@@ -63,7 +63,7 @@ export default function Complaints() {
   }
 
   useEffect(() => {
-    fetchComplaints(); 
+    fetchComplaints();
   }, [selectedFilters]);
 
   const handleFilterChange = (type, value) => {
@@ -119,24 +119,23 @@ export default function Complaints() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {complaints &&
-                complaints.map((complaint) => (
-                  <TableRow key={complaint._id}>
-                    <TableCell onClick={() => openComplaint(complaint)}>
-                      {complaint.title}
-                    </TableCell>
-                    <TableCell onClick={() => openComplaint(complaint)}>
-                      {formatDate(complaint.date)}
-                    </TableCell>
-                    <TableCell>
-                      <PendingAndResolved
-                        status={complaint.status}
-                        id={complaint._id}
-                        onRefresh={fetchComplaints}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {complaints?.map((complaint) => (
+                <TableRow key={complaint._id}>
+                  <TableCell onClick={() => openComplaint(complaint)}>
+                    {complaint.title}
+                  </TableCell>
+                  <TableCell onClick={() => openComplaint(complaint)}>
+                    {formatDate(complaint.date)}
+                  </TableCell>
+                  <TableCell>
+                    <PendingAndResolved
+                      status={complaint.status}
+                      id={complaint._id}
+                      onRefresh={fetchComplaints}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

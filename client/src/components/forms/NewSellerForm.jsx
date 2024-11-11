@@ -174,46 +174,6 @@ export default function NewSellerForm(props) {
             </FormItem>
           )}
         />
-
-        {form2.getValues("status") === "Tour guide" && (
-          <div className="flex flex-col">
-            <div className="flex flex-col">
-              <Label>Upload Avatar</Label>
-              <AvatarUploader
-                size={24}
-                userType="tourGuide"
-                userId="66fb241366ea8f57d59ec6db"
-              />
-            </div>
-          </div>
-        )}
-
-        {form2.getValues("status") !== "Tour guide" && (
-          <div className="flex flex-col">
-            <div className="flex flex-col">
-              <Label>Upload Avatar</Label>
-              <AvatarUploader
-                size={24}
-                userType="tourGuide"
-                userId="66fb241366ea8f57d59ec6db"
-              />
-            </div>
-          </div>
-        )}
-
-        {form2.getValues("status") !== "Tour guide" && (
-          <div className="flex flex-col">
-            <div className="flex flex-col">
-              <Label>Upload Avatar</Label>
-              <AvatarUploader
-                size={24}
-                userType="tourGuide"
-                userId="66fb241366ea8f57d59ec6db"
-              />
-            </div>
-          </div>
-        )}
-
         <Button variant="secondary" type="submit">
           Create account
         </Button>

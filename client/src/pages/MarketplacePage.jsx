@@ -38,13 +38,15 @@ export default function MarketplacePage() {
       });
   };
 
+  26835438303
+  14215076750
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
       .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
-        setMaxPrice(response.data.maxPrice + 200);
-        setSliderRange([0, response.data.maxPrice]); // Set the range once maxPrice is fetched
+        setMaxPrice(response.data + 200);
+        setSliderRange([0, response.data]); // Set the range once maxPrice is fetched
       })
       .catch((error) => {
         console.error(error);

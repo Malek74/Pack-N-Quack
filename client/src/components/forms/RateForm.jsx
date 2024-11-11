@@ -16,6 +16,7 @@ import {
 import { RatingInput } from "../shared/RatingsInput";
 import PropTypes from "prop-types";
 import { useToast } from "@/hooks/use-toast";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 // Define zod schema for comment and rating
 const schema = z.object({
@@ -66,6 +67,7 @@ export default function RateForm(props) {
             comment: values.comment,
             rating: values.rating,
           });
+          toast({ title: "Rating added succesfully" });
         } catch (error) {
           console.error(error);
         }
@@ -79,6 +81,7 @@ export default function RateForm(props) {
             comment: values.comment,
             rating: values.rating,
           });
+          toast({ title: "Rating added succesfully" });
         } catch (error) {
           console.error(error);
         }
@@ -119,6 +122,7 @@ export default function RateForm(props) {
             comment: values.comment,
             rating: values.rating,
           });
+          toast({ title: "Rating added succesfully" });
         } catch (error) {
           console.error(error);
         }
@@ -155,18 +159,20 @@ export default function RateForm(props) {
                         key={duck.id}
                         onClick={() => handleExperienceChange(duck.id)}
                         type="button"
-                        className={`flex flex-col items-center ${experience === duck.id
-                          ? "text-green-500"
-                          : "text-gray-400"
-                          }`}
+                        className={`flex flex-col items-center ${
+                          experience === duck.id
+                            ? "text-green-500"
+                            : "text-gray-400"
+                        }`}
                       >
                         <img
                           src={duck.src}
                           alt={duck.label}
-                          className={`w-[100px] h-[100px] ${rating === duck.id
-                            ? "border-2 border-green-500"
-                            : ""
-                            }`}
+                          className={`w-[100px] h-[100px] ${
+                            rating === duck.id
+                              ? "border-2 border-green-500"
+                              : ""
+                          }`}
                         />
                         {experience === duck.id && (
                           <span className="text-sm mt-1 font-semibold">
@@ -218,12 +224,15 @@ export default function RateForm(props) {
           )}
         />
         {/* Submit Button */}
+        <DialogClose>
         <Button
           type="submit"
           className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white"
         >
           Submit
         </Button>
+        </DialogClose>
+
       </form>
     </Form>
   );

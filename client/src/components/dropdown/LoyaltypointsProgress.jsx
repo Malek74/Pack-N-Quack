@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Infinity } from "lucide-react";
 
-export default function LoyaltyPointsProgress({ currentPoints = 750 }) {
+export default function LoyaltyPointsProgress({ currentPoints = 0 }) {
   const maxPoints = {
     bronze: 100000,
     silver: 500000,

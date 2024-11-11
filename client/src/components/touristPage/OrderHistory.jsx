@@ -114,7 +114,7 @@ export default function OrderHistory() {
             </Card>
           ))
         ) : (
-          <div></div>
+          <div>No purchases yet D:</div>
         )}
       </div>
     );

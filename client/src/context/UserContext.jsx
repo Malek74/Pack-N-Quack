@@ -17,6 +17,8 @@ export const UserProvider = ({ children }) => {
 
   // const [userId, setUserId] = useState("6702def62ed9e2a0d138f558");
   // const [userType, setUserType] = useState("tourist");
+
+  // const [userId, setUserId] = useState("6725442e98359339d8b821f0");
   // const [userId, setUserId] = useState("66fb241366ea8f57d59ec6db");
   // const [userType, setUserType] = useState("tourGuide");
   const [userId, setUserId] = useState("670002186379370f9748adb5");

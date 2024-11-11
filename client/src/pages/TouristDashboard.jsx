@@ -71,6 +71,11 @@ export default function TouristDashboard() {
       path: "order-history",
     },
     {
+      label: "My Prodcucts",
+      icon: Package,
+      path: "my-products",
+    },
+    {
       label: "Complaints",
       icon: Angry,
       path: "complaints",

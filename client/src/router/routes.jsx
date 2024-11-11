@@ -158,6 +158,8 @@ const routes = createRoutesFromElements(
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="complaints" element={<ComplaintsPageTourist />} />
       <Route path="rewards" element={<PointsAndLoyalty />} />
+      <Route path="my-products" element={<AdminProducts seller />} />
+
       <Route path="itinerary-bookings" element={<ItineraryBookings />}></Route>
       {/* <Route path="bookings" element={<Booked />} /> */}
       <Route path="complaints/:id" element={<ComplaintDetailsPageTourist />} />

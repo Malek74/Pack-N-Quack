@@ -30,12 +30,12 @@ import FilterButtons from "../shared/FilterButtons";
 import PriceSlider from "../shared/PriceSlider";
 import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
-export default function AdminProducts() {
+export default function AdminProducts({ seller }) {
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { prefCurrency } = useUser();
-  const [tab, setTab] = useState("all");
+  const [tab, setTab] = useState("active");
   const [maxPrice, setMaxPrice] = useState(null);
   const [priceRange, setPriceRange] = useState([0, 1000000]); // Applied price range
   const [sliderRange, setSliderRange] = useState([0, 1000000]); // Temporary slider range
@@ -49,6 +49,7 @@ export default function AdminProducts() {
         const min = priceRange[0] > 0 ? priceRange[0] : 0;
         const max = priceRange[1] || maxPrice;
         console.log("fetching");
+        const sellerID = seller ? "&sellerID=6703ba52daf9eae5ef55344c" : "";
         const archiveFilter =
           tab === "all"
             ? ""
@@ -57,7 +58,7 @@ export default function AdminProducts() {
             : `isArchived=false`;
         axios
           .get(
-            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}`
+            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}${sellerID}`
           )
           .then((response) => {
             setProducts(response.data);
@@ -77,8 +78,12 @@ export default function AdminProducts() {
     axios
       .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
-        setMaxPrice(response.data.maxPrice + 200);
-        setSliderRange([0, response.data.maxPrice]);
+        console.log(response.data);
+        console.log(typeof response.data);
+
+        setMaxPrice(response.data + 200);
+        console.log(maxPrice);
+        setSliderRange([0, response.data + 200]);
       })
       .catch((error) => {
         console.error(error);
@@ -181,9 +186,9 @@ export default function AdminProducts() {
             <TableHeader>
               <TableRow>
                 <TableHead>Image</TableHead>
-                <TableHead>Seller</TableHead>
+                {!seller && <TableHead>Seller</TableHead>}
                 <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
+                {!seller && <TableHead>Description</TableHead>}
                 <TableHead>Price</TableHead>
                 <TableHead>Rating</TableHead>
                 <TableHead>Available Quantity</TableHead>
@@ -207,15 +212,21 @@ export default function AdminProducts() {
                           width="64"
                         />
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {product.sellerUsername}
-                        </Badge>
-                      </TableCell>
+                      {!seller && (
+                        <TableCell>
+                          <Badge variant="outline">
+                            {product.sellerUsername}
+                          </Badge>
+                        </TableCell>
+                      )}
                       <TableCell className="font-medium">
                         {product.name}
                       </TableCell>
-                      <TableCell className="">{product.description}</TableCell>
+                      {!seller && (
+                        <TableCell className="">
+                          {product.description}
+                        </TableCell>
+                      )}
                       <TableCell className="hidden md:table-cell">
                         {product.price}
                       </TableCell>
@@ -294,7 +305,7 @@ export default function AdminProducts() {
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
           <Tabs
-            defaultValue="all"
+            defaultValue="active"
             onValueChange={(value) => {
               setTab(value);
               setProducts([]);
@@ -330,8 +341,8 @@ export default function AdminProducts() {
                     <PriceSlider
                       min={0}
                       max={maxPrice}
-                      priceRange={sliderRange} // Pass the temporary slider range
-                      handlePriceChange={handlePriceChange} // Update slider range on change
+                      priceRange={sliderRange}
+                      handlePriceChange={handlePriceChange}
                     />
                     <Button
                       size="sm"
@@ -349,7 +360,11 @@ export default function AdminProducts() {
                   form={
                     <ProductForm
                       onRefresh={debouncedFetchProducts}
-                      adderId="6706596fd394ab3a8816c3d5"
+                      adderId={
+                        seller
+                          ? "6703ba52daf9eae5ef55344c"
+                          : "6706596fd394ab3a8816c3d5"
+                      }
                     />
                   }
                 />
@@ -357,14 +372,14 @@ export default function AdminProducts() {
             </div>
 
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              {/* <TabsTrigger value="all">All</TabsTrigger> */}
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="archived">Archived</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all">
+            {/* <TabsContent value="all">
               <TableContent />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="active">
               <TableContent />
             </TabsContent>
