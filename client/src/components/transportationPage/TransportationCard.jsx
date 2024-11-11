@@ -17,7 +17,8 @@ export default function transportationCard(props) {
 
         <div
             onClick={openTransportationPage}
-            className="container rounded-lg w-[25rem] h-auto p-2 shadow-md"
+            className="p-4 shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[500px] rounded-xl"
+
         >
             <div className="flex place-content-end ">
                 <img className=" w-[25rem] rounded-lg mb-4" src={props.img} />

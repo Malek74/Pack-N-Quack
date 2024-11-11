@@ -76,7 +76,7 @@ export default function Transportation() {
     }, [transportationDeleted, transportationUpdated, transportationCreated]);
 
     return (
-        <div className="flex flex-col  w-screen p-14">
+        <div className="flex flex-col px-16 my-8">
             <Banner
                 background={Transportationsbackground}
                 alt="Transportations Background"
@@ -96,7 +96,7 @@ export default function Transportation() {
                 Upcoming Transportations
             </h1>
 
-            <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10">
+            <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
                 {transportations.map((transportation) => (
                     <TransportationCard
                         key={transportation._id}
