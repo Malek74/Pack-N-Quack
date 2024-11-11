@@ -19,12 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { format } from "date-fns";
 export default function DeleteRequests() {
   const { toast } = useToast();
   const [accounts, setAccounts] = useState();
   const fetchAccounts = () => {
     axios
-      .get("api/admin/deleteRequests")
+      .get("/api/admins/deleteRequests")
       .then((response) => {
         setAccounts(response.data);
         console.log(response.data);
@@ -35,12 +36,9 @@ export default function DeleteRequests() {
   };
 
   const deleteClicked = (account) => {
-    console.log("Hi " + account.userType);
     axios
-      .delete(`api/admins/${account._id}`, {
-        data: {
-          userType: account.userType,
-        },
+      .post(`/api/admins/confirmDelete`, {
+        ...account,
       })
       .then(() => {
         toast({
@@ -51,7 +49,8 @@ export default function DeleteRequests() {
       .catch((error) => {
         console.error(error);
         toast({
-          text: `Failed to delete account"`,
+          title: error.response.data.message,
+          description: error.response.data.error,
           variant: "destructive", // Error variant
         });
       });
@@ -65,8 +64,10 @@ export default function DeleteRequests() {
     <div className="flex flex-col sm:gap-4 sm:py-4">
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
-          <CardTitle>Accounts</CardTitle>
-          <CardDescription>Manage all accounts.</CardDescription>
+          <CardTitle>Deletion Account Requests</CardTitle>
+          <CardDescription>
+            Manage all account deletion requests.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {" "}
@@ -77,15 +78,19 @@ export default function DeleteRequests() {
                 <TableHead>Username</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>User Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Request Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {accounts &&
                 accounts.map((account) => (
                   <TableRow key={account._id}>
-                    <TableCell>{account.username}</TableCell>
+                    <TableCell>{account.name}</TableCell>
                     <TableCell>{account.email}</TableCell>
                     <TableCell>{account.userType}</TableCell>
+                    <TableCell>{account.status}</TableCell>
+                    <TableCell>{format(account.date, "PP")}</TableCell>
                     <TableCell>
                       <DeleteButton onConfirm={() => deleteClicked(account)} />
                     </TableCell>
