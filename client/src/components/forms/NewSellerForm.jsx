@@ -1,25 +1,11 @@
-import React, { useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
-import { CheckIcon } from "lucide-react";
 
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import DialogTerms from "../shared/DialogTerms";
 import {
   Form,
   FormControl,
@@ -29,16 +15,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/shared/PhoneInput";
-import { SampleDatePicker } from "@/components/shared/datepicker";
+import { Label } from "../ui/label";
+import ImageUploader from "../shared/ImageUploader";
+import AvatarUploader from "../shared/AvatarUploader";
 
 export default function NewSellerForm(props) {
   const formSchema2 = z.object({
@@ -51,7 +33,10 @@ export default function NewSellerForm(props) {
     status: z.enum(
       ["Advertiser", "Seller", "Tour guide"],
       "Please select a status."
-    ), // Radio group validation
+    ),
+    terms: z.boolean().refine((value) => value === true, {
+      message: "You must accept terms and conditions.",
+    }),
   });
   // 1.2 Define your form for seller , tour guide and advertisor signup.
   const form2 = useForm({
@@ -60,7 +45,8 @@ export default function NewSellerForm(props) {
       username: "", // Default value for username
       email: "", // Default value for email
       password: "", // Default value for password
-      status: undefined, // Default value for status dropdown
+      status: undefined,
+      terms: false,
     },
   });
 
@@ -70,10 +56,7 @@ export default function NewSellerForm(props) {
     props.submitFunction(values);
   }
 
-  
   return (
-
-
     <Form {...form2}>
       <form onSubmit={form2.handleSubmit(onSubmit2)} className="space-y-8">
         {/* Username Field */}
@@ -169,6 +152,28 @@ export default function NewSellerForm(props) {
           )}
         />
 
+        {/* Terms and Conditions */}
+        <FormField
+          control={form2.control}
+          name="terms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  {...field}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Accept terms and conditions</FormLabel>
+                <FormDescription>
+                  You agree to our <DialogTerms></DialogTerms>
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
         <Button variant="secondary" type="submit">
           Create account
         </Button>

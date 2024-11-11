@@ -1,8 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import DropDownMenuComponent from "./components/DropDownMenuComponent";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import logo from "/assets/icons/logo.png";
+import DropDownMenuBook from "./components/DropDownMenuBook";
+
+import ComboboxCurrency from "./components/ComboboxCurrency";
+import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
+
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
 
@@ -31,15 +35,17 @@ export default function Header() {
           <Button asChild variant="link">
             <li>
               <Link
-                to="/profile"
-                className={isActive("/profile") ? "text-yellow-500" : ""}
+                to="/touristDashboard/profile"
+                className={
+                  isActive("/touristDashboard") ? "text-yellow-500" : ""
+                }
               >
                 Profile
               </Link>
             </li>
           </Button>
 
-          <Button asChild variant="link">
+          {/* <Button asChild variant="link">
             <li>
               <Link
                 to="/about"
@@ -48,9 +54,9 @@ export default function Header() {
                 About Us
               </Link>
             </li>
-          </Button>
+          </Button> */}
 
-          <Button asChild variant="link">
+          {/* <Button asChild variant="link">
             <li>
               <Link
                 to="/contact"
@@ -59,7 +65,8 @@ export default function Header() {
                 Contact
               </Link>
             </li>
-          </Button>
+          </Button> */}
+
           <Button asChild variant="link">
             <li>
               <Link
@@ -77,13 +84,45 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
-              <DropDownMenuComponent location={location} />
+              <DropDownMenuTGSADV location={location} />
+            </li>
+          </Button>
+
+          <Button asChild variant="link">
+            <li
+              className={
+                isActive("/itinerariesTourists")
+                  ? "text-yellow-500"
+                  : isActive("/activitiesTourists")
+                    ? "text-yellow-500"
+                    : isActive("/historicalTourists")
+                      ? "text-yellow-500"
+                      : ""
+              }
+            >
+              <DropDownMenuTourist />
+            </li>
+          </Button>
+
+          <Button asChild variant="link">
+            <li
+              className={
+                isActive("/bookingFlight")
+                  ? "text-yellow-500"
+                  : isActive("/bookingHotel")
+                    ? "text-yellow-500"
+                    : isActive("/transportations")
+                      ? "text-yellow-500"
+                      : ""
+              }
+            >
+              <DropDownMenuBook location={location} />
             </li>
           </Button>
 
@@ -92,20 +131,19 @@ export default function Header() {
               className={
                 isActive("/itineraries")
                   ? "text-yellow-500"
-                  : isActive("/activitiesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/historicalTourists")
-                  ? "text-yellow-500"
-                  : ""
+                  : isActive("/activities")
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
-            >
-              <DropDownMenuTourist />
-            </li>
+            ></li>
           </Button>
         </ul>
 
         {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
+          <ComboboxCurrency />
           <Button asChild variant="ghost">
             <li>
               <Link to="/login">Log in</Link>

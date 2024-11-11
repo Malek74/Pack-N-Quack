@@ -9,7 +9,7 @@ export default function PriceRangeSlider({
   min = 0,
   max = 1000,
   step = 10,
-  formatPrice = (price) => `$${price?.toFixed(2) ?? "0.00"}`,
+  formatPrice = (price) => `${price?.toFixed(2) ?? "0.00"}`,
   onChange,
   ...props
 }) {

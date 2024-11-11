@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,9 +17,14 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { DialogClose } from "@radix-ui/react-dialog";
+import ImageUploader from "../shared/ImageUploader";
+
 export default function ProductForm({ onRefresh, adderId }) {
+  const [submissionSuccess, setSubmissionSuccess] = useState(false); // Track submission status
+
   const { toast } = useToast();
-  // Define schema for validation
+
+  // Define schema for validation, including images as an array
   const productFormSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
     price: z.coerce
@@ -29,6 +36,9 @@ export default function ProductForm({ onRefresh, adderId }) {
     description: z
       .string()
       .min(10, { message: "Description must be at least 10 characters." }),
+    images: z
+      .array(z.instanceof(File))
+      .min(1, { message: "At least one image is required." }), // Add validation for images
   });
 
   // Initialize form
@@ -39,37 +49,44 @@ export default function ProductForm({ onRefresh, adderId }) {
       price: "",
       quantity: "",
       description: "",
+      images: [], // Add default empty array for images
     },
   });
 
   // Handle form submission
-  function onSubmit(values) {
-    console.log(values);
-    axios
-      .post("/api/products/", {
-        name: values.name,
-        price: values.price,
-        available_quantity: values.quantity,
-        description: values.description,
-        id: adderId,
-      })
-      .then((response) => {
-        console.log("Product created successfully:", response.data);
-        toast({
-          title: "Product created succesfully!",
-        });
-        onRefresh();
-        // onTagCreate(); // Call the parent function to refresh the table
-      })
-      .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Product could not be created",
-          description: error.response.data.message,
-        });
-        console.error(error);
-        console.log(error);
+  async function onSubmit(values) {
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("price", values.price.toString()); // Ensure price is a string
+    formData.append("available_quantity", values.quantity.toString()); // Ensure quantity is a string
+    formData.append("description", values.description);
+    values.images.forEach((image) => {
+      formData.append(`images`, image); // Append each image from form data
+    });
+
+    try {
+      const response = await axios.post(`/api/products/${adderId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      setSubmissionSuccess(true); // Set success to true
+
+      toast({
+        title: "Product created successfully!",
+      });
+      onRefresh();
+
+      form.reset();
+    } catch (error) {
+      setSubmissionSuccess(false); // Ensure it doesn’t close on error
+
+      toast({
+        variant: "destructive",
+        title: "Product could not be created",
+        description: error.response?.data?.message,
+      });
+    }
   }
 
   return (
@@ -88,7 +105,6 @@ export default function ProductForm({ onRefresh, adderId }) {
               <FormControl>
                 <Input placeholder="Enter the name" {...field} />
               </FormControl>
-              {/* <FormDescription>Name of the product being sold.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -102,14 +118,11 @@ export default function ProductForm({ onRefresh, adderId }) {
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter the price"
-                  type="number"
-                  {...field}
-                  valueAsNumber
-                />
+                <Input placeholder="Enter the price" type="number" {...field} />
               </FormControl>
-              {/* <FormDescription>Price of the product in EGP.</FormDescription> */}
+              <FormDescription>
+                Price in <strong>USD</strong>.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -129,7 +142,6 @@ export default function ProductForm({ onRefresh, adderId }) {
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>Set the available quantity of the product.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -145,16 +157,41 @@ export default function ProductForm({ onRefresh, adderId }) {
               <FormControl>
                 <Textarea placeholder="Enter the description" {...field} />
               </FormControl>
-              {/* <FormDescription>Provide a brief description of the product.</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
         />
-        <DialogClose className="place-self-end">
+
+        {/* Image Uploader Field */}
+        <Controller
+          control={form.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Images</FormLabel>
+              <FormControl>
+                <ImageUploader
+                  imagesUploaded={field.value}
+                  setImagesUploaded={(images) => field.onChange(images)}
+                  shouldHandleSave={false}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {submissionSuccess ? (
+          <DialogClose asChild>
+            <Button className="place-self-end" type="submit">
+              Submit
+            </Button>
+          </DialogClose>
+        ) : (
           <Button className="place-self-end" type="submit">
             Submit
           </Button>
-        </DialogClose>
+        )}
       </form>
     </Form>
   );
