@@ -14,6 +14,7 @@ import { useUser } from "@/context/UserContext";
 import AvatarUploader from "@/components/shared/AvatarUploader";
 import FileUploader from "@/components/shared/FileUploader";
 import { Button } from "@/components/ui/button";
+import DialogTerms from "@/components/shared/DialogTerms";
 export default function MyProfilePage() {
   const { toast } = useToast();
   const { userId, userType } = useUser();
@@ -44,6 +45,61 @@ export default function MyProfilePage() {
       toast({
         title: "YAY!",
         description: "Documents uploaded successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: error.response.data.message,
+        description: error.response.data.error,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAcceptTermsAdvertiser = async () => {
+    try {
+      const response = await axios.put(`/api/advertisers/terms/${userId}`);
+      console.log(response.data);
+      toast({
+        title: "YAY!",
+        description: "Terms accepted successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: error.response.data.message,
+        description: error.response.data.error,
+        variant: "destructive",
+      });
+    }
+  };
+  const handleAcceptTermsSeller = async () => {
+    try {
+      const response = await axios.put(`/api/sellers/terms/${userId}`);
+      console.log(response.data);
+      toast({
+        title: "YAY!",
+        description: "Terms accepted successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: error.response.data.message,
+        description: error.response.data.error,
+        variant: "destructive",
+      });
+    }
+  };
+  const handleAcceptTermsTourGuide = async () => {
+    try {
+      const response = await axios.put(`/api/tourGuide/terms/${userId}`);
+      console.log(response.data);
+      toast({
+        title: "YAY!",
+        description: "Terms accepted successfully!",
         variant: "success",
       });
     } catch (error) {
@@ -100,8 +156,10 @@ export default function MyProfilePage() {
         isAccepted,
         username,
         uploadedFiles,
+        hasAcceptedTerms,
       } = profile;
-
+      console.log("asdaiosdad", hasAcceptedTerms);
+      console.log("asdaiosdad2", isAccepted);
       return (
         <div className="flex gap-2">
           <Card className="max-w-md mx-auto shadow-md rounded-lg">
@@ -220,6 +278,17 @@ export default function MyProfilePage() {
               </div>
             )}
           </div>
+          {isAccepted && !hasAcceptedTerms && (
+            <div className="flex flex-col justify-center items-center  p-4">
+              <DialogTerms />
+              <Button
+                type="button"
+                onClick={() => handleAcceptTermsAdvertiser()}
+              >
+                Accept Terms
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -236,6 +305,7 @@ export default function MyProfilePage() {
         username,
         mobile,
         isAccepted,
+        hasAcceptedTerms,
         uploadedFiles,
       } = profile;
 
@@ -361,6 +431,17 @@ export default function MyProfilePage() {
               </div>
             )}
           </div>
+          {isAccepted && !hasAcceptedTerms && (
+            <div className="flex flex-col justify-center items-center  p-4">
+              <DialogTerms />
+              <Button
+                type="button"
+                onClick={() => handleAcceptTermsTourGuide()}
+              >
+                Accept Terms
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -369,8 +450,14 @@ export default function MyProfilePage() {
 
   function SellerCard() {
     if (profile) {
-      const { email, username, isAccepted, description, uploadedFiles } =
-        profile;
+      const {
+        email,
+        username,
+        isAccepted,
+        description,
+        uploadedFiles,
+        hasAcceptedTerms,
+      } = profile;
       return (
         <div className="flex gap-2">
           <Card className="max-w-md mx-auto shadow-md rounded-lg">
@@ -458,6 +545,14 @@ export default function MyProfilePage() {
               </div>
             )}
           </div>
+          {isAccepted && !hasAcceptedTerms && (
+            <div className="flex flex-col justify-center items-center  p-4">
+              <DialogTerms />
+              <Button type="button" onClick={() => handleAcceptTermsSeller()}>
+                Accept Terms
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
