@@ -41,7 +41,7 @@ const routes = createRoutesFromElements(
     <Route path="historical/:idTG" element={<HistoricalPage />} />
     <Route path="marketplace" element={<MarketplacePage />} />
     <Route path="RegistrationPage" element={<RegistrationPage />} />
-    <Route path="activitiesTourists" element={<ActivitiesTourists />} />
+    <Route path="activities" element={<ActivitiesPage />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
 
     <Route
@@ -80,7 +80,7 @@ const routes = createRoutesFromElements(
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>
     <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
-    
+
 
     <Route path="touristDashboard" element={<TouristDashboard />}>
       <Route path="profile" element={<MyProfilePage />} />
@@ -89,7 +89,7 @@ const routes = createRoutesFromElements(
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
-       
+
     </Route>
 
     <Route

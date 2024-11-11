@@ -130,26 +130,26 @@ export default function HomePage() {
 
   const filteredActivities = activities
     ? activities.filter((activity) =>
-        activity.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
-        itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   return (
-    <div className="flex flex-col px-16">
+    <div className="flex flex-col px-16 my-8">
       <div className="relative mb-6">
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-          //    alt="Hustling market"
-          //    name="Live your dream destinations."
-          //    textAlign="left"
-          //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+        //    alt="Hustling market"
+        //    name="Live your dream destinations."
+        //    textAlign="left"
+        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}

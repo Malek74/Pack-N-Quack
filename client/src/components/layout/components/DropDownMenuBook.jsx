@@ -20,6 +20,9 @@ const DropDownMenuComponent = () => {
       case "/bookingHotel":
         setLabel("Book a Hotel");
         break;
+      case "/transportations":
+        setLabel("Book a Transportation");
+        break;
       default:
         setLabel("Booking");
     }

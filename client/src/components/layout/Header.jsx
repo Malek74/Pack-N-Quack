@@ -84,10 +84,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuTGSADV location={location} />
@@ -100,10 +100,10 @@ export default function Header() {
                 isActive("/itinerariesTourists")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/historicalTourists")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historicalTourists")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuTourist />
@@ -113,13 +113,13 @@ export default function Header() {
           <Button asChild variant="link">
             <li
               className={
-                isActive("/itineraries")
+                isActive("/bookingFlight")
                   ? "text-yellow-500"
-                  : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                  : isActive("/bookingHotel")
+                    ? "text-yellow-500"
+                    : isActive("/transportations")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuBook location={location} />
@@ -132,10 +132,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
+                    ? "text-yellow-500"
+                    : isActive("/historical")
+                      ? "text-yellow-500"
+                      : ""
               }
             >
               <DropDownMenuProfile location={location} />
