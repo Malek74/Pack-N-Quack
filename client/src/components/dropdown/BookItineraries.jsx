@@ -1,6 +1,5 @@
 import React from "react";
-import ItineraryCard from "../itinerariesPage/ItineraryCard";
-
+import ItinerariesCard from "../itinerariesPage/ItinerariesCard";
 export default function BookItinerary({ itinerariesDB }) {
   const cancelBooking = (id) => {
     console.log(`Itinerary booking with id: ${id} has been cancelled.`);

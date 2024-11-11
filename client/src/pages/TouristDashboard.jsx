@@ -36,9 +36,9 @@ export default function TouristDashboard() {
       path: "rewards",
     },
     {
-      label: "Bookings",
+      label: "Activity Bookings",
       icon: Plane,
-      path: "bookings",
+      path: "activitiy-bookings",
     },
     {
       label: "Itinerary Bookings",

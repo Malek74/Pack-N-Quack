@@ -61,22 +61,21 @@ export default function ItinerariesTouristsPage() {
       )}
       {!isLoading && (
         <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-10 px-14 mb-36">
-          {fetchedItineraries &&
-            fetchedItineraries.map((itinerary) => (
-              <ItinerariesCard
-                key={itinerary._id}
-                id={itinerary._id}
-                image={itinerary.image}
-                name={itinerary.name}
-                description={itinerary.description}
-                tags={itinerary.tags}
-                price={itinerary.price}
-                rating={itinerary.ratings.averageRating}
-                numberOfReviews={itinerary.ratings.reviews.length}
-                coverImage={itinerary.coverImage || null}
-                touristClicked
-              />
-            ))}
+          {fetchedItineraries?.map((itinerary) => (
+            <ItinerariesCard
+              key={itinerary._id}
+              id={itinerary._id}
+              image={itinerary.image}
+              name={itinerary.name}
+              description={itinerary.description}
+              tags={itinerary.tags}
+              price={itinerary.price}
+              rating={itinerary.ratings.averageRating}
+              numberOfReviews={itinerary.ratings.reviews.length}
+              coverImage={itinerary.coverImage || null}
+              touristClicked
+            />
+          ))}
         </div>
       )}
 
