@@ -19,10 +19,7 @@ router.post("/", addAdmin);
 router.get("/getpending", getPendingPasswordChangeRequests);
 router.post("/reviewreq", handlePasswordChangeRequest);
 router.put("/isAccepted", acceptOrReject);
-router.get("/complaints", getComplaints);
-router.get("/complaints/:id", viewComplaintById);
-router.put("/complaints/pending/:id", markComplaintPending);
-router.put("/complaints/resolved/:id", markComplaintResolved);
+
 router.get("/deleteRequests", getDeleteRequests);
 router.post("/confirmDelete", handleDeleteRequest)
 
