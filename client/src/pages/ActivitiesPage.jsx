@@ -126,14 +126,14 @@ export default function Activities() {
             selectedFilters["Sort By"] == "price-asc"
               ? 1
               : selectedFilters["Sort By"] == "price-desc"
-              ? -1
-              : 0,
+                ? -1
+                : 0,
           sortRating:
             selectedFilters["Sort By"] == "ratings-asc"
               ? 1
               : selectedFilters["Sort By"] == "ratings-desc"
-              ? -1
-              : 0,
+                ? -1
+                : 0,
           rating: selectedFilters.Ratings,
           dateMin: selectedRange.from,
           dateMax: selectedRange.to,
@@ -182,11 +182,18 @@ export default function Activities() {
   return (
     <div className="flex flex-col justify-center w-screen px-14 my-8">
       <div className="relative mb-6">
-        <Banner
-          background={Activitiesbackground}
-          alt="Activities Background"
-          name="ACTIVITIES"
-        />
+        {tourist ?
+          <Banner
+            background={Activitiesbackground}
+            alt="Activities Background"
+            name="ACTIVITIES"
+          /> :
+          <Banner
+            background={Activitiesbackground}
+            alt="Activities Background"
+            name="MY ACTIVITIES"
+          />}
+
         {tourist && (
           <SearchBar
             searchTerm={searchTerm}

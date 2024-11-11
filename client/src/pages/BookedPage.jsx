@@ -100,18 +100,6 @@ export default function Booked() {
                     <h1 className='text-center text-3xl font-semibold my-10'>Your Booked Transportations</h1>
                     <div className='grid grid-cols-3 justify-evenly gap-5'>
                         {Array.isArray(bookedTransportations) && bookedTransportations.map((transportation) => (
-                            // <TransportationCard
-                            //     key={transportation._id}
-                            //     img={TransportationImage}
-                            //     advertiserName={transportation.transportationID.name}
-                            //     type={transportation.transportationID.type}
-                            //     time={transportation.transportationID.date}
-                            //     from={transportation.transportationID.origin}
-                            //     to={transportation.transportationID.destination}
-                            //     price={transportation.transportationID.price}
-                            //     notTourist={false}
-                            //     discounts={transportation.specialDiscounts}
-                            //     transportationID={transportation._id} />
                             <Card className="p-6 m-10 w-[24rem] h-auto flex flex-col " key={transportation._id}>
                                 <img className=" w-[20rem] rounded-lg mb-4 self-center" src={TransportationImage} />
                                 <div className="flex justify-between">
