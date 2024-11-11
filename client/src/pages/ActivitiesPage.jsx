@@ -173,7 +173,7 @@ export default function Activities() {
     selectedRange, activityDeleted, activityUpdated, activityCreated]);
 
   return (
-    <div className="flex flex-col  w-screen px-14 my-8">
+    <div className="flex flex-col justify-center w-screen px-14 my-8">
       <div className="relative mb-6">
         <Banner
           background={Activitiesbackground}
@@ -251,7 +251,7 @@ export default function Activities() {
         Upcoming Actvities
       </h1>
 
-      <div className="grid grid-cols-3 justify-stretch w-screen self-center gap-y-10">
+      <div className="grid grid-cols-3 justify-evenly w-screen self-center gap-y-10 px-10">
         {activities.map((activity) => (
           <ActivityCard
             key={activity._id}
@@ -270,6 +270,7 @@ export default function Activities() {
             booking={activity.isBookingOpen}
             discounts={activity.specialDiscounts}
             rating={activity.ratings.averageRating}
+            numberOfReviews={activity.ratings.reviews.length}
             activityID={activity._id}
             deleteActivityFunction={deleteActivity}
             updateActivityFunction={editActivity}

@@ -36,7 +36,7 @@ export default function ItinerariesCard({
   const navigate = useNavigate();
   return (
     <Card
-      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[550px] h-[450px]"
+      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[450px] "
       onClick={() => {
         if (touristClicked) navigate(`/itinerariesTourists/${id}`);
         if (tourGuideClicked) navigate(`/itinerariesTourGuide/${id}`);
@@ -72,7 +72,7 @@ export default function ItinerariesCard({
             {description}
           </p>
           <div className="flex justify-between">
-            <Label className="font-semibold text-lg text-gray-500">
+            <Label className="font-semibold text-lg text-skyblue">
               Price: {price}
             </Label>
 

@@ -9,106 +9,17 @@ import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
 import ActivityCard from "@/components/activityPage/ActivityCard";
 import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
+import ItineraryCard from "@/components/itinerariesPage/ItinerariesCard";
+
 import { set } from "date-fns";
 
 import { ShareButton } from "@/components/shared/ShareButton";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const userID = "672f8e2c142c1410c5243616";
+  const userID = "6732171fabc80503fd8f92a2";
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
-  // const products = [
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Sample Product 1",
-  //     seller: "Amazon",
-  //     rating: 2,
-  //     reviewsCount: 25,
-  //     price: "99.99",
-  //     description: "This is a sample product",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  //   {
-  //     img: Activitiesbackground,
-  //     name: "Another Product",
-  //     seller: "BestBuy",
-  //     rating: 4.5,
-  //     reviewsCount: 15,
-  //     price: "199.99",
-  //     description: "Another product example",
-  //   },
-  // ];
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,9 +28,9 @@ export default function HomePage() {
           `/api/tourist/myPreferences/${userID}`
         );
         console.log(response.data);
-        setActivities(response.data.activities);
+        setActivities(response.data.activites);
         setItineraries(response.data.itineraries);
-        set;
+        console.log(response.data.activites);
       } catch (error) {
         console.error(error);
       }
@@ -133,6 +44,7 @@ export default function HomePage() {
       activity.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     : [];
+  console.log(filteredActivities);
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
@@ -160,7 +72,7 @@ export default function HomePage() {
         />
       </div>
 
-      <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-center">
+      <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
         {Array.isArray(filteredActivities) &&
           filteredActivities.map((activity) => (
             <ActivityCard
@@ -184,10 +96,10 @@ export default function HomePage() {
           ))}
         {Array.isArray(filteredItineraries) &&
           filteredItineraries.map((itinerary) => (
-            <RamitoItinerariesCard
+            <ItineraryCard
               key={itinerary._id}
               id={itinerary._id}
-              image={itinerary.image}
+              coverImage={itinerary.coverImage || null}
               name={itinerary.name}
               description={itinerary.description}
               tags={itinerary.tags}

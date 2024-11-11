@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import RateComment from "./shared/RateComment";
-import RateForm from "./forms/RateForm";
+import RateComment from "../shared/RateComment";
+import RateForm from "../forms/RateForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 export default function ItinerariesMade() {

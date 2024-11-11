@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Star } from "lucide-react"; // Importing Star for rating display
+import Loading from "../components/shared/Loading";
 
 export default function SingleActivityPage() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ export default function SingleActivityPage() {
 
   // Render a loading state or the activity details
   if (!activity) {
-    return <div className="text-center text-xl">Loading...</div>;
+    return <div className="flex justify-center mt-10"><Loading /></div>;
   }
 
   // Destructure properties from the fetched activity data
@@ -79,7 +80,7 @@ export default function SingleActivityPage() {
           </span>
         ))}
       </div>
-      
+
       <div className="mt-6 p-4 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Location</h2>
         <iframe
