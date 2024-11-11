@@ -62,7 +62,7 @@ export const handleDeleteRequest = async (req, res) => {
                 const myItineraries = await Itinerary.find({ tourGuideID: userId });
 
                 //delete all itineraries 
-                await Itinerary.deleteMany({ tourGuideID: userId });
+                // await Itinerary.updateMany({ tourGuideID: userId });
 
                 //delete the requests
                 await DeleteRequest.findOneAndDelete({ email: email, name: name, userType: userType });
@@ -80,16 +80,17 @@ export const handleDeleteRequest = async (req, res) => {
 
                 //fetch advertiser
                 const advertiser = await advertiserModel.findOne({ email: email, username: name });
+                console.log(advertiser);
 
                 //fetch all activities of the advertiser
-                const activities = await activityModel.deleteMany({ advertiserID: advertiser._id });
-
+                const activities = await activityModel.updateMany({ advertiserID: advertiser._id }, { flagged: true });
+                console.log(activities);
 
                 //delete the requests
                 await DeleteRequest.findOneAndDelete({ email: email, name: name, userType: userType });
 
                 //delete advertiser
-                await advertiserModel.findByIdAndDelete(advertiser._id);
+                // await advertiserModel.findByIdAndDelete(advertiser._id);
 
                 return res.status(200).json({ message: `User deleted successfully` });
 

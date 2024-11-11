@@ -238,11 +238,9 @@ export const requestDeleteAccount = async (req, res) => {
                 const tourGuideDelete = await tourGuide.findById(userId);
 
                 const myItineraries = await Itinerary.find({ tourGuideID: userId, flagged: false, available_dates: { $elemMatch: { $gte: new Date() } } });
-                console.log("MY ITINERARIES");
-                console.log(myItineraries.length);
 
                 //deactivate all my itineraries
-                await Itinerary.updateMany({ tourGuideID: userId }, { isActive: false });
+                await Itinerary.updateMany({ tourGuideID: userId }, { isActive: false, flagged: true });
 
                 //check if any of theses itineraries have bookings
                 for (let i = 0; i < myItineraries.length; i++) {
@@ -274,7 +272,7 @@ export const requestDeleteAccount = async (req, res) => {
 
 
                 //flag all user activities
-                await activityModel.updateMany({ advertiserID: userId }, { flagged: false });
+                await activityModel.updateMany({ advertiserID: userId }, { flagged: true });
 
                 for (let i = 0; i < upcomingActivities.length; i++) {
                     const bookings = await Booking.find({ activityID: upcomingActivities[i]._id, date: { $gte: new Date() } });

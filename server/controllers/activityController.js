@@ -15,7 +15,7 @@ export const getActivities = async (req, res) => {
     const conversionRate = await getConversionRate(prefCurrency);
 
     try {
-        let activities = await activityModel.find({}).populate('advertiserID categoryID tags');
+        let activities = await activityModel.find({ flagged: false }).populate('advertiserID categoryID tags');
 
         //change price to preferred currency
         activities = activities.map(activity => {
