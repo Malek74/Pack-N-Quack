@@ -7,7 +7,7 @@ import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 import { protect } from "../middleware/authenticator.js";
 import { getComplaints, viewComplaintById, markComplaintPending, markComplaintResolved, viewComplaints } from "../controllers/complaintController.js";
-import { getDeleteRequests } from "../controllers/deleteRequestsController.js";
+import { getDeleteRequests, handleDeleteRequest } from "../controllers/deleteRequestsController.js";
 
 const router = express.Router();
 config();
@@ -24,6 +24,8 @@ router.get("/complaints/:id", viewComplaintById);
 router.put("/complaints/pending/:id", markComplaintPending);
 router.put("/complaints/resolved/:id", markComplaintResolved);
 router.get("/deleteRequests", getDeleteRequests);
+router.post("/confirmDelete", handleDeleteRequest)
+
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const user = await adminModel.findOne({ username }) || await advertiserModel.findOne({ username });

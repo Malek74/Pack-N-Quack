@@ -142,7 +142,8 @@ export const addItinerary = async (req, res) => {
             description: description,
             isActive: true,
             images: imagesUrls,
-            coverImage: coverImageUrl
+            coverImage: coverImageUrl,
+            flagged: false,
         });
         const createdItinerary = await Itinerary.create(itinerary);
 

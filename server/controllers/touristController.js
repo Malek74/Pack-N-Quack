@@ -167,8 +167,8 @@ export const getMyprefernces = async (req, res) => {
 
     try {
         const tourist = await Tourist.findById(id);
-        const prefereredActivities = await tourist.preferences.preferredActivities;
-        const prefereredItineraries = await tourist.preferences.preferredItineraries;
+        const prefereredActivities =  tourist.preferences.preferredActivities;
+        const prefereredItineraries =  tourist.preferences.preferredItineraries;
 
         let activities = [];
         let itineraries = [];
@@ -177,15 +177,13 @@ export const getMyprefernces = async (req, res) => {
         console.log(prefereredItineraries);
 
         //get activities based on tags
-        activities.push(... await activityModel.find({ 'tags': { $in: prefereredItineraries } }));
+        activities.push(... await activityModel.find({ 'tags': { $in: prefereredItineraries } }).populate('tags categoryID'));
 
         //get itineraries based on tags
-        itineraries.push(... await Itinerary.find({ 'tags': { $in: prefereredItineraries } }));
+        itineraries.push(... await Itinerary.find({ 'tags': { $in: prefereredItineraries } }).populate('tags'));
 
         //get activities based on categories
-        itineraries.push(... await activityModel.find({ 'categoryID': { $in: prefereredActivities } }));
-
-
+        activities.push(... await activityModel.find({ 'categoryID': { $in: prefereredActivities } }).populate('tags categoryID'));
 
         const result = {
             activites: activities,

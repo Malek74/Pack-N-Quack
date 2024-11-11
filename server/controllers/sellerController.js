@@ -1,7 +1,6 @@
 
 import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
-import DeleteRequest from '../models/deleteRequests.js';
 
 
 //get all sellers
@@ -85,24 +84,7 @@ export const updateSellerInfo = async (req, res) => {
 //TODO: Add cascade deleting for items that belong to the seller
 //delete by ID
 export const deleteSeller = async (req, res) => {
-    const id = req.params.id;
-    console.log(id);
-    if (!id) {
-        return res.status(400).json({ message: "Please provide a Seller ID" });
-    }
-    try {
-        const deletedSeller = await seller.findByIdAndDelete(id);
-        await deleteProducts(id);
-
-        const deleteRequest = await DeleteRequest.create({
-            sellerID: id,
-            status: "accepted"
-        });
-
-        return res.status(200).json({ message: `Seller with id ${id} deleted successfully` })
-    } catch (error) {
-        return res.status(400).json({ error: error.message })
-    }
+    
 }
 
 export const acceptTerms = async (req, res) => {

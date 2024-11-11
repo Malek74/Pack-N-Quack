@@ -1,12 +1,15 @@
 import activityModel from "../models/activitySchema.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
-import { addLoyaltyPoints, refundMoney } from "../utils/Helpers.js";
+import { addLoyaltyPoints, refundMoney, deleteProducts } from "../utils/Helpers.js";
 import Booking from "../models/bookingSchema.js";
 import Activity from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
-import tourGuide from "../models/tourGuideSchema.js"
+import DeleteRequest from '../models/deleteRequests.js';
+import tourGuide from '../models/tourGuideSchema.js';
+import seller from '../models/sellerSchema.js';
+import product from "../models/productSchema.js";
 
 export const bookEvent = async (req, res) => {
 
@@ -47,7 +50,7 @@ export const bookEvent = async (req, res) => {
         let success_url = "";
 
         if (eventType == "activity") {
-            success_url = "http://localhost:5173/BookActivities";
+            success_url = "http://localhost:5173/touristDashboard/activity-bookings";
         }
         else if (eventType == "itinerary") {
             success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
@@ -195,46 +198,108 @@ export const requestDeleteAccount = async (req, res) => {
     console.log(req.body);
 
     switch (userType) {
-        case 'Advertiser':
-            userModel = advertiserModel;
+        case 'seller':
+
+            if (!userId) {
+                return res.status(400).json({ message: "Please provide a Seller ID" });
+            }
+            try {
+                // const deletedSeller = await seller.findByIdAndDelete(userId);
+                // await deleteProducts(userId);
+                const sellerFound = await seller.findById(userId);
+                const deleteRequest = await DeleteRequest.create({
+                    name: sellerFound.username,
+                    email: sellerFound.email,
+                    userType: "Seller",
+                    status: "approved",
+                });
+
+                //archive all products
+                await product.updateMany({ seller_id: userId }, { isArchived: true });
+
+                return res.status(200).json({ message: `Delete Request created successfully` });
+            } catch (error) {
+                return res.status(500).json({ message: error.message });
+            }
             break;
-        case 'Tourist':
-            userModel = Tourist;
-            break;
-        case 'Tour Guide':
-            userModel = tourGuide;
-            break;
+
+        case 'tourist':
+            const tourist = await Tourist.findById(userId);
+
+            const deleteRequest = await DeleteRequest.create({ name: tourist.name, email: tourist.email, userType: "Tourist", date: new Date(), status: "approved" });
+            return res.status(200).json({ message: `Delete Request created successfully` });
+
+        case 'tourGuide':
+            if (!userId) {
+                return res.status(400).json({ message: "Tour Guide ID is required." });
+            }
+            try {
+                //retrieve all itineraries of the tour guide that are active and not flagged and have dates in the future
+                const tourGuideDelete = await tourGuide.findById(userId);
+
+                const myItineraries = await Itinerary.find({ tourGuideID: userId, flagged: false, available_dates: { $elemMatch: { $gte: new Date() } } });
+                console.log("MY ITINERARIES");
+                console.log(myItineraries.length);
+
+                //deactivate all my itineraries
+                await Itinerary.updateMany({ tourGuideID: userId }, { isActive: false });
+
+                //check if any of theses itineraries have bookings
+                for (let i = 0; i < myItineraries.length; i++) {
+                    const itirenaryBookings = await Booking.find({ itineraryID: myItineraries[i]._id, date: { $gte: new Date() } });
+                    if (itirenaryBookings.length > 0) {
+                        const deleteRequest = await DeleteRequest.create({ name: tourGuideDelete.username, email: tourGuideDelete.email, userType: "Tour Guide", date: new Date(), status: "rejected" });
+                        return res.status(200).json({ message: "Delete Request created successfully." });
+                    }
+                }
+
+                // const deletedTourGuide = await tourGuide.findByIdAndDelete(id);
+                // if (!deletedTourGuide) {
+                //     return res.status(404).json({ message: "Tour Guide not found." });
+                // }
+
+                const deleteRequest = await DeleteRequest.create({ name: tourGuideDelete.username, email: tourGuideDelete.email, userType: "Tour Guide", date: new Date(), status: "approved" });
+                // deleteIteneraries(id);
+                return res.status(200).json({ message: "Delete Request created successfully." });
+            } catch (error) {
+                return res.status(404).json({ message: error.message });
+            }
+        case 'advertisers':
+
+            try {
+
+                const upcomingActivities = await activityModel.find({ advertiserID: userId, date: { $gte: new Date() } });
+
+                const advertiser = await advertiserModel.findById(userId);
+
+
+                //flag all user activities
+                await activityModel.updateMany({ advertiserID: userId }, { flagged: false });
+
+                for (let i = 0; i < upcomingActivities.length; i++) {
+                    const bookings = await Booking.find({ activityID: upcomingActivities[i]._id, date: { $gte: new Date() } });
+                    if (bookings.length > 0) {
+                        const request = await DeleteRequest.create({ name: advertiser.username, email: advertiser.email, userType: "Advertiser", date: new Date(), status: "rejected" });
+                        return res.status(200).json({ message: `Delete Request created successfully` });
+                    }
+                }
+
+
+                // const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: userId });
+
+
+                // console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
+                // const deletedAdvertiser = await advertiserModel.findByIdAndDelete(userId);
+
+                // res.status(200).json(deletedAdvertiser);
+                const request = await DeleteRequest.create({ name: advertiser.username, email: advertiser.email, userType: "Advertiser", date: new Date(), status: "approved" });
+                return res.status(200).json({ message: `Delete Request created successfully` });
+
+            } catch (error) {
+                res.status(404).json({ message: error.message });
+            }
         default:
             return res.status(400).json({ message: "Invalid user type" });
     }
 
-    try {
-        const userExist = await userModel.findById(userId);
-        if (!userExist) {
-            return res.status(404).json({ message: "User doesn't exist" });
-        }
-
-        if (userModel === Tourist) {
-            const hasBooking = await Booking.findOne({ touristID: userId });
-            if (hasBooking && !hasBooking.status == 'cancelled') {
-                return res.status(400).json({ message: "You cannot delete your account because you have booked an upcoming event" });
-            }
-        } else if (userModel === tourGuide) {
-            const joinedItinerary = await Itinerary.findOne({ tourGuideID: userId });
-            if (joinedItinerary && joinedItinerary.isActive == true && !joinedItinerary.flagged) {
-                return res.status(400).json({ message: "You cannot delete your account because you are assigned to an upcoming event" });
-            }
-        } else {
-            const joinedActivity = await Activity.findOne({ advertiserID: userId });
-            if (joinedActivity && !joinedActivity.flagged) {
-                return res.status(400).json({ message: "You cannot delete your account because you are assigned to an upcoming event" });
-            }
-        }
-        await userModel.findByIdAndDelete(userId);
-        return res.status(200).json({ message: "Account deleted successfully" });
-
-    } catch (error) {
-        console.error("Error processing account deletion:", error);
-        return res.status(500).json({ message: error.message });
-    }
 };

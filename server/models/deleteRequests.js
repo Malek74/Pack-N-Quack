@@ -1,21 +1,17 @@
 import mongoose from "mongoose";
 
 const deleteRequestSchema = new mongoose.Schema({
-    touristID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Tourist',
+    name: {
+        type: String,
+        required: true
     },
-    tourGuideID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TourGuide',
+    email: {
+        type: String,
+        required: true
     },
-    advertiserID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Advertiser',
-    },
-    sellerID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Seller',
+    userType: {
+        type: String,
+        required: true
     },
     date: {
         type: Date,
@@ -24,7 +20,6 @@ const deleteRequestSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],
-        default: 'pending'
     }
 });
 
