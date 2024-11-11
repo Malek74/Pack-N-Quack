@@ -74,6 +74,8 @@ export default function ItinerariesTouristsPage() {
               numberOfReviews={itinerary.ratings.reviews.length}
               coverImage={itinerary.coverImage || null}
               touristClicked
+              small={true}
+
             />
           ))}
         </div>

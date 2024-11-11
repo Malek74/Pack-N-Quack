@@ -50,7 +50,7 @@ export default function ItinerariesCard({
 
   return (
     <Card
-      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[450px] "
+      //  className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[450px] "
       className={cardClassName}
       onClick={() => {
         if (touristClicked) navigate(`/itinerariesTourists/${id}`);
