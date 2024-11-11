@@ -10,6 +10,16 @@ import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryAc
 import Maps from "@/components/shared/Maps";
 import { useUser } from "@/context/UserContext";
 import { ShareButton } from "@/components/shared/ShareButton";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import BookItineraryForm from "@/components/ItinerariesPage/BookItineraryForm";
 export default function SingleItineraryTouristsPage() {
   const { id } = useParams();
   const [isloading, setIsLoading] = useState(true);
@@ -46,10 +56,32 @@ export default function SingleItineraryTouristsPage() {
               <Label className="text-3xl font-bold">
                 {fetchedItinerary.name}
               </Label>
-              <ShareButton
-                title={fetchedItinerary.name}
-                link={window.location.href}
-              />
+              <div className="flex gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <Button variant="outline">Book Itinerary</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Book {fetchedItinerary.name} ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Please fill out the booking form!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <BookItineraryForm
+                      itineraryId={fetchedItinerary._id}
+                      available_dates={fetchedItinerary.available_dates}
+                      price={fetchedItinerary.price}
+                    />
+                  </AlertDialogContent>
+                </AlertDialog>
+                <ShareButton
+                  title={fetchedItinerary.name}
+                  link={window.location.href}
+                />
+              </div>
             </div>
             <p className="text-lg text-neutral-600">
               {fetchedItinerary.description}

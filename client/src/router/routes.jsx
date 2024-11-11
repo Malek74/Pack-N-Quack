@@ -42,6 +42,9 @@ import ItinerariesView from "@/components/adminPage/ItinerariesView";
 import Complaints from "@/components/adminPage/Complaints";
 import OneComplain from "@/components/adminPage/OneComplain";
 import AccountDashboard from "@/components/adminPage/AdminDashboard";
+import DeleteRequests from "@/components/adminPage/DeleteRequests";
+import ItineraryBookings from "@/pages/ItinerariesBookings";
+
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -104,6 +107,7 @@ const routes = createRoutesFromElements(
       <Route path="itineraries" element={<ItinerariesView />} />
       <Route path="complaints" element={<Complaints />} />
       <Route path="complaints/:complaintID" element={<OneComplain />} />
+      <Route path="delete-requests" element={<DeleteRequests />} />
     </Route>
 
     <Route path="touristDashboard" element={<TouristDashboard />}>
@@ -114,11 +118,9 @@ const routes = createRoutesFromElements(
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="complaints" element={<ComplaintsPageTourist />} />
       <Route path="rewards" element={<PointsAndLoyalty />} />
+      <Route path="itinerary-bookings" element={<ItineraryBookings />}></Route>
       {/* <Route path="bookings" element={<Booked />} /> */}
-      <Route
-        path="complaints/:id"
-        element={<ComplaintDetailsPageTourist />}
-      />
+      <Route path="complaints/:id" element={<ComplaintDetailsPageTourist />} />
     </Route>
   </Route>
 );

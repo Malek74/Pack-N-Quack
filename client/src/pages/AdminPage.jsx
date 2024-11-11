@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import logo from "/assets/icons/logo.png";
 
@@ -14,6 +13,7 @@ import {
   CircleUser,
   TentTree,
   Angry,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate, Outlet } from "react-router-dom";
@@ -33,12 +33,19 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useState } from "react";
+
 const sidebarItems = [
   {
     label: "Manage Accounts",
     icon: UserRoundPen,
     section: "Users",
     path: "users",
+  },
+  {
+    label: "Account Delete Requests",
+    icon: Trash2,
+    section: "Delete Requests",
+    path: "delete-requests",
   },
   {
     label: "Tourism Governors",
@@ -172,14 +179,6 @@ export default function AdminPage() {
                     : activeSection}
                 </BreadcrumbPage>
               </BreadcrumbItem>
-              {activeSection === "Single Complaint" && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>{currentComplaint.title}</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </>
-              )}
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex gap-4">

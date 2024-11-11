@@ -1,14 +1,9 @@
-import React, { useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
-import { CheckIcon } from "lucide-react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import DialogTerms from "../shared/DialogTerms";
 import {
@@ -20,16 +15,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/shared/PhoneInput";
-import { SampleDatePicker } from "@/components/shared/datepicker";
 
 export default function NewSellerForm(props) {
   const formSchema2 = z.object({

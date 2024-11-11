@@ -1,19 +1,15 @@
 import TouristProfile from "@/components/forms/TouristProfile";
 import TourGuideProfile from "@/components/forms/TourGuideProfile";
 import AdvertiserProfile from "@/components/forms/AdvertiserProfile";
-import SellerProfileD from "@/components/forms/SellerProfile";
 import CreateDialog from "@/components/shared/CreateDialog";
 import ChangePassword from "@/components/forms/ChangePassword";
 import RequestAccDelete from "@/components/forms/RequestAccDelete";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import PointsAndLoyalty from "@/components/dropdown/Pointsandloyality";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
-import DeleteButton from "@/components/shared/DeleteButton";
 import { useUser } from "@/context/UserContext";
 export default function MyProfilePage() {
   const { toast } = useToast();

@@ -7,7 +7,7 @@ import {
   Gift,
   Package,
   Angry,
-  Plane
+  Plane,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -39,6 +39,11 @@ export default function TouristDashboard() {
       label: "Bookings",
       icon: Plane,
       path: "bookings",
+    },
+    {
+      label: "Itinerary Bookings",
+      icon: Plane,
+      path: "itinerary-bookings",
     },
     {
       label: "Tour Guides",

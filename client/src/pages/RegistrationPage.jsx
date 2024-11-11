@@ -1,49 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
-import { CheckIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PhoneInput } from "@/components/shared/PhoneInput";
-import { SampleDatePicker } from "@/components/shared/datepicker";
 import NewTouristForm from "@/components/forms/NewTouristForm";
 import NewSellerForm from "@/components/forms/NewSellerForm";
 import registration from "/assets/images/registration.jpg";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-
 
 export default function RegistrationPage() {
   const { toast } = useToast();
@@ -72,7 +36,7 @@ export default function RegistrationPage() {
         toast({
           title: "Account created succesfully",
         });
-        navigate("/")
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error creating tourist", error);
@@ -86,7 +50,12 @@ export default function RegistrationPage() {
 
   const createNewTourguideSellerAdvertiser = (values) => {
     console.log("axios");
-    const endpoint = values.status === "Advertiser" ? "advertisers" : values.status === "Seller" ? "sellers" : "tourGuide"
+    const endpoint =
+      values.status === "Advertiser"
+        ? "advertisers"
+        : values.status === "Seller"
+        ? "sellers"
+        : "tourGuide";
     axios
       .post(`/api/${endpoint}/`, {
         username: values.username, // Default value for username
@@ -98,7 +67,7 @@ export default function RegistrationPage() {
         toast({
           title: "Account created succesfully",
         });
-        navigate("/")
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error creating account", error);

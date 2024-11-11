@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,8 +20,14 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
 
   const formSchema = z
     .object({
-      passwordold: z.string().min(8).max(100, "Password must be at least 8 characters"),
-      passwordnew: z.string().min(8).max(100, "Password must be at least 8 characters"), 
+      passwordold: z
+        .string()
+        .min(8)
+        .max(100, "Password must be at least 8 characters"),
+      passwordnew: z
+        .string()
+        .min(8)
+        .max(100, "Password must be at least 8 characters"),
       passwordnewconfirm: z.string().min(8).max(100),
     })
     .refine((data) => data.passwordnew === data.passwordnewconfirm, {
@@ -41,12 +46,12 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
 
   function onSubmit(values) {
     console.log(values);
-    const user = userType === "tourist" ? "Tourist" : "Tourist"
+    const user = userType === "tourist" ? "Tourist" : "Tourist";
     axios
       .post(`api/changepass/${profile._id}`, {
-        oldPass: values.passwordold,
+        oldPassword: values.passwordold,
         requestedPassword: values.passwordnew,
-        userType: user
+        userType: user,
       })
       .then(() => {
         toast({
@@ -57,7 +62,8 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Incorrect current password, Try again!! ",
+          title: "Something went wrong",
+          description: error.response.data.message,
         });
         console.log(error);
       });
@@ -66,7 +72,6 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
         {/* Current password */}
         <FormField
           control={form.control}
@@ -75,7 +80,11 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
             <FormItem>
               <FormLabel>Current password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter current password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter current password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,7 +99,11 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
             <FormItem>
               <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter new password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter new password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,7 +118,11 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
             <FormItem>
               <FormLabel>Confirm new password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Re-enter new password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Re-enter new password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
