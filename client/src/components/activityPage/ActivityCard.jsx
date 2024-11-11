@@ -8,22 +8,27 @@ import { Rating } from "../shared/Rating";
 import { Label } from "../ui/label";
 //import Activity from "lucide-react";
 import { useUser } from "@/context/UserContext";
-export default function activityCard(props) {
+export default function ActivityCard(props) {
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
   const date = new Date(props.time);
   const openActivityPage = () => {
-    console.log(props.id)
+    console.log(props.activityID);
+    console.log(props.booking);
     navigate(`/activity/${props.activityID}`);
   };
   return (
     <div
       className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[570px] rounded-xl"
-      onClick={props.booking ? openActivityPage : undefined}
+      onClick={() => {
+        props.booking && openActivityPage();
+      }}
     >
-      <img className=" rounded-lg rounded-b-none h-[300px] w-full object-fill" src={props.img} />
+      <img
+        className=" rounded-lg rounded-b-none h-[300px] w-full object-fill"
+        src={props.img}
+      />
       <div className="flex place-content-end ">
-
         {props.notTourist && (
           <>
             <Button
@@ -79,21 +84,23 @@ export default function activityCard(props) {
             <br />
           </p>
 
-
           <p className="text-base">
             <b className="mr-2">Booking:</b>
             {props.booking ? "Open" : "Closed"}
           </p>
           <div className="flex flex-col justify-between gap-2">
-
             <div className="flex justify-between">
               <Label className="font-semibold text-lg text-skyblue">
-                Price: {props.priceType == "fixed"
+                Price:{" "}
+                {props.priceType == "fixed"
                   ? props.price
                   : `${props.minPrice} - ${props.maxPrice}`}
               </Label>
 
-              <Rating rating={props.rating} numberOfReviews={props.numberOfReviews} />
+              <Rating
+                rating={props.rating}
+                numberOfReviews={props.numberOfReviews}
+              />
             </div>
             <div className="flex flex-col gap-y-0">
               {Array.isArray(props.discounts) &&
@@ -113,10 +120,9 @@ export default function activityCard(props) {
                 </Label>
               ))}
             </div>
-
           </div>
-        </div >
-      </div >
-    </div >
+        </div>
+      </div>
+    </div>
   );
 }

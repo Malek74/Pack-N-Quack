@@ -37,7 +37,7 @@ const DropDownMenuTourist = () => {
           <Link to="/itinerariesTourists">Itineraries</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link to="/activitiesTourists">Activities</Link>
+          <Link to="/activities">Activities</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Link to="/historicalTourists">Historical</Link>

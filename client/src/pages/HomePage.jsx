@@ -20,7 +20,6 @@ export default function HomePage() {
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,15 +40,15 @@ export default function HomePage() {
 
   const filteredActivities = activities
     ? activities.filter((activity) =>
-      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
   console.log(filteredActivities);
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
-      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   return (
@@ -58,10 +57,10 @@ export default function HomePage() {
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-        //    alt="Hustling market"
-        //    name="Live your dream destinations."
-        //    textAlign="left"
-        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+          //    alt="Hustling market"
+          //    name="Live your dream destinations."
+          //    textAlign="left"
+          //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
@@ -77,6 +76,7 @@ export default function HomePage() {
           filteredActivities.map((activity) => (
             <ActivityCard
               key={activity.activityID}
+              activityID={activity._id}
               img={activity.coverImagePath}
               name={activity.name}
               category={activity.categoryID.name}
@@ -107,6 +107,7 @@ export default function HomePage() {
               price={itinerary.price}
               rating={itinerary.ratings.averageRating}
               numberOfReviews={itinerary.ratings.reviews.length}
+              touristClicked
             />
           ))}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">

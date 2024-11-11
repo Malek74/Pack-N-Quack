@@ -7,6 +7,14 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
+
+  //Tourist: 6725442e98359339d8b821f0
+  //Active Bookings Advertiser  670002186379370f9748adb5
+  //No Active Bookings Advertiser: 6703aff23169dedf2f7519a6
+  //tani wa7ed no active bookings
+  //tourguid with itineraries : 66fb241366ea8f57d59ec6db
+  //tourguide with no itirneraries: 6706508d6abe36408a62e701
+
   // const [userId, setUserId] = useState("6702def62ed9e2a0d138f558");
   // const [userType, setUserType] = useState("tourist");
   // const [userId, setUserId] = useState("66fb241366ea8f57d59ec6db");

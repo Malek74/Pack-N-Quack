@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ActivityCard from "@/components/activityPage/ActivityCard";
 import Activitiesbackground from "/assets/images/Background.jpg";
-import Banner from "@/components/shared/Banner";
+import Banner from "@/components/shared/BannerV2";
 import CreateDialog from "@/components/shared/CreateDialog";
 import ActivityForm from "@/components/forms/ActivityForm";
 import axios from "axios";
@@ -69,7 +69,9 @@ export default function Activities() {
   let count = 0;
 
   let tourist = true;
-  { idAdv ? tourist = false : tourist = true }
+  {
+    idAdv ? (tourist = false) : (tourist = true);
+  }
 
   const addActivity = async (values) => {
     try {
@@ -124,14 +126,14 @@ export default function Activities() {
             selectedFilters["Sort By"] == "price-asc"
               ? 1
               : selectedFilters["Sort By"] == "price-desc"
-                ? -1
-                : 0,
+              ? -1
+              : 0,
           sortRating:
             selectedFilters["Sort By"] == "ratings-asc"
               ? 1
               : selectedFilters["Sort By"] == "ratings-desc"
-                ? -1
-                : 0,
+              ? -1
+              : 0,
           rating: selectedFilters.Ratings,
           dateMin: selectedRange.from,
           dateMax: selectedRange.to,
@@ -160,17 +162,22 @@ export default function Activities() {
       }
     };
 
-
-
-    { idAdv ? fetchMyActivites() : fetchActivites() };
+    {
+      idAdv ? fetchMyActivites() : fetchActivites();
+    }
     fetchData();
-  }, [searchTerm,
+  }, [
+    searchTerm,
     minPrice,
     maxPrice,
     selectedFilters,
     selectedTags,
     count,
-    selectedRange, activityDeleted, activityUpdated, activityCreated]);
+    selectedRange,
+    activityDeleted,
+    activityUpdated,
+    activityCreated,
+  ]);
 
   return (
     <div className="flex flex-col justify-center w-screen px-14 my-8">
@@ -180,12 +187,15 @@ export default function Activities() {
           alt="Activities Background"
           name="ACTIVITIES"
         />
-        {tourist && <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          placeholder={"Look for an activity.."}
-        />}</div>
-      {!tourist &&
+        {tourist && (
+          <SearchBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            placeholder={"Look for an activity.."}
+          />
+        )}
+      </div>
+      {!tourist && (
         <div className="flex place-content-end mr-8">
           <CreateDialog
             title="an Activity"
@@ -194,59 +204,62 @@ export default function Activities() {
               <ActivityForm type="act" createActivityFunction={addActivity} />
             }
           />
-        </div>}
-      {tourist && <div className="flex mb-10">
-        <span className="ml-18">
-          {" "}
-          <FilterButton
-            categories={categories}
-            buttons={buttons}
-            onFilterChange={handleFilterChange}
-          />
-        </span>
-        <span>
-          <Multiselect
-            className="w-max"
-            isObject={false}
-            onSelect={(selectedList) => {
-              setSelectedTags(selectedList);
-              count = count + 1;
-            }}
-            onRemove={(selectedList) => {
-              setSelectedTags(selectedList);
-              count--;
-            }}
-            options={tags.map((tag) => tag.name)}
-          />
-        </span>
-        <span>
-          <Input
-            placeholder="Min Price"
-            value={minPrice}
-            type="number"
-            onChange={(e) => setMinPrice(e.target.value)} // Capture min price
-          />
-        </span>
-        <span>
-          <Input
-            placeholder="Max Price"
-            value={maxPrice}
-            type="number"
-            onChange={(e) => setMaxPrice(e.target.value)} // Capture max price
-          />
-        </span>
+        </div>
+      )}
+      {tourist && (
+        <div className="flex mb-10">
+          <span className="ml-18">
+            {" "}
+            <FilterButton
+              categories={categories}
+              buttons={buttons}
+              onFilterChange={handleFilterChange}
+            />
+          </span>
+          <span>
+            <Multiselect
+              className="w-max"
+              isObject={false}
+              onSelect={(selectedList) => {
+                setSelectedTags(selectedList);
+                count = count + 1;
+              }}
+              onRemove={(selectedList) => {
+                setSelectedTags(selectedList);
+                count--;
+              }}
+              options={tags.map((tag) => tag.name)}
+            />
+          </span>
+          <span>
+            <Input
+              placeholder="Min Price"
+              value={minPrice}
+              type="number"
+              onChange={(e) => setMinPrice(e.target.value)} // Capture min price
+            />
+          </span>
+          <span>
+            <Input
+              placeholder="Max Price"
+              value={maxPrice}
+              type="number"
+              onChange={(e) => setMaxPrice(e.target.value)} // Capture max price
+            />
+          </span>
 
-        <span>
-          {" "}
-          <DatePickerWithRange onDateChange={handleDateChange} />
-        </span>
-        <span>
-          <Button onClick={() => console.log(searchTerm)} className="">
-            Submit Filters
-          </Button>
-        </span>
-        {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
-      </div>}
+          <span>
+            {" "}
+            <DatePickerWithRange onDateChange={handleDateChange} />
+          </span>
+          <span>
+            <Button onClick={() => console.log(searchTerm)} className="">
+              Submit Filters
+            </Button>
+          </span>
+          {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
+        </div>
+      )}
       <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">
         Upcoming Actvities
       </h1>
