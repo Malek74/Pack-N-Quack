@@ -18,6 +18,9 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "../ui/label";
+import ImageUploader from "../shared/ImageUploader";
+import AvatarUploader from "../shared/AvatarUploader";
 
 export default function NewSellerForm(props) {
   const formSchema2 = z.object({
@@ -171,6 +174,45 @@ export default function NewSellerForm(props) {
             </FormItem>
           )}
         />
+
+        {form2.getValues("status") === "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
+
+        {form2.getValues("status") !== "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
+
+        {form2.getValues("status") !== "Tour guide" && (
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <Label>Upload Avatar</Label>
+              <AvatarUploader
+                size={24}
+                userType="tourGuide"
+                userId="66fb241366ea8f57d59ec6db"
+              />
+            </div>
+          </div>
+        )}
 
         <Button variant="secondary" type="submit">
           Create account

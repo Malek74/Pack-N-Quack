@@ -7,8 +7,14 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
-  const [userId, setUserId] = useState("6702cde57d7e2444d9713d8d");
-  const [userType, setUserType] = useState("tourist");
+  // const [userId, setUserId] = useState("6702cde57d7e2444d9713d8d");
+  // const [userType, setUserType] = useState("tourist");
+  // const [userId, setUserId] = useState("66fb241366ea8f57d59ec6db");
+  // const [userType, setUserType] = useState("tourGuide");
+  // const [userId, setUserId] = useState("670002186379370f9748adb5");
+  // const [userType, setUserType] = useState("advertisers");
+  const [userId, setUserId] = useState("6703ba52daf9eae5ef55344c");
+  const [userType, setUserType] = useState("seller");
 
   // On mount, check localStorage for prefCurrency and set it if found
   useEffect(() => {

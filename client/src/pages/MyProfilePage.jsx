@@ -11,17 +11,43 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
 import { useUser } from "@/context/UserContext";
+import AvatarUploader from "@/components/shared/AvatarUploader";
 export default function MyProfilePage() {
   const { toast } = useToast();
   const { userId, userType } = useUser();
   const usertype = userType;
-  const isTourGuide = usertype === "tour_guide";
-  const isAdvertiser = usertype === "advertiser";
+  const isTourGuide = usertype === "tourGuide";
+  const isAdvertiser = usertype === "advertisers";
   const isSeller = usertype === "seller";
   const isTourist = usertype === "tourist";
   console.log(isTourist);
   const [profile, setProfile] = useState();
-  const endpoint = "tourist";
+  const endpoint = userType === "seller" ? "sellers" : userType;
+  const [croppedImage, setCroppedImage] = useState(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+
+  useEffect(() => {
+    const getAvatar = async () => {
+      try {
+        const response = await axios.post(`/api/upload/fetchImages/${userId}`, {
+          userType: userType,
+        });
+        console.log(response.data);
+        setCroppedImageUrl(response.data.image);
+        toast({
+          description: "Avatar Downloaded successfully!",
+          variant: "success",
+        });
+      } catch (e) {
+        toast({
+          description: "Something went wrong while getting the avatar.",
+          variant: "destructive",
+        });
+        console.error(e);
+      }
+    };
+    getAvatar();
+  }, []);
 
   const fetchProfile = () => {
     axios
@@ -54,85 +80,94 @@ export default function MyProfilePage() {
       } = profile;
 
       return (
-        <Card className="max-w-md mx-auto shadow-md rounded-lg">
-          {/* Company Name */}
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              {companyName}
-            </CardTitle>
-            <Badge
-              variant={isAccepted ? "success" : "destructive"}
-              className="mt-2"
-            >
-              {isAccepted ? "Accepted" : "Pending"}
-            </Badge>
-          </CardHeader>
+        <div className="flex gap-2">
+          <Card className="max-w-md mx-auto shadow-md rounded-lg">
+            {/* Company Name */}
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                {companyName}
+              </CardTitle>
+              <Badge
+                variant={isAccepted ? "success" : "destructive"}
+                className="mt-2"
+              >
+                {isAccepted ? "Accepted" : "Pending"}
+              </Badge>
+            </CardHeader>
 
-          {/* Content */}
-          <CardContent className="space-y-4">
-            {/* Description */}
-            <div>
-              <h3 className="text-sm font-semibold">Description</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
-            </div>
+            {/* Content */}
+            <CardContent className="space-y-4">
+              {/* Description */}
+              <div>
+                <h3 className="text-sm font-semibold">Description</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
 
-            {/* Establishment Date */}
-            <div>
-              <h3 className="text-sm font-semibold">Established</h3>
-              <p className="text-sm text-muted-foreground">
-                {new Date(establishmentDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
+              {/* Establishment Date */}
+              <div>
+                <h3 className="text-sm font-semibold">Established</h3>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(establishmentDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
 
-            {/* Contact Information */}
-            <div>
-              <h3 className="text-sm font-semibold">Contact Information</h3>
-              <p className="text-sm text-muted-foreground">
-                <strong>Hotline:</strong> {hotline}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <strong>Website:</strong>{" "}
-                <a
-                  href={website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline"
-                >
-                  {website.replace("https://", "").replace("www.", "")}
-                </a>
-              </p>
-            </div>
+              {/* Contact Information */}
+              <div>
+                <h3 className="text-sm font-semibold">Contact Information</h3>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Hotline:</strong> {hotline}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Website:</strong>{" "}
+                  <a
+                    href={website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {website.replace("https://", "").replace("www.", "")}
+                  </a>
+                </p>
+              </div>
 
-            {/* Email */}
-            <div>
-              <h3 className="text-sm font-semibold">Email</h3>
-              <p className="text-sm text-muted-foreground">{email}</p>
-            </div>
+              {/* Email */}
+              <div>
+                <h3 className="text-sm font-semibold">Email</h3>
+                <p className="text-sm text-muted-foreground">{email}</p>
+              </div>
 
-            {/* Username */}
-            <div>
-              <h3 className="text-sm font-semibold">Username</h3>
-              <p className="text-sm text-muted-foreground">{username}</p>
-            </div>
+              {/* Username */}
+              <div>
+                <h3 className="text-sm font-semibold">Username</h3>
+                <p className="text-sm text-muted-foreground">{username}</p>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex space-x-2">
-              <CreateDialog
-                form={
-                  <AdvertiserProfile
-                    profile={profile}
-                    onRefresh={fetchProfile}
-                  />
-                }
-              />
-            </div>
-            {renderDeleteAccountChangePassword()}
-          </CardContent>
-        </Card>
+              {/* Action Buttons */}
+              <div className="flex space-x-2">
+                <CreateDialog
+                  form={
+                    <AdvertiserProfile
+                      profile={profile}
+                      onRefresh={fetchProfile}
+                    />
+                  }
+                />
+              </div>
+              {renderDeleteAccountChangePassword()}
+            </CardContent>
+          </Card>
+          <AvatarUploader
+            userType={usertype}
+            userId={userId}
+            croppedImage={croppedImage}
+            setCroppedImage={setCroppedImage}
+            croppedImageUrl={croppedImageUrl}
+          />
+        </div>
       );
     }
     return null;
@@ -151,87 +186,98 @@ export default function MyProfilePage() {
       } = profile;
 
       return (
-        <Card className="max-w-md mx-auto shadow-md rounded-lg">
-          {/* Tour Guide Info */}
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">{username}</CardTitle>
-            <Badge
-              variant={isAccepted ? "success" : "destructive"}
-              className="mt-2"
-            >
-              {isAccepted ? "Accepted" : "Pending"}
-            </Badge>
-          </CardHeader>
+        <div className="flex gap-2">
+          <Card className="max-w-md mx-auto shadow-md rounded-lg">
+            {/* Tour Guide Info */}
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                {username}
+              </CardTitle>
+              <Badge
+                variant={isAccepted ? "success" : "destructive"}
+                className="mt-2"
+              >
+                {isAccepted ? "Accepted" : "Pending"}
+              </Badge>
+            </CardHeader>
 
-          {/* Content */}
-          <CardContent className="space-y-4">
-            {/* Experience Years */}
-            <div>
-              <h3 className="text-sm font-semibold">Experience</h3>
-              <p className="text-sm text-muted-foreground">
-                {experienceYears} years of experience
-              </p>
-            </div>
-
-            {/* Previous Work Section */}
-            <div>
-              <h3 className="text-sm font-semibold">Previous Work</h3>
-              <div className="space-y-2">
-                {Array.isArray(previousWork) && previousWork.length > 0 ? (
-                  previousWork.map((work, index) => (
-                    <div key={index} className="border p-2 rounded-lg">
-                      <p className="font-semibold text-sm">{work.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Company:</strong> {work.company}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Duration:</strong>{" "}
-                        {work.duration.length > 0
-                          ? `${new Date(
-                              work.duration[0]
-                            ).toLocaleDateString()} - ${new Date(
-                              work.duration[1]
-                            ).toLocaleDateString()}`
-                          : "Duration not available"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {work.description}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No previous work data available.
-                  </p>
-                )}
+            {/* Content */}
+            <CardContent className="space-y-4">
+              {/* Experience Years */}
+              <div>
+                <h3 className="text-sm font-semibold">Experience</h3>
+                <p className="text-sm text-muted-foreground">
+                  {experienceYears} years of experience
+                </p>
               </div>
-            </div>
 
-            {/* Contact Information */}
-            <div>
-              <h3 className="text-sm font-semibold">Contact Information</h3>
-              <p className="text-sm text-muted-foreground">
-                <strong>Email:</strong> {email}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <strong>Mobile:</strong> {mobile}
-              </p>
-            </div>
+              {/* Previous Work Section */}
+              <div>
+                <h3 className="text-sm font-semibold">Previous Work</h3>
+                <div className="space-y-2">
+                  {Array.isArray(previousWork) && previousWork.length > 0 ? (
+                    previousWork.map((work, index) => (
+                      <div key={index} className="border p-2 rounded-lg">
+                        <p className="font-semibold text-sm">{work.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Company:</strong> {work.company}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Duration:</strong>{" "}
+                          {work.duration.length > 0
+                            ? `${new Date(
+                                work.duration[0]
+                              ).toLocaleDateString()} - ${new Date(
+                                work.duration[1]
+                              ).toLocaleDateString()}`
+                            : "Duration not available"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {work.description}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No previous work data available.
+                    </p>
+                  )}
+                </div>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex space-x-2">
-              <CreateDialog
-                form={
-                  <TourGuideProfile
-                    profile={profile}
-                    onRefresh={fetchProfile}
-                  />
-                }
-              />
-            </div>
-            {renderDeleteAccountChangePassword()}
-          </CardContent>
-        </Card>
+              {/* Contact Information */}
+              <div>
+                <h3 className="text-sm font-semibold">Contact Information</h3>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Email:</strong> {email}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Mobile:</strong> {mobile}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-2">
+                <CreateDialog
+                  form={
+                    <TourGuideProfile
+                      profile={profile}
+                      onRefresh={fetchProfile}
+                    />
+                  }
+                />
+              </div>
+              {renderDeleteAccountChangePassword()}
+            </CardContent>
+          </Card>
+          <AvatarUploader
+            userType={usertype}
+            userId={userId}
+            croppedImage={croppedImage}
+            setCroppedImage={setCroppedImage}
+            croppedImageUrl={croppedImageUrl}
+          />
+        </div>
       );
     }
     return null;
@@ -241,52 +287,63 @@ export default function MyProfilePage() {
     if (profile) {
       const { email, username, isAccepted, description } = profile;
       return (
-        <Card className="max-w-md mx-auto shadow-md rounded-lg">
-          {/* Company Name */}
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">{username}</CardTitle>
-            <Badge
-              variant={isAccepted ? "success" : "destructive"}
-              className="mt-2"
-            >
-              {isAccepted ? "Accepted" : "Pending"}
-            </Badge>
-          </CardHeader>
+        <div className="flex gap-2">
+          <Card className="max-w-md mx-auto shadow-md rounded-lg">
+            {/* Company Name */}
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                {username}
+              </CardTitle>
+              <Badge
+                variant={isAccepted ? "success" : "destructive"}
+                className="mt-2"
+              >
+                {isAccepted ? "Accepted" : "Pending"}
+              </Badge>
+            </CardHeader>
 
-          {/* Content */}
-          <CardContent className="space-y-4">
-            {/* Description */}
-            <div>
-              <h3 className="text-sm font-semibold">Description</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
-            </div>
+            {/* Content */}
+            <CardContent className="space-y-4">
+              {/* Description */}
+              <div>
+                <h3 className="text-sm font-semibold">Description</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
 
-            {/* Email */}
-            <div>
-              <h3 className="text-sm font-semibold">Email</h3>
-              <p className="text-sm text-muted-foreground">{email}</p>
-            </div>
+              {/* Email */}
+              <div>
+                <h3 className="text-sm font-semibold">Email</h3>
+                <p className="text-sm text-muted-foreground">{email}</p>
+              </div>
 
-            {/* Username */}
-            <div>
-              <h3 className="text-sm font-semibold">Username</h3>
-              <p className="text-sm text-muted-foreground">{username}</p>
-            </div>
+              {/* Username */}
+              <div>
+                <h3 className="text-sm font-semibold">Username</h3>
+                <p className="text-sm text-muted-foreground">{username}</p>
+              </div>
 
-            {/* Edit profile action Buttons */}
-            <div className="flex space-x-2">
-              <CreateDialog
-                form={
-                  <SellerProfileDialog
-                    profile={profile}
-                    onRefresh={fetchProfile}
-                  />
-                }
-              />
-            </div>
-            {renderDeleteAccountChangePassword()}
-          </CardContent>
-        </Card>
+              {/* Edit profile action Buttons */}
+              <div className="flex space-x-2">
+                <CreateDialog
+                  form={
+                    <SellerProfileDialog
+                      profile={profile}
+                      onRefresh={fetchProfile}
+                    />
+                  }
+                />
+              </div>
+              {renderDeleteAccountChangePassword()}
+            </CardContent>
+          </Card>
+          <AvatarUploader
+            userType={usertype}
+            userId={userId}
+            croppedImage={croppedImage}
+            setCroppedImage={setCroppedImage}
+            croppedImageUrl={croppedImageUrl}
+          />
+        </div>
       );
     }
   }
