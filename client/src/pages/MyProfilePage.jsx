@@ -99,6 +99,7 @@ export default function MyProfilePage() {
         email,
         isAccepted,
         username,
+        uploadedFiles,
       } = profile;
 
       return (
@@ -192,26 +193,32 @@ export default function MyProfilePage() {
                 croppedImageUrl={croppedImageUrl}
               />
             </div>
-            <FileUploader
-              filesUploaded={file1}
-              setFilesUploaded={setFile1}
-              fileToUpload="ID"
-            />
+            {(uploadedFiles.documents.length > 0 && (
+              <h1>You already uploaded ur documents</h1>
+            )) || (
+              <div className="flex flex-col items-end gap-4">
+                <FileUploader
+                  filesUploaded={file1}
+                  setFilesUploaded={setFile1}
+                  fileToUpload="ID"
+                />
 
-            <FileUploader
-              filesUploaded={file2}
-              setFilesUploaded={setFile2}
-              fileToUpload="Taxation Registery Card"
-            />
-            <Button
-              className="self-center"
-              type="button"
-              onClick={() => {
-                handleFileUpload();
-              }}
-            >
-              Upload Files
-            </Button>
+                <FileUploader
+                  filesUploaded={file2}
+                  setFilesUploaded={setFile2}
+                  fileToUpload="Taxation Registery Card"
+                />
+                <Button
+                  className="self-center"
+                  type="button"
+                  onClick={() => {
+                    handleFileUpload();
+                  }}
+                >
+                  Upload Files
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -229,6 +236,7 @@ export default function MyProfilePage() {
         username,
         mobile,
         isAccepted,
+        uploadedFiles,
       } = profile;
 
       return (
@@ -326,26 +334,32 @@ export default function MyProfilePage() {
                 croppedImageUrl={croppedImageUrl}
               />
             </div>
-            <FileUploader
-              filesUploaded={file1}
-              setFilesUploaded={setFile1}
-              fileToUpload="ID"
-            />
+            {(uploadedFiles.documents.length > 0 && (
+              <h1>You already uploaded ur documents</h1>
+            )) || (
+              <div className="flex flex-col items-end gap-4">
+                <FileUploader
+                  filesUploaded={file1}
+                  setFilesUploaded={setFile1}
+                  fileToUpload="ID"
+                />
 
-            <FileUploader
-              filesUploaded={file2}
-              setFilesUploaded={setFile2}
-              fileToUpload="Certificate"
-            />
-            <Button
-              className="self-center"
-              type="button"
-              onClick={() => {
-                handleFileUpload();
-              }}
-            >
-              Upload Files
-            </Button>
+                <FileUploader
+                  filesUploaded={file2}
+                  setFilesUploaded={setFile2}
+                  fileToUpload="Taxation Registery Card"
+                />
+                <Button
+                  className="self-center"
+                  type="button"
+                  onClick={() => {
+                    handleFileUpload();
+                  }}
+                >
+                  Upload Files
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -355,7 +369,8 @@ export default function MyProfilePage() {
 
   function SellerCard() {
     if (profile) {
-      const { email, username, isAccepted, description } = profile;
+      const { email, username, isAccepted, description, uploadedFiles } =
+        profile;
       return (
         <div className="flex gap-2">
           <Card className="max-w-md mx-auto shadow-md rounded-lg">
@@ -416,26 +431,32 @@ export default function MyProfilePage() {
                 croppedImageUrl={croppedImageUrl}
               />
             </div>
-            <FileUploader
-              filesUploaded={file1}
-              setFilesUploaded={setFile1}
-              fileToUpload="ID"
-            />
+            {(uploadedFiles.documents.length > 0 && (
+              <h1>You already uploaded ur documents</h1>
+            )) || (
+              <div className="flex flex-col items-end gap-4">
+                <FileUploader
+                  filesUploaded={file1}
+                  setFilesUploaded={setFile1}
+                  fileToUpload="ID"
+                />
 
-            <FileUploader
-              filesUploaded={file2}
-              setFilesUploaded={setFile2}
-              fileToUpload="Taxation Registery Card"
-            />
-            <Button
-              className="self-center"
-              type="button"
-              onClick={() => {
-                handleFileUpload();
-              }}
-            >
-              Upload Files
-            </Button>
+                <FileUploader
+                  filesUploaded={file2}
+                  setFilesUploaded={setFile2}
+                  fileToUpload="Taxation Registery Card"
+                />
+                <Button
+                  className="self-center"
+                  type="button"
+                  onClick={() => {
+                    handleFileUpload();
+                  }}
+                >
+                  Upload Files
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       );
