@@ -12,6 +12,8 @@ import axios from "axios";
 import SellerProfileDialog from "@/components/forms/SellerProfileDialog";
 import { useUser } from "@/context/UserContext";
 import AvatarUploader from "@/components/shared/AvatarUploader";
+import FileUploader from "@/components/shared/FileUploader";
+import { Button } from "@/components/ui/button";
 export default function MyProfilePage() {
   const { toast } = useToast();
   const { userId, userType } = useUser();
@@ -25,6 +27,31 @@ export default function MyProfilePage() {
   const endpoint = userType === "seller" ? "sellers" : userType;
   const [croppedImage, setCroppedImage] = useState(null);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+  const [file1, setFile1] = useState([]);
+  const [file2, setFile2] = useState([]);
+
+  const handleFileUpload = () => {
+    const formData = new FormData();
+    formData.append("ID", file1[0]);
+    formData.append("Taxation Registry Card", file2[0]);
+    formData.append("userType", userType);
+    try {
+      const response = axios.post(`/api/upload/documents/${userId}`, formData);
+      console.log(response);
+      toast({
+        title: "YAY!",
+        description: "Documents uploaded successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: error.response.data.message,
+        description: error.response.data.error,
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const getAvatar = async () => {
@@ -34,15 +61,7 @@ export default function MyProfilePage() {
         });
         console.log(response.data);
         setCroppedImageUrl(response.data.image);
-        toast({
-          description: "Avatar Downloaded successfully!",
-          variant: "success",
-        });
       } catch (e) {
-        toast({
-          description: "Something went wrong while getting the avatar.",
-          variant: "destructive",
-        });
         console.error(e);
       }
     };
@@ -160,13 +179,37 @@ export default function MyProfilePage() {
               {renderDeleteAccountChangePassword()}
             </CardContent>
           </Card>
-          <AvatarUploader
-            userType={usertype}
-            userId={userId}
-            croppedImage={croppedImage}
-            setCroppedImage={setCroppedImage}
-            croppedImageUrl={croppedImageUrl}
-          />
+          <div className="flex flex-col items-end gap-4">
+            <div className="self-center">
+              <AvatarUploader
+                userType={usertype}
+                userId={userId}
+                croppedImage={croppedImage}
+                setCroppedImage={setCroppedImage}
+                croppedImageUrl={croppedImageUrl}
+              />
+            </div>
+            <FileUploader
+              filesUploaded={file1}
+              setFilesUploaded={setFile1}
+              fileToUpload="ID"
+            />
+
+            <FileUploader
+              filesUploaded={file2}
+              setFilesUploaded={setFile2}
+              fileToUpload="Taxation Registery Card"
+            />
+            <Button
+              className="self-center"
+              type="button"
+              onClick={() => {
+                handleFileUpload();
+              }}
+            >
+              Upload Files
+            </Button>
+          </div>
         </div>
       );
     }
@@ -270,13 +313,37 @@ export default function MyProfilePage() {
               {renderDeleteAccountChangePassword()}
             </CardContent>
           </Card>
-          <AvatarUploader
-            userType={usertype}
-            userId={userId}
-            croppedImage={croppedImage}
-            setCroppedImage={setCroppedImage}
-            croppedImageUrl={croppedImageUrl}
-          />
+          <div className="flex flex-col items-end gap-4">
+            <div className="self-center">
+              <AvatarUploader
+                userType={usertype}
+                userId={userId}
+                croppedImage={croppedImage}
+                setCroppedImage={setCroppedImage}
+                croppedImageUrl={croppedImageUrl}
+              />
+            </div>
+            <FileUploader
+              filesUploaded={file1}
+              setFilesUploaded={setFile1}
+              fileToUpload="ID"
+            />
+
+            <FileUploader
+              filesUploaded={file2}
+              setFilesUploaded={setFile2}
+              fileToUpload="Certificate"
+            />
+            <Button
+              className="self-center"
+              type="button"
+              onClick={() => {
+                handleFileUpload();
+              }}
+            >
+              Upload Files
+            </Button>
+          </div>
         </div>
       );
     }
@@ -336,13 +403,37 @@ export default function MyProfilePage() {
               {renderDeleteAccountChangePassword()}
             </CardContent>
           </Card>
-          <AvatarUploader
-            userType={usertype}
-            userId={userId}
-            croppedImage={croppedImage}
-            setCroppedImage={setCroppedImage}
-            croppedImageUrl={croppedImageUrl}
-          />
+          <div className="flex flex-col items-end gap-4">
+            <div className="self-center">
+              <AvatarUploader
+                userType={usertype}
+                userId={userId}
+                croppedImage={croppedImage}
+                setCroppedImage={setCroppedImage}
+                croppedImageUrl={croppedImageUrl}
+              />
+            </div>
+            <FileUploader
+              filesUploaded={file1}
+              setFilesUploaded={setFile1}
+              fileToUpload="ID"
+            />
+
+            <FileUploader
+              filesUploaded={file2}
+              setFilesUploaded={setFile2}
+              fileToUpload="Taxation Registery Card"
+            />
+            <Button
+              className="self-center"
+              type="button"
+              onClick={() => {
+                handleFileUpload();
+              }}
+            >
+              Upload Files
+            </Button>
+          </div>
         </div>
       );
     }

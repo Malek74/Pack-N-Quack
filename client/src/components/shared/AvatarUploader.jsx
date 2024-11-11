@@ -11,7 +11,6 @@ import getCroppedImg from "@/utilities/getCroppedImg"; // Helper function to get
 import axios from "axios";
 
 AvatarUploader.propTypes = {
-  size: PropTypes.number,
   userType: PropTypes.string,
   userId: PropTypes.string,
   croppedImage: PropTypes.instanceOf(File),
@@ -23,15 +22,14 @@ AvatarUploader.propTypes = {
 // TODO: get userType and userId dynamically
 // TODO: Add avatar viewing
 export default function AvatarUploader({
-  size = 28,
   userType,
   userId,
   croppedImage,
   setCroppedImage,
   croppedImageUrl,
 }) {
-  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-${size}`;
-  const imgClassName = `rounded-full object-cover max-w-${size}`;
+  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-28`;
+  const imgClassName = `rounded-full object-cover`;
 
   const { toast } = useToast();
   const [avatarUploaded, setAvatarUploaded] = useState(null); // Use URL for preview
