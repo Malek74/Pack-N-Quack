@@ -3,7 +3,6 @@ import ProductForm from "../forms/ProductForm";
 import DeleteButton from "../shared/DeleteButton";
 import { EditProductDialog } from "../editButtonsWillBeReusedLater/EditProduct";
 import axios from "axios";
-import { ListFilter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,51 +24,66 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUser } from "@/context/UserContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FilterButton from "@/components/shared/FilterButtons";
-import PriceSlider from "@/components/shared/PriceSlider";
+import FilterButtons from "../shared/FilterButtons";
+import PriceSlider from "../shared/PriceSlider";
 import { useState, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce"; // Import debounce from lodash
-
-export default function AdminProducts() {
+export default function AdminProducts({ seller }) {
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [minPrice, setMinPrice] = useState(0);
+  const { prefCurrency } = useUser();
+  const [tab, setTab] = useState("active");
   const [maxPrice, setMaxPrice] = useState(null);
   const [priceRange, setPriceRange] = useState([0, 1000000]); // Applied price range
   const [sliderRange, setSliderRange] = useState([0, 1000000]); // Temporary slider range
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // Create a debounced version of fetchProducts using useMemo to ensure it persists across renders
   const debouncedFetchProducts = useMemo(
     () =>
       debounce(() => {
+        setLoading(true);
         const min = priceRange[0] > 0 ? priceRange[0] : 0;
         const max = priceRange[1] || maxPrice;
-
+        console.log("fetching");
+        const sellerID = seller ? "&sellerID=6703ba52daf9eae5ef55344c" : "";
+        const archiveFilter =
+          tab === "all"
+            ? ""
+            : tab === "archived"
+            ? `isArchived=true`
+            : `isArchived=false`;
         axios
           .get(
-            `/api/products?minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}`
+            `/api/products?${archiveFilter}&minPrice=${min}&maxPrice=${max}&sortBy=ratings.averageRating&order=${selectedFilters["Sort By Rating"]}&name=${searchTerm}&currency=${prefCurrency}${sellerID}`
           )
           .then((response) => {
             setProducts(response.data);
-            console.log(priceRange + response.data);
+            console.log(response.data);
           })
           .catch((error) => {
             console.error(error);
           });
-      }, 100), // Debounce with 500ms delay
-    [priceRange, searchTerm, selectedFilters, maxPrice]
+        setLoading(false);
+      }, 50), // Debounce with 500ms delay
+
+    [priceRange, searchTerm, selectedFilters, maxPrice, tab, prefCurrency]
   );
 
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
-      .get(`api/products/maxProductPrice`)
+      .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
-        setMaxPrice(response.data.maxPrice + 200);
-        setSliderRange([0, response.data.maxPrice]);
+        console.log(response.data);
+        console.log(typeof response.data);
+
+        setMaxPrice(response.data + 200);
+        console.log(maxPrice);
+        setSliderRange([0, response.data + 200]);
       })
       .catch((error) => {
         console.error(error);
@@ -81,13 +95,12 @@ export default function AdminProducts() {
     if (maxPrice !== null) {
       debouncedFetchProducts(); // Use the debounced function
     }
-  }, [searchTerm, maxPrice, priceRange, selectedFilters]);
+  }, [searchTerm, maxPrice, priceRange, selectedFilters, tab, prefCurrency]);
 
   // Fetch maxPrice when component mounts
   useEffect(() => {
     fetchMaxPrice();
   }, []);
-
   const handleFilterChange = (type, value) => {
     setSelectedFilters((prev) => ({
       ...prev,
@@ -105,6 +118,30 @@ export default function AdminProducts() {
     setPriceRange(sliderRange);
   };
 
+  const handleArchiving = (product, archive) => {
+    axios
+      .put(`api/products/update/${product._id}/`, {
+        price: product.price,
+        description: product.description,
+        isArchived: archive,
+        images: product.images,
+      })
+      .then(() => {
+        toast({
+          title: "Product updated succesfully!",
+        });
+        debouncedFetchProducts();
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Product could not be updated",
+          // description: error.response.data.message,
+        });
+        console.log(error);
+      });
+  };
+
   const deleteClicked = (id) => {
     axios
       .delete(`api/products/delete/${id}`)
@@ -114,7 +151,7 @@ export default function AdminProducts() {
         });
         debouncedFetchProducts(); // Refresh the products list after deletion
       })
-      .catch((error) => {
+      .catch(() => {
         toast({
           text: "Failed to delete product",
           variant: "destructive", // Error variant
@@ -132,11 +169,149 @@ export default function AdminProducts() {
     },
   ];
 
+  const TableContent = () => {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {tab.charAt(0).toUpperCase() + tab.slice(1)} Products
+          </CardTitle>
+          <CardDescription>
+            Manage your products and view their sales performance.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Image</TableHead>
+                {!seller && <TableHead>Seller</TableHead>}
+                <TableHead>Name</TableHead>
+                {!seller && <TableHead>Description</TableHead>}
+                <TableHead>Price</TableHead>
+                <TableHead>Rating</TableHead>
+                <TableHead>Available Quantity</TableHead>
+                <TableHead>Sales</TableHead>
+                {tab == "all" && <TableHead>Status</TableHead>}
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {loading && <div>Loading...</div>}
+              {!loading && products.length > 0
+                ? products.map((product) => (
+                    <TableRow key={product._id}>
+                      <TableCell className="hidden sm:table-cell">
+                        <img
+                          alt="Product image"
+                          className="aspect-square rounded-md object-cover"
+                          height="64"
+                          src={product.picture}
+                          width="64"
+                        />
+                      </TableCell>
+                      {!seller && (
+                        <TableCell>
+                          <Badge variant="outline">
+                            {product.sellerUsername}
+                          </Badge>
+                        </TableCell>
+                      )}
+                      <TableCell className="font-medium">
+                        {product.name}
+                      </TableCell>
+                      {!seller && (
+                        <TableCell className="">
+                          {product.description}
+                        </TableCell>
+                      )}
+                      <TableCell className="hidden md:table-cell">
+                        {product.price}
+                      </TableCell>
+                      <TableCell>{product.ratings.averageRating}</TableCell>
+                      <TableCell>{product.available_quantity}</TableCell>
+                      <TableCell>
+                        {product.product_sales > 0
+                          ? product.product_sales
+                          : "0"}
+                      </TableCell>
+                      {tab == "all" && (
+                        <TableCell>
+                          {product.isArchived ? "Archived" : "Active"}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <EditProductDialog
+                          product={product}
+                          onRefresh={debouncedFetchProducts}
+                        />
+                        <DeleteButton
+                          onConfirm={() => deleteClicked(product._id)}
+                        />
+                        {tab === "all" && product.isArchived && (
+                          <Button
+                            onClick={() => handleArchiving(product, false)}
+                          >
+                            Unarchive
+                          </Button>
+                        )}
+                        {tab === "all" && !product.isArchived && (
+                          <Button
+                            onClick={() => handleArchiving(product, true)}
+                          >
+                            Archive
+                          </Button>
+                        )}
+
+                        {tab === "archived" && (
+                          <Button
+                            onClick={() => handleArchiving(product, false)}
+                          >
+                            Unarchive
+                          </Button>
+                        )}
+                        {tab === "active" && (
+                          <Button
+                            onClick={() => handleArchiving(product, true)}
+                          >
+                            Archive
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : !loading && (
+                    <TableRow>
+                      <TableCell colSpan="7">No products found.</TableCell>
+                    </TableRow>
+                  )}
+            </TableBody>
+          </Table>
+        </CardContent>
+
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>1-{products.length}</strong> of{" "}
+            <strong>{products.length}</strong> products
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  };
   return (
     <div className="flex min-h-screen w-full flex-col p-4">
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
-          <Tabs defaultValue="all">
+          <Tabs
+            defaultValue="active"
+            onValueChange={(value) => {
+              setTab(value);
+              setProducts([]);
+              console.log(value);
+            }}
+          >
             <div className="flex items-center justify-center">
               <div className="flex justify-center gap-4 mb-4 items-center">
                 <div className="rounded-lg flex justify-center items-center">
@@ -155,7 +330,7 @@ export default function AdminProducts() {
                   </Button>
                 </div>
                 {/* Filter Buttons */}
-                <FilterButton
+                <FilterButtons
                   className="mb-0"
                   buttons={filterButtons}
                   onFilterChange={handleFilterChange}
@@ -166,8 +341,8 @@ export default function AdminProducts() {
                     <PriceSlider
                       min={0}
                       max={maxPrice}
-                      priceRange={sliderRange} // Pass the temporary slider range
-                      handlePriceChange={handlePriceChange} // Update slider range on change
+                      priceRange={sliderRange}
+                      handlePriceChange={handlePriceChange}
                     />
                     <Button
                       size="sm"
@@ -185,7 +360,11 @@ export default function AdminProducts() {
                   form={
                     <ProductForm
                       onRefresh={debouncedFetchProducts}
-                      adderId="670304850bf9fdbd2db01e47"
+                      adderId={
+                        seller
+                          ? "6703ba52daf9eae5ef55344c"
+                          : "6706596fd394ab3a8816c3d5"
+                      }
                     />
                   }
                 />
@@ -193,99 +372,19 @@ export default function AdminProducts() {
             </div>
 
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              {/* <TabsTrigger value="all">All</TabsTrigger> */}
               <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="draft">Draft</TabsTrigger>
-              <TabsTrigger value="archived" className="hidden sm:flex">
-                Archived
-              </TabsTrigger>
+              <TabsTrigger value="archived">Archived</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Products</CardTitle>
-                  <CardDescription>
-                    Manage your products and view their sales performance.
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="hidden w-[100px] sm:table-cell">
-                          <span className="sr-only">Image</span>
-                        </TableHead>
-                        <TableHead>Seller</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Rating</TableHead>
-                        <TableHead></TableHead>
-                        <TableHead></TableHead>
-                      </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                      {products.length > 0 ? (
-                        products.map((product) => (
-                          <TableRow key={product._id}>
-                            <TableCell className="hidden sm:table-cell">
-                              <img
-                                alt="Product image"
-                                className="aspect-square rounded-md object-cover"
-                                height="64"
-                                src={product.picture[0]}
-                                width="64"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">
-                                {product.sellerUsername}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {product.name}
-                            </TableCell>
-                            <TableCell className="">
-                              {product.description}
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                              {product.price}
-                            </TableCell>
-                            <TableCell>
-                              {product.ratings.averageRating}
-                            </TableCell>
-                            <TableCell>
-                              <EditProductDialog
-                                product={product}
-                                onRefresh={debouncedFetchProducts}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <DeleteButton
-                                onConfirm={() => deleteClicked(product._id)}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan="7">No products found.</TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-
-                <CardFooter>
-                  <div className="text-xs text-muted-foreground">
-                    Showing <strong>1-{products.length}</strong> of{" "}
-                    <strong>{products.length}</strong> products
-                  </div>
-                </CardFooter>
-              </Card>
+            {/* <TabsContent value="all">
+              <TableContent />
+            </TabsContent> */}
+            <TabsContent value="active">
+              <TableContent />
+            </TabsContent>
+            <TabsContent value="archived">
+              <TableContent />
             </TabsContent>
           </Tabs>
         </main>

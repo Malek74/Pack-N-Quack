@@ -23,7 +23,7 @@ const formSchema = z.object({
   userName: z.string().nonempty({ message: "Username is required" }),
   email: z.string().email({ message: "Invalid email address" }),
   websiteLink: z.string().url({ message: "Please enter a valid URL" }),
-  hotline: z
+  hotline: z.coerce
     .number()
     .min(5, { message: "Hotline must be at least 5 characters" }),
   companyProfile: z

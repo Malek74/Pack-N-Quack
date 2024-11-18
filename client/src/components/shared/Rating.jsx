@@ -1,5 +1,4 @@
-import React from "react";
-
+// eslint-disable-next-line react/prop-types
 export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
   const sizes = {
     small: 12,
@@ -7,16 +6,25 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
     large: 24,
   };
 
+  // eslint-disable-next-line react/prop-types
   const StarIcon = ({ filled, percentage }) => (
     <svg
       width={sizes[size]}
       height={sizes[size]}
       viewBox="0 0 18 18"
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-${sizes[size]} h-${sizes[size]} ${filled ? "" : "text-gray-300"}`}
+      className={`w-${sizes[size]} h-${sizes[size]} ${
+        filled ? "" : "text-gray-300"
+      }`}
     >
       <defs>
-        <linearGradient id={`grad-${percentage}`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient
+          id={`grad-${percentage}`}
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="0%"
+        >
           <stop offset={`${percentage}%`} stopColor="#FFC700" />
           <stop offset={`${percentage}%`} stopColor="transparent" />
         </linearGradient>
@@ -24,7 +32,7 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
       <path
         d="M9 0L12 6L18 6.75L13.88 11.37L15 18L9 15L3 18L4.13 11.37L0 6.75L6 6L9 0Z"
         fill={filled ? "#FFC700" : `url(#grad-${percentage})`}
-        stroke="#FFC700"  // Adding a stroke for the outline
+        stroke="#FFC700" // Adding a stroke for the outline
         strokeWidth="1"
       />
     </svg>

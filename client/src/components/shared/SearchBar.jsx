@@ -1,10 +1,17 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
+
+SearchBar.propTypes = {
+  searchTerm: PropTypes.string,
+  setSearchTerm: PropTypes.func,
+  placeholder: PropTypes.string,
+};
+
 export default function SearchBar({ searchTerm, setSearchTerm, placeholder }) {
   return (
-    <div className="absolute inset-x-0 top-[87.5%] w-full flex justify-center">
+    <div className="absolute inset-x-0 top-[84.5%] w-full flex justify-center">
       <div className="w-[60%] bg-white rounded-lg p-4 shadow-lg flex justify-center items-center">
         <Input
           placeholder={placeholder}

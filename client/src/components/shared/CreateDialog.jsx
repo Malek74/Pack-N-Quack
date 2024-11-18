@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { PlusCircle } from "lucide-react";
-export default function CreateDialog({ title, form }) {
+export default function CreateDialog({ title="", form, changePassword=false }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -17,14 +17,14 @@ export default function CreateDialog({ title, form }) {
           variant="outline"
           size="sm"
         >
-          <PlusCircle className="h-3.5 w-3.5" />
+          {!changePassword && <PlusCircle className="h-3.5 w-3.5" />}
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Add {title}
+           {!changePassword ?  `Add ${title}`: "Change Password"}
           </span>
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className=" max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create a new {title}</DialogTitle>
           <DialogDescription>

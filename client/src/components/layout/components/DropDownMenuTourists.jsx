@@ -5,27 +5,26 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-import React from 'react'
 import { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const DropDownMenuTourist = () => {
-  const [label, setLabel] = useState("What to do?")
+  const [label, setLabel] = useState("What to do?");
   useEffect(() => {
     switch (location.pathname) {
-      case '/itineraries':
-        setLabel('Itineraries');
+      case "/itinerariesTourists":
+        setLabel("Itineraries");
         break;
-      case '/activitiesTourists':
-        setLabel('Activities');
+      case "/activitiesTourists":
+        setLabel("Activities");
         break;
-      case '/historicalTourists':
-        setLabel('Historical');
+      case "/historicalTourists":
+        setLabel("Historical");
         break;
       default:
-        setLabel('As a Tourist');
+        setLabel("As a Tourist");
     }
   }, [location.pathname]);
   return (
@@ -34,15 +33,18 @@ const DropDownMenuTourist = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>As a Tourist</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem><Link to="/itineraries">Itineraries</Link></DropdownMenuItem>
-        <DropdownMenuItem><Link to="/activitiesTourists">Activities</Link></DropdownMenuItem>
-        <DropdownMenuItem><Link to="/historicalTourists">Historical</Link></DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link to="/itinerariesTourists">Itineraries</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link to="/activities">Activities</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link to="/historicalTourists">Historical</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+};
 
-  )
-}
-
-export default DropDownMenuTourist
-
-
+export default DropDownMenuTourist;
