@@ -4,6 +4,9 @@ import Document from '../models/documentSchema.js';
 import DeleteRequest from '../models/deleteRequests.js';
 import Itinerary from '../models/itinerarySchema.js';
 import Booking from '../models/bookingSchema.js';
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
 
 //@desc Create a new tour guide
 //@route POST /api/tourGuide
@@ -29,7 +32,17 @@ export const createTourGuide = async (req, res) => {
     }
 
     try {
-        const newTourGuide = await tourGuide.create({ email: email, username, password });
+        const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+
+        const newTourGuide = await tourGuide.create({ email: email, username, password: hashedPassword });
+
+        //create a token for the user
+        const token = createToken(username, newTourGuide._id, "Tour Guide");
+
+        //send the token in the response
+        res.cookie("jwt", token, { httpOnly: true });
 
         return res.status(201).json(newTourGuide);
     } catch (error) {
@@ -49,7 +62,7 @@ export const getTourGuides = async (req, res) => {
 }
 
 export const getTourGuideById = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
@@ -73,12 +86,11 @@ export const getTourGuideById = async (req, res) => {
 //@access Public
 export const editTourGuide = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.user._id;
         const { email, mobile, experienceYears, previousWork, isAccepted, oldEmail } = req.body;
         console.log(req.body)
         if (email) {
             if (email != oldEmail) {
-                console.log("HIII")
                 if (await emailExists(email)) {
                     return res.status(400).json({ message: "Email already exists" });
                 }
@@ -111,8 +123,11 @@ export const editTourGuide = async (req, res) => {
 };
 
 export const rateTourGuide = async (req, res) => {
-    const { touristId, rating, comment } = req.body;
+
+    const { rating, comment } = req.body;
     const tourGuideId = req.params.id;
+    const touristId = req.user._id;
+
     if (!tourGuideId) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
     }
@@ -146,7 +161,7 @@ export const rateTourGuide = async (req, res) => {
 };
 
 export const acceptTerms = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
     }
@@ -166,7 +181,7 @@ export const acceptTerms = async (req, res) => {
 }
 
 export const deleteTourGuide = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
     }

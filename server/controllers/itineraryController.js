@@ -9,7 +9,8 @@ import { uploadImages } from '../utils/Helpers.js';
 import activityTag from '../models/activityTagSchema.js';
 import { getConversionRate } from '../utils/Helpers.js';
 import cloudinary from '../utils/cloudinary.js';
-
+import { io } from '../server.js';
+import Notification from '../models/norificationSchema.js';
 
 
 //@desc create a new itinerary
@@ -607,6 +608,19 @@ export const Flagg = async (req, res) => {
                 }
             }
         }
+
+        //create new notification for the tour guide
+        const notification = await Notification.create({
+            title: "Itinerary flagged",
+            message: `Your itinerary ${itinerary.name} has been flagged`,
+            user: {
+                id: itinerary.tourGuideID,
+                role: "TourGuide"
+            }
+        });
+
+        io.emit("flaggedItinerary", notification);
+
         return res.status(200).json(updatedItinerary);
 
     } catch (error) {

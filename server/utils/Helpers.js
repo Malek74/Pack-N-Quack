@@ -8,12 +8,13 @@ import tourist from '../models/touristSchema.js';
 import activityModel from "../models/activitySchema.js";
 import product from "../models/productSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
-// import cloudinary from '../utils/cloudinary.js';
 import { v2 as cloudinary } from 'cloudinary';
-
 import dotenv from 'dotenv';
 import axios from "axios";
 import { json } from "express";
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+
 
 //@desc check if username exists in the database
 //@param username
@@ -293,3 +294,56 @@ export const deleteIteneraries = async (tourGuideId) => {
     const itinerariesToDelete = await Itinerary.deleteMany({ tourGuideID: tourGuideId });
     return itinerariesToDelete
 }
+
+export const getUserRole = async (username) => {
+    let userRole = '';
+    let user = await tourist.findOne({ username });
+    if (user) {
+        userRole = 'Tourist';
+        return userRole;
+
+    } else {
+        user = await advertiserModel.findOne({ username });
+        if (user) {
+            userRole = 'Advertiser';
+            return userRole;
+
+        } else {
+            user = await tourGuide.findOne({ username });
+            if (user) {
+                userRole = 'Tour Guide';
+                return userRole;
+
+            } else {
+                user = await touristGoverner.findOne({ username });
+                if (user) {
+                    userRole = 'Tourism Governer';
+                    return userRole;
+
+                } else {
+                    user = await seller.findOne({ username });
+                    if (user) {
+                        userRole = 'Seller';
+                        return userRole;
+                    }
+                    else {
+                        user = await adminModel.findOne({ username });
+                        if (user) {
+                            userRole = 'Admin';
+                            return userRole;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    return userRole;
+}
+
+export const createToken = (username, id, role) => {
+    return jwt.sign({ id, username, role }, process.env.JWT_SECRET_KEY, {
+        expiresIn: 24 * 60 * 60 //
+    });
+    
+};

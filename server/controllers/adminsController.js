@@ -8,6 +8,9 @@ import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '.
 import tourist from "../models/touristSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import { PasswordChangeRequest } from "../models/changePassSchema.js";
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
 
 
 
@@ -89,7 +92,18 @@ export const addAdmin = async (req, res) => {
         return res.status(400).json({ message: "Username already exists" });
     }
 
-    const newAdmin = new adminModel({ username, password });
+    // Hash the password
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newAdmin = new adminModel({ username, password: hashedPassword });
+
+    // Create a token for the user
+    const token = createToken(username, newAdmin._id, "Admin");
+
+    // Send the token in the response
+    res.cookie("jwt", token, { httpOnly: true });
+
     console.log(newAdmin);
     try {
         const a = await newAdmin.save();
@@ -167,7 +181,10 @@ export const handlePasswordChangeRequest = async (req, res) => {
                     return res.status(400).json({ message: "Invalid user type" });
             }
 
-            await userModel.findByIdAndUpdate(request.userId, { password: request.requestedPassword });
+            //hash the password
+            const salt = await bcrypt.genSalt();
+            const hashedPassword = await bcrypt.hash(request.requestedPassword, salt);
+            await userModel.findByIdAndUpdate(request.userId, { password: hashedPassword });
             request.status = 'approved';
         } else {
             request.status = 'declined';

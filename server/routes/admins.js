@@ -28,34 +28,6 @@ router.get("/complaints/:id", viewComplaintById);
 router.put("/complaints/pending/:id", markComplaintPending);
 router.put("/complaints/resolved/:id", markComplaintResolved);
 
-router.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    const user = await adminModel.findOne({ username }) || await advertiserModel.findOne({ username });
-    if (user) {
-        console.log(password + " " + user.password);
-        if (password === user.password) {
-            const token = jwt.sign(
-                { username: username, _id: user._id },
-                process.env.JWT_SECRET_KEY,
-                { expiresIn: "2m" }
-            )
-
-            res.status(200).json({
-                id: user._id,
-                username: user.username,
-                token: token,
-            });
-        } else {
-            res.status(400).json({ message: "Incorrect password" });
-        }
-    } else {
-        res.status(400).json({ message: "Username not found" });
-    }
-});
-
-router.get("/verify", protect, (req, res) => {
-    res.status(200).json(req.user);
-});
-
-
 export default router;
+
+
