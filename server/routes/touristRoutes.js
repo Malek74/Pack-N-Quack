@@ -12,7 +12,10 @@ import {
     getMyHotels,
     viewMyTourGuides,
     viewMyItineraries,
-    viewMyActivities
+    viewMyActivities,
+    viewMyWishlist,
+    addToWishlist,
+    removeFromWishlist
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints, viewComplaintById } from '../controllers/complaintController.js';
 
@@ -36,5 +39,8 @@ router.get('/myactivities/:id', viewMyActivities);
 router.get('/complaints/:id', viewMyComplaints);
 router.post('/complaints', createComplaint);
 router.get('/myComplaints/:id', viewComplaintById);
+router.get('/wishlist/:id', viewMyWishlist);
+router.post('/wishlist/:id', addToWishlist);
+router.delete('/wishlist/:id', removeFromWishlist);
 
 export default router;
