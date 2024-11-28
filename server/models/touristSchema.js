@@ -84,7 +84,13 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tag'
         }],
-    }
+    },
+
+    wishlist: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Product'
+    }],
+
 },
     { timestamps: true }
 );
