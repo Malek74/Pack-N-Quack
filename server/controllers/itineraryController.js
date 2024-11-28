@@ -11,6 +11,7 @@ import { getConversionRate } from '../utils/Helpers.js';
 import cloudinary from '../utils/cloudinary.js';
 import { io } from '../server.js';
 import Notification from '../models/norificationSchema.js';
+import transactionModel from '../models/transactionsSchema.js';
 
 
 //@desc create a new itinerary
@@ -595,7 +596,6 @@ export const Flagg = async (req, res) => {
         //flag itinerary
         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flag } }, { new: true, runValidators: true });
 
-
         let isbooked = await Booking.find({ itineraryID: itineraryID });
         if (isbooked.length > 0) {
             if (flag == true) {
@@ -604,6 +604,17 @@ export const Flagg = async (req, res) => {
                     if (user) {
                         //update wallet in user
                         const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + itinerary.price } }, { new: true, runValidators: true });
+
+                        //create a transaction 
+                        const transaction = new transactionModel({
+                            amount: itinerary.price,
+                            incoming: true,
+                            userId: user._id,
+                            title: "Itinerary Refund",
+                            description: "Refund for flagged itinerary",
+                            method: "wallet"
+                        });
+
                     }
                 }
             }

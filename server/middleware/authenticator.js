@@ -10,7 +10,7 @@ config();
 
 
 export const protect = async (req, res, next) => {
-    const token = req.cookies.token;
+    const token = req.cookies.jwt;
     console.log(token);
     if (!token) {
         return res.status(401).json({ message: 'Not authorized, no token' });
@@ -51,6 +51,7 @@ export const protect = async (req, res, next) => {
                 break;
         }
         req.user = user;
+        req.role = decoded.role;
         next();
     }
     catch (error) {

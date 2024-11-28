@@ -3,6 +3,7 @@ import { getConversionRate } from "../utils/Helpers.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
 import product from "../models/productSchema.js";
+import PromoCodes from "../models/promoCodesSchema.js";
 
 //@desc Get all transportation
 //@route GET /api/transportation
@@ -92,7 +93,7 @@ export const createTransportation = async (req, res) => {
 export const bookTransportation = async (req, res) => {
 
     const touristID = req.params.id;
-    const { eventID, numOfTickets } = req.body;
+    const { eventID, numOfTickets, promocode } = req.body;
     console.log(req.body);
     let event = {}
     try {
@@ -116,7 +117,42 @@ export const bookTransportation = async (req, res) => {
             unit_amount: event.price * 100,
         });
 
+        //fetch promocode if it exists
+        let promo;
+        if (promoCode) {
+            promo = await PromoCodes.findOne({ code: promoCode });
 
+            if (!promo) {
+                res.status(400).send("Promocode does not exist");
+            }
+
+            if (!promo.isActive) {
+                res.status(400).send("Promocode has already been used");
+            }
+
+            //set promocode to inactive 
+
+
+            //check if it's his birthday promo
+            if (promo.code == tourist.promoCode.code) {
+                //today is birthday
+                const today = new Date();
+                const birthDate = new Date(tourist.dob);
+                const lastUsed = new Date(tourist.promoCode.lastUsed);
+
+                if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
+                    res.status(400).json({ message: "Promocode has already been used" });
+                }
+
+                if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
+                    res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                }
+            }
+            else {
+                await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+
+            }
+        }
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -126,6 +162,7 @@ export const bookTransportation = async (req, res) => {
             mode: 'payment',
             success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
             cancel_url: 'https://www.amazon.com/',  //todo:add correct link
+            discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
             metadata: {
                 eventID: eventID,
                 touristID: touristID,

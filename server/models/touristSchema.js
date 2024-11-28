@@ -84,7 +84,19 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tag'
         }],
+    },
+    promoCode: {
+        code: {
+            type: String,
+            default: ''
+        },
+        lastUsed: {
+            type: Date,
+            default: Date.now()
+        }
     }
+
+
 },
     { timestamps: true }
 );

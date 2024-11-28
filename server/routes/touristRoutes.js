@@ -16,7 +16,7 @@ import {
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints, viewComplaintById } from '../controllers/complaintController.js';
 import { protect } from '../middleware/authenticator.js';
-
+import { getMyTransactions } from '../controllers/bookingController.js';
 
 const router = express.Router();
 
@@ -36,5 +36,6 @@ router.get('/myactivities', protect, viewMyActivities);
 router.get('/complaints/', protect, viewMyComplaints);
 router.post('/complaints', protect, createComplaint);
 router.get('/myComplaints', protect, viewComplaintById);
+router.get("/myTransactions", protect, getMyTransactions);
 
 export default router;

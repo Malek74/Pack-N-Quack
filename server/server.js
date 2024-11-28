@@ -36,7 +36,8 @@ import { Server } from 'socket.io';
 import e from 'express';
 import SocketConnection from './models/socketConnections.js';
 import cookieParser from 'cookie-parser';
-import { login, logout } from './controllers/loginRegisterController.js';
+import { login, logout, forgotPassword, updatePassword } from './controllers/loginRegisterController.js';
+import { protect } from './middleware/authenticator.js';
 
 config();
 const app = express();
@@ -107,3 +108,5 @@ app.use('/api/transportation', transportation);
 app.use('/api/itiernaryTags', tagRoutes);
 app.post('/api/login', login);
 app.get('/api/logout', logout);
+app.get('/api/forgotPassword', protect, forgotPassword);
+app.post('/api/OTPPassword', protect, updatePassword);

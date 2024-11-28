@@ -3,6 +3,7 @@ import Tourist from '../models/touristSchema.js';
 import Stripe from 'stripe';
 import { convertPrice, getConversionRate } from '../utils/Helpers.js';
 import AmadeusBooking from '../models/amadeusBooking.js';
+import PromoCodes from "../models/promoCodesSchema.js"
 
 const cities = [
   { "city": "New York", "iata_code": "JFK" },
@@ -231,7 +232,7 @@ export const confirmFlightPrice = async (req, res) => {
 }
 
 export const bookFlight = async (req, res) => {
-  const { price, numTickets, origin, destination, currency, date } = req.body;
+  const { price, numTickets, origin, destination, currency, date, promocode } = req.body;
   const touristID = req.params.id;
   const conversionRate = await getConversionRate(currency);
 
@@ -254,7 +255,6 @@ export const bookFlight = async (req, res) => {
     //convert price to USD using exchange rate api
     const priceConverted = parseInt(price * conversionRate);
 
-
     //create product on stripe
     const productStripe = await stripe.products.create({
       name: `${originCity} to ${destinationCity}`,
@@ -265,7 +265,42 @@ export const bookFlight = async (req, res) => {
       },
     });
 
-    console.log(productStripe);
+    //fetch promocode if it exists
+    let promo;
+    if (promocode) {
+      promo = await PromoCodes.findOne({ code: promoCode });
+
+      if (!promo) {
+        res.status(400).send("Promocode does not exist");
+      }
+
+      if (!promo.isActive) {
+        res.status(400).send("Promocode has already been used");
+      }
+
+      //set promocode to inactive 
+
+
+      //check if it's his birthday promo
+      if (promo.code == tourist.promoCode.code) {
+        //today is birthday
+        const today = new Date();
+        const birthDate = new Date(tourist.dob);
+        const lastUsed = new Date(tourist.promoCode.lastUsed);
+
+        if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
+          res.status(400).json({ message: "Promocode has already been used" });
+        }
+
+        if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
+          res.status(400).json({ message: "Promocode can be used only on your birthday" });
+        }
+      }
+      else {
+        await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+
+      }
+    }
 
     //create checkout session 
     const session = await stripe.checkout.sessions.create({
@@ -286,6 +321,7 @@ export const bookFlight = async (req, res) => {
       mode: 'payment',
       success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
       cancel_url: 'https://www.amazon.com/',  //todo:add correct link
+      discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
       metadata: {
         tourist_id: touristID,
         flight: `${origin} to ${destination}`,

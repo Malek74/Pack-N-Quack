@@ -4,7 +4,7 @@ import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
-import { emailExists, usernameExists } from "../utils/Helpers.js";
+import { emailExists, usernameExists, createPromoCode } from "../utils/Helpers.js";
 import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import Places from "../models/PlacesSchema.js";
@@ -15,6 +15,7 @@ import DeleteRequest from "../models/deleteRequests.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
@@ -49,9 +50,24 @@ export const createTourist = async (req, res) => {
         const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        //generate a promocode for the user
+
+        const initials = name.split(" ").map((word) => word.charAt(0)).join("");
+        console.log(initials);
+        //concatenate the initials with a random number
+        const code = initials + 10;
+
+        //create the promo code
+        await createPromoCode(code, 10, true);
 
 
-        const newTourist = await Tourist.create({ email, username, password: hashedPassword, mobile, dob, nationality, jobTitle, role, name, stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries } });
+        const newTourist = await Tourist.create({
+            email, username, password: hashedPassword, mobile, dob, nationality, jobTitle, role, name, stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries }, promoCode: {
+                code: code,
+                lastUsed: null
+            }
+        });
+        
         //create admin token
         const token = createToken(username, newTourist._id, "Tourist");
         res.cookie("jwt", token, { httpOnly: true });
@@ -329,3 +345,4 @@ export const viewMyActivities = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+

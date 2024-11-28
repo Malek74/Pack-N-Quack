@@ -14,6 +14,8 @@ import axios from "axios";
 import { json } from "express";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import Stripe from "stripe";
+import PromoCodes from "../models/promoCodesSchema.js";
 
 
 //@desc check if username exists in the database
@@ -345,5 +347,43 @@ export const createToken = (username, id, role) => {
     return jwt.sign({ id, username, role }, process.env.JWT_SECRET_KEY, {
         expiresIn: 24 * 60 * 60 //
     });
-    
+
 };
+
+
+export const createPromoCode = async ( promocode, discount, isBirthDay) => {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+
+    try {
+        const coupon = await stripe.coupons.create({
+            percent_off: discount, // Adjust discount percentage as needed
+            duration: 'repeating', // Each user can apply it only once per use
+            name: promocode, // Name for the coupon
+            duration_in_months: 1, // Duration of the discount
+        });
+
+
+        // Create a promotion code linked to the coupon ID
+        const promoCode = await stripe.promotionCodes.create({
+            coupon: coupon.id, // Reference to an existing coupon
+            code: promocode, // The promotion code users will enter
+            max_redemptions: 50, // Unlimited total redemptions
+        });
+
+        // Save promotion code details to your database
+        await PromoCodes.create({
+            code: promoCode.code,
+            discount,
+            isBirthDay,
+            stripeID: promoCode.id,
+        });
+
+        console.log(`Promotion code ${promocode} created successfully!`);
+        return promoCode;
+    } catch (error) {
+        console.error('Error creating promo code:', error);
+        throw new Error('Failed to create promotion code');
+    }
+};
+

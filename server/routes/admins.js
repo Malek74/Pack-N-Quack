@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getAdmins, addAdmin, deleteUser, getAllUsers, getPendingPasswordChangeRequests, handlePasswordChangeRequest, acceptOrReject } from "../controllers/adminsController.js";
+import { getAdmins, addAdmin, deleteUser, getAllUsers, getPendingPasswordChangeRequests, handlePasswordChangeRequest, acceptOrReject, adminCreatePromoCode } from "../controllers/adminsController.js";
 import adminModel from "../models/adminSchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import { config } from "dotenv";
@@ -27,6 +27,7 @@ router.get("/complaints", viewComplaints);
 router.get("/complaints/:id", viewComplaintById);
 router.put("/complaints/pending/:id", markComplaintPending);
 router.put("/complaints/resolved/:id", markComplaintResolved);
+router.post("/createPromocode", adminCreatePromoCode);
 
 export default router;
 

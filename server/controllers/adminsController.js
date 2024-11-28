@@ -9,8 +9,9 @@ import tourist from "../models/touristSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import { PasswordChangeRequest } from "../models/changePassSchema.js";
 import bcrypt from "bcrypt";
-import { createToken } from "../utils/Helpers.js";
+import { createToken, createPromoCode } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+import PromoCodes from "../models/promoCodesSchema.js";
 
 
 
@@ -305,6 +306,35 @@ export const acceptOrReject = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+
+}
+
+//create promocode
+
+export const adminCreatePromoCode = async (req, res) => {
+    const { code, amount } = req.body;
+    console.log(req.body);
+    if (!code || !amount) {
+        return res.status(400).json({ message: "Please provide code and amount" });
+    }
+
+    try {
+        const promoCodeExists = await PromoCodes.find({ code: code });
+
+        if (promoCodeExists.length > 0) {
+            return res.status(400).json({ message: "Promocode already exists" });
+        }
+
+        await createPromoCode(code, amount, false);
+
+        return res.status(200).send({ message: "Promocode created successfully" })
+
+    }
+
+    catch (error) {
+        console.log(error);
+        return res.status(500).send({ message: "Error While creating the code" });
     }
 
 }

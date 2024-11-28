@@ -8,8 +8,7 @@ router.get("/allSellers", getAllSellers);
 router.post("/", protect, createSeller);
 router.put("/", protect, updateSellerInfo);
 router.get('/', protect, getSellerByID);
-router.delete('/',protect, deleteSeller);
-router.put('/terms/',protect, acceptTerms);
+router.delete('/', protect, deleteSeller);
+router.put('/terms/', protect, acceptTerms);
 
-export default router; 
-
+export default router;
