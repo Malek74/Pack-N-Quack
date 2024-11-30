@@ -456,6 +456,19 @@ export const updateQuantityInCart = async (req, res) => {
         const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
 
         if (productIndex !== -1) {
+            if(req.body.quantity < 0){
+                return res.status(400).json({message: "Quantity cannot be negative"});
+            }
+            if(req.body.quantity === 0){
+                // Quantity is 0 - Remove the item from the cart
+                const updatedCart = await Tourist.findByIdAndUpdate(
+                    touristId,
+                    { $pull: { cart: { productID: productId } } },
+                    { new: true }
+                ).populate('cart.productID');
+    
+                return res.status(200).json(updatedCart.cart);
+            }
             // Product exists in the cart - Update its quantity
             const updatedCart = await Tourist.findOneAndUpdate(
                 { _id: touristId, "cart.productID": productId },
