@@ -77,6 +77,16 @@ export const bookEvent = async (req, res) => {
             }
         }
 
+        if (eventType == "activity") {
+            success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
+        }
+        else if (eventType == "itinerary") {
+            success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
+        }
+        else {
+            success_url = "http://localhost:5173/touristDashboard/booked";
+        }
+
 
         //handle payment by wallet and related transactions
         if (payByWallet) {
@@ -86,6 +96,7 @@ export const bookEvent = async (req, res) => {
 
             //create transaction for amount paid from wallet
             if (walletAmount < 0) {
+
                 //create transaction for wallet deduction
                 await transactionModel.create({
                     userId: touristID,
@@ -94,7 +105,7 @@ export const bookEvent = async (req, res) => {
                     date: new Date(),
                     method: "wallet",
                     incoming: false,
-                    description: `Wallet deduction for booking for ${event.name}`
+                    description: `Wallet deduction for booking  ${event.name}`
                 });
             }
 
@@ -102,7 +113,7 @@ export const bookEvent = async (req, res) => {
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
 
             if (amountLeftToPay == 0) {
-                sendPaymentReceipt(tourist.email, tourist.username, event.name, dateSelected, amountToPay, price.id);
+                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, price.id);
                 return res.status(200).json({ message: "Payment successful" });
             } else {
 
@@ -146,14 +157,12 @@ export const bookEvent = async (req, res) => {
                     }
                 });
                 return res.status(200).json({ url: session.url });
-
-
             }
 
         }
         else {
             if (paymentMethod == "cash") {
-                sendPaymentReceipt(tourist.email, tourist.username, event.name, dateSelected, amountToPay, price.id);
+                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, price.id);
                 return res.status(200).json({ message: "Payment successful" });
             }
 
@@ -169,16 +178,6 @@ export const bookEvent = async (req, res) => {
                     description: `Payment for booking for ${event.name}`
                 });
             }
-        }
-
-        if (eventType == "activity") {
-            success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
-        }
-        else if (eventType == "itinerary") {
-            success_url = "http://localhost:5173/touristDashboard/itinerary-bookings";
-        }
-        else {
-            success_url = "http://localhost:5173/touristDashboard/booked";
         }
 
 
@@ -434,9 +433,18 @@ export const requestDeleteAccount = async (req, res) => {
 
 export const getMyTransactions = async (req, res) => {
     const userId = req.user._id;
+
     try {
+        const tourist = await Tourist.findById(userId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+
+        const data = { wallet: tourist.wallet, loyaltyPoints: tourist.loyaltyPoints };
+
         const transactions = await transactionModel.find({ userId: userId });
-        return res.status(200).json(transactions);
+        data.transactions = transactions;
+        return res.status(200).json(data);
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }

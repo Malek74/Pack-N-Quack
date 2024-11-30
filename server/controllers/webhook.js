@@ -25,7 +25,7 @@ export const sendPaymentReceipt = async (email, username, itineraryName, payment
         text: `
         Hello ${username},
 
-        Thank you for your payment for the event/itinerary "${itineraryName}" on ${paymentDate}.
+        Thank you for your payment for booking "${itineraryName}" on ${paymentDate}.
         Below are your payment details:
 
         - Itinerary/Event Name: ${itineraryName}
@@ -178,7 +178,13 @@ export const confirmPayment = async (req, res) => {
                         touristID: touristId,
                         stripeSessionID: session.id
                     });
+
+                    //send email to tourist
+                    const tourist = await Tourist.findById(touristId);
+                    await sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, hotel.checkIn, session.amount_total / 100, session.id);
+
                     console.log(hotelBooking);
+
                     return res.status(200).json(hotelBooking);
                 }
                 else if (type === "transportation") {

@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getConversionRate } from "../utils/Helpers.js";
 import Tourist from "../models/touristSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
+import { sendPaymentReceipt } from "../controllers/webhook.js";
 
 const cities = [
     { "city": "New York", "iata_code": "JFK" },
@@ -110,7 +111,7 @@ export const listHotelRooms = async (req, res) => {
 };
 
 export const bookRoom = async (req, res) => {
-    const { price, numOfDays, hotel, currency, room, checkIn, checkOut, name, promocode } = req.body;
+    const { price, numOfDays, hotel, currency, room, paymentMethod, checkIn, checkOut, name, promocode, payByWallet } = req.body;
     console.log("Parameters received:", req.body);
     const touristID = req.params.id;
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -176,40 +177,99 @@ export const bookRoom = async (req, res) => {
             }
         }
 
-        //create checkout session 
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: [
-                {
-                    price_data: {
-                        currency: "usd",
-                        unit_amount: priceConverted * 100,
-                        product_data: {
-                            name: `Booking in${hotel.hotel}`,
-                            description: `We wish you a quacking stay in ${hotel.hotel}`,
-                        }
-                    },
-                    quantity: parseInt(numOfDays),
-                },
-            ],
-            mode: 'payment',
-            discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
-            success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
-            cancel_url: 'https://www.amazon.com/',  //todo:add correct link
-            metadata: {
-                tourist_id: touristID,
-                hotel: hotel.hotel,
-                price: price,
-                type: hotel.type,
-                description: hotel.description.text,
-                type: "hotel",
-                bedType: hotel.bedType,
-                beds: hotel.beds,
-                checkIn: checkIn,
-                checkOut: checkOut,
-                name: name
+
+        //handle payment by wallet and related transactions
+        if (payByWallet) {
+
+            let amountLeftToPay = amountToPay - tourist.wallet;
+            let walletAmount = amountToPay - amountLeftToPay;
+
+            //create transaction for amount paid from wallet
+            if (walletAmount < 0) {
+
+                //create transaction for wallet deduction
+                await transactionModel.create({
+                    userId: touristID,
+                    title: "Hotel Booking",
+                    amount: walletAmount,
+                    date: new Date(),
+                    method: "wallet",
+                    incoming: false,
+                    description: `Wallet deduction for booking a room in ${hotel.hotel}`
+                });
             }
-        });
+
+            //update wallet amount
+            await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
+
+            if (amountLeftToPay == 0) {
+                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, dateSelected, amountToPay, price.id);
+                return res.status(200).json({ message: "Payment successful" });
+            } else {
+
+                //create transaction for amount left to pay by card
+                await transactionModel.create({
+                    userId: touristID,
+                    title: "Hotel Booking",
+                    amount: walletAmount,
+                    date: new Date(),
+                    method: "card",
+                    incoming: false,
+                    description: `Wallet deduction for booking a room in ${hotel.hotel}`
+                });
+
+
+                //create price to be paid after deducting wallet amount        
+                const price = await stripe.prices.create({
+                    currency: 'usd',
+                    product: product.id,
+                    unit_amount: amountLeftToPay * 100,
+                });
+
+
+                const session = await stripe.checkout.sessions.create({
+                    payment_method_types: ['card'],
+                    line_items: [{
+                        price: price.id,
+                        quantity: numOfTickets,
+                    }],
+                    mode: 'payment',
+                    success_url: success_url,
+                    discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
+                    metadata: {
+                        eventID: eventID,
+                        eventType: eventType,
+                        touristID: touristID,
+                        type: "event",
+                        price: amountLeftToPay,
+                        numOfTickets: numOfTickets,
+                        date: dateSelected
+                    }
+                });
+                return res.status(200).json({ url: session.url });
+            }
+
+        }
+        else {
+            if (paymentMethod == "cash") {
+                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, dateSelected, amountToPay, price.id);
+                return res.status(200).json({ message: "Payment successful" });
+            }
+
+            if (paymentMethod == "card") {
+                //create transaction for amount paid
+                await transactionModel.create({
+                    userId: touristID,
+                    title: "Hotel Booking",
+                    amount: walletAmount,
+                    date: new Date(),
+                    method: "card",
+                    incoming: false,
+                    description: `Wallet deduction for booking a room in ${hotel.hotel}`
+                });
+            }
+        }
+
 
 
         return res.status(200).json({ url: session.url });

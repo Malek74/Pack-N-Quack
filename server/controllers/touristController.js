@@ -15,6 +15,7 @@ import DeleteRequest from "../models/deleteRequests.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+import transactionModel from "../models/transactionsSchema.js";
 
 
 // Creating Tourist for Registration
@@ -67,7 +68,7 @@ export const createTourist = async (req, res) => {
                 lastUsed: null
             }
         });
-        
+
         //create admin token
         const token = createToken(username, newTourist._id, "Tourist");
         res.cookie("jwt", token, { httpOnly: true });
@@ -224,20 +225,21 @@ export const getMyprefernces = async (req, res) => {
 
 export const redeemPoints = async (req, res) => {
     const touristID = req.user._id;
+    const points = req.body.points;
 
     try {
         const tourist = await Tourist.findById(touristID);
 
-        const canBeRedeemed = Math.floor(tourist.loyaltyPoints / 10000);
+
 
         //verify there are enough points to redeem
-        if (canBeRedeemed == 0) {
+        if (points > tourist.loyaltyPoints) {
             return res.status(400).json({ message: "Not enough points to redeem" });
         }
 
         //deduct points
-        const newPoints = tourist.loyaltyPoints - canBeRedeemed * 10000;
-        const newWallet = tourist.wallet + canBeRedeemed * 100;
+        const newPoints = tourist.loyaltyPoints - points;
+        const newWallet = tourist.wallet + (points * 100) / 10000;
 
         //update tourist
         const updatedTourist = await Tourist.findOneAndUpdate(
@@ -246,6 +248,8 @@ export const redeemPoints = async (req, res) => {
             { new: true }
         );
 
+        //create transaction
+        const transaction = await transactionModel.create({ amount: (points * 100) / 10000, incoming: true, userId: touristID, title: "Redeem Points", description: "Redeem Points", method: "wallet" });
         return res.status(200).json(updatedTourist);
     }
     catch (error) {
