@@ -12,7 +12,12 @@ import {
     getMyHotels,
     viewMyTourGuides,
     viewMyItineraries,
-    viewMyActivities
+    viewMyActivities,
+    bookmark,
+    viewBookmarks,
+    AddNewAddress,
+    setDefaultAddress,
+    viewAddresses,
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints, viewComplaintById } from '../controllers/complaintController.js';
 
@@ -36,5 +41,13 @@ router.get('/myactivities/:id', viewMyActivities);
 router.get('/complaints/:id', viewMyComplaints);
 router.post('/complaints', createComplaint);
 router.get('/myComplaints/:id', viewComplaintById);
+router.post('/save', bookmark);
+router.get('/viewbookmark', viewBookmarks);
+router.post('/addAddress', AddNewAddress);
+router.post('/setdefault', setDefaultAddress);
+router.get('/viewAddress', viewAddresses);
+
+
+
 
 export default router;

@@ -15,7 +15,7 @@ import DeleteRequest from "../models/deleteRequests.js";
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
-    const { email, username, password, mobile, dob, nationality, role, jobTitle, name, preferedFirstTag, preferedSecondTag, preferedFirstCategory, preferedSecondCategory } = req.body;
+    const { email, username, password, mobile, dob, nationality, role, jobTitle, name, address=[], preferedFirstTag, preferedSecondTag, preferedFirstCategory, preferedSecondCategory } = req.body;
     console.log(req.body);
     try {
         // Check if the email or username is already taken by any user
@@ -30,13 +30,18 @@ export const createTourist = async (req, res) => {
             return res.status(400).json({ message: "Username is already taken." });
         }
 
-        //create stripe account
+        const addressArray = Array.isArray(address) ? address : [address];
+    const defaultAddress = addressArray[0];
+       
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
         const customer = await stripe.customers.create({
             name: name,
             email: email,
             phone: mobile,
+            address: {
+                line1: defaultAddress,
+              },
         });
 
         const preferredActivities = [preferedFirstCategory, preferedSecondCategory];
@@ -45,7 +50,7 @@ export const createTourist = async (req, res) => {
         console.log(preferredItineraries);
 
         // If both email and username are unique, create a new tourist
-        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name, stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries } });
+        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name ,address: addressArray, defaultAddress ,stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries } });
         res.status(200).json(newTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -323,3 +328,174 @@ export const viewMyActivities = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const bookmark = async (req, res) => {
+  const { touristID, eventID } = req.body;
+
+  try {
+    if (!touristID) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+      }
+      const tourist = await Tourist.findById(touristID);
+      if (!tourist) {
+        return res.status(404).json({ message: "Tourist not found" });
+      }
+
+    const flagA= false;
+      let eventExist = await Itinerary.findById(eventID);
+     if (!eventExist) {
+      eventExist = await activityModel.findById(eventID);
+      flagA= true;
+      if (!eventExist) {
+          return res.status(404).json({ message: "Event doesn't exist" });
+      }
+  }
+
+  if (flagA){
+    if (!tourist.savedEvents.savedActivities.includes(eventID)) {
+        tourist.savedEvents.savedActivities.push(eventID);
+      } else {
+        return res.status(400).json({ message: "Activity already bookmarked" });
+      }
+  }
+  else {
+    if (!tourist.savedEvents.savedItineraries.includes(event)) {
+        tourist.savedEvents.savedItineraries.push(itineraryID);
+      } else {
+        return res.status(400).json({ message: "Itinerary already bookmarked" });
+      }
+  }
+    await tourist.save();
+
+    return res.status(200).json({ message: "Bookmark saved successfully" });
+  } catch (error) {
+    console.error("Error in bookmark controller:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+export const viewBookmarks = async (req, res) => {
+  const { touristID } = req.params;
+
+  try {
+    if (!touristID) {
+      return res.status(400).json({ message: "Tourist ID is required" });
+    }
+
+    const tourist = await Tourist.findById(touristID)
+      .populate("savedEvents.savedActivities")
+      .populate("savedEvents.savedItineraries");
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const savedActivities = tourist.savedEvents.savedActivities.map(activity => ({
+      id: activity._id,
+      name: activity.name,
+      category: activity.categoryID,
+    }));
+
+    const savedItineraries = tourist.savedEvents.savedItineraries.map(itinerary => ({
+      id: itinerary._id,
+      title: itinerary.title,
+      tags: itinerary.tags,
+    }));
+
+    return res.status(200).json({
+      savedActivities,
+      savedItineraries,
+    });
+  } catch (error) {
+    console.error("Error in viewBookmarks controller:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const AddNewAddress = async (req, res) => {
+    const { touristID, address } = req.body;
+  
+    try {
+      if (!touristID) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+      }
+      if (!address) {
+        return res.status(400).json({ message: "Address is required" });
+      }
+      const tourist = await Tourist.findById(touristID);
+  
+      if (!tourist) {
+        return res.status(404).json({ message: "Tourist not found" });
+      }
+  
+      if (tourist.address.includes(address)) {
+        return res.status(400).json({ message: "Address already exists" });
+      }
+      tourist.address.push(address);
+  
+      await tourist.save();
+  
+      return res.status(200).json({ message: "Address added successfully", address: tourist.address });
+    } catch (error) {
+      console.error("Error in AddNewAddress controller:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  };
+  
+
+  export const setDefaultAddress = async (req, res) => {
+    const { touristID, defaultAddress } = req.body;
+  
+    try {
+      if (!touristID || !defaultAddress) {
+        return res.status(400).json({ message: "Tourist ID and default address are required" });
+      }
+  
+      const tourist = await Tourist.findById(touristID);
+  
+      if (!tourist) {
+        return res.status(404).json({ message: "Tourist not found" });
+      }
+  y
+      if (!tourist.address.includes(defaultAddress)) {
+        return res.status(400).json({ message: "Default address must be one of the saved addresses" });
+      }
+      tourist.defaultAddress = defaultAddress;
+      await tourist.save();
+  
+      return res.status(200).json({
+        message: "Default address set successfully",
+        defaultAddress: tourist.defaultAddress,
+      });
+    } catch (error) {
+      console.error("Error setting default address:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  };
+  
+  export const viewAddresses = async (req, res) => {
+    const { touristID } = req.params; 
+
+    try {
+
+        const tourist = await Tourist.findById(touristID);
+        
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+        const allAddresses = tourist.address;
+        const defaultAddress = tourist.defaultAddress;
+
+
+        return res.status(200).json({
+            allAddresses,
+            defaultAddress
+        });
+
+    } catch (error) {
+        console.error("Error retrieving addresses:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};

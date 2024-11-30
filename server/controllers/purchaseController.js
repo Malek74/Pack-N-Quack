@@ -156,3 +156,22 @@ export const ReviewProduct = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+export const viewPurchasedItems = async (req, res) => {
+    const { userId } = req.params;  
+    try {
+        const purchaseRecord = await PurchasedItem.findOne({ user: userId });
+
+        if (!purchaseRecord) {
+            return res.status(404).json({ message: "No purchased items found for this user." });
+        }
+        const purchasedItems = purchaseRecord.items;
+        return res.status(200).json({
+            purchasedItems
+        });
+    } catch (error) {
+        console.error("Error retrieving purchased items:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+

@@ -303,3 +303,50 @@ export const requestDeleteAccount = async (req, res) => {
     }
 
 };
+
+export const viewUpcomingBooking = async (req,res) => {
+        const {userId } = req.body;
+    try {
+        const userExist = await Tourist.findById(userId);
+        if (!userExist) {
+            return res.status(404).json({ message: "User doesn't exist" });
+        }
+       
+        const bookingExist = await Booking.find({ touristID: userId });
+
+        const upcomingBookings = bookingExist.filter(booking => new Date(booking.date) > new Date());
+
+        if (upcomingBookings.length === 0) {
+            return res.status(404).json({ message: "No upcoming events for this tourist" });
+        }
+
+        return res.status(200).json({ upcomingBookings });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+    
+}
+
+export const viewPastBooking = async (req,res) => {
+    const {userId } = req.body;
+try {
+    const userExist = await Tourist.findById(userId);
+    if (!userExist) {
+        return res.status(404).json({ message: "User doesn't exist" });
+    }
+   
+    const bookingExist = await Booking.find({ touristID: userId });
+
+    const upcomingBookings = bookingExist.filter(booking => new Date(booking.date) < new Date());
+
+    if (upcomingBookings.length === 0) {
+        return res.status(404).json({ message: "No upcoming events for this tourist" });
+    }
+
+    return res.status(200).json({ upcomingBookings });
+} catch (error) {
+    return res.status(500).json({ message: error.message });
+}
+
+}

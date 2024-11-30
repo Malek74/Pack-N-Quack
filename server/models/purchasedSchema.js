@@ -16,8 +16,20 @@ const purchasedSchema = new Schema({
         boughtNtimes: { type: Number },
         rating: { type: Number },
         review: { type: String }
-    }]
-});
+    }],
+    waitingList: [{
+        productId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Product',
+        },
+    }],
+    status :{
+        type : String,
+        default: "pending confirmation"
+    }
+}, 
+{ timestamps: true }
+);
 
 const PurchasedItem = model('PurchasedItem', purchasedSchema);
 export default PurchasedItem;

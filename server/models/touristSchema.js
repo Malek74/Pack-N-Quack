@@ -19,6 +19,14 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
+    address:[ {
+        type: String,
+        required: true,
+    },],
+    defaultAddress: {
+        type: String, 
+        default: null,
+    },
     mobile: {
         type: String,
         required: true,
@@ -84,7 +92,18 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tag'
         }],
+    },
+    savedEvents:{
+        savedItineraries: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Itinerary'
+        }],
+        savedActivities: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Activity'
+        }],
     }
+
 },
     { timestamps: true }
 );

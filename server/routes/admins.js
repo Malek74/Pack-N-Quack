@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getAdmins, addAdmin, deleteUser, getAllUsers, getPendingPasswordChangeRequests, handlePasswordChangeRequest, acceptOrReject } from "../controllers/adminsController.js";
+import { getAdmins, addAdmin, deleteUser, getAllUsers, getPendingPasswordChangeRequests, handlePasswordChangeRequest, acceptOrReject,getTotalUsersNum,getTotalNewUsersCount } from "../controllers/adminsController.js";
 import adminModel from "../models/adminSchema.js";
 import advertiserModel from "../models/advertiserSchema.js";
 import { config } from "dotenv";
@@ -21,7 +21,9 @@ router.post("/reviewreq", handlePasswordChangeRequest);
 router.put("/isAccepted", acceptOrReject);
 
 router.get("/deleteRequests", getDeleteRequests);
-router.post("/confirmDelete", handleDeleteRequest)
+router.post("/confirmDelete", handleDeleteRequest);
+router.get("/sum", getTotalUsersNum);
+router.get("/newsum", getTotalNewUsersCount);
 
 router.get("/complaints", viewComplaints);
 router.get("/complaints/:id", viewComplaintById);

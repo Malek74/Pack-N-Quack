@@ -291,3 +291,72 @@ export const acceptOrReject = async (req, res) => {
     }
 
 }
+
+export const getTotalUsersNum = async (req,res) => {
+    try {
+         //Fetch users from different schemas
+         const admins = await adminModel.find({});
+         const advertisers = await advertiserModel.find({});
+         const tourists = await tourist.find({});
+         const governors = await touristGoverner.find({});
+         const sellers = await seller.find({});
+         const tourGuides = await tourGuide.find({});
+ 
+         // Append the role to each set of users
+         const allAdmins = admins.map(user => ({ ...user.toObject(), userType: 'admin' }));
+         const allAdvertisers = advertisers.map(user => ({ ...user.toObject(), userType: 'advertiser' }));
+         const allTourists = tourists.map(user => ({ ...user.toObject(), userType: 'tourist' }));
+         const allGovernors = governors.map(user => ({ ...user.toObject(), userType: 'touristGovernor' }));
+         const allSellers = sellers.map(user => ({ ...user.toObject(), userType: 'seller' }));
+         const allTourGuides = tourGuides.map(user => ({ ...user.toObject(), userType: 'tourGuide' }));
+ 
+         const totalUsers = 
+         allAdmins.length +
+         allAdvertisers.length +
+         allTourists.length +
+         allGovernors.length +
+         allSellers.length +
+         allTourGuides.length;
+
+         return res.status(200).json({ totalUsers });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
+}
+
+export const getTotalNewUsersCount = async (req, res) => {
+    try {
+        const month = new Date();
+        month.setMonth(month.getMonth() - 1); //bageeb from the date el shahr el fat
+
+        const admins = await adminModel.find({ createdAt: { $gte: month } });
+        const advertisers = await advertiserModel.find({ createdAt: { $gte: month } });
+        const tourists = await tourist.find({ createdAt: { $gte: month } });
+        const governors = await touristGoverner.find({ createdAt: { $gte: month } });
+        const sellers = await seller.find({ createdAt: { $gte: month } });
+        const tourGuides = await tourGuide.find({ createdAt: { $gte: month } });
+
+        const allAdmins = admins.map(user => ({ ...user.toObject(), userType: 'admin' }));
+        const allAdvertisers = advertisers.map(user => ({ ...user.toObject(), userType: 'advertiser' }));
+        const allTourists = tourists.map(user => ({ ...user.toObject(), userType: 'tourist' }));
+        const allGovernors = governors.map(user => ({ ...user.toObject(), userType: 'touristGovernor' }));
+        const allSellers = sellers.map(user => ({ ...user.toObject(), userType: 'seller' }));
+        const allTourGuides = tourGuides.map(user => ({ ...user.toObject(), userType: 'tourGuide' }));
+
+        // Calculate total number of new users
+        const totalNewUsers =
+            allAdmins.length +
+            allAdvertisers.length +
+            allTourists.length +
+            allGovernors.length +
+            allSellers.length +
+            allTourGuides.length;
+
+        // Send response
+        return res.status(200).json({ totalNewUsers });
+    } catch (error) {
+        // Handle errors
+        return res.status(500).json({ message: error.message });
+    }
+};
