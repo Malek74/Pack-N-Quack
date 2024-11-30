@@ -84,6 +84,24 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tag'
         }],
+    },
+
+    cart: {
+        type: [
+            {
+                _id: false,
+                productID: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+                },
+
+                quantity: {
+                    type: Number,
+                    default: 1
+                }
+            }
+        ],
+        default: []
     }
 },
     { timestamps: true }
