@@ -31,20 +31,37 @@ import booking from './routes/booking.js';
 import webhook from './routes/webhook.js';
 import hotelRoutes from './routes/hotelRoutes.js';
 import transportation from './routes/transportationRoutes.js';
-
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import e from 'express';
+import SocketConnection from './models/socketConnections.js';
+import cookieParser from 'cookie-parser';
+import { login, logout, forgotPassword, updatePassword } from './controllers/loginRegisterController.js';
+import { protect } from './middleware/authenticator.js';
 
 config();
 const app = express();
 const port = process.env.PORT || 8000;
 const mongoURI = process.env.MONGO_URI;
+const httpServer = createServer(app); // Create an HTTP server & attach the Express app to it
+const io = new Server(httpServer, {
+    cors: {
+        origin: '*',
+    }
+}); //attach socket.io to the http server
 
 
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
-})
+export { io };
+
+httpServer.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});;
+
 // Middleware to parse JSON
 app.use(express.json());
 
+// Middleware to parse cookies
+app.use(cookieParser());
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: false }));
 
@@ -89,3 +106,7 @@ app.use('/api/complaints', complaint);
 app.use('/api/admins', admins);
 app.use('/api/transportation', transportation);
 app.use('/api/itiernaryTags', tagRoutes);
+app.post('/api/login', login);
+app.get('/api/logout', logout);
+app.get('/api/forgotPassword', protect, forgotPassword);
+app.post('/api/OTPPassword', protect, updatePassword);

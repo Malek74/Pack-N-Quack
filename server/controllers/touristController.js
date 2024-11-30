@@ -4,7 +4,7 @@ import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
-import { emailExists, usernameExists } from "../utils/Helpers.js";
+import { emailExists, usernameExists, createPromoCode } from "../utils/Helpers.js";
 import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import Places from "../models/PlacesSchema.js";
@@ -12,6 +12,11 @@ import Stripe from "stripe";
 import Booking from "../models/bookingSchema.js";
 import AmadeusBooking from "../models/amadeusBooking.js";
 import DeleteRequest from "../models/deleteRequests.js";
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
+import transactionModel from "../models/transactionsSchema.js";
+
 
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
@@ -46,12 +51,34 @@ export const createTourist = async (req, res) => {
 
         const preferredActivities = [preferedFirstCategory, preferedSecondCategory];
         const preferredItineraries = [preferedFirstTag, preferedSecondTag];
-        console.log(preferredActivities);
-        console.log(preferredItineraries);
+
 
         // If both email and username are unique, create a new tourist
-        const newTourist = await Tourist.create({ email, username, password, mobile, dob, nationality, jobTitle, role, name ,address: addressArray, defaultAddress ,stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries } });
-        res.status(200).json(newTourist);
+        const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        //generate a promocode for the user
+
+        const initials = name.split(" ").map((word) => word.charAt(0)).join("");
+        console.log(initials);
+        //concatenate the initials with a random number
+        const code = initials + 10;
+
+        //create the promo code
+        await createPromoCode(code, 10, true);
+
+
+        const newTourist = await Tourist.create({
+            email, username, password: hashedPassword, mobile, dob, nationality, jobTitle, role, name ,address: addressArray, defaultAddress ,stripeID: customer.id, preferences: { preferredActivities: preferredActivities, preferredItineraries: preferredItineraries }, promoCode: {
+                code: code,
+                lastUsed: null
+            }
+        });
+
+        //create admin token
+        const token = createToken(username, newTourist._id, "Tourist");
+        res.cookie("jwt", token, { httpOnly: true });
+        console.log(token); res.status(200).json(newTourist);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -59,16 +86,8 @@ export const createTourist = async (req, res) => {
 
 // Tourist view Profile
 export const getTourist = async (req, res) => {
-    const id = req.params.id;
-    console.log(id);
 
-    try {
-        //Find by email as it is unique identifier
-        const touristProfile = await Tourist.findById(id);
-        return res.status(200).json(touristProfile);
-    } catch (error) {
-        return res.status(404).json({ message: error.message });
-    }
+    return res.status(200).json(req.user);
 };
 
 //@desc Get all tourists
@@ -87,9 +106,13 @@ export const getTourists = async (req, res) => {
 // Tourist update data by username
 export const updateTourist = async (req, res) => {
     // DOB, Username, Wallet are not changable
-    const username = req.params.id;
     console.log(req.body)
-    console.log(username)
+    const user = req.user;
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
     try {
         // If a new email is being passed for update, check if it's already taken
         const newEmail = req.body.email;
@@ -103,7 +126,7 @@ export const updateTourist = async (req, res) => {
         }
 
         const updatedTourist = await Tourist.findOneAndUpdate(
-            { _id: username },
+            { _id: user._id },
             req.body,
             { new: true }
         );
@@ -116,13 +139,13 @@ export const updateTourist = async (req, res) => {
 
 // Tourist delete by username
 export const deleteTourist = async (req, res) => {
-    const { username } = req.params;
+    const user = req.user;
 
     try {
 
-        const tourist = await Tourist.findOneAndDelete({ username });
+        const tourist = await Tourist.findByIdAndDelete(user._id);
 
-        const deleteRequest = await DeleteRequest.create({ userID: tourist._id, status: "approved" });
+        const deleteRequest = await DeleteRequest.create({ userID: tourist._id, status: "approved", userType: "Tourist", email: tourist.email, username: tourist.username, name: tourist.name, mobile: tourist.mobile });
 
         return res.status(200).json(tourist);
     }
@@ -133,17 +156,18 @@ export const deleteTourist = async (req, res) => {
 
 export const getMyBookings = async (req, res) => {
 
-    const id = req.params.id;
+    const id = req.user._id;
     const eventType = req.body.eventType;
     console.log(req.body);
     try {
 
         if (eventType == "activity") {
-            const myBookings = await Booking.find({ touristID: req.params.id, itineraryID: null, transportationID: null }).populate('activityID');
+            const myBookings = await Booking.find({ touristID: id, itineraryID: null, transportationID: null }).populate('activityID');
+            console.log(myBookings);
             return res.status(200).json(myBookings);
         }
         else if (eventType == "itinerary") {
-            const myBookings = await Booking.find({ touristID: req.params.id, activityID: null, transportationID: null }).populate({
+            const myBookings = await Booking.find({ touristID: id, activityID: null, transportationID: null }).populate({
                 path: 'itineraryID',
                 populate: {
                     path: 'tags', // Field in Itinerary schema to populate
@@ -153,9 +177,9 @@ export const getMyBookings = async (req, res) => {
             return res.status(200).json(myBookings);
         }
         else if (eventType == "transportation") {
-            const myTransportation = await Booking.find({ touristID: req.params.id, activityID: null, itineraryID: null }).populate('transportationID');
-            const myFlights = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: true }, hotelData: { $exists: false } });
-            const myHotels = await AmadeusBooking.find({ touristID: req.params.id, flightData: { $exists: false }, hotelData: { $exists: true } });
+            const myTransportation = await Booking.find({ touristID: id, activityID: null, itineraryID: null }).populate('transportationID');
+            const myFlights = await AmadeusBooking.find({ touristID: id, flightData: { $exists: true }, hotelData: { $exists: false } });
+            const myHotels = await AmadeusBooking.find({ touristID: id, flightData: { $exists: false }, hotelData: { $exists: true } });
             return res.status(200).json({ transportations: myTransportation, flights: myFlights, hotels: myHotels });
         }
 
@@ -168,12 +192,12 @@ export const getMyBookings = async (req, res) => {
 //@desc Get my preferences
 //@route GET /api/tourist/preference/:id
 export const getMyprefernces = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
 
     try {
         const tourist = await Tourist.findById(id);
-        const prefereredActivities =  tourist.preferences.preferredActivities;
-        const prefereredItineraries =  tourist.preferences.preferredItineraries;
+        const prefereredActivities = tourist.preferences.preferredActivities;
+        const prefereredItineraries = tourist.preferences.preferredItineraries;
 
         let activities = [];
         let itineraries = [];
@@ -206,21 +230,22 @@ export const getMyprefernces = async (req, res) => {
 }
 
 export const redeemPoints = async (req, res) => {
-    const touristID = req.params.id;
+    const touristID = req.user._id;
+    const points = req.body.points;
 
     try {
         const tourist = await Tourist.findById(touristID);
 
-        const canBeRedeemed = Math.floor(tourist.loyaltyPoints / 10000);
+
 
         //verify there are enough points to redeem
-        if (canBeRedeemed == 0) {
+        if (points > tourist.loyaltyPoints) {
             return res.status(400).json({ message: "Not enough points to redeem" });
         }
 
         //deduct points
-        const newPoints = tourist.loyaltyPoints - canBeRedeemed * 10000;
-        const newWallet = tourist.wallet + canBeRedeemed * 100;
+        const newPoints = tourist.loyaltyPoints - points;
+        const newWallet = tourist.wallet + (points * 100) / 10000;
 
         //update tourist
         const updatedTourist = await Tourist.findOneAndUpdate(
@@ -229,6 +254,8 @@ export const redeemPoints = async (req, res) => {
             { new: true }
         );
 
+        //create transaction
+        const transaction = await transactionModel.create({ amount: (points * 100) / 10000, incoming: true, userId: touristID, title: "Redeem Points", description: "Redeem Points", method: "wallet" });
         return res.status(200).json(updatedTourist);
     }
     catch (error) {
@@ -238,7 +265,7 @@ export const redeemPoints = async (req, res) => {
 }
 
 export const getMyFlights = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
 
     try {
         const myBookings = await AmadeusBooking.find({ touristID: id, flightData: { $exists: true }, hotelData: { $exists: false } });
@@ -251,7 +278,7 @@ export const getMyFlights = async (req, res) => {
 }
 
 export const getMyHotels = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
 
     try {
         const myBookings = await AmadeusBooking.find({ touristID: id, flightData: { $exists: false }, hotelData: { $exists: true } });
@@ -266,7 +293,7 @@ export const getMyHotels = async (req, res) => {
 
 //TODO: edit so that the Itinerary status is confirmed
 export const viewMyTourGuides = async (req, res) => {
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
@@ -291,7 +318,7 @@ export const viewMyTourGuides = async (req, res) => {
 
 //TODO: edit so that the Itinerary status is confirmed
 export const viewMyItineraries = async (req, res) => {
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
@@ -312,7 +339,7 @@ export const viewMyItineraries = async (req, res) => {
 
 //TODO: edit so that the Activity status is confirmed
 export const viewMyActivities = async (req, res) => {
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }

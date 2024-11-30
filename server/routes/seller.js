@@ -1,13 +1,14 @@
 import express from "express";
-import {getAllSellers,createSeller,getSellerByID,updateSellerInfo,deleteSeller, acceptTerms} from "../controllers/sellerController.js";
+import { getAllSellers, createSeller, getSellerByID, updateSellerInfo, deleteSeller, acceptTerms } from "../controllers/sellerController.js";
+import { protect } from '../middleware/authenticator.js';
 
 const router = express.Router();
 
-router.get("/", getAllSellers);
-router.post("/", createSeller);
-router.put("/:id", updateSellerInfo);
-router.get('/:id', getSellerByID);
-router.delete('/:id', deleteSeller);
-router.put('/terms/:id', acceptTerms);
+router.get("/allSellers", getAllSellers);
+router.post("/", protect, createSeller);
+router.put("/", protect, updateSellerInfo);
+router.get('/', protect, getSellerByID);
+router.delete('/', protect, deleteSeller);
+router.put('/terms/', protect, acceptTerms);
 
 export default router;

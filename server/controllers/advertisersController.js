@@ -3,6 +3,9 @@ import advertiserModel from "../models/advertiserSchema.js";
 import { usernameExists, emailExists } from "../utils/Helpers.js";
 import DeleteRequest from "../models/deleteRequests.js";
 import Booking from "../models/bookingSchema.js";
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;
@@ -17,7 +20,20 @@ export const addAdvertiser = async (req, res) => {
         return res.status(400).json({ message: "Username already exists" });
     }
 
-    const newAdvertiser = new advertiserModel({ email, username, password });
+    const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+
+
+    const newAdvertiser = new advertiserModel({ email, username, password: hashedPassword });
+
+    //create a token for the user
+    const token = createToken(username, newAdvertiser._id, "Advertiser");
+
+    //send the token in the response
+    res.cookie("jwt", token, { httpOnly: true });
+
+
     try {
         const advertiser = await newAdvertiser.save();
         return res.status(200).json(advertiser);
@@ -39,7 +55,7 @@ export const getAdvertisers = async (req, res) => {
 // @route GET /api/advertisers/:id
 // @params id of advertiser
 export const getAdvertiser = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     try {
         const advertiser = await advertiserModel.findById(id);
         res.status(200).json(advertiser);
@@ -52,7 +68,7 @@ export const getAdvertiser = async (req, res) => {
 // @route DELETE /api/advertisers/delete/:id
 // @params id of advertiser
 export const deleteAdvertiser = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     try {
 
         const upcomingActivities = await activityModel.find({ advertiserID: id, date: { $gte: new Date() } });
@@ -65,7 +81,6 @@ export const deleteAdvertiser = async (req, res) => {
         }
 
         const activitiesByAdvertiser = await activityModel.deleteMany({ advertiserID: id });
-
 
         console.log(activitiesByAdvertiser.deletedCount, 'activities deleted');
         const deletedAdvertiser = await advertiserModel.findByIdAndDelete(id);
@@ -80,7 +95,7 @@ export const deleteAdvertiser = async (req, res) => {
 // @params id of advertiser
 // @Body { companyName, email, username, password, website, hotline, establishmentDate, description, isAccepted }
 export const updateAdvertiser = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     if (req.body.email != req.body.oldEmail) {
         const doesEmailExists = await emailExists(req.body.email);
         if (doesEmailExists) {
@@ -99,7 +114,7 @@ export const updateAdvertiser = async (req, res) => {
 // @route GET /api/advertisers/activities/:id
 // @params id of advertiser
 export const getAdvertiserActivities = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     try {
         const activities = await activityModel.find({ advertiserID: id }).populate('advertiserID categoryID tags');
         res.status(200).json(activities);
@@ -109,7 +124,7 @@ export const getAdvertiserActivities = async (req, res) => {
 }
 
 export const acceptTerms = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     if (!id) {
         return res.status(400).json({ message: "Advertiser ID is required." });
     }

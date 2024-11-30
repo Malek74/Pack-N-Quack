@@ -7,6 +7,7 @@ import stripe from 'stripe';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { getConversionRate } from "../utils/Helpers.js";
 import Booking from "../models/bookingSchema.js";
+import transactionModel from "../models/transactionsSchema.js";
 
 // @desc Get all activities
 // @route GET /api/activity
@@ -40,10 +41,9 @@ export const getActivities = async (req, res) => {
 export const addActivity = async (req, res) => {
 
     const newActivity = req.body;
+    newActivity.advertiserID = req.user._id;
     console.log(req.body)
-    if (!req.body.advertiserID) {
-        req.body.advertiserID = new mongoose.Types.ObjectId("66ffe2acd9af7892d8193dad");
-    }
+
     const priceType = req.body.priceType;
     if (priceType === 'range') {
         if (!req.body.minPrice || !req.body.maxPrice) {
@@ -103,8 +103,6 @@ export const addActivity = async (req, res) => {
 // @Body { advertiserID, categoryID, date, location, priceType, price, minPrice, maxPrice, tags, specialDiscounts, isBookingOpen, duration, name }
 export const updateActivity = async (req, res) => {
     const id = req.params.id;
-    console.log(id)
-    console.log(req.body)
     if (req.body.tags) {
         const tags = req.body.tags;
         let tagsIDs = [];
@@ -118,7 +116,6 @@ export const updateActivity = async (req, res) => {
         const category = await activityCategory.findOne({ name: req.body.categoryID });
         req.body.categoryID = category._id
     }
-    console.log(req.body)
     try {
         const updatedActivity = await activityModel.findByIdAndUpdate(id, req.body, { new: true });
         res.status(200).json(updatedActivity);
@@ -140,43 +137,6 @@ export const deleteActivity = async (req, res) => {
     }
 }
 
-// @desc Search for an activity based on Name ,Category or Tag
-// @route GET /api/activity/search
-// @Body { searchBy, name, categoryID, tagID }
-// export const searchActivity = async (req, res) => {
-//     const searchBy = req.body.searchBy; // name, category, tag
-//     const name = req.body.name;
-//     const categoryID = req.body.categoryID;
-//     const tagID = req.body.tagID;
-//     let a;
-
-//     switch (searchBy) {
-//         case "name":
-//             a = await activityModel.find({ name: name });
-//             if (!a) {
-//                 return res.status(404).json({ message: 'Activity not found' });
-//             }
-//             res.status(200).json(a);
-//             break;
-//         case "category":
-//             a = await activityModel.find({ categoryID: categoryID });
-//             if (!a) {
-//                 return res.status(404).json({ message: 'Activities not found' });
-//             }
-//             res.status(200).json(a);
-//             break;
-//         case "tag":
-//             a = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
-//             if (!a) {
-//                 return res.status(404).json({ message: 'Activities not found' });
-//             }
-//             a = a.filter(activity => activity.flagged === false);
-//             res.status(200).json(a);
-//             break;
-//         default:
-//             break;
-//     }
-// }
 
 export const searchActivity = async (req, res) => {
     const searchBy = req.body.searchBy; // name, category, tag
@@ -305,7 +265,8 @@ export const getUpcomingActivities = async (req, res) => {
 // @Body { touristID, review, rating }
 export const postReview = async (req, res) => {
     const id = req.params.id;
-    const { touristID, comment, rating } = req.body;
+    const { comment, rating } = req.body;
+    const touristID = req.user._id;
     console.log(req.body);
 
     try {
@@ -422,7 +383,7 @@ export const filterAndSortActivities = async (req, res) => {
 };
 
 export const getMyActivities = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     try {
         const activities = await activityModel.find({ advertiserID: id, flagged: false }).populate('advertiserID categoryID tags');
         if (activities.lemgth === 0) {
@@ -480,7 +441,6 @@ export const Flagg = async (req, res) => {
         //flag itinerary
         const updatedActivity = await activityModel.findByIdAndUpdate(activityID, { $set: { flagged: flagger } }, { new: true, runValidators: true });
 
-
         let isbooked = await Booking.find({ activityID: activity._id });
         if (isbooked.length > 0) {
             if (flagger == true) {
@@ -490,6 +450,17 @@ export const Flagg = async (req, res) => {
                         //update wallet in user
                         if (activity.priceType == 'fixed') {
                             const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + activity.price } }, { new: true, runValidators: true });
+
+                            //create transaction
+                            const transaction = new transactionModel({
+                                amount: activity.price,
+                                incoming: true,
+                                userId: user._id,
+                                title: 'Refund',
+                                description: 'Activity has been flagged',
+                                method: 'wallet'
+                            });
+
                         }
 
                         if (activity.priceType == 'range') {

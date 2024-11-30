@@ -22,21 +22,21 @@ export const viewComplaints = async (req, res) => {
     try {
         let query = {};
         let sortQuery = {};
-        if(status !== 'undefined'){
+        if (status !== 'undefined') {
             query.status = status;
         }
-        if(sort !== 'undefined'){
+        if (sort !== 'undefined') {
             sortQuery.createdAt = sort === 'asc' ? 1 : -1;
         }
         const complaints = await complaintModel.find(query).sort(sortQuery);
-        return res.status(200).json(complaints);   
-    }catch(error){
+        return res.status(200).json(complaints);
+    } catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }
 
 export const viewComplaintById = async (req, res) => {
-    const complaintId = req.params.id;
+    const complaintId = req.user._id;
     try {
         const complaints = await complaintModel.findById(complaintId);
         return res.status(200).json(complaints);
@@ -46,7 +46,7 @@ export const viewComplaintById = async (req, res) => {
 }
 
 export const viewMyComplaints = async (req, res) => {
-    const userId = req.params.id;
+    const userId = req.user._id;
     if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
     }
@@ -63,11 +63,13 @@ export const viewMyComplaints = async (req, res) => {
 }
 
 export const createComplaint = async (req, res) => {
-    const {issuerID, title, body} = req.body;
+    const { title, body } = req.body;
     console.log(req.body);
-    
-    if(!issuerID){
-        return res.status(400).json({message:"Issuer ID is required"});
+
+    const issuerID = req.user._id;
+
+    if (!issuerID) {
+        return res.status(400).json({ message: "Issuer ID is required" });
     }
     if (!title) {
         return res.status(400).json({ message: "Title is required" });

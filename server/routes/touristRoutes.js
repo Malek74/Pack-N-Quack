@@ -20,27 +20,28 @@ import {
     viewAddresses,
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints, viewComplaintById } from '../controllers/complaintController.js';
-
-
+import { protect } from '../middleware/authenticator.js';
+import { getMyTransactions } from '../controllers/bookingController.js';
 
 const router = express.Router();
 
 router.post('/', createTourist); // Create
-router.get('/:id', getTourist); // Read 
-router.put('/:id', updateTourist); // Update 
+router.get('/', protect, getTourist); // Read 
+router.put('/', protect, updateTourist); // Update 
 router.get('/', getTourists)
-router.delete('/:id', deleteTourist);
-router.get('/myPreferences/:id', getMyprefernces);
-router.post('/myBookings/:id', getMyBookings);
-router.post('/redeemPoints/:id', redeemPoints);
-router.get('/myFlights/:id', getMyFlights);
-router.get('/myHotels/:id', getMyHotels);
-router.get('/mytourguides/:id', viewMyTourGuides);
-router.get('/myitineraries/:id', viewMyItineraries);
-router.get('/myactivities/:id', viewMyActivities);
-router.get('/complaints/:id', viewMyComplaints);
-router.post('/complaints', createComplaint);
-router.get('/myComplaints/:id', viewComplaintById);
+router.delete('/', protect, deleteTourist);
+router.get('/myPreferences', protect, getMyprefernces);
+router.post('/myBookings', protect, getMyBookings);
+router.post('/redeemPoints', protect, redeemPoints);
+router.get('/myFlights', protect, getMyFlights);
+router.get('/myHotels', protect, getMyHotels);
+router.get('/mytourguides', protect, viewMyTourGuides);
+router.get('/myitineraries', protect, viewMyItineraries);
+router.get('/myactivities', protect, viewMyActivities);
+router.get('/complaints/', protect, viewMyComplaints);
+router.post('/complaints', protect, createComplaint);
+router.get('/myComplaints', protect, viewComplaintById);
+router.get("/myTransactions", protect, getMyTransactions);
 router.post('/save', bookmark);
 router.get('/viewbookmark', viewBookmarks);
 router.post('/addAddress', AddNewAddress);
