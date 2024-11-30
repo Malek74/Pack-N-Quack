@@ -325,6 +325,22 @@ export const viewMyActivities = async (req, res) => {
     }
 }
 
+export const getCart = async (req, res) => {
+    const touristId = req.user._id;
+
+    if(!touristId){
+        return res.status(400).json({message: "Tourist ID is required"});
+    }
+
+    try{
+        const tourist = await Tourist.findById(touristId).populate('cart.productID');
+        return res.status(200).json(tourist.cart);
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({message: error.message});
+    }
+}
+
 export const addItemToCart = async (req, res) => {
     const productId = req.body.productID;
     const touristId = req.user._id;
