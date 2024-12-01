@@ -5,6 +5,7 @@ import { Rating } from "../shared/Rating";
 import { useNavigate } from "react-router-dom";
 import { Activity, FlagOff, Bookmark } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useState } from "react";
 
 ItinerariesCard.propTypes = {
   id: PropTypes.string,
@@ -47,10 +48,12 @@ export default function ItinerariesCard({
     : "rounded-lg rounded-b-none h-[300px] w-full object-fill";
 
   const { prefCurrency } = useUser();
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const handleBookmark = (e) => {
     e.stopPropagation();
     console.log("Bookmark clicked");
+    setIsBookmarked(!isBookmarked);
   };
   return (
     <Card
@@ -77,10 +80,10 @@ export default function ItinerariesCard({
             <div className="flex gap-2">
               {touristClicked && (
                 <Bookmark
-                  //fill="gold"
+                  fill={isBookmarked ? "gold" : "white"}
                   size={36}
                   className="text-gold hover:text-goldhover"
-                  onClick={() => handleBookmark()}
+                  onClick={(e) => handleBookmark(e)}
                 />
               )}
               {isFlagged && (

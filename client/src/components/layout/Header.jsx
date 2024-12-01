@@ -6,6 +6,8 @@ import DropDownMenuBook from "./components/DropDownMenuBook";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
 import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
+import { Label } from "../ui/label";
+import Notifications from "../notifications/Notifications";
 
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
@@ -84,10 +86,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historical")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuTGSADV location={location} />
@@ -100,10 +102,10 @@ export default function Header() {
                 isActive("/itinerariesTourists")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
-                    ? "text-yellow-500"
-                    : isActive("/historicalTourists")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historicalTourists")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuTourist />
@@ -116,10 +118,10 @@ export default function Header() {
                 isActive("/bookingFlight")
                   ? "text-yellow-500"
                   : isActive("/bookingHotel")
-                    ? "text-yellow-500"
-                    : isActive("/transportations")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/transportations")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuBook location={location} />
@@ -132,14 +134,17 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historical")
+                  ? "text-yellow-500"
+                  : ""
               }
             ></li>
           </Button>
         </ul>
+        <div className="px-4">
+          <Notifications />
+        </div>
 
         {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
