@@ -42,11 +42,11 @@ router.get('/complaints/', protect, viewMyComplaints);
 router.post('/complaints', protect, createComplaint);
 router.get('/myComplaints', protect, viewComplaintById);
 router.get("/myTransactions", protect, getMyTransactions);
-router.post('/save', bookmark);
-router.get('/viewbookmark', viewBookmarks);
-router.post('/addAddress', AddNewAddress);
-router.post('/setdefault', setDefaultAddress);
-router.get('/viewAddress', viewAddresses);
+router.post('/save', protect, bookmark);
+router.get('/viewbookmark', protect, viewBookmarks);
+router.post('/addAddress', protect, AddNewAddress);
+router.post('/setdefault', protect, setDefaultAddress);
+router.get('/viewAddress', protect, viewAddresses);
 
 
 

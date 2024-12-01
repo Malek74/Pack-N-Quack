@@ -455,7 +455,7 @@ export const getMyTransactions = async (req, res) => {
 
 
 export const viewUpcomingBooking = async (req,res) => {
-        const {userId } = req.user._id;
+        const userId  = req.user._id;
     try {
         const userExist = await Tourist.findById(userId);
         if (!userExist) {
@@ -479,7 +479,7 @@ export const viewUpcomingBooking = async (req,res) => {
 }
 
 export const viewPastBooking = async (req,res) => {
-    const {userId } = req.user._id;
+    const userId  = req.user._id;
 try {
     const userExist = await Tourist.findById(userId);
     if (!userExist) {

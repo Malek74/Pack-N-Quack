@@ -357,7 +357,10 @@ export const viewMyActivities = async (req, res) => {
 }
 
 export const bookmark = async (req, res) => {
-  const { touristID, eventID } = req.body;
+  const  touristID =  req.user._id;
+  const  {eventID}  = req.body;
+
+  console.log(eventID);
 
   try {
     if (!touristID) {
@@ -367,8 +370,11 @@ export const bookmark = async (req, res) => {
       if (!tourist) {
         return res.status(404).json({ message: "Tourist not found" });
       }
-
-    const flagA= false;
+      if (!tourist.savedEvents) {
+        tourist.savedEvents = { savedItineraries: [], savedActivities: [] };
+    }
+    
+    let flagA= false;
       let eventExist = await Itinerary.findById(eventID);
      if (!eventExist) {
       eventExist = await activityModel.findById(eventID);
@@ -377,17 +383,19 @@ export const bookmark = async (req, res) => {
           return res.status(404).json({ message: "Event doesn't exist" });
       }
   }
+  console.log(eventExist);
 
   if (flagA){
-    if (!tourist.savedEvents.savedActivities.includes(eventID)) {
+    if (!tourist.savedEvents.savedActivities.some(id => id.toString() === eventID)) {
         tourist.savedEvents.savedActivities.push(eventID);
-      } else {
+    }
+     else {
         return res.status(400).json({ message: "Activity already bookmarked" });
       }
   }
   else {
-    if (!tourist.savedEvents.savedItineraries.includes(event)) {
-        tourist.savedEvents.savedItineraries.push(itineraryID);
+    if (!tourist.savedEvents.savedItineraries.some(id => id.toString() === eventID)) {
+        tourist.savedEvents.savedItineraries.push(eventID);
       } else {
         return res.status(400).json({ message: "Itinerary already bookmarked" });
       }
@@ -404,45 +412,43 @@ export const bookmark = async (req, res) => {
 
 
 export const viewBookmarks = async (req, res) => {
-  const { touristID } = req.params;
-
-  try {
-    if (!touristID) {
-      return res.status(400).json({ message: "Tourist ID is required" });
+    const touristID = req.user._id;
+  
+    try {
+    
+      const tourist = await Tourist.findById(touristID)
+        .populate("savedEvents.savedActivities") 
+        .populate("savedEvents.savedItineraries"); 
+  
+     
+      const savedActivities = tourist.savedEvents?.savedActivities?.map(activity => ({
+        id: activity._id,
+        name: activity.name,
+        category: activity.categoryID,
+      })) || [];
+  
+      const savedItineraries = tourist.savedEvents?.savedItineraries?.map(itinerary => ({
+        id: itinerary._id,
+        name: itinerary.name,
+        tags: itinerary.tags,
+      })) || [];
+  
+      return res.status(200).json({
+        savedActivities,
+        savedItineraries,
+      });
+    } catch (error) {
+      console.error("Error in viewBookmarks controller:", error);
+      return res.status(500).json({ message: error.message });
     }
-
-    const tourist = await Tourist.findById(touristID)
-      .populate("savedEvents.savedActivities")
-      .populate("savedEvents.savedItineraries");
-
-    if (!tourist) {
-      return res.status(404).json({ message: "Tourist not found" });
-    }
-
-    const savedActivities = tourist.savedEvents.savedActivities.map(activity => ({
-      id: activity._id,
-      name: activity.name,
-      category: activity.categoryID,
-    }));
-
-    const savedItineraries = tourist.savedEvents.savedItineraries.map(itinerary => ({
-      id: itinerary._id,
-      title: itinerary.title,
-      tags: itinerary.tags,
-    }));
-
-    return res.status(200).json({
-      savedActivities,
-      savedItineraries,
-    });
-  } catch (error) {
-    console.error("Error in viewBookmarks controller:", error);
-    return res.status(500).json({ message: error.message });
-  }
-};
+  };
+  
 
 export const AddNewAddress = async (req, res) => {
-    const { touristID, address } = req.body;
+    const touristID  =  req.user._id;
+    const  address = req.body.address;
+
+ 
   
     try {
       if (!touristID) {
@@ -473,8 +479,9 @@ export const AddNewAddress = async (req, res) => {
   
 
   export const setDefaultAddress = async (req, res) => {
-    const { touristID, defaultAddress } = req.body;
-  
+    const  touristID =   req.user._id;
+    const defaultAddress = req.body.defaultAddress;
+
     try {
       if (!touristID || !defaultAddress) {
         return res.status(400).json({ message: "Tourist ID and default address are required" });
@@ -485,7 +492,7 @@ export const AddNewAddress = async (req, res) => {
       if (!tourist) {
         return res.status(404).json({ message: "Tourist not found" });
       }
-  y
+  
       if (!tourist.address.includes(defaultAddress)) {
         return res.status(400).json({ message: "Default address must be one of the saved addresses" });
       }
@@ -503,7 +510,7 @@ export const AddNewAddress = async (req, res) => {
   };
   
   export const viewAddresses = async (req, res) => {
-    const { touristID } = req.params; 
+    const  touristID  = req.user._id; 
 
     try {
 

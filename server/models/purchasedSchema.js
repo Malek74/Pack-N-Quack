@@ -15,18 +15,10 @@ const purchasedSchema = new Schema({
         },
         boughtNtimes: { type: Number },
         rating: { type: Number },
-        review: { type: String }
+        review: { type: String },
+        status :{ type : String, default: "pending"  }
     }],
-    waitingList: [{
-        productId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product',
-        },
-    }],
-    status :{
-        type : String,
-        default: "pending confirmation"
-    }
+    
 }, 
 { timestamps: true }
 );
