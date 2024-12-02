@@ -45,6 +45,19 @@ export default function Header() {
             </li>
           </Button>
 
+          <Button asChild variant="link">
+            <li>
+              <Link
+                to="/sales-report"
+                className={
+                  isActive("/sales-report") ? "text-yellow-500" : ""
+                }
+              >
+                Sales Report
+              </Link>
+            </li>
+          </Button>
+
           {/* <Button asChild variant="link">
             <li>
               <Link

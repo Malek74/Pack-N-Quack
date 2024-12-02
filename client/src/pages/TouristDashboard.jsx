@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -79,6 +80,11 @@ export default function TouristDashboard() {
       label: "Complaints",
       icon: Angry,
       path: "complaints",
+    },
+    {
+      label: "Sales Report",
+      icon: ChartNoAxesCombined,
+      path: "sales-report",
     },
   ];
 

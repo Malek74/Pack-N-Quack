@@ -49,6 +49,8 @@ import BookItinerary from "@/components/dropdown/BookItineraries";
 import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
+import SalesReportClientPage from "@/pages/SalesReportClientPage";
+
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -59,6 +61,7 @@ const routes = createRoutesFromElements(
     <Route path="RegistrationPage" element={<RegistrationPage />} />
     <Route path="activities" element={<ActivitiesPage />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
+    <Route path="sales-report" element={<SalesReportClientPage />} />
 
     <Route
       path="itinerariesTourists"
@@ -109,7 +112,7 @@ const routes = createRoutesFromElements(
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
-
+      <Route path="sales-report" element={<SalesReportClientPage />} />
     </Route>
 
     <Route path="touristDashboard" element={<TouristDashboard />} />
