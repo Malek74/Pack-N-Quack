@@ -50,6 +50,7 @@ import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
 import SalesReportClientPage from "@/pages/SalesReportClientPage";
+import SalesReport from "@/components/adminPage/SalesReport";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -143,6 +144,7 @@ const routes = createRoutesFromElements(
       <Route path="complaints/:complaintID" element={<OneComplain />} />
       <Route path="delete-requests" element={<DeleteRequests />} />
       <Route path="document-review" element={<DocumentReview />} />
+      <Route path="sales-report" element={<SalesReport />} />
     </Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>

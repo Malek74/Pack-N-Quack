@@ -9,10 +9,10 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog"
-import SalesReportFilters from "./SalesReportFilters";
+import AdminSalesReportFilters from "./AdminSalesReportFilters";
   
 
-export function FilterButton({setReportFilters}) {
+export function AdminFilterButton({setReportFilters}) {
     const [filtersOn, setFiltersOn] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ export function FilterButton({setReportFilters}) {
                 Hey quackers, use these filters to zero in on your perfect tour guide stats—your sales report, tailored just for you!
                 </DialogDescription>
         </DialogHeader>
-        <SalesReportFilters setReportFilters={setReportFilters}/>
+        <AdminSalesReportFilters setReportFilters={setReportFilters}/>
         </DialogContent>
     </Dialog>
 
