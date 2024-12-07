@@ -490,7 +490,7 @@ export const updateQuantityInCart = async (req, res) => {
 
 
 export const viewMyWishlist = async (req, res) => {
-    const touristID = req.user._id;
+    const touristID = req.params.id;
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
@@ -505,7 +505,7 @@ export const viewMyWishlist = async (req, res) => {
 
 export const addToWishlist = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.user._id;
+    const touristId = req.params.id;
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }
@@ -535,8 +535,8 @@ export const addToWishlist = async (req, res) => {
 }
 
 export const removeFromWishlist = async (req, res) => {
-    const productId = req.body.productID;
-    const touristId = req.user._id;
+    const productId = req.params.productId;
+    const touristId = req.params.id;
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }
