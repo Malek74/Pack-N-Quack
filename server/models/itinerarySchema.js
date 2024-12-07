@@ -57,6 +57,10 @@ const itinerarySchema = new mongoose.Schema({
             description: {
                 type: String,
                 default: ''
+            },
+            image: {
+                type: String,
+                required: false
             }
         }],
     }],
@@ -66,7 +70,7 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
 
-    
+
     ratings: {
         averageRating: {
             type: Number,
@@ -75,9 +79,9 @@ const itinerarySchema = new mongoose.Schema({
             max: 5
         },
         reviews: [{
-            userID: {
+            touristId: {
                 type: Schema.Types.ObjectId,
-                ref: 'User', // Reference to the User model
+                ref: 'Tourist', // Reference to the User model
                 required: true
             },
             rating: {
@@ -86,9 +90,10 @@ const itinerarySchema = new mongoose.Schema({
                 min: 1,
                 max: 5
             },
-            review: {
+            comment: {
                 type: String,
-                default: '' // Optional text review
+                required: false,
+                default: ''
             },
             date: {
                 type: Date,
@@ -96,7 +101,6 @@ const itinerarySchema = new mongoose.Schema({
             }
         }]
     },
-
     price: {
         type: Number,
         required: true
@@ -106,18 +110,27 @@ const itinerarySchema = new mongoose.Schema({
         required: true
     },
     pickUpLocation: {
-        type: String,
-        required: true
+        name: {
+            type: String,
+            required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
 
     dropOffLocation: {
-        type: String,
-        required: true
+        name: {
+            type: String,
+            required: true
+        },
+        googleMapLink: {
+            type: String,
+            required: true
+        }
     },
-    bookings: {
-        type: Number,
-        default: 0
-    },
+
     tags: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -125,14 +138,33 @@ const itinerarySchema = new mongoose.Schema({
         }],
         default: []
     },
-    subscribers: [{
-        type: [Schema.Types.ObjectId],
-        ref: 'Tourist'
-    }],
+    stripeID: {
+        type: String,
+        required: true
+    },
+    coverImage: {
+        type: String,
+        required: false
+    },
+    images: {
+        type: [String],
+        required: false
+    },
+
+
+
     accessibility: {
         type: String,
         required: true
-    }
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    flagged: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
