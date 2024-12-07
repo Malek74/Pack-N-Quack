@@ -5,14 +5,27 @@ import logo from "/assets/icons/logo.png";
 import DropDownMenuBook from "./components/DropDownMenuBook";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
-import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
-
+import { useUser } from "@/context/UserContext";
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
+  const {
+    userType,
+    userId,
+    logout,
+    isTourGuide,
+    isSeller,
+    isAdvertiser,
+    isTourist,
+    isTourismGovernor,
+    isGuest,
+  } = useUser();
 
+  console.log("tourist " + isTourist);
+  console.log("seller " + isSeller);
+  console.log("guest " + isGuest);
+  const isLoggedIn = userId != null;
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
-
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
@@ -24,136 +37,107 @@ export default function Header() {
 
         {/* Centered Navigation Links */}
         <ul className="flex justify-center mx-auto">
-          <Button asChild variant="link">
-            <li>
+          <li>
+            <Button asChild variant="link">
               <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>
                 Home
               </Link>
+            </Button>
+          </li>
+
+          {(isTourist || isSeller || isGuest) && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/marketplace"
+                  className={isActive("/marketplace") ? "text-yellow-500" : ""}
+                >
+                  Marketplace
+                </Link>
+              </Button>
             </li>
-          </Button>
+          )}
+
+          {isTourGuide && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/itineraries"
+                  className={isActive("/itineraries") ? "text-yellow-500" : ""}
+                >
+                  Itineraries
+                </Link>
+              </Button>
+            </li>
+          )}
+
+          {isTourismGovernor && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/historical"
+                  className={isActive("/historical") ? "text-yellow-500" : ""}
+                >
+                  Historical Places
+                </Link>
+              </Button>
+            </li>
+          )}
+
+          {(isTourist || isGuest) && (
+            <li>
+              <Button variant="link">
+                <DropDownMenuTourist />
+              </Button>
+            </li>
+          )}
 
           <Button asChild variant="link">
             <li>
-              <Link
-                to="/touristDashboard/profile"
-                className={
-                  isActive("/touristDashboard") ? "text-yellow-500" : ""
-                }
-              >
-                Profile
-              </Link>
-            </li>
-          </Button>
-
-          {/* <Button asChild variant="link">
-            <li>
-              <Link
-                to="/about"
-                className={isActive("/about") ? "text-yellow-500" : ""}
-              >
-                About Us
-              </Link>
-            </li>
-          </Button> */}
-
-          {/* <Button asChild variant="link">
-            <li>
-              <Link
-                to="/contact"
-                className={isActive("/contact") ? "text-yellow-500" : ""}
-              >
-                Contact
-              </Link>
-            </li>
-          </Button> */}
-
-          <Button asChild variant="link">
-            <li>
-              <Link
-                to="/marketplace"
-                className={isActive("/marketplace") ? "text-yellow-500" : ""}
-              >
-                Marketplace
-              </Link>
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itineraries")
-                  ? "text-yellow-500"
-                  : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
-              }
-            >
-              <DropDownMenuTGSADV location={location} />
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itinerariesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/activitiesTourists")
-                    ? "text-yellow-500"
-                    : isActive("/historicalTourists")
-                      ? "text-yellow-500"
-                      : ""
-              }
-            >
-              <DropDownMenuTourist />
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/bookingFlight")
-                  ? "text-yellow-500"
-                  : isActive("/bookingHotel")
-                    ? "text-yellow-500"
-                    : isActive("/transportations")
-                      ? "text-yellow-500"
-                      : ""
-              }
-            >
               <DropDownMenuBook location={location} />
             </li>
           </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itineraries")
-                  ? "text-yellow-500"
-                  : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
-              }
-            ></li>
-          </Button>
         </ul>
 
-        {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
-          <ComboboxCurrency />
-          <Button asChild variant="ghost">
-            <li>
-              <Link to="/login">Log in</Link>
-            </li>
-          </Button>
-          <Button asChild variant="default" className="bg-primary">
-            <li>
-              <Link to="/RegistrationPage">Sign up</Link>
-            </li>
-          </Button>
+          <li>
+            <ComboboxCurrency />
+          </li>
+          {!isLoggedIn ? (
+            <>
+              <li>
+                <Button asChild variant="ghost">
+                  <Link to="/login">Log in</Link>
+                </Button>
+              </li>
+              <li>
+                <Button asChild variant="default" className="bg-primary">
+                  <Link to="/register">Sign up</Link>
+                </Button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Button asChild variant="link">
+                  <Link
+                    to="/touristDashboard/profile"
+                    className={
+                      isActive("/touristDashboard") ? "text-yellow-500" : ""
+                    }
+                  >
+                    Profile
+                  </Link>
+                </Button>
+              </li>
+              <li>
+                {/* THIS IS TEMPORARY */}
+                <Button variant="link" onClick={logout}>
+                  Logout
+                </Button>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>

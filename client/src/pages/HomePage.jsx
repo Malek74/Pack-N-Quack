@@ -10,7 +10,7 @@ import axios from "axios";
 import ActivityCard from "@/components/activityPage/ActivityCard";
 import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import ItineraryCard from "@/components/itinerariesPage/ItinerariesCard";
-
+import { useUser } from "@/context/UserContext";
 import { set } from "date-fns";
 
 import { ShareButton } from "@/components/shared/ShareButton";
@@ -19,7 +19,6 @@ export default function HomePage() {
   const userID = "6732171fabc80503fd8f92a2";
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {

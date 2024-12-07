@@ -6,7 +6,6 @@ import AdminPage from "@/pages/AdminPage";
 import ComponentTestPage from "@/pages/ComponentTestPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import HistoricalPage from "@/pages/HistoricalPage";
-import ActivitiesTourists from "@/pages/ActivitiesTouristsPage";
 import HistoricalTourists from "@/pages/HistoricalPageTourists";
 import MarketplacePage from "@/pages/MarketplacePage";
 import RegistrationPage from "@/pages/RegistrationPage";
@@ -49,6 +48,7 @@ import BookItinerary from "@/components/dropdown/BookItineraries";
 import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
+import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
 
@@ -59,7 +59,8 @@ const routes = createRoutesFromElements(
     <Route path="activities/:idAdv" element={<ActivitiesPage />} />
     <Route path="historical/:idTG" element={<HistoricalPage />} />
     <Route path="marketplace" element={<MarketplacePage />} />
-    <Route path="RegistrationPage" element={<RegistrationPage />} />
+    <Route path="register" element={<RegistrationPage />} />
+    <Route path="login" element={<LoginPage />} />
     <Route path="activities" element={<ActivitiesPage />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
 
@@ -102,9 +103,12 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>
-    <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
-    <Route path="cart" element={<Cart />}></Route>
+    <Route
+      path="transportation/:id"
+      element={<SingleTransportationPage />}
+    ></Route>
 
+    <Route path="cart" element={<Cart />}></Route>
     <Route path="touristDashboard" element={<TouristDashboard />}>
       <Route path="profile" element={<MyProfilePage />} />
       <Route path="tour-guides" element={<TourGuides />} />
@@ -112,10 +116,8 @@ const routes = createRoutesFromElements(
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
-
     </Route>
 
-    <Route path="touristDashboard" element={<TouristDashboard />} />
     <Route
       path="*"
       element={
