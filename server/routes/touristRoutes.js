@@ -51,6 +51,4 @@ router.post('/setdefault', protect, setDefaultAddress);
 router.get('/viewAddress', protect, viewAddresses);
 
 
-
-
 export default router;

@@ -13,6 +13,7 @@ import product from "../models/productSchema.js";
 import transactionModel from "../models/transactionsSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
 import { sendPaymentReceipt } from "./webhook.js";
+import { getConversionRate } from "../utils/Helpers.js";
 
 export const bookEvent = async (req, res) => {
 
@@ -438,15 +439,12 @@ export const requestDeleteAccount = async (req, res) => {
         default:
             return res.status(400).json({ message: "Invalid user type" });
     }
-
 };
-
-
 
 
 export const getMyTransactions = async (req, res) => {
     const userId = req.user._id;
-    const currency = req.body.currency || "USD";
+    const currency = req.query.currency || "USD";
 
 
     try {
@@ -457,7 +455,7 @@ export const getMyTransactions = async (req, res) => {
             return res.status(404).json({ message: "Tourist not found" });
         }
 
-        const data = { wallet: tourist.wallet, loyaltyPoints: tourist.loyaltyPoints };
+        const data = { wallet: tourist.wallet * conversionRate, loyaltyPoints: tourist.loyaltyPoints };
 
         const transactions = await transactionModel.find({ userId: userId });
         for (let i = 0; i < transactions.length; i++) {

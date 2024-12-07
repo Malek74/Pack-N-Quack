@@ -471,13 +471,18 @@ export const viewBookmarks = async (req, res) => {
 
 
 export const AddNewAddress = async (req, res) => {
-    const { touristID, address } = req.body;
+    const touristID = req.user._id;
+    const mainAddress = req.body.address.mainAddress;
+    const extraAddresses = req.body.address.extraAddresses;
+
+    console.log("Body: ", req.body);
+    console.log("Tourist ID: ", req.user._id);
 
     try {
         if (!touristID) {
             return res.status(400).json({ message: "Tourist ID is required" });
         }
-        if (!address) {
+        if (!mainAddress) {
             return res.status(400).json({ message: "Address is required" });
         }
         const tourist = await Tourist.findById(touristID);
@@ -486,10 +491,18 @@ export const AddNewAddress = async (req, res) => {
             return res.status(404).json({ message: "Tourist not found" });
         }
 
-        if (tourist.address.includes(address)) {
+        if (tourist.address.includes(mainAddress)) {
             return res.status(400).json({ message: "Address already exists" });
         }
-        tourist.address.push(address);
+        if (tourist.address.length == 0) {
+            tourist.defaultAddress = mainAddress;
+        }
+
+        tourist.address.push(mainAddress);
+
+        if (extraAddresses.length > 0) {
+            tourist.address.push(...extraAddresses);
+        }
 
         await tourist.save();
 
@@ -532,10 +545,9 @@ export const setDefaultAddress = async (req, res) => {
 };
 
 export const viewAddresses = async (req, res) => {
-    const { touristID } = req.params;
+    const touristID = req.user._id;
 
     try {
-
         const tourist = await Tourist.findById(touristID);
 
         if (!tourist) {
@@ -543,7 +555,6 @@ export const viewAddresses = async (req, res) => {
         }
         const allAddresses = tourist.address;
         const defaultAddress = tourist.defaultAddress;
-
 
         return res.status(200).json({
             allAddresses,

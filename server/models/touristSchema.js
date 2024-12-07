@@ -19,13 +19,41 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
-    address:[ {
-        type: String,
-        required: true,
-    },],
+    address: [{
+        address: {
+            type: String,
+            required: true,
+        },
+        town: {
+            type: String,
+            required: true,
+        },
+        postcode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        }
+    }],
     defaultAddress: {
-        type: String, 
-        default: null,
+        address: {
+            type: String,
+            required: true,
+        },
+        town: {
+            type: String,
+            required: true,
+        },
+        postcode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        }
     },
     mobile: {
         type: String,
@@ -93,7 +121,7 @@ const touristSchema = new Schema({
             ref: 'Tag'
         }],
     },
-    savedEvents:{
+    savedEvents: {
         savedItineraries: [{
             type: Schema.Types.ObjectId,
             ref: 'Itinerary'
@@ -102,8 +130,6 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Activity'
         }],
-    
-
     },
     promoCode: {
         code: {
@@ -115,8 +141,6 @@ const touristSchema = new Schema({
             default: Date.now()
         }
     }
-
-
 },
     { timestamps: true }
 );
