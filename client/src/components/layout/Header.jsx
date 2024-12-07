@@ -6,10 +6,18 @@ import DropDownMenuBook from "./components/DropDownMenuBook";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
 import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
-
+import { useUser } from "@/context/UserContext";
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
+  const { userType, userId, logout } = useUser();
 
+  const isAdmin = userType === "Admin";
+  const isTourist = userType === "Tourist";
+  const isAdvertiser = userType === "Advertiser";
+  const isSeller = userType === "Seller";
+  const isTourGuide = userType === "Tour Guide";
+  const isTourismGovernor = userType === "Tourism Governer";
+  const isLoggedIn = userId != null;
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
 
@@ -28,19 +36,6 @@ export default function Header() {
             <li>
               <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>
                 Home
-              </Link>
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li>
-              <Link
-                to="/touristDashboard/profile"
-                className={
-                  isActive("/touristDashboard") ? "text-yellow-500" : ""
-                }
-              >
-                Profile
               </Link>
             </li>
           </Button>
@@ -84,10 +79,10 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historical")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuTGSADV location={location} />
@@ -100,10 +95,10 @@ export default function Header() {
                 isActive("/itinerariesTourists")
                   ? "text-yellow-500"
                   : isActive("/activitiesTourists")
-                    ? "text-yellow-500"
-                    : isActive("/historicalTourists")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historicalTourists")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuTourist />
@@ -116,10 +111,10 @@ export default function Header() {
                 isActive("/bookingFlight")
                   ? "text-yellow-500"
                   : isActive("/bookingHotel")
-                    ? "text-yellow-500"
-                    : isActive("/transportations")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/transportations")
+                  ? "text-yellow-500"
+                  : ""
               }
             >
               <DropDownMenuBook location={location} />
@@ -132,28 +127,54 @@ export default function Header() {
                 isActive("/itineraries")
                   ? "text-yellow-500"
                   : isActive("/activities")
-                    ? "text-yellow-500"
-                    : isActive("/historical")
-                      ? "text-yellow-500"
-                      : ""
+                  ? "text-yellow-500"
+                  : isActive("/historical")
+                  ? "text-yellow-500"
+                  : ""
               }
             ></li>
           </Button>
         </ul>
 
-        {/* Sign In and Sign Up on the right */}
         <ul className="flex gap-2">
-          <ComboboxCurrency />
-          <Button asChild variant="ghost">
-            <li>
-              <Link to="/login">Log in</Link>
-            </li>
-          </Button>
-          <Button asChild variant="default" className="bg-primary">
-            <li>
-              <Link to="/RegistrationPage">Sign up</Link>
-            </li>
-          </Button>
+          <li>
+            <ComboboxCurrency />
+          </li>
+          {!isLoggedIn ? (
+            <>
+              <li>
+                <Button asChild variant="ghost">
+                  <Link to="/login">Log in</Link>
+                </Button>
+              </li>
+              <li>
+                <Button asChild variant="default" className="bg-primary">
+                  <Link to="/register">Sign up</Link>
+                </Button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Button asChild variant="link">
+                  <Link
+                    to="/touristDashboard/profile"
+                    className={
+                      isActive("/touristDashboard") ? "text-yellow-500" : ""
+                    }
+                  >
+                    Profile
+                  </Link>
+                </Button>
+              </li>
+              <li>
+                {/* THIS IS TEMPORARY */}
+                <Button variant="link" onClick={logout}>
+                  Logout
+                </Button>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>

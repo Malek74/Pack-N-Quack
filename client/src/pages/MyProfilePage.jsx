@@ -18,14 +18,36 @@ import DialogTerms from "@/components/shared/DialogTerms";
 export default function MyProfilePage() {
   const { toast } = useToast();
   const { userId, userType } = useUser();
-  const usertype = userType;
-  const isTourGuide = usertype === "tourGuide";
-  const isAdvertiser = usertype === "advertisers";
-  const isSeller = usertype === "seller";
-  const isTourist = usertype === "tourist";
-  console.log(isTourist);
+  const [isTourGuide, setIsTourGuide] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
+  const [isAdvertiser, setIsAdvertiser] = useState(false);
+  const [isTourist, setIsTourist] = useState(false);
+
   const [profile, setProfile] = useState();
-  const endpoint = userType === "seller" ? "sellers" : userType;
+
+  const getEndpoint = (userType) => {
+    switch (userType) {
+      case "Admin":
+        return "admins";
+
+      case "Advertiser":
+        setIsAdvertiser(true);
+        return "advertisers";
+
+      case "Seller":
+        setIsSeller(true);
+        return "sellers";
+
+      case "Tourist":
+        setIsTourist(true);
+        return "tourist";
+
+      case "Tour Guide":
+        setIsTourGuide(true);
+        return "tourGuide";
+    }
+  };
+
   const [croppedImage, setCroppedImage] = useState(null);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const [file1, setFile1] = useState([]);
@@ -115,7 +137,7 @@ export default function MyProfilePage() {
   useEffect(() => {
     const getAvatar = async () => {
       try {
-        const response = await axios.post(`/api/upload/fetchImages/${userId}`, {
+        const response = await axios.post(`/api/upload/fetchImages/`, {
           userType: userType,
         });
         console.log(response.data);
@@ -125,11 +147,11 @@ export default function MyProfilePage() {
       }
     };
     getAvatar();
-  }, []);
+  }, [userId, userType]);
 
-  const fetchProfile = () => {
+  const fetchProfile = (endpoint) => {
     axios
-      .get(`api/${endpoint}/${userId}`)
+      .get(`api/${endpoint}`)
       .then((response) => {
         setProfile(response.data);
         console.log(response.data);
@@ -140,8 +162,10 @@ export default function MyProfilePage() {
   };
 
   useEffect(() => {
-    fetchProfile(); // Initial fetch when component mounts
-  }, []);
+    const endpoint = getEndpoint(userType);
+    if (endpoint != undefined) fetchProfile(endpoint); // Initial fetch when component mounts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, userType]);
 
   // Advertiser Profile Card (AdvCard)
   function AdvCard() {
@@ -244,8 +268,6 @@ export default function MyProfilePage() {
           <div className="flex flex-col items-end gap-4">
             <div className="self-center">
               <AvatarUploader
-                userType={usertype}
-                userId={userId}
                 croppedImage={croppedImage}
                 setCroppedImage={setCroppedImage}
                 croppedImageUrl={croppedImageUrl}
@@ -397,8 +419,6 @@ export default function MyProfilePage() {
           <div className="flex flex-col items-end gap-4">
             <div className="self-center">
               <AvatarUploader
-                userType={usertype}
-                userId={userId}
                 croppedImage={croppedImage}
                 setCroppedImage={setCroppedImage}
                 croppedImageUrl={croppedImageUrl}
@@ -511,8 +531,6 @@ export default function MyProfilePage() {
           <div className="flex flex-col items-end gap-4">
             <div className="self-center">
               <AvatarUploader
-                userType={usertype}
-                userId={userId}
                 croppedImage={croppedImage}
                 setCroppedImage={setCroppedImage}
                 croppedImageUrl={croppedImageUrl}
@@ -680,23 +698,13 @@ export default function MyProfilePage() {
         <div className="flex space-x-2">
           <CreateDialog
             changePassword
-            form={
-              <ChangePassword
-                profile={profile}
-                userType={usertype}
-                onRefresh={fetchProfile}
-              />
-            }
+            form={<ChangePassword profile={profile} onRefresh={fetchProfile} />}
           />
         </div>
 
         {/* Request account to be deleted action Button */}
         <div className="flex space-x-2">
-          <RequestAccDelete
-            onRefresh={fetchProfile}
-            userId={userId}
-            userType={usertype}
-          />
+          <RequestAccDelete onRefresh={fetchProfile} />
         </div>
       </div>
     );
