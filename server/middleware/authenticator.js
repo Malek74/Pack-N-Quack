@@ -52,6 +52,8 @@ export const protect = async (req, res, next) => {
         }
         req.user = user;
         req.role = decoded.role;
+
+       
         next();
     }
     catch (error) {

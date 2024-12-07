@@ -19,8 +19,15 @@ const notificationSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+
+    type: {
+        type: String,
+        enum: ['bookingOpen', 'reminder', 'outOfStock', 'flag'],
+        required: true
     }
 });
+
 
 
 export default model('Notification', notificationSchema);

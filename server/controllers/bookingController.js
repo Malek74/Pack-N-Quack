@@ -16,8 +16,13 @@ import { sendPaymentReceipt } from "./webhook.js";
 
 export const bookEvent = async (req, res) => {
 
-    const touristID = req.user._id;
-    const { eventType, eventID, payByWallet, numOfTickets, dateSelected, promoCode, paymentMethod } = req.body;
+    const { eventType, eventID, promoCode, payByWallet, numOfTickets, dateSelected } = req.body;
+
+    console.log(req.body);
+    // const touristID = req.user._id;
+
+    const touristID = "674641df1887b9c3e11436c4"
+    let success_url = "";
     let event = {}
     try {
 
@@ -88,17 +93,27 @@ export const bookEvent = async (req, res) => {
         }
 
 
+        let walletAmount
         //handle payment by wallet and related transactions
         if (payByWallet) {
+            let amountLeftToPay
+            if (amountToPay > tourist.wallet) {
+                amountLeftToPay = amountToPay - tourist.wallet;
+                walletAmount = tourist.wallet;
 
-            let amountLeftToPay = amountToPay - tourist.wallet;
-            let walletAmount = amountToPay - amountLeftToPay;
+            }
+            else {
+                amountLeftToPay = 0;
+                walletAmount = amountToPay;
+            }
 
+            let transaction;
+            console.log("wallet amount: ", walletAmount);
             //create transaction for amount paid from wallet
-            if (walletAmount < 0) {
+            if (walletAmount > 0) {
 
                 //create transaction for wallet deduction
-                await transactionModel.create({
+                transaction = await transactionModel.create({
                     userId: touristID,
                     title: event.name,
                     amount: walletAmount,
@@ -107,14 +122,15 @@ export const bookEvent = async (req, res) => {
                     incoming: false,
                     description: `Wallet deduction for booking  ${event.name}`
                 });
+                console.log(transaction);
             }
 
             //update wallet amount
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
-
+            console.log("amount left to pay: ", amountLeftToPay);
             if (amountLeftToPay == 0) {
-                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, price.id);
-                return res.status(200).json({ message: "Payment successful" });
+                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
+                return res.status(200).json({ message: "Payment successful", url: success_url });
             } else {
 
                 //create transaction for amount left to pay by card
@@ -161,23 +177,17 @@ export const bookEvent = async (req, res) => {
 
         }
         else {
-            if (paymentMethod == "cash") {
-                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, price.id);
-                return res.status(200).json({ message: "Payment successful" });
-            }
+            //create transaction for amount paid
+            await transactionModel.create({
+                userId: touristID,
+                title: event.name,
+                amount: amountToPay,
+                date: new Date(),
+                method: "card",
+                incoming: true,
+                description: `Payment for booking for ${event.name}`
+            });
 
-            if (paymentMethod == "card") {
-                //create transaction for amount paid
-                await transactionModel.create({
-                    userId: touristID,
-                    title: event.name,
-                    amount: amountToPay,
-                    date: new Date(),
-                    method: "card",
-                    incoming: true,
-                    description: `Payment for booking for ${event.name}`
-                });
-            }
         }
 
 
@@ -436,8 +446,12 @@ export const requestDeleteAccount = async (req, res) => {
 
 export const getMyTransactions = async (req, res) => {
     const userId = req.user._id;
+    const currency = req.body.currency || "USD";
+
 
     try {
+        const conversionRate = await getConversionRate(currency);
+
         const tourist = await Tourist.findById(userId);
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
@@ -446,6 +460,10 @@ export const getMyTransactions = async (req, res) => {
         const data = { wallet: tourist.wallet, loyaltyPoints: tourist.loyaltyPoints };
 
         const transactions = await transactionModel.find({ userId: userId });
+        for (let i = 0; i < transactions.length; i++) {
+            transactions[i].amount = transactions[i].amount * conversionRate;
+        }
+
         data.transactions = transactions;
         return res.status(200).json(data);
     } catch (error) {
@@ -454,14 +472,14 @@ export const getMyTransactions = async (req, res) => {
 };
 
 
-export const viewUpcomingBooking = async (req,res) => {
-        const {userId } = req.user._id;
+export const viewUpcomingBooking = async (req, res) => {
+    const { userId } = req.user._id;
     try {
         const userExist = await Tourist.findById(userId);
         if (!userExist) {
             return res.status(404).json({ message: "User doesn't exist" });
         }
-       
+
         const bookingExist = await Booking.find({ touristID: userId });
 
         const upcomingBookings = bookingExist.filter(booking => new Date(booking.date) > new Date());
@@ -475,28 +493,28 @@ export const viewUpcomingBooking = async (req,res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-    
+
 }
 
-export const viewPastBooking = async (req,res) => {
-    const {userId } = req.user._id;
-try {
-    const userExist = await Tourist.findById(userId);
-    if (!userExist) {
-        return res.status(404).json({ message: "User doesn't exist" });
+export const viewPastBooking = async (req, res) => {
+    const { userId } = req.user._id;
+    try {
+        const userExist = await Tourist.findById(userId);
+        if (!userExist) {
+            return res.status(404).json({ message: "User doesn't exist" });
+        }
+
+        const bookingExist = await Booking.find({ touristID: userId });
+
+        const upcomingBookings = bookingExist.filter(booking => new Date(booking.date) < new Date());
+
+        if (upcomingBookings.length === 0) {
+            return res.status(404).json({ message: "No upcoming events for this tourist" });
+        }
+
+        return res.status(200).json({ upcomingBookings });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
-   
-    const bookingExist = await Booking.find({ touristID: userId });
-
-    const upcomingBookings = bookingExist.filter(booking => new Date(booking.date) < new Date());
-
-    if (upcomingBookings.length === 0) {
-        return res.status(404).json({ message: "No upcoming events for this tourist" });
-    }
-
-    return res.status(200).json({ upcomingBookings });
-} catch (error) {
-    return res.status(500).json({ message: error.message });
-}
 
 }

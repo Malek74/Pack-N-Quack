@@ -5,10 +5,14 @@ import activityCategory from "../models/activityCategorySchema.js";
 import { query } from "express";
 import stripe from 'stripe';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
-import { getConversionRate } from "../utils/Helpers.js";
+import { getConversionRate, sendEventFlaggedEmail } from "../utils/Helpers.js";
 import Booking from "../models/bookingSchema.js";
 import transactionModel from "../models/transactionsSchema.js";
-
+import { io } from '../server.js';
+import notificationSchema from "../models/notificationSchema.js";
+import Tourist from "../models/touristSchema.js";
+import advertiserModel from "../models/advertiserSchema.js";
+import { sendEventBookingNotification } from "../routes/shareEmail.js"
 // @desc Get all activities
 // @route GET /api/activity
 export const getActivities = async (req, res) => {
@@ -103,6 +107,10 @@ export const addActivity = async (req, res) => {
 // @Body { advertiserID, categoryID, date, location, priceType, price, minPrice, maxPrice, tags, specialDiscounts, isBookingOpen, duration, name }
 export const updateActivity = async (req, res) => {
     const id = req.params.id;
+    const isBookingOpen = req.body.isBookingOpen;
+
+    const activity = await activityModel.findById(id);
+
     if (req.body.tags) {
         const tags = req.body.tags;
         let tagsIDs = [];
@@ -119,7 +127,27 @@ export const updateActivity = async (req, res) => {
     try {
         const updatedActivity = await activityModel.findByIdAndUpdate(id, req.body, { new: true });
         res.status(200).json(updatedActivity);
+
+        let notification;
+
+        if (isBookingOpen) {
+            if (isBookingOpen == true && activity.isBookingOpen == false) {
+
+                for (let i = 0; i < activity.subscribers.length; i++) {
+                    const tourist = await Tourist.findById(activity.subscribers[i]);
+                    notification = await notificationSchema.create({ title: 'Activity Booking Available', message: `${updatedActivity.name} has been made available for booking`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'bookingOpen' });
+                    await sendEventBookingNotification(tourist.email, tourist.username, updatedActivity.name, updatedActivity.date, updatedActivity.location, `http://localhost:5173/activity/${updatedActivity._id}`);
+                    const roomID = (tourist._id.toString());
+                    console.log(roomID);
+                    io.to(roomID).emit('newNotification', notification);
+                }
+
+            }
+
+        }
+
     } catch (error) {
+        console.log(error);
         res.status(404).json({ message: error.message });
     }
 }
@@ -422,20 +450,17 @@ export const viewSingleActivity = async (req, res) => {
     }
 }
 
+
 export const Flagg = async (req, res) => {
     const activityID = req.params.id;
     const flagger = req.body.flagger;
 
-
+    let activity;
     try {
-        let activity = await activityModel.findById(activityID);
+        activity = await activityModel.findById(activityID);
 
         if (!activity) {
             return res.status(404).json({ message: "No itinerary found with ID " + activityID });
-        }
-
-        if (flagger === false && activity.flagged === true) {
-            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
         }
 
         //flag itinerary
@@ -469,7 +494,25 @@ export const Flagg = async (req, res) => {
                     }
                 }
             }
+
         }
+        //create notification in  DB
+
+        let notification;
+        if (flagger) {
+            notification = await notificationSchema.create({ title: 'Activity Flagged', message: `${activity.name} has been flagged inappropriate`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+            const advertiser = await advertiserModel.findById(activity.advertiserID);
+            await sendEventFlaggedEmail(advertiser.email, advertiser.username, activity.name, activity.date);
+
+        }
+        else {
+            notification = await notificationSchema.create({ title: 'Activity Unflagged', message: `${activity.name} has been unflagged`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+        }
+
+        const roomID = (activity.advertiserID.toString())
+        io.to(roomID).emit('newNotification', notification)
+
+
         return res.status(200).json(updatedActivity);
 
     } catch (error) {
@@ -477,3 +520,22 @@ export const Flagg = async (req, res) => {
         console.log(error);
     }
 };
+
+
+export const notifyMe = async (req, res) => {
+
+    const activityID = req.params.id;
+    console.log(activityID);
+
+    const activity = await activityModel.findById(activityID);
+
+    if (!activity) {
+        return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    // const user = req.user;
+    const user = await Tourist.findById("674641df1887b9c3e11436c4");
+    await activityModel.findByIdAndUpdate(activityID, { $addToSet: { subscribers: user._id } }, { new: true });
+
+    return res.status(200).json({ message: 'Activity subscribed successfully' });
+}

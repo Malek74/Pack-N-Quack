@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpModel from "../models/otpSchema.js";
 import nodemailer from "nodemailer";
-
+import { io } from '../server.js';
 config();
 
 const transporter = nodemailer.createTransport({
@@ -117,12 +117,19 @@ export const login = async (req, res) => {
 
     // create token
     console.log(user._id);
-    const token = createToken(user.username, user._id, role);
+    const token = createToken(user.username, user._id, role, '');
+
 
     //create cookie
-    res.cookie('jwt', token, { httpOnly: true });
+    res.cookie('jwt', token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        path: '/',
+        sameSite: 'none',
+    })
 
-    return res.status(200).json({ user });
+    return res.status(200).json({ role: role, username: user.username, id: user._id });
 
 
 }

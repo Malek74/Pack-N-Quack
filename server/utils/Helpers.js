@@ -16,7 +16,10 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import Stripe from "stripe";
 import PromoCodes from "../models/promoCodesSchema.js";
+import nodemailer from "nodemailer";
+import { config } from "dotenv";
 
+config();
 
 //@desc check if username exists in the database
 //@param username
@@ -297,6 +300,29 @@ export const deleteIteneraries = async (tourGuideId) => {
     return itinerariesToDelete
 }
 
+
+export const getUsersTodayBirthdays = async () => {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth() + 1;
+
+    try {
+        const tourists = await tourist.find({
+            $expr: {
+                $and: [
+                    { $eq: [{ $dayOfMonth: "$dob" }, day] },
+                    { $eq: [{ $month: "$dob" }, month] }
+                ]
+            }
+        });
+        return tourists;
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
 export const getUserRole = async (username) => {
     let userRole = '';
     let user = await tourist.findOne({ username });
@@ -343,15 +369,15 @@ export const getUserRole = async (username) => {
     return userRole;
 }
 
-export const createToken = (username, id, role) => {
-    return jwt.sign({ id, username, role }, process.env.JWT_SECRET_KEY, {
+export const createToken = (username, id, role, socketId) => {
+    return jwt.sign({ id, username, role, socketId }, process.env.JWT_SECRET_KEY, {
         expiresIn: 24 * 60 * 60 //
     });
 
 };
 
 
-export const createPromoCode = async ( promocode, discount, isBirthDay) => {
+export const createPromoCode = async (promocode, discount, isBirthDay) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -387,3 +413,53 @@ export const createPromoCode = async ( promocode, discount, isBirthDay) => {
     }
 };
 
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com', // e.g., smtp.gmail.com for Gmail
+    port: 465, // Or 587 for other providers
+    secure: true, // true for 465, false for 587
+    auth: {
+        user: 'captianquackerss@gmail.com', // organization's email
+        pass: process.env.EMAIL_PASSKEY, // your email password
+    },
+});
+export const sendEventFlaggedEmail = async (email, username, eventName, eventDate) => {
+
+    try {
+        const mailOptions = {
+            from: '"CaptainQuackers" <captianquackerss@gmail.com>',
+            to: email,
+            subject: `Important: Your Event Has Been Flagged Inappropriate`,
+            text: `Hello ${username}, your event titled "${eventName}" has been flagged as inappropriate. It will be reviewed shortly.`,
+            html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h1 style="color: #FF6347;">Important Notice: Your Event Has Been Flagged Inappropriate</h1>
+                <p>Hello ${username},</p>
+                <p>We regret to inform you that your event titled "<strong>${eventName}</strong>" scheduled on ${eventDate} has been flagged as inappropriate by our moderation team.</p>
+                <p>We take community safety seriously, and we have temporarily suspended your event pending further review. If you believe this is an error, please reach out to our support team to dispute this decision.</p>
+                <h3>Event Details:</h3>
+                <p><strong>Event Name:</strong> ${eventName}</p>
+                <p><strong>Event Date:</strong> ${eventDate}</p>
+                <p>If you have any questions or concerns, feel free to contact our support team at <a href="mailto:support@yourwebsite.com">support@yourwebsite.com</a>.</p>
+                <p>We appreciate your cooperation in maintaining a respectful and safe platform for all users.</p>
+                <p>Best regards,<br>Captain Quackers and the Pack N Quack Team</p>
+                <img src="cid:logo" alt="Pack N Quack Logo" style="width:150px;height:auto; margin-top: 20px;" />
+            </div>
+            `,
+            attachments: [
+                {
+                    filename: 'logo.png',
+                    path: '../client/public/assets/icons/logo.png',
+                    cid: 'logo',
+                },
+            ],
+        };
+
+        // Send email
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully to ${email}`);
+    } catch (error) {
+        console.error('Error sending email:', error.message);
+    }
+
+};

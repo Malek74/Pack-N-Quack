@@ -339,33 +339,42 @@ export const adminCreatePromoCode = async (req, res) => {
 
 }
 
-export const getTotalUsersNum = async (req,res) => {
+export const getAllPromoCodes = async (req, res) => {
     try {
-         //Fetch users from different schemas
-         const admins = await adminModel.find({});
-         const advertisers = await advertiserModel.find({});
-         const tourists = await tourist.find({});
-         const governors = await touristGoverner.find({});
-         const sellers = await seller.find({});
-         const tourGuides = await tourGuide.find({});
- 
-         // Append the role to each set of users
-         const allAdmins = admins.map(user => ({ ...user.toObject(), userType: 'admin' }));
-         const allAdvertisers = advertisers.map(user => ({ ...user.toObject(), userType: 'advertiser' }));
-         const allTourists = tourists.map(user => ({ ...user.toObject(), userType: 'tourist' }));
-         const allGovernors = governors.map(user => ({ ...user.toObject(), userType: 'touristGovernor' }));
-         const allSellers = sellers.map(user => ({ ...user.toObject(), userType: 'seller' }));
-         const allTourGuides = tourGuides.map(user => ({ ...user.toObject(), userType: 'tourGuide' }));
- 
-         const totalUsers = 
-         allAdmins.length +
-         allAdvertisers.length +
-         allTourists.length +
-         allGovernors.length +
-         allSellers.length +
-         allTourGuides.length;
+        const promocodes = await PromoCodes.find({ isBirthDay: false });
+        res.status(200).json(promocodes);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
 
-         return res.status(200).json({ totalUsers });
+export const getTotalUsersNum = async (req, res) => {
+    try {
+        //Fetch users from different schemas
+        const admins = await adminModel.find({});
+        const advertisers = await advertiserModel.find({});
+        const tourists = await tourist.find({});
+        const governors = await touristGoverner.find({});
+        const sellers = await seller.find({});
+        const tourGuides = await tourGuide.find({});
+
+        // Append the role to each set of users
+        const allAdmins = admins.map(user => ({ ...user.toObject(), userType: 'admin' }));
+        const allAdvertisers = advertisers.map(user => ({ ...user.toObject(), userType: 'advertiser' }));
+        const allTourists = tourists.map(user => ({ ...user.toObject(), userType: 'tourist' }));
+        const allGovernors = governors.map(user => ({ ...user.toObject(), userType: 'touristGovernor' }));
+        const allSellers = sellers.map(user => ({ ...user.toObject(), userType: 'seller' }));
+        const allTourGuides = tourGuides.map(user => ({ ...user.toObject(), userType: 'tourGuide' }));
+
+        const totalUsers =
+            allAdmins.length +
+            allAdvertisers.length +
+            allTourists.length +
+            allGovernors.length +
+            allSellers.length +
+            allTourGuides.length;
+
+        return res.status(200).json({ totalUsers });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -407,3 +416,15 @@ export const getTotalNewUsersCount = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+
+export const deletePromoCode = async (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    try {
+        await PromoCodes.findByIdAndDelete(id);
+        return res.status(200).json({ message: "Promocode deleted successfully" });
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}

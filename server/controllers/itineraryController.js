@@ -7,10 +7,10 @@ import Stripe from 'stripe';
 import Booking from "../models/bookingSchema.js";
 import { uploadImages } from '../utils/Helpers.js';
 import activityTag from '../models/activityTagSchema.js';
-import { getConversionRate } from '../utils/Helpers.js';
+import { getConversionRate, sendEventFlaggedEmail } from '../utils/Helpers.js';
 import cloudinary from '../utils/cloudinary.js';
 import { io } from '../server.js';
-import Notification from '../models/norificationSchema.js';
+import notificationSchema from '../models/notificationSchema.js';
 import transactionModel from '../models/transactionsSchema.js';
 
 
@@ -589,9 +589,6 @@ export const Flagg = async (req, res) => {
             return res.status(404).json({ message: "No itinerary found with ID " + itineraryID });
         }
 
-        if (flag === false && itinerary.flagged === true) {
-            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
-        }
 
         //flag itinerary
         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flag } }, { new: true, runValidators: true });
@@ -620,17 +617,16 @@ export const Flagg = async (req, res) => {
             }
         }
 
-        //create new notification for the tour guide
-        const notification = await Notification.create({
-            title: "Itinerary flagged",
-            message: `Your itinerary ${itinerary.name} has been flagged`,
-            user: {
-                id: itinerary.tourGuideID,
-                role: "TourGuide"
-            }
-        });
+        let notification;
+        if (flag) {
+            notification = await notificationSchema.create({ title: 'Activity Flagged', message: `${activity.name} has been flagged inappropriate`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+        }
+        else {
+            notification = await notificationSchema.create({ title: 'Activity Unflagged', message: `${activity.name} has been unflagged`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+        }
 
-        io.emit("flaggedItinerary", notification);
+        const roomID = (itinerary.tourGuideID.toString())
+        io.to(roomID).emit('newNotification', notification)
 
         return res.status(200).json(updatedItinerary);
 
