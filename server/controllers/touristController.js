@@ -398,7 +398,7 @@ export const addItemToCart = async (req, res) => {
 }
 
 export const removeItemFromCart = async (req, res) => {
-    const productId = req.body.productID;
+    const productId = req.params.productId;
     const touristId = req.params.id;
 
     if(!productId){

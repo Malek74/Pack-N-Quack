@@ -41,7 +41,7 @@ router.get('/complaints/:id', viewMyComplaints);
 router.post('/complaints', createComplaint);
 router.get('/myComplaints/:id', viewComplaintById);
 router.post('/cart/addItemToCart/:id', addItemToCart);
-router.delete('/cart/removeItemFromCart/:id', removeItemFromCart);
+router.delete('/cart/removeItemFromCart/:id/:productId', removeItemFromCart);
 router.put('/cart/updateQuantity/:id', updateQuantityInCart);
 router.get('/cart/viewCart/:id', getCart);
 export default router;
