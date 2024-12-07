@@ -12,13 +12,11 @@ import {
 import SalesReportFilters from "./SalesReportFilters";
   
 
-export function FilterButton() {
+export function FilterButton({setReportFilters}) {
     const [filtersOn, setFiltersOn] = useState(false);
-    const [reportFilters ,setReportFilters] = useState();
 
   return (
     <Dialog>
-        
         <DialogTrigger><Button variant="outline" size="icon">
             <Filter />
        </Button></DialogTrigger>

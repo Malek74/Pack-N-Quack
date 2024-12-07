@@ -16,16 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { title: "Mark", revenue: 186, bookings: 80 },
-  { title: "Itinerary2", revenue: 305, bookings: 200 },
-  { title: "Itinerary3", revenue: 237, bookings: 120 },
-  { title: "Activity1", revenue: 73, bookings: 190 },
-  { title: "Activity2", revenue: 209, bookings: 130 },
-  { title: "Activity3", revenue: 214, bookings: 140 },
-  { title: "Activity4", revenue: 219, bookings: 140 },
-  { title: "Activity5", revenue: 214, bookings: 140 },
-]
+
 
 const chartConfig = {
   revenue: {
@@ -38,7 +29,8 @@ const chartConfig = {
   },
 } 
 
-export function BarRevenuePerProductChart() {
+export function BarRevenuePerProductChart({revenueAndBookingPerEvent}) {
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -47,7 +39,7 @@ export function BarRevenuePerProductChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={revenueAndBookingPerEvent}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="title"

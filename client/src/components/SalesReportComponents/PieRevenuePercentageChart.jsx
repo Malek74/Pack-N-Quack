@@ -17,11 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { type: "itineraries", revenue: 275, fill: "var(--color-itineraries)" },
-  { type: "activities", revenue: 200, fill: "var(--color-activities)" },
 
-]
 
 const chartConfig = {
   revenue: {
@@ -37,7 +33,11 @@ const chartConfig = {
   }
 } 
 
-export function PieRevenuePercentageChart() {
+export function PieRevenuePercentageChart({totalRevenue}) {
+  const chartData = [
+    { type: "itineraries", revenue: totalRevenue.itinerariesRevenue, fill: "var(--color-itineraries)" },
+    { type: "activities", revenue: totalRevenue.activitiesRevenue, fill: "var(--color-activities)" },
+  ]
   const totalrevenue = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.revenue, 0)
   }, [])
