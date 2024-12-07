@@ -41,6 +41,6 @@ router.post('/complaints', createComplaint);
 router.get('/myComplaints/:id', viewComplaintById);
 router.get('/wishlist/:id', viewMyWishlist);
 router.post('/wishlist/:id', addToWishlist);
-router.delete('/wishlist/:id', removeFromWishlist);
+router.delete('/wishlist/:id/:productid', removeFromWishlist);
 
 export default router;
