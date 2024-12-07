@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  Gem,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -34,6 +35,11 @@ export default function TouristDashboard() {
       label: "Rewards and Points",
       icon: Gift,
       path: "rewards",
+    },
+     {
+      label: "Promo codes",
+      icon: Gem,
+      path: "promo-codes",
     },
     {
       label: "Activity Bookings",
