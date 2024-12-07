@@ -14,6 +14,7 @@ import AmadeusBooking from "../models/amadeusBooking.js";
 import DeleteRequest from "../models/deleteRequests.js";
 import productModel from "../models/productSchema.js";
 
+
 // Creating Tourist for Registration
 export const createTourist = async (req, res) => {
     const { email, username, password, mobile, dob, nationality, role, jobTitle, name, preferedFirstTag, preferedSecondTag, preferedFirstCategory, preferedSecondCategory } = req.body;
@@ -371,6 +372,15 @@ export const addItemToCart = async (req, res) => {
 
         const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
         const oldQuantity = productIndex !== -1 ? tourist.cart[productIndex].quantity : 0;
+
+        const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
+        if(wishlistIndex !== -1){
+            await Tourist.findByOneAndUpdate(
+                {_id: touristId},
+                {$pull: {wishlist: productId}},
+                {new: true}
+            );
+        }      
 
         if (productIndex !== -1) {
             // Product exists in the cart - Update its quantity
