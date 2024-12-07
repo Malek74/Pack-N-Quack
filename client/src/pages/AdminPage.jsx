@@ -15,6 +15,7 @@ import {
   Angry,
   Trash2,
   File,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate, Outlet } from "react-router-dom";
@@ -95,6 +96,12 @@ const sidebarItems = [
     icon: TentTree,
     section: "Itineraries",
     path: "itineraries",
+  },
+  {
+    label: "Sales Report",
+    icon: ChartNoAxesCombined,
+    section: "Sales Report",
+    path: "sales-report",
   },
   {
     label: "Complaints",
