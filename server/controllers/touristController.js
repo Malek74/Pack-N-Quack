@@ -438,32 +438,26 @@ export const bookmark = async (req, res) => {
 
 
 export const viewBookmarks = async (req, res) => {
-    const { touristID } = req.params;
+    const touristID = req.user._id;
 
     try {
-        if (!touristID) {
-            return res.status(400).json({ message: "Tourist ID is required" });
-        }
 
         const tourist = await Tourist.findById(touristID)
             .populate("savedEvents.savedActivities")
             .populate("savedEvents.savedItineraries");
 
-        if (!tourist) {
-            return res.status(404).json({ message: "Tourist not found" });
-        }
 
-        const savedActivities = tourist.savedEvents.savedActivities.map(activity => ({
+        const savedActivities = tourist.savedEvents?.savedActivities?.map(activity => ({
             id: activity._id,
             name: activity.name,
             category: activity.categoryID,
-        }));
+        })) || [];
 
-        const savedItineraries = tourist.savedEvents.savedItineraries.map(itinerary => ({
+        const savedItineraries = tourist.savedEvents?.savedItineraries?.map(itinerary => ({
             id: itinerary._id,
-            title: itinerary.title,
+            name: itinerary.name,
             tags: itinerary.tags,
-        }));
+        })) || [];
 
         return res.status(200).json({
             savedActivities,
@@ -474,6 +468,7 @@ export const viewBookmarks = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 
 export const AddNewAddress = async (req, res) => {
     const { touristID, address } = req.body;
