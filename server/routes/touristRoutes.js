@@ -44,4 +44,9 @@ router.post('/cart/addItemToCart/:id', addItemToCart);
 router.delete('/cart/removeItemFromCart/:id', removeItemFromCart);
 router.put('/cart/updateQuantity/:id', updateQuantityInCart);
 router.get('/cart/viewCart/:id', getCart);
+router.get('/cart/viewCart/:id', getCart);
+router.get('/wishlist/:id', viewMyWishlist);
+router.post('/wishlist/:id', addToWishlist);
+router.delete('/wishlist/:id', removeFromWishlist);
+
 export default router;
