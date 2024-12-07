@@ -1,12 +1,18 @@
 import adminModel from "../models/adminSchema.js";
 import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
+import Stripe from "stripe";
+import { convertPrice, getConversionRate } from "../utils/Helpers.js";
+import cloudinary from '../utils/cloudinary.js';
+import PurchasedItem from "../models/purchasedSchema.js";
+import Tourist from "../models/touristSchema.js";
 
 
 //get product by ID
 export const getProductByID = async (req, res) => {
     const { id } = req.params;
     const isAdmin = adminModel.findById(id);
+    const prefCurrency = req.body.prefCurrency;
 
 
     console.log(id + "this is id");
@@ -15,6 +21,8 @@ export const getProductByID = async (req, res) => {
     }
     try {
         const searchedProduct = await product.findById(id).populate('seller_id');
+        const newPrice = convertPrice(searchedProduct.price, prefCurrency);
+        searchedProduct.price = newPrice;
         return res.status(200).json(searchedProduct);
     } catch (error) {
         return res.status(400).json({ error: error.message });
@@ -24,19 +32,67 @@ export const getProductByID = async (req, res) => {
 //create product
 export const createProduct = async (req, res) => {
 
-    const userID = req.body.id;
+    const userID = req.params.id;
     console.log("SellerID: " + userID);
-    const { name, price, description, available_quantity } = req.body;
+    console.log(req);
+
+    const { name, price, description, available_quantity, } = req.body;
     if (!name || !price || !description || !available_quantity) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
 
+    //create product on stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const productStripe = await stripe.products.create({
+        name: name,
+        description: description,
+        default_price_data: {
+            currency: "usd",
+            unit_amount: price * 100,
+        },
+    });
+
     const isAdmin = await adminModel.findById(userID);
     const isSeller = await seller.findById(userID);
 
+    const imagesUrls = [];
+    try {
+
+        for (const file of req.files['images']) {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url);
+        }
+
+    }
+    catch (error) {
+        console.error("Error during image upload to Cloudinary:", error);
+        return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+    }
+
     if (!isAdmin) {
         try {
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID }));
+
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: isSeller.username, seller_id: userID, stripeID: productStripe.id, picture: imagesUrls }));
             return res.status(200).json(newproduct);
         } catch (error) {
             return res.status(400).json({ error: error.message });
@@ -45,9 +101,8 @@ export const createProduct = async (req, res) => {
     else {
         try {
             console.log("Admin Product");
-
             const sellerUsername = await seller.findById(userID).username;
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID }));
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
             return res.status(200).json(newproduct);
         } catch (error) {
             return res.status(400).json({ error: error.message });
@@ -55,26 +110,91 @@ export const createProduct = async (req, res) => {
     }
 }
 
+
 export const editProduct = async (req, res) => {
     const { id } = req.params;
-    const { description, price } = req.body;
+    const { description, price, isArchived } = req.body;
     if (!id) {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
-        const newproduct = await product.findByIdAndUpdate(id, { description, price }, { new: true }).populate('seller_id');
-        console.log(newproduct)
+        const productEdited = await product.findById(id);
+        if (!productEdited) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        let imagesUrls = [];
+        try {
+            const sanitizedPublicId = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '');
+            const publicId = sanitizedPublicId;
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: 'image',
+                        public_id: publicId,
+                        overwrite: true,
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Cloudinary upload error:", error);
+                            return reject(error);
+                        }
+                        resolve(result);
+                    }
+                );
+
+                uploadStream.end(file.buffer);
+            });
+
+            imagesUrls.push(result.secure_url)
+        }
+        catch (error) {
+            console.error("Error during image upload to Cloudinary:", error);
+            // return res.status(500).json({ message: 'Error uploading image to Cloudinary.', error });
+        }
+
+
+        //attempt to update product on stripe
+        try {
+
+            ///create new price on stripe
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            const newPrice = await stripe.prices.create({
+                unit_amount: price * 100, // Price in cents
+                currency: 'usd',
+                product: productEdited.stripeID, // Replace with your actual product ID
+            });
+
+
+            const updatedProduct = await stripe.products.update(productEdited.stripeID, {
+                description: description,
+                default_price: newPrice.id,
+            })
+        }
+        catch (error) {
+            console.log(error);
+        }
+        let newproduct = {};
+        if (imagesUrls.length == 0) {
+            console.log("No images provided");
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, isArchived: isArchived }, { new: true }).populate('seller_id');
+        }
+        else {
+            newproduct = await product.findByIdAndUpdate(id, { description: description, price: price, picture: imagesUrls, isArchived: isArchived }, { new: true }).populate('seller_id');
+        }
+
         return res.status(200).json(newproduct);
     } catch (error) {
         return res.status(400).json({ error: error.message });
     }
 }
+
 //update product by ID
 export const updateProduct = async (req, res) => {
     const id = req.params.id;
-    const { name, picture, price, description, seller_id, ratings, reviews, available_quantity } = req.body;
+    const { name, picture, price, description, seller_id, ratings, reviews, available_quantity, product_sales, isArchived } = req.body;
 
-    
+
 
     const oldproduct = await product.findById(id);
     if (!oldproduct) {
@@ -96,6 +216,15 @@ export const updateProduct = async (req, res) => {
         if (description) newInfo.description = description;
         if (ratings) newInfo.ratings = ratings;
         if (reviews) newInfo.reviews = reviews;
+        if (product_sales) newInfo.product_sales = product_sales;
+        if (isArchived == true) {
+            newInfo.isArchived = true;
+        }
+        else {
+            newInfo.isArchived = false;
+        }
+
+
         if (available_quantity) {
             if (available_quantity > 0) {
                 newInfo.available_quantity = available_quantity;
@@ -103,8 +232,20 @@ export const updateProduct = async (req, res) => {
                 return res.status(400).json({ message: "Please provide a valid quantity" });
             }
         }
+
+        //create product on stripe
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const productStripe = await stripe.products.create({
+            name: name,
+            description: description,
+            default_price_data: {
+                currency: "usd",
+                unit_amount: price * 100,
+            },
+        });
+
         const newproduct = await product.findByIdAndUpdate(id, { $set: newInfo }, { new: true }).populate('seller_id');
-        return res.status(200).json(newproductt);
+        return res.status(200).json(newproduct);
 
     } catch (error) {
         return res.status(400).json({ error: error.message })
@@ -117,7 +258,7 @@ export const searchProduct = async (req, res) => {
 
     try {
         const products = await product.find({
-            name: { $regex: new RegExp(searchTerm, 'i') }
+            name: { $regex: new RegExp(searchTerm, 'i'), isArchived: false }
         }).populate('seller_id');
 
         console.log(products);
@@ -135,14 +276,24 @@ export const searchProduct = async (req, res) => {
 }
 //get max price of product
 export const getMaxPrice = async (req, res) => {
+    const currency = req.query.currency || "USD";
+    console.log('Currency:', currency);
+
     try {
-        const result = await product.aggregate([
-            { $group: { _id: null, maxPrice: { $max: "$price" } } }
-        ]);
+        // Fetch the max price of all unarchived products
+        const result = await product.find().sort({ price: -1 }).limit(1).select('price');
         if (result.length === 0) {
             res.json({ maxPrice: 0 });
         }
-        res.json(result[0]);
+
+        if (currency) {
+            const conversionRate = await getConversionRate(currency);
+            console.log('Conversion Rate:', conversionRate);
+            console.log('Max Price:', result[0].price);
+            result[0].price *= conversionRate;
+            console.log('Converted Max Price:', result[0].price);
+        }
+        return res.json(result[0].price);
 
     } catch (error) {
         console.error('Error fetching max price:', error);
@@ -152,67 +303,146 @@ export const getMaxPrice = async (req, res) => {
 
 //@desc get a single itinerary by id, category, or tag
 //@route GET api/itinerary
+export const allProductSwQ = async (req, res) => {
+    try {
+
+        let products = await product.find({ $or: [{ isArchived: false }, { isArchived: { $exists: false } }] }).select('name product_sales available_quantity');
+        // products = products.filter(product => product.isArchived == false);
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching product sales and quantities:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const eachProductSwQ = async (req, res) => {
+    const name = req.params.name;
+    try {
+
+        const products = await product.findOne({ name }).select('name product_sales available_quantity');
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products sales and quantities:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const getProducts = async (req, res) => {
     const name = req.query.name;
     const maxPrice = req.query.maxPrice;
     const minPrice = req.query.minPrice;
     const sortBy = req.query.sortBy;
     const order = req.query.order;
+    const prefCurrency = req.query.currency || "USD";
+    const sellerID = req.query.sellerID;
+    console.log('Pref Currency:', prefCurrency);
+    const isArchived = req.query.isArchived;
+    console.log('Is Archived:', isArchived);
 
     let query = {}; // Create an object to build your query
     let sortOptions = {};
 
     try {
+
+        const conversionRate = await getConversionRate(prefCurrency || 'USD');
+
         // Build query based on input parameters
         if (minPrice || maxPrice) {
             query.price = {};
             if (minPrice) {
-                query.price.$gte = minPrice;
+                //parseInt converts string to integer
+                query.price.$gte = parseInt(minPrice);
             } else {
                 query.price.$gte = 0;
             }
             if (maxPrice) {
-                query.price.$lte = maxPrice;
+                query.price.$lte = parseInt(maxPrice * conversionRate);
             } else {
-                query.price.$lte = Number.MAX_SAFE_INTEGER;
+                query.price.$lte = Number.MAX_SAFE_INTEGER * conversionRate;
             }
+            
         }
 
+        if(sellerID){
+            query.seller_id = sellerID;
+        }
         if (name) {
             query.name = { $regex: name, $options: 'i' };
+        }
+        console.log(isArchived);
+        if (isArchived) {
+            if (isArchived === 'true' || isArchived === 'false') {
+                query.isArchived = isArchived === 'true';
+            }
+        }
+        else {
+            query.isArchived = false; ``
         }
 
         // Set sorting options if provided
         if (sortBy && order) {
             sortOptions[sortBy] = order === 'asc' ? 1 : -1;
         }
-
+        const baseCurrency = prefCurrency || 'USD';
         console.log('Query:', query);
         console.log('Sort Options:', sortOptions);
 
-        // Fetch the itinerary using the built query
+        // Assume conversionRate is fetched from an API beforehand
+        console.log('Conversion Rate:', conversionRate);
         const products = await product.find(query).sort(sortOptions).populate('seller_id');
 
-        return res.status(200).json(products);
+        // Convert prices to preferred currency
+        const convertedProducts = products.map(product => {
+            product.price *= conversionRate;
+            return product;
+        })
 
+        return res.json(convertedProducts);
 
     } catch (error) {
         return res.status(500).json({ message: error.message }); // Handle server errors
     }
 };
 
-
-
-/*//get all products
-export const getProducts = async (req, res) => {
+export const getMyProducts = async (req, res) => {
+    const id = req.params.id;
+    const prefCurrency = req.query.currency || "USD";
     try {
-        const products = await product.find();
-        res.status(200).json(products)
-    } catch (error) {
-        res.status(400).json({ error: error.message })
+        //fetch tourist
+        const tourist = await Tourist.findById(id);
+
+        //check if user exists
+        if (!tourist) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        //fetch products bought by the user
+        const boughtProducts = await PurchasedItem.find({ user: id }).select('items.items').populate('items.productId');
+        if (boughtProducts.length == 0) {
+            return res.status(200).json(boughtProducts);
+        }
+
+        if (prefCurrency) {
+            const conversionRate = await getConversionRate(prefCurrency);
+            const convertedProducts = boughtProducts.map(product => {
+                product.items = product.items.map(item => {
+                    item.price *= conversionRate;
+                    return item;
+                });
+                return product;
+            });
+            return res.status(200).json(convertedProducts[0].items);
+        }
+
+        //return products
+        return res.status(200).json(boughtProducts[0].items);
     }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
 }
-*/
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;

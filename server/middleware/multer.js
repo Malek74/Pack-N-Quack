@@ -4,6 +4,8 @@ import multer from 'multer';
 const storage = multer.memoryStorage();
 
 // Set up multer to accept multiple files
-const upload = multer({ storage: storage });
+export const upload = multer({ storage: storage });
+export const awsUpload = multer({ storage: multer.memoryStorage() });
 
-export default upload;
+
+
