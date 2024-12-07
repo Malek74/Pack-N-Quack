@@ -102,7 +102,18 @@ const touristSchema = new Schema({
             }
         ],
         default: []
-    }
+    },
+
+    wishlist: {
+        type: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+            }
+        ],
+        default: []
+    },
+
 },
     { timestamps: true }
 );

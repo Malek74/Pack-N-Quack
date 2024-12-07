@@ -375,7 +375,7 @@ export const addItemToCart = async (req, res) => {
 
         const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
         if(wishlistIndex !== -1){
-            await Tourist.findByOneAndUpdate(
+            await Tourist.findOneAndUpdate(
                 {_id: touristId},
                 {$pull: {wishlist: productId}},
                 {new: true}
