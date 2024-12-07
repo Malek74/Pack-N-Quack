@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import Maps from "../shared/Maps";
