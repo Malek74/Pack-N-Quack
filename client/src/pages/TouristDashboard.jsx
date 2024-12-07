@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  MapPinHouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -80,6 +81,11 @@ export default function TouristDashboard() {
       icon: Angry,
       path: "complaints",
     },
+    {
+      label: "Addresses",
+      icon: MapPinHouse,
+      path: "addresses",
+    },
   ];
 
   return (
@@ -95,10 +101,11 @@ export default function TouristDashboard() {
                       key={label}
                       variant="ghost"
                       onClick={() => handleSectionChange(label, path)}
-                      className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${activeSection === label
-                        ? "bg-muted text-primary"
-                        : "text-muted-foreground hover:text-primary"
-                        }`}
+                      className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                        activeSection === label
+                          ? "bg-muted text-primary"
+                          : "text-muted-foreground hover:text-primary"
+                      }`}
                     >
                       <Icon className="h-4 w-4" />
                       {label}
