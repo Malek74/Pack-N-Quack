@@ -49,6 +49,7 @@ import BookItinerary from "@/components/dropdown/BookItineraries";
 import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
+import PaymentTransactionPage from "@/pages/PaymentTransactionPage";
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
@@ -158,6 +159,7 @@ const routes = createRoutesFromElements(
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="complaints" element={<ComplaintsPageTourist />} />
       <Route path="rewards" element={<PointsAndLoyalty />} />
+      <Route path="PaymentTransactionPage" element={<PaymentTransactionPage />} />
       <Route path="my-products" element={<AdminProducts seller />} />
 
       <Route path="itinerary-bookings" element={<ItineraryBookings />}></Route>
