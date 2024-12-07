@@ -326,7 +326,7 @@ export const viewMyActivities = async (req, res) => {
 }
 
 export const getCart = async (req, res) => {
-    const touristId = req.user._id;
+    const touristId = req.params.id;
 
     if(!touristId){
         return res.status(400).json({message: "Tourist ID is required"});
@@ -343,7 +343,7 @@ export const getCart = async (req, res) => {
 
 export const addItemToCart = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.user._id;
+    const touristId = req.params.id;
     const quantity = req.body.quantity;
 
     if(!productId){
@@ -399,7 +399,7 @@ export const addItemToCart = async (req, res) => {
 
 export const removeItemFromCart = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.user._id;
+    const touristId = req.params.id;
 
     if(!productId){
         return res.status(400).json({message: "Product ID is required"});
@@ -437,7 +437,7 @@ export const removeItemFromCart = async (req, res) => {
 
 export const updateQuantityInCart = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.user._id;
+    const touristId = req.params.id;
 
     if(!productId){
         return res.status(400).json({message: "Product ID is required"});
