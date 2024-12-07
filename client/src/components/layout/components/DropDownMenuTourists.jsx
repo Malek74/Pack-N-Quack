@@ -17,22 +17,20 @@ const DropDownMenuTourist = () => {
       case "/itinerariesTourists":
         setLabel("Itineraries");
         break;
-      case "/activitiesTourists":
+      case "/activities":
         setLabel("Activities");
         break;
       case "/historicalTourists":
         setLabel("Historical");
         break;
       default:
-        setLabel("As a Tourist");
+        setLabel("What to do?");
     }
   }, [location.pathname]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{label}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>As a Tourist</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Link to="/itinerariesTourists">Itineraries</Link>
         </DropdownMenuItem>

@@ -5,22 +5,27 @@ import logo from "/assets/icons/logo.png";
 import DropDownMenuBook from "./components/DropDownMenuBook";
 
 import ComboboxCurrency from "./components/ComboboxCurrency";
-import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
 import { useUser } from "@/context/UserContext";
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
-  const { userType, userId, logout } = useUser();
+  const {
+    userType,
+    userId,
+    logout,
+    isTourGuide,
+    isSeller,
+    isAdvertiser,
+    isTourist,
+    isTourismGovernor,
+    isGuest,
+  } = useUser();
 
-  const isAdmin = userType === "Admin";
-  const isTourist = userType === "Tourist";
-  const isAdvertiser = userType === "Advertiser";
-  const isSeller = userType === "Seller";
-  const isTourGuide = userType === "Tour Guide";
-  const isTourismGovernor = userType === "Tourism Governer";
+  console.log("tourist " + isTourist);
+  console.log("seller " + isSeller);
+  console.log("guest " + isGuest);
   const isLoggedIn = userId != null;
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
-
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
@@ -32,107 +37,65 @@ export default function Header() {
 
         {/* Centered Navigation Links */}
         <ul className="flex justify-center mx-auto">
-          <Button asChild variant="link">
-            <li>
+          <li>
+            <Button asChild variant="link">
               <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>
                 Home
               </Link>
-            </li>
-          </Button>
+            </Button>
+          </li>
 
-          {/* <Button asChild variant="link">
+          {(isTourist || isSeller || isGuest) && (
             <li>
-              <Link
-                to="/about"
-                className={isActive("/about") ? "text-yellow-500" : ""}
-              >
-                About Us
-              </Link>
+              <Button asChild variant="link">
+                <Link
+                  to="/marketplace"
+                  className={isActive("/marketplace") ? "text-yellow-500" : ""}
+                >
+                  Marketplace
+                </Link>
+              </Button>
             </li>
-          </Button> */}
+          )}
 
-          {/* <Button asChild variant="link">
+          {isTourGuide && (
             <li>
-              <Link
-                to="/contact"
-                className={isActive("/contact") ? "text-yellow-500" : ""}
-              >
-                Contact
-              </Link>
+              <Button asChild variant="link">
+                <Link
+                  to="/itineraries"
+                  className={isActive("/itineraries") ? "text-yellow-500" : ""}
+                >
+                  Itineraries
+                </Link>
+              </Button>
             </li>
-          </Button> */}
+          )}
+
+          {isTourismGovernor && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/historical"
+                  className={isActive("/historical") ? "text-yellow-500" : ""}
+                >
+                  Historical Places
+                </Link>
+              </Button>
+            </li>
+          )}
+
+          {(isTourist || isGuest) && (
+            <li>
+              <Button variant="link">
+                <DropDownMenuTourist />
+              </Button>
+            </li>
+          )}
 
           <Button asChild variant="link">
             <li>
-              <Link
-                to="/marketplace"
-                className={isActive("/marketplace") ? "text-yellow-500" : ""}
-              >
-                Marketplace
-              </Link>
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itineraries")
-                  ? "text-yellow-500"
-                  : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
-              }
-            >
-              <DropDownMenuTGSADV location={location} />
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itinerariesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/activitiesTourists")
-                  ? "text-yellow-500"
-                  : isActive("/historicalTourists")
-                  ? "text-yellow-500"
-                  : ""
-              }
-            >
-              <DropDownMenuTourist />
-            </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/bookingFlight")
-                  ? "text-yellow-500"
-                  : isActive("/bookingHotel")
-                  ? "text-yellow-500"
-                  : isActive("/transportations")
-                  ? "text-yellow-500"
-                  : ""
-              }
-            >
               <DropDownMenuBook location={location} />
             </li>
-          </Button>
-
-          <Button asChild variant="link">
-            <li
-              className={
-                isActive("/itineraries")
-                  ? "text-yellow-500"
-                  : isActive("/activities")
-                  ? "text-yellow-500"
-                  : isActive("/historical")
-                  ? "text-yellow-500"
-                  : ""
-              }
-            ></li>
           </Button>
         </ul>
 

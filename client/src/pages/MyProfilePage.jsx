@@ -17,11 +17,15 @@ import { Button } from "@/components/ui/button";
 import DialogTerms from "@/components/shared/DialogTerms";
 export default function MyProfilePage() {
   const { toast } = useToast();
-  const { userId, userType } = useUser();
-  const [isTourGuide, setIsTourGuide] = useState(false);
-  const [isSeller, setIsSeller] = useState(false);
-  const [isAdvertiser, setIsAdvertiser] = useState(false);
-  const [isTourist, setIsTourist] = useState(false);
+  const {
+    userId,
+    userType,
+    isTourGuide,
+    isSeller,
+    isAdvertiser,
+    isTourist,
+    isTourismGovernor,
+  } = useUser();
 
   const [profile, setProfile] = useState();
 
@@ -31,19 +35,15 @@ export default function MyProfilePage() {
         return "admins";
 
       case "Advertiser":
-        setIsAdvertiser(true);
         return "advertisers";
 
       case "Seller":
-        setIsSeller(true);
         return "sellers";
 
       case "Tourist":
-        setIsTourist(true);
         return "tourist";
 
       case "Tour Guide":
-        setIsTourGuide(true);
         return "tourGuide";
     }
   };

@@ -10,7 +10,13 @@ export const UserProvider = ({ children }) => {
   const [prefCurrency, setPrefCurrency] = useState("EGP");
   const [userId, setUserId] = useState(null);
   const [userType, setUserType] = useState(null);
-
+  const [isTourGuide, setIsTourGuide] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
+  const [isAdvertiser, setIsAdvertiser] = useState(false);
+  const [isTourist, setIsTourist] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isTourismGovernor, setIsTourismGovernor] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   // On mount, check localStorage for cached data and set it if found
   useEffect(() => {
     const cachedCurrency = localStorage.getItem("prefCurrency");
@@ -25,7 +31,30 @@ export const UserProvider = ({ children }) => {
     if (cachedUserType) {
       setUserType(cachedUserType);
     }
-  }, []);
+    switch (userType) {
+      case "Admin":
+        setIsAdmin(true);
+        break;
+      case "Advertiser":
+        setIsAdvertiser(true);
+        break;
+      case "Seller":
+        setIsSeller(true);
+        break;
+      case "Tourist":
+        setIsTourist(true);
+        break;
+      case "Tour Guide":
+        setIsTourGuide(true);
+        break;
+      case "Tourism Governor":
+        setIsTourismGovernor(true);
+        break;
+      default:
+        setIsGuest(true);
+        break;
+    }
+  }, [userType]);
 
   // Function to update preferred currency
   const updatePrefCurrency = (currency) => {
@@ -68,6 +97,13 @@ export const UserProvider = ({ children }) => {
         userType,
         updateUserType,
         logout,
+        isAdmin,
+        isSeller,
+        isTourismGovernor,
+        isTourist,
+        isTourGuide,
+        isAdvertiser,
+        isGuest,
       }}
     >
       {children}
