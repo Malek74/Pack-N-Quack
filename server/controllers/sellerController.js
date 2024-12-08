@@ -1,4 +1,5 @@
 
+import Orders from "../models/orderSchema.js";
 import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 import bcrypt from "bcrypt";
@@ -114,5 +115,161 @@ export const acceptTerms = async (req, res) => {
     }
     catch (error) {
         return res.status(404).json({ message: error.message });
+    }
+}
+
+export const getBookingCount = async (req, res) => {
+    const id = req.params.id;
+    const  startDate = req.query.startDate;
+    const  endDate = req.query.endDate || new Date();
+    const productId = req.query.productId;
+
+    if(!id) {
+        return res.status(400).json({ message: "Seller ID is required." });
+    }
+
+    if (startDate && !Date.parse(startDate)) {
+        return res.status(400).json({ message: "Invalid start date." });
+    }
+
+    if(endDate && !Date.parse(endDate)) {
+        return res.status(400).json({ message: "Invalid end date." });
+    }
+
+    if(productId && !mongoose.Types.ObjectId.isValid(activityId)) {
+        return res.status(400).json({ message: "Invalid product ID." });
+    }
+
+
+
+    try {
+
+        if(productId && !(await activityModel.findById(productId))){
+            return res.status(400).json({ message: "Product not found." });
+        }
+
+        if(!await seller.findById(id)) {
+            return res.status(400).json({ message: "Seller not found." });
+        }
+    
+        // let productIds = (await activityModel.find({ advertiserID: id, date: { $lte: new Date() } })).map(activity => activity._id.toString());
+
+        let activityQuery = { 
+            sellerID: id, 
+            orderDate: { $lte: new Date() } 
+        };
+
+        // If a specific activity is provided, add it to the activity query
+        // if (productId) {
+        //     productIds = [productId];
+        // }
+
+
+        // Prepare the match stage for bookings
+        // const matchStage = {
+        //     productId: { $in: productIds.map(id => new mongoose.Types.ObjectId(id)) }
+        // };
+
+        // Add date filtering if a specific date is provided
+        if (startDate && endDate) {
+            matchStage.orderDate = {
+                $gte: new Date(startDate),
+                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
+            };
+        }
+
+        // console.log(matchStage);    
+
+        // const bookings = await Order.find().select('_id product orderDate');
+
+        const revenuePerDay = await Orders.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: {
+                        creationDay: { $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$date"
+                        } }
+                    },
+                    count: { $sum: 1 },
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    Date: "$_id.creationDay",
+                    revenue: { $multiply: ["$totalPrice", 0.9] }
+                }
+            },
+            {
+                $sort: { creationDay: 1 }
+            }
+        ]);
+
+        const totalRevenue = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: null, 
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    activitiesRevenue: { $multiply: ["$totalPrice", 0.9] }
+                }
+            },
+        ]);
+
+        const totalBookings = await Booking.countDocuments(matchStage);
+
+        const revenueAndBookingsPerEvent = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: {
+                        activityID: "$activityID",
+                    },
+                    count: { $sum: 1 },
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $lookup: {
+                    from: 'activities',
+                    localField: '_id.activityID',
+                    foreignField: '_id',
+                    as: 'activityDetails'
+                }
+            },
+            {
+                $unwind: '$activityDetails' // Deconstructs the array created by $lookup
+            },
+            {
+                $project: {
+                    _id: 0,
+                    title: '$activityDetails.name',
+                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
+                    bookings: "$count"
+                }
+            },
+            {
+                $sort: { creationDay: 1 }
+            }
+        ]);
+
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+    
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 }

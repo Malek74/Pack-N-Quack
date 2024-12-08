@@ -7,6 +7,7 @@ import Booking from '../models/bookingSchema.js';
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+import mongoose from 'mongoose';    
 
 //@desc Create a new tour guide
 //@route POST /api/tourGuide
@@ -210,4 +211,160 @@ export const deleteTourGuide = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
+
+export const getRevenue = async (req, res) => {
+    const id = req.params.id;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate || new Date();
+    const itineraryId = req.query.itineraryId;
+
+    if(!id) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+
+    if (startDate && !Date.parse(startDate)) {
+        return res.status(400).json({ message: "Invalid start date." });
+    }
+
+    if(endDate && !Date.parse(endDate)) {
+        return res.status(400).json({ message: "Invalid end date." });
+    }
+
+    if(itineraryId && !mongoose.Types.ObjectId.isValid(itineraryId)) {
+        return res.status(400).json({ message: "Invalid itinerary ID." });
+    }
+
+
+
+    try {
+
+        if(itineraryId && !(await Itinerary.findById(itineraryId))){
+            return res.status(400).json({ message: "Activity not found." });
+        }
+
+        if(!await tourGuide.findById(id)) {
+            return res.status(400).json({ message: "Advertiser not found." });
+        }
+    
+        let itineraryIds = (await Itinerary.find({ tourGuideID: id, available_dates:{ $elemMatch: {$lte: new Date()} }})).map(activity => activity._id.toString());
+        console.log(itineraryIds);
+
+        let itineraryQuery = { 
+            tourGuideID: id, 
+            date: { $lte: new Date() } 
+        };
+
+        // If a specific activity is provided, add it to the activity query
+        if (itineraryId) {
+            itineraryIds = itineraryId;
+        }
+
+
+        // Prepare the match stage for bookings
+        const matchStage = {
+            itineraryID: { $in: itineraryIds.map(id => new mongoose.Types.ObjectId(id)) }
+        };
+
+        // Add date filtering if a specific date is provided
+        if (startDate && endDate) {
+            matchStage.date = {
+                $gte: new Date(startDate),
+                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
+            };
+        }
+
+        console.log(matchStage);    
+
+        const bookings = await Booking.find({ itineraryID: { $in: itineraryIds } }).select('_id itineraryID date');
+
+        const revenuePerDay = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: {
+                        creationDay: { $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$date"
+                        } }
+                    },
+                    count: { $sum: 1 },
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    Date: "$_id.creationDay",
+                    revenue: { $multiply: ["$totalPrice", 0.9] }
+                }
+            },
+            {
+                $sort: { creationDay: 1 }
+            }
+        ]);
+
+        const totalRevenue = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: null, 
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    activitiesRevenue: { $multiply: ["$totalPrice", 0.9] }
+                }
+            },
+        ]);
+
+        const totalBookings = await Booking.countDocuments(matchStage);
+
+        const revenueAndBookingsPerEvent = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: {
+                        itineraryID: "$itineraryID",
+                    },
+                    count: { $sum: 1 },
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $lookup: {
+                    from: 'itineraries',
+                    localField: '_id.itineraryID',
+                    foreignField: '_id',
+                    as: 'activityDetails'
+                }
+            },
+            {
+                $unwind: '$activityDetails' // Deconstructs the array created by $lookup
+            },
+            {
+                $project: {
+                    _id: 0,
+                    title: '$activityDetails.name',
+                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
+                    bookings: "$count"
+                }
+            },
+
+        ]);
+
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+    
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 

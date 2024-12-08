@@ -1,6 +1,8 @@
 import express from "express";
 import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities, acceptTerms } from "../controllers/advertisersController.js";
 import { protect } from '../middleware/authenticator.js';
+import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities, acceptTerms, getBookingCount } from "../controllers/advertisersController.js";
+
 const router = express.Router();
 
 router.post("/", protect, addAdvertiser);
@@ -16,5 +18,8 @@ router.put("/update", protect, updateAdvertiser);
 router.get("/activities", protect, getAdvertiserActivities);
 
 router.put("/terms", protect, acceptTerms);
+router.put("/terms/:id", acceptTerms);
+
+router.get("/testing/:id",getBookingCount);
 
 export default router;
