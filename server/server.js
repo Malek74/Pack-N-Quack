@@ -132,7 +132,7 @@ app.use('/api/itiernaryTags', tagRoutes);
 app.post('/api/login', login);
 app.get('/api/logout', logout);
 app.use('/api/notifications', notifications);
-app.get('/api/forgotPassword', forgotPassword);
+app.post('/api/forgotPassword', forgotPassword);
 app.post('/api/OTPPassword', protect, updatePassword);
 
 // Schedule the function to run at 11 PM every day

@@ -142,10 +142,12 @@ export const logout = (req, res) => {
 }
 
 export const forgotPassword = async (req, res) => {
-    const username = req.user.username;
+    const username = req.body.username;
     let user;
 
-    switch (req.role) {
+    const role = await getUserRole(username);
+
+    switch (role) {
         case "Admin":
             user = await adminModel.findOne({ username: username });
             break;
@@ -174,14 +176,14 @@ export const forgotPassword = async (req, res) => {
             user = null;
             break;
     }
-
+    console.log(user);
     if (!user) {
         return res.status(400).json({ message: "Username not found" });
     }
 
     let otpCode;
     //check if user has any pending otp request
-    const otp = await otpModel.findOne({ userId: id, status: 'pending' });
+    const otp = await otpModel.findOne({ userId: user._id, status: 'pending' });
 
     //if user has a pending otp request, return the otp
     if (!otp) {
@@ -189,7 +191,7 @@ export const forgotPassword = async (req, res) => {
         const code = Math.floor(100000 + Math.random() * 900000);
 
         //create otp request
-        const newOtp = await otpModel.create({ otp: code, userId: id });
+        const newOtp = await otpModel.create({ otp: code, userId: user._id });
         console.log(newOtp);
         otpCode = newOtp.otp;
     } else {
@@ -205,11 +207,44 @@ export const forgotPassword = async (req, res) => {
 }
 
 export const updatePassword = async (req, res) => {
-    const id = req.user._id;
-    const { otp, newPassword } = req.body;
 
+    const { otp, newPassword, username } = req.body;
+    let user;
+
+    const role = await getUserRole(username);
+
+    switch (role) {
+        case "Admin":
+            user = await adminModel.findOne({ username: username });
+            break;
+
+        case "Advertiser":
+            user = await Advertiser.findOne({ username: username });
+            break;
+
+        case "Seller":
+            user = await Seller.findOne({ username: username });
+            break;
+
+        case "Tourist":
+            user = await Tourist.findOne({ username: username });
+            break;
+
+        case "Tour Guide":
+            user = await TourGuide.findOne({ username: username });
+            break;
+
+        case "Tourism Governer":
+            user = await TouristGovernor.findOne({ username: username });
+            break;
+
+        default:
+            user = null;
+            break;
+    }
+    console.log(user);
     //check otp code is correct
-    const code = await otpModel.findOne({ userId: id, otp: otp, status: 'pending' });
+    const code = await otpModel.findOne({ userId: user._id, otp: otp, status: 'pending' });
     console.log(code);
     if (!code) {
         return res.status(400).json({ message: "Invalid OTP" });
@@ -219,7 +254,7 @@ export const updatePassword = async (req, res) => {
 
     //print old password
 
-    const isdiff = await bcrypt.compare(newPassword, req.user.password);
+    const isdiff = await bcrypt.compare(newPassword, user.password);
     if (isdiff) {
         return res.status(400).json({ message: "New password cannot be the same as the old password" });
     }
@@ -228,32 +263,31 @@ export const updatePassword = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    let user;
 
     //update password
-    switch (req.role) {
+    switch (role) {
         case "Admin":
-            user = await adminModel.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await adminModel.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         case "Advertiser":
-            user = await Advertiser.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await Advertiser.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         case "Seller":
-            user = await Seller.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await Seller.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         case "Tourist":
-            user = await Tourist.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await Tourist.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         case "Tour Guide":
-            user = await TourGuide.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await TourGuide.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         case "Tourism Governer":
-            user = await TouristGovernor.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+            user = await TouristGovernor.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
             break;
 
         default:
