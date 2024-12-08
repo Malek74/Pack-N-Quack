@@ -18,14 +18,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import PendingAndResolved from "../shared/PendingAndResolved";
-import FilterButtons from "../shared/FilterButtons";
+import { useUser } from "@/context/UserContext";
+
 import { AdminRevenuePieChart } from "../SalesReportComponents/AdminRevenuePieChart";
 import { AdminFilterButton } from "@/components/SalesReportComponents/AdminFilterButton"
 export default function Stats() {
   const [Stats, setStats] = useState([]);
   const [reportFilters, setReportFilters] = useState();
   const navigate = useNavigate();
+  const { prefCurrency } = useUser(); //use to get currency to display sign for revenue and request data
   // const fetchStats = () => {
   //   console.log(
   //     "fetching w/ query ",
@@ -192,7 +193,7 @@ export default function Stats() {
         <CardContent >
           {" "}
           <div className="flex w-full justify-center mb-6">
-          <AdminRevenuePieChart totalRevenue={totalRevenue}/>
+          <AdminRevenuePieChart totalRevenue={totalRevenue} prefCurrency={prefCurrency}/>
           </div>
           {" "}
           <Table>
@@ -218,7 +219,7 @@ export default function Stats() {
                     {stat.date}
                   </TableCell>
                   <TableCell>
-                    {stat.revenue}
+                    {stat.revenue} {prefCurrency}
                   </TableCell>
                 </TableRow>
               ))}

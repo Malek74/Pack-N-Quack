@@ -126,7 +126,7 @@ const SalesReportClientPage = () => {
         { date: "2024-06-30", revenue: 446 },
       ],
       totalRevenue: {
-        itinerariesRevenue: 275,
+        itinerariesRevenue: 2705,
         activitiesRevenue: 200,
       },
       totalBookings: {
@@ -161,7 +161,7 @@ const SalesReportClientPage = () => {
         <AreaRevenueChart revenuePerDay = {dummyStats.revenuePerDay}/>
 
         <div className="flex justify-between w-full gap-4">
-            <PieRevenuePercentageChart totalRevenue = {dummyStats.totalRevenue} />
+            <PieRevenuePercentageChart totalRevenue = {dummyStats.totalRevenue} prefCurrency={prefCurrency} />
             <PieBookingsPercentageChart totalBookings = {dummyStats.totalBookings} />
         </div>
 

@@ -33,7 +33,7 @@ const chartConfig = {
   }
 } 
 
-export function PieRevenuePercentageChart({totalRevenue}) {
+export function PieRevenuePercentageChart({totalRevenue, prefCurrency}) {
   const chartData = [
     { type: "itineraries", revenue: totalRevenue.itinerariesRevenue, fill: "var(--color-itineraries)" },
     { type: "activities", revenue: totalRevenue.activitiesRevenue, fill: "var(--color-activities)" },
@@ -46,7 +46,7 @@ export function PieRevenuePercentageChart({totalRevenue}) {
     <Card className="flex flex-col w-1/2">
       <CardHeader className="items-center pb-0">
         <CardTitle>Total Revenue</CardTitle>
-        <CardDescription>Revenue Stats</CardDescription>
+        <CardDescription>Revenue Stats in {prefCurrency}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -80,7 +80,7 @@ export function PieRevenuePercentageChart({totalRevenue}) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          ${totalrevenue.toLocaleString()}
+                          {totalrevenue.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
