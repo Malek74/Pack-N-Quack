@@ -3,7 +3,7 @@ import Product from "../models/productSchema.js";
 import PurchasedItem from "../models/purchasedSchema.js";
 import Stripe from "stripe";
 import Order from "../models/orderSchema.js"
-
+import { getConversionRate } from "../utils/Helpers.js";
 
 export const rateProduct = async (req, res) => {
     const touristID = req.user._id;
@@ -121,16 +121,18 @@ export const viewAllOrderDetails = async (req, res) => {
             orderDetails = await Order.find({ touristID: touristID });
         }
         if (status == "pending") {
-            orderDetails = await Order.findOne({ touristID: touristID, orderStatus: status });
+            orderDetails = await Order.findOne({ touristID: touristID, orderStatus: "Out for Delivery" });
         }
 
         if (!orderDetails) {
             return res.status(404).json({ message: "No orders found for this user." });
         }
 
-        orderDetails.products.forEach((product) => {
-            product.price = product.price * conversionRate;
-        });
+        if (orderDetails.length > 0) {
+            orderDetails.products.forEach((product) => {
+                product.price = product.price * conversionRate;
+            });
+        }
         return res.status(200).json(orderDetails);
     } catch (error) {
         console.error("Error retrieving order details:", error);
@@ -214,7 +216,7 @@ export const cancelOrder = async (req, res) => {
             { _id: touristID },
             { $inc: { wallet: refundAmount } },
             { new: true }
-        );  
+        );
 
         return res.status(200).json({ message: "Order has been cancelled successfully." });
     } catch (error) {
