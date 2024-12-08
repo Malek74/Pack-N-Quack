@@ -16,6 +16,7 @@ import Loading from "@/components/shared/Loading";
 
 import { ShareButton } from "@/components/shared/ShareButton";
 import Delivery from "@/components/CheckOutPage/Delivery";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { userId, userType } = useUser();
@@ -75,6 +76,11 @@ export default function HomePage() {
           placeholder={"Look for something fun to do!"}
         />
       </div>
+
+      <GuideButton
+        guideMessage={"Navigate though home bar and check out our activities!"}
+      />
+
       <div className="flex justify-center mt-10  ">
         {loading && <Loading />}
       </div>

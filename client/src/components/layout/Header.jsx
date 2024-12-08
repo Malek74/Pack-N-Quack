@@ -5,6 +5,10 @@ import logo from "/assets/icons/logo.png";
 import DropDownMenuBook from "./components/DropDownMenuBook";
 import { ShoppingCart } from "lucide-react";
 import ComboboxCurrency from "./components/ComboboxCurrency";
+import DropDownMenuTGSADV from "./components/DropDownMenuTGSADV";
+import { Label } from "../ui/label";
+import Notifications from "../notifications/Notifications";
+
 import { useUser } from "@/context/UserContext";
 export default function Header() {
   const location = useLocation(); // Hook to get current page location
@@ -98,7 +102,11 @@ export default function Header() {
             </li>
           </Button>
         </ul>
-
+        {isLoggedIn && (
+          <div className="px-4">
+            <Notifications />
+          </div>
+        )}
         <ul className="flex gap-2">
           <li>
             <Button asChild variant="link">

@@ -10,6 +10,7 @@ import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryAc
 import Maps from "@/components/shared/Maps";
 import { useUser } from "@/context/UserContext";
 import { ShareButton } from "@/components/shared/ShareButton";
+import GuideButton from "@/components/guideComponents/popMessage";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -186,6 +187,8 @@ export default function SingleItineraryTouristsPage() {
             </div>
           ))}
         </div>
+        <GuideButton guideMessage={"Explore the itinerary details, book your trip, and get ready for an unforgettable experience!"} />
+
       </div>
     )
   );

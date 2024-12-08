@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { countries } from "../shared/countries";
 import { TableBody, TableHeader } from "@/components/ui/table";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";

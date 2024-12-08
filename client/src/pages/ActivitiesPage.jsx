@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function Activities() {
   const { idAdv } = useParams();
   const [activities, setActivities] = useState([]);
@@ -305,6 +306,11 @@ export default function Activities() {
           />
         ))}
       </div>
+
+
+<GuideButton guideMessage={"Choose an activity card to explore your next adventure!"} />
+
+
     </div>
   );
 }

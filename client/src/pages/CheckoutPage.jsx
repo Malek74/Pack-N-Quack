@@ -1,5 +1,8 @@
 import CheckoutForm from "@/components/forms/CheckoutForm";
 import CartPage from "./CartPage";
+import GuideButton from "@/components/guideComponents/popMessage";
+
+
 import Delivery from "@/components/CheckOutPage/Delivery";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -115,6 +118,9 @@ export default function CheckoutPage() {
                         />
                     </div>
                 </div>
+
+ <GuideButton guideMessage={"Ensure the quantities and items are correct, then proceed to payment"} />
+
 
             </div>
             <div className="w-min h-full justify-between" >

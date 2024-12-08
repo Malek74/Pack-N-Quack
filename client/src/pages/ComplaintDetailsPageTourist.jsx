@@ -14,6 +14,7 @@ import axios from "axios";
 import { CircleArrowLeft, ArrowBigLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 const ComplaintDetailsPageTourist = () => {
   const [complaint, setComplaint] = useState();
@@ -108,7 +109,9 @@ const ComplaintDetailsPageTourist = () => {
     <div className="flex justify-center items-center flex-1">
       <Loading />
     </div>
-  );
+  
+  
+);
 };
 
 export default ComplaintDetailsPageTourist;

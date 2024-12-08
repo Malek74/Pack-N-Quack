@@ -6,6 +6,7 @@ import TransportationImage from '/assets/images/duckInTaxi.png';
 import HotelImage from '/assets/images/duckInHotel.jpg';
 import FlightImage from '/assets/images/duckInPlane.jpg';
 import TransportationCard from '@/components/transportationPage/TransportationCard';
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function Booked() {
     const userID = useUser().userId;
     const [bookedFlights, setBookedFlights] = useState([])
@@ -42,6 +43,8 @@ export default function Booked() {
 
 
     return (
+
+        
         <div className='container mx-auto px-4 py-8 '>
             {Array.isArray(bookedFlights) && bookedFlights.length > 0 &&
                 <div className='flex flex-col items-center justify-center place-content-center self-center '>
@@ -63,9 +66,16 @@ export default function Booked() {
                                 </div>
                             </Card>
                         ))}
+        
                     </div>
+    
                 </div>
+
+                
             }
+
+            <GuideButton guideMessage={"booking" }
+      />
             {Array.isArray(bookedHotels) && bookedHotels.length > 0 &&
                 <div className='flex flex-col items-center justify-center place-content-center self-center '>
                     <h1 className='text-center text-3xl font-semibold my-10'>Your Booked Hotels</h1>
@@ -122,6 +132,8 @@ export default function Booked() {
                             </Card>
                         ))}
                     </div></div >}
+
+                        <GuideButton guideMessage={"Select what you want to book from the list of available items  " } />
         </div>
     )
 }

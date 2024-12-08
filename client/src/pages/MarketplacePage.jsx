@@ -13,6 +13,7 @@ import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
@@ -144,6 +145,9 @@ export default function MarketplacePage() {
           }
         />
       )}
+
+     <GuideButton guideMessage={"Search and select items in the marketplace, then add them to your cart and proceed with checkout."} />
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
         {products.length > 0 ? (

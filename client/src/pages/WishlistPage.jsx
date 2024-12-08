@@ -13,6 +13,7 @@ import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function MarketplacePage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [products, setProducts] = useState([]);
@@ -77,6 +78,10 @@ export default function MarketplacePage() {
                     ))
                 )}
             </div>
+
+            <GuideButton guideMessage={"View, add, or remove items from your wishlist to manage your preferences."} />
+
+
         </div>
     );
 }

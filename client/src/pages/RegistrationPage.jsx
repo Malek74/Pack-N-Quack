@@ -7,6 +7,8 @@ import NewTouristForm from "@/components/forms/NewTouristForm";
 import NewSellerForm from "@/components/forms/NewSellerForm";
 import registration2 from "/assets/images/registeration2.jpg";
 import axios from "axios";
+import GuideButton from "@/components/guideComponents/popMessage";
+
 import { useToast } from "@/hooks/use-toast";
 
 export default function RegistrationPage() {
@@ -106,6 +108,10 @@ export default function RegistrationPage() {
           <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser} />
         </div>
       )}
+      
+<GuideButton guideMessage={"Select your role as a tourist, tour guide, advertiser, or seller to sign up and get started."} />
+
+
     </div>
   );
 }

@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useUser } from "@/context/UserContext";
+import GuideButton from "@/components/guideComponents/popMessage";
+
 export default function TouristDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState();
@@ -59,6 +61,11 @@ export default function TouristDashboard() {
       label: "Promo codes",
       icon: Gem,
       path: "promo-codes",
+    },
+    {
+      label: "Transactions",
+      icon: Gift,
+      path: "transactions",
     },
     {
       label: "Transactions",
@@ -136,7 +143,6 @@ export default function TouristDashboard() {
     isAdvertiser,
     isTourist,
     isTourismGovernor,
-    sidebarItems,
   ]);
   if (sidebarItems && userType) {
     return (
@@ -170,6 +176,9 @@ export default function TouristDashboard() {
             <Outlet />
           </div>
         </div>
+
+        <GuideButton guideMessage={"Navigating the webiste" } />
+
       </div>
     );
   }

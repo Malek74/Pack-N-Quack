@@ -8,6 +8,7 @@ import CartCard from "../components/cartPage/CartCard";
 import Loading from "@/components/shared/Loading";
 import Banner from "@/components/shared/Banner";
 import BannerImage from "/assets/images/Background.jpg";
+import GuideButton from "@/components/guideComponents/popMessage";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
@@ -65,6 +66,9 @@ const Cart = () => {
                     </div>
                 </>
             )}
+
+            <GuideButton guideMessage={"Here's your guide to managing your cart. \n 1)Add items to your cart \n 2)Proceed with adding items then checkout" } />
+
         </div>
     );
 };
