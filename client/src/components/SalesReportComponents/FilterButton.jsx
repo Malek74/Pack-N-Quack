@@ -25,7 +25,7 @@ export function FilterButton({setReportFilters}) {
              <DialogTitle>Filter</DialogTitle>
                 <DialogDescription>
                 {/* <SlidersHorizontal /> */}
-                Hey quackers, use these filters to zero in on your perfect tour guide stats—your sales report, tailored just for you!
+                Hey quackers, use these filters to zero in on your perfect stats—your sales report, tailored just for you!
                 </DialogDescription>
         </DialogHeader>
         <SalesReportFilters setReportFilters={setReportFilters}/>

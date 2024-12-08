@@ -18,8 +18,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import PendingAndResolved from "../shared/PendingAndResolved";
-import FilterButtons from "../shared/FilterButtons";
+import { useUser } from "@/context/UserContext";
+
 import { AdminRevenuePieChart } from "../SalesReportComponents/AdminRevenuePieChart";
 import { AdminFilterButton } from "@/components/SalesReportComponents/AdminFilterButton";
 export default function Stats() {
