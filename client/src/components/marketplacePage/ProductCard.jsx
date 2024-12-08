@@ -29,7 +29,7 @@ export default function ProductCard(props) {
     try {
       console.log(id);
       axios
-        .post(`api/tourist/wishlist/${touristId}`, { productID: id })
+        .post(`api/tourist/wishlist/`, { productID: id })
         .then(() => {
           setWishlisted(true);
           toast({
@@ -52,7 +52,7 @@ export default function ProductCard(props) {
     try {
       console.log(id);
       axios
-        .delete(`api/tourist/wishlist/${touristId}/${id}`)
+        .delete(`api/tourist/wishlist/${id}`)
         .then(() => {
           setWishlisted(false);
           toast({

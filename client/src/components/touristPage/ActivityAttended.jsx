@@ -18,7 +18,7 @@ export default function ActivityAttended() {
     const fetchAccounts = async () => {
       try {
         const response = await axios.get(
-          "/api/tourist/myactivities/6725442e98359339d8b821f0"
+          "/api/tourist/myactivities/"
         );
         setAccounts(response.data);
       } catch (error) {
