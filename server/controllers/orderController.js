@@ -124,9 +124,9 @@ export const viewAllOrderDetails = async (req, res) => {
 
 export const viewSingleOrderDetails = async (req, res) => {
     const touristID = req.user._id;
-    const {productID}=req.body;
+    const {orderID}=req.body;
     try {
-        const orderDetails = await Order.findOne({ touristID: touristID, "products.productID": productID }, { "products.$": 1 });
+        const orderDetails = await Order.findOne({ touristID: touristID, _id: orderID });
        
         if (!orderDetails) {
             return res.status(404).json({ message: "No orders found for this user." });
