@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
 import { getUserRole } from "../utils/Helpers.js";
+import mongoose from "mongoose";
 
 
 //get all sellers
@@ -122,20 +123,52 @@ export const acceptTerms = async (req, res) => {
 
 export const getRevenue = async (req, res) => {
     const sellerId = req.params.id;
-    const role = getUserRole(req);
-    if (role === "Selller"){
-        query
+    const productIDs = req.query.productIDs;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    if (!sellerId) {
+        return res.status(400).json({ message: "Seller ID is required." });
     }
-    const productIds = await product.find({ adminSellerID: sellerId }).select("_id");
-    console.log(productIds);
+    try{
+        let productIds = (await product.find({ seller_id: sellerId }).select("_id")).map((product) => product._id);
+        console.log(productIds);
+
+        if (productIDs) {
+            productIds = productIDs.split(",");
+            console.log(productIDs);
+        }
+
+        // Prepare the match stage for the aggregation query
+        const matchStage = {
+            "products.productID": { $in: productIds.map(id => new mongoose.Types.ObjectId(id)) }
+        };
+
+        // Add date filtering to the match stage if startDate and endDate are provided
+        if (startDate && endDate) {
+            matchStage.date = {
+                $gte: new Date(startDate),
+                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)) // Ensure end date is exclusive
+            };
+        }
+
     const dailyRevenue = await Orders.aggregate([
         {
             $unwind: "$products" // Break down the `products` array
         },
         {
-            $match: {
-                "products.productID": { $in: productIds } // Match products sold by the seller
+            $match: 
+                matchStage
+        },
+        {
+            $lookup: {
+                from: "products", // Name of the products collection
+                localField: "products.productID", // Field in orders to match
+                foreignField: "_id", // Field in products to match
+                as: "productDetails" // Alias for the joined data
             }
+        },
+        {
+            $unwind: "$productDetails" // Unwind the joined product details
         },
         {
             $group: {
@@ -146,16 +179,21 @@ export const getRevenue = async (req, res) => {
                             date: "$orderDate" // Group by the order date
                         }
                     },
+                    productID: "$products.productID"
                 },
-                totalPrice: { $sum: { $multiply: ["$products.quantity", "$products.price"] } } // Calculate total price
+                totalPrice: {
+                    $sum: {
+                        $multiply: ["$products.quantity", "$productDetails.price"] // Calculate total revenue for each product
+                    }
+                }
             }
         },
         {
             $project: {
                 _id: 0,
                 // productId: "$_id.productID",
-                Date: "$_id.creationDay",
-                activitiesRevenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
+                date: "$_id.creationDay",
+                revenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
             }
         },
         {
@@ -169,13 +207,28 @@ export const getRevenue = async (req, res) => {
         },
         {
             $match: {
-                "products.productID": { $in: productIds } // Match products sold by the seller
+                matchStage
             }
+        },
+        {
+            $lookup: {
+                from: "products", // Name of the products collection
+                localField: "products.productID", // Field in orders to match
+                foreignField: "_id", // Field in products to match
+                as: "productDetails" // Alias for the joined data
+            }
+        },
+        {
+            $unwind: "$productDetails" // Unwind the joined product details
         },
         {
             $group: {
                 _id: null, // Single group for total revenue
-                totalPrice: { $sum: { $multiply: ["$products.quantity", "$products.price"] } } // Sum total prices
+                totalPrice: {
+                    $sum: {
+                        $multiply: ["$products.quantity", "$productDetails.price"] // Calculate total revenue
+                    }
+                }
             }
         },
         {
@@ -186,15 +239,67 @@ export const getRevenue = async (req, res) => {
         }
     ]);
 
+const salesAndRevenuePerProduct = await Orders.aggregate([
+    // Unwind the products array
+    {
+        $unwind: "$products"
+    },
+    // Match products by productIds
+    {
+        $match: {
+            matchStage
+        }
+    },
+    // Lookup product details from the products collection
+    {
+        $lookup: {
+            from: "products", // Name of the products collection
+            localField: "products.productID", // Field in orders to match
+            foreignField: "_id", // Field in products to match
+            as: "productDetails" // Alias for the joined data
+        }
+    },
+    // Unwind the joined product details
+    {
+        $unwind: "$productDetails"
+    },
+    // Group by productID
+    {
+        $group: {
+            _id: {
+                productID: "$products.productID"
+            },
+            totalSales: { $sum: "$products.quantity" }, // Total quantity sold
+            totalRevenue: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } } // Revenue = quantity * price
+        }
+    },
+    // Project the final result
+    {
+        $project: {
+            _id: 0,
+            productName: "$productDetails.name", // Replace `name` with the product's name field
+            revenue: { $multiply: ["$totalRevenue", 0.9] }, // Apply 90% revenue calculation
+            sales: "$totalSales"
+        }
+    }
+]);
+
+
     console.log({
         dailyRevenue,
-        totalRevenue: totalRevenue[0]?.activitiesRevenue 
+        totalRevenue: totalRevenue[0]?.activitiesRevenue,
+        salesAndRevenuePerProduct 
     });
 
     return res.status(200).json({
-        dailyRevenue,
-        totalRevenue: totalRevenue[0]?.activitiesRevenue
+        revenuePerDay: dailyRevenue,
+        totalRevenue: totalRevenue[0]?.activitiesRevenue,
+        salesAndRevenuePerProduct
     });
+    }catch(error){
+        return res.status(400).json({ message: error.message });
+    }
+
     
 }
 
