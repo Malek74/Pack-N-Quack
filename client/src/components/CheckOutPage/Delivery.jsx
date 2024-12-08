@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -28,6 +27,18 @@ export default function AddressFormWithLayout() {
       const response = await axios.get("/api/tourist/viewAddress");
       setAddresses(response.data.allAddresses);
       setDefaultAddress(response.data.defaultAddress);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error adding address:", error);
+    }
+  };
+
+  const handleSetDefaultAddress = async (a) => {
+    const addressToSend = addresses.find((address) => address.address === a);
+    try {
+      const response = await axios.post("/api/tourist/setdefault", {
+        defaultAddress: addressToSend,
+      });
       console.log(response.data);
     } catch (error) {
       console.error("Error adding address:", error);
@@ -72,7 +83,15 @@ export default function AddressFormWithLayout() {
                 <TableCell>{address.town}</TableCell>
                 <TableCell>{address.country}</TableCell>
                 <TableCell>
-                  <input type="radio" name="address" value={address.address} />
+                  <input
+                    type="radio"
+                    name="address"
+                    value={address.address}
+                    onChange={(e) => {
+                      handleSetDefaultAddress(e.target.value);
+                    }}
+                    defaultChecked={address.address === defaultAddress.address}
+                  />
                 </TableCell>
               </TableRow>
             ))}
