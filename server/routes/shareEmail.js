@@ -113,15 +113,40 @@ export const sendEventBookingNotification = async (userEmail, userName, eventNam
 
 
 
-// Example usage
-sendEventBookingNotification(
-    'user@example.com',  // User's email
-    'John Doe',          // User's name
-    'Amazing Event',     // Event name
-    'December 15, 2024', // Event date
-    'Downtown Hall',     // Event location
-    'https://example.com/book-event' // Booking link
-);
+
+export const productOutOfStockEmail = async (sellerEmail, productName, productSKU) => {
+    try {
+
+        // Email content
+        const mailOptions = {
+            from: '"Your Business Name" <your-email@example.com>',
+            to: sellerEmail,
+            subject: "Product Out of Stock Notification",
+            html: `
+                <p>Dear Seller,</p>
+                <p>We hope this message finds you well.</p>
+                <p>We wanted to let you know that one of your products is now out of stock. Please see the details below:</p>
+                <ul>
+                    <li><strong>Product Name:</strong> ${productName}</li>
+                    <li><strong>SKU:</strong> ${productSKU}</li>
+                    <li><strong>Current Stock:</strong> 0</li>
+                </ul>
+                <p>To ensure a seamless shopping experience for your customers, we recommend restocking this product as soon as possible.</p>
+                <p>If you have already replenished the stock, kindly update the inventory through your seller dashboard or contact our support team for assistance.</p>
+                <p>Feel free to reach out if you have any questions or require further help.</p>
+                <p>Best regards,</p>
+                <p>Your Business Name</p>
+            `,
+        };
+
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Out of Stock email sent: %s", info.messageId);
+    } catch (error) {
+        console.error("Error sending Out of Stock notification:", error);
+    }
+}
+
 router.post('/:id', shareMail);
 export default router;
 
