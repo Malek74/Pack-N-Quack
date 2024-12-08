@@ -233,7 +233,6 @@ export const bookRoom = async (req, res) => {
                     description: `Wallet deduction for booking a room in ${hotel.hotel}`
                 });
 
-
                 //create price to be paid after deducting wallet amount        
                 const price = await stripe.prices.create({
                     currency: 'usd',
@@ -287,19 +286,15 @@ export const bookRoom = async (req, res) => {
                 mode: 'payment',
                 success_url: success_url,
 
-            
+
             });
+            return res.status(200).json({ url: session.url });
+
 
         }
     }
-
-
-
-    return res.status(200).json({ url: session.url });
-
-
-} catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error booking Hotel", error: error.message });
-}
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error booking Hotel", error: error.message });
+    }
 }
