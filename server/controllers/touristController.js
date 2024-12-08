@@ -548,6 +548,8 @@ export const setDefaultAddress = async (req, res) => {
     const { defaultAddress } = req.body;
     const touristID = req.user._id;
 
+    console.log("Body: ", defaultAddress);
+
     try {
         if (!touristID || !defaultAddress) {
             return res.status(400).json({ message: "Tourist ID and default address are required" });
@@ -558,13 +560,10 @@ export const setDefaultAddress = async (req, res) => {
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
         }
-        y
-        if (!tourist.address.includes(defaultAddress)) {
-            return res.status(400).json({ message: "Default address must be one of the saved addresses" });
-        }
+
         tourist.defaultAddress = defaultAddress;
         await tourist.save();
-
+        console.log("Default address set successfully");
         return res.status(200).json({
             message: "Default address set successfully",
             defaultAddress: tourist.defaultAddress,
