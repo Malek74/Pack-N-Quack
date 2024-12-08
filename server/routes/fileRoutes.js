@@ -17,6 +17,6 @@ router.post('/productImage', upload.fields([{ name: 'uploadImages', maxCount: 10
 
 router.post('/fetchDocuments', protect, fetchUserDocuments);
 router.post('/fetchAllDocuments', fetchAllDocuments);
-router.post('/fetchImages/',potect, fetchUserImages);
+router.post('/fetchImages/',protect, fetchUserImages);
 
 export default router;
