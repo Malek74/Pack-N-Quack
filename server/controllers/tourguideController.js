@@ -62,7 +62,7 @@ export const getTourGuides = async (req, res) => {
 }
 
 export const getTourGuideById = async (req, res) => {
-    const id = req.user._id;
+    const id = req.params.id;
     console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });

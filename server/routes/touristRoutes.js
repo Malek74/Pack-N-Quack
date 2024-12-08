@@ -57,12 +57,12 @@ router.post('/addAddress', protect, AddNewAddress);
 router.post('/setdefault', protect, setDefaultAddress);
 router.get('/viewAddress', protect, viewAddresses);
 
-router.post('/cart/addItemToCart/:id', addItemToCart);
-router.delete('/cart/removeItemFromCart/:id/:productId', removeItemFromCart);
-router.put('/cart/updateQuantity/:id', updateQuantityInCart);
-router.get('/cart/viewCart/:id', getCart);
-router.get('/wishlist/:id', viewMyWishlist);
-router.post('/wishlist/:id', addToWishlist);
-router.delete('/wishlist/:id/:productId', removeFromWishlist);
+router.post('/cart/addItemToCart',protect, addItemToCart);
+router.delete('/cart/removeItemFromCart/:productId',protect, removeItemFromCart);
+router.put('/cart/updateQuantity',protect ,updateQuantityInCart);
+router.get('/cart/viewCart', protect, getCart);
+router.get('/wishlist',protect, viewMyWishlist);
+router.post('/wishlist', protect,addToWishlist);
+router.delete('/wishlist/:productId',protect, removeFromWishlist);
 
 export default router;

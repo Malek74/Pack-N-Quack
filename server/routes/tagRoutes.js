@@ -5,6 +5,7 @@ import {
     getAllTags,
     updateTag
 } from '../controllers/tagController.js';
+import { protect } from '../middleware/authenticator.js';
 // import { isTourismGovernor } from '../middleware/auth.js'; 
 
 const router = express.Router();

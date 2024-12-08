@@ -5,7 +5,7 @@ import { protect } from '../middleware/authenticator.js';
 const router = express.Router();
 
 router.get("/allSellers", getAllSellers);
-router.post("/", protect, createSeller);
+router.post("/", createSeller);
 router.put("/", protect, updateSellerInfo);
 router.get('/', protect, getSellerByID);
 router.delete('/', protect, deleteSeller);

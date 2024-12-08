@@ -100,7 +100,7 @@ export const deleteSeller = async (req, res) => {
 }
 
 export const acceptTerms = async (req, res) => {
-    const sellerId = req.params.id;
+    const sellerId = req.user._id;
     if (!sellerId) {
         return res.status(400).json({ message: "Seller ID is required." });
     }

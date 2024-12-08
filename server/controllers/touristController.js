@@ -573,7 +573,7 @@ export const viewAddresses = async (req, res) => {
 
 
 export const getCart = async (req, res) => {
-    const touristId = req.params.id;
+    const touristId = req.user._id;
 
     if(!touristId){
         return res.status(400).json({message: "Tourist ID is required"});
@@ -590,7 +590,7 @@ export const getCart = async (req, res) => {
 
 export const addItemToCart = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.params.id;
+    const touristId = req.user._id;
     const quantity = req.body.quantity;
 
     if(!productId){
@@ -655,7 +655,7 @@ export const addItemToCart = async (req, res) => {
 
 export const removeItemFromCart = async (req, res) => {
     const productId = req.params.productId;
-    const touristId = req.params.id;
+    const touristId = req.user._id;
 
     if(!productId){
         return res.status(400).json({message: "Product ID is required"});
@@ -693,7 +693,7 @@ export const removeItemFromCart = async (req, res) => {
 
 export const updateQuantityInCart = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.params.id;
+    const touristId = req.user._id;
 
     if(!productId){
         return res.status(400).json({message: "Product ID is required"});
@@ -746,7 +746,7 @@ export const updateQuantityInCart = async (req, res) => {
 
 
 export const viewMyWishlist = async (req, res) => {
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     if (!touristID) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
@@ -761,7 +761,7 @@ export const viewMyWishlist = async (req, res) => {
 
 export const addToWishlist = async (req, res) => {
     const productId = req.body.productID;
-    const touristId = req.params.id;
+    const touristId = req.user._id;
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }
@@ -792,7 +792,7 @@ export const addToWishlist = async (req, res) => {
 
 export const removeFromWishlist = async (req, res) => {
     const productId = req.params.productId;
-    const touristId = req.params.id;
+    const touristId = req.user._id;
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }

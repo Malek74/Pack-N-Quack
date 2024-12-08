@@ -10,7 +10,7 @@ import Tourist from "../models/touristSchema.js";
 
 //get product by ID
 export const getProductByID = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.user._id;
     const isAdmin = adminModel.findById(id);
     const prefCurrency = req.body.prefCurrency;
 
@@ -32,7 +32,7 @@ export const getProductByID = async (req, res) => {
 //create product
 export const createProduct = async (req, res) => {
 
-    const userID = req.params.id;
+    const userID = req.user._id;
     console.log("SellerID: " + userID);
     console.log(req);
 
@@ -191,7 +191,7 @@ export const editProduct = async (req, res) => {
 
 //update product by ID
 export const updateProduct = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const { name, picture, price, description, seller_id, ratings, reviews, available_quantity, product_sales, isArchived } = req.body;
 
 
@@ -406,7 +406,7 @@ export const getProducts = async (req, res) => {
 };
 
 export const getMyProducts = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const prefCurrency = req.query.currency || "USD";
     try {
         //fetch tourist
