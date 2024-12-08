@@ -16,6 +16,6 @@ router.get('/:id', getTourGuideById);
 router.delete('/:id', deleteTourGuide);
 router.post('/rate/:id', rateTourGuide);
 router.put('/terms/:id', acceptTerms);
-router.get("/testing/:id", getRevenue);
+router.get("/testing", getRevenue);
 
 export default router;

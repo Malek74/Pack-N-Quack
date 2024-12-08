@@ -1,22 +1,24 @@
 import { Schema, model } from "mongoose";
-import tourist from "./touristSchema";
+// import product from "./productSchema";
+// import Tourist from "./touristSchema";
 
 const orderSchema = new Schema({
     touristID: {
         type: Schema.Types.ObjectId,
-        ref: tourist,
+        ref: 'Tourist',
         required: true
     },
-    productIDs: {
-        type: [Schema.Types.ObjectId],
-        ref: 'product',
-        required: true
-    },
-    sellerIDs: {
-        type: [Schema.Types.ObjectId],
-        ref: 'seller',
-        required: true
-    },
+    products: [{
+        productID: {
+            type: Schema.Types.ObjectId,
+            ref: 'Product',
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        }
+    }],
     stripeSessionID: {
         type: String,
         default: null,
@@ -28,7 +30,8 @@ const orderSchema = new Schema({
     },
     orderStatus: {
         type: String,
-        required: true
+        required: true,
+        default: "Pending"
     },
     orderTotal: {
         type: Number,
