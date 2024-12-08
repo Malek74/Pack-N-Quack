@@ -390,44 +390,88 @@ export const viewMyActivities = async (req, res) => {
 }
 
 export const bookmark = async (req, res) => {
-    const { touristID, eventID } = req.body;
+    const { eventID, bookmark, eventType } = req.body;
+
+    const touristID = req.user._id;
+    console.log(touristID);
+    let bookMarks;
+
 
     try {
         if (!touristID) {
             return res.status(400).json({ message: "Tourist ID is required" });
         }
+        
         const tourist = await Tourist.findById(touristID);
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
         }
 
-        const flagA = false;
-        let eventExist = await Itinerary.findById(eventID);
-        if (!eventExist) {
-            eventExist = await activityModel.findById(eventID);
-            flagA = true;
-            if (!eventExist) {
-                return res.status(404).json({ message: "Event doesn't exist" });
-            }
-        }
+        if (bookmark) {
+            if (eventType === "activity") {
+                bookMarks = tourist.savedEvents.savedActivities;
+                const activity = await activityModel.findById(eventID);
+                console.log(activity);
+                if (!activity) {
+                    return res.status(404).json({ message: "Activity not found" });
+                }
+                bookMarks.push(eventID);
+                console.log(bookMarks);
+                await Tourist.findOneAndUpdate(
+                    { _id: touristID },
+                    { $set: { 'savedEvents.savedActivities': bookMarks } },
+                    { new: true }
+                );
 
-        if (flagA) {
-            if (!tourist.savedEvents.savedActivities.includes(eventID)) {
-                tourist.savedEvents.savedActivities.push(eventID);
-            } else {
-                return res.status(400).json({ message: "Activity already bookmarked" });
+            } else if (eventType === "itinerary") {
+                const itinerary = await Itinerary.findById(eventID);
+                bookMarks = tourist.savedEvents.savedItineraries;
+                if (!itinerary) {
+                    return res.status(404).json({ message: "Itinerary not found" });
+                }
+                bookMarks.push(eventID);
+                await Tourist.findOneAndUpdate(
+                    { _id: touristID },
+                    { $set: { 'savedEvents.savedItineraries': bookMarks } },
+                    { new: true }
+                );
             }
+
+            return res.status(200).json({ message: "Event bookmarked successfully" });
         }
         else {
-            if (!tourist.savedEvents.savedItineraries.includes(event)) {
-                tourist.savedEvents.savedItineraries.push(itineraryID);
-            } else {
-                return res.status(400).json({ message: "Itinerary already bookmarked" });
-            }
-        }
-        await tourist.save();
+            if (eventType === "activity") {
+                bookMarks = tourist.savedEvents.savedActivities;
+                const activity = await activityModel.findById(eventID);
+                if (!activity) {
+                    return res.status(404).json({ message: "Activity not found" });
+                }
+                bookMarks = bookMarks.filter(bookmark => bookmark._id != eventID);
+                await Tourist.findOneAndUpdate(
+                    { _id: touristID },
+                    { $set: { 'savedEvents.savedActivities': bookMarks } },
+                    { new: true }
+                );
 
-        return res.status(200).json({ message: "Bookmark saved successfully" });
+            } else if (eventType === "itinerary") {
+                bookMarks = tourist.savedEvents.savedItineraries;
+                const itinerary = await Itinerary.findById(eventID);
+
+                if (!itinerary) {
+                    return res.status(404).json({ message: "Itinerary not found" });
+                }
+                bookMarks = bookMarks.filter(bookmark => bookmark._id != eventID);
+                await Tourist.findOneAndUpdate(
+                    { _id: touristID },
+                    { $set: { 'savedEvents.savedItineraries': bookMarks } },
+                    { new: true }
+                );
+                await tourist.save();
+
+                return res.status(200).json({ message: "Event unbookmarked successfully" });
+            }
+
+        }
     } catch (error) {
         console.error("Error in bookmark controller:", error);
         return res.status(500).json({ message: error.message });
