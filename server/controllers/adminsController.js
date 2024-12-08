@@ -383,39 +383,59 @@ export const getTotalUsersNum = async (req, res) => {
 
 export const getTotalNewUsersCount = async (req, res) => {
     try {
-        const month = new Date();
-        month.setMonth(month.getMonth() - 1); //bageeb from the date el shahr el fat
+        const currentDate = new Date();
+        const months = 12; // Change this to the number of months you want to calculate
+        const monthlyData = [];
 
-        const admins = await adminModel.find({ createdAt: { $gte: month } });
-        const advertisers = await advertiserModel.find({ createdAt: { $gte: month } });
-        const tourists = await tourist.find({ createdAt: { $gte: month } });
-        const governors = await touristGoverner.find({ createdAt: { $gte: month } });
-        const sellers = await seller.find({ createdAt: { $gte: month } });
-        const tourGuides = await tourGuide.find({ createdAt: { $gte: month } });
+        for (let i = 0; i < months; i++) {
+            const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i + 1, 1);
 
-        const allAdmins = admins.map(user => ({ ...user.toObject(), userType: 'admin' }));
-        const allAdvertisers = advertisers.map(user => ({ ...user.toObject(), userType: 'advertiser' }));
-        const allTourists = tourists.map(user => ({ ...user.toObject(), userType: 'tourist' }));
-        const allGovernors = governors.map(user => ({ ...user.toObject(), userType: 'touristGovernor' }));
-        const allSellers = sellers.map(user => ({ ...user.toObject(), userType: 'seller' }));
-        const allTourGuides = tourGuides.map(user => ({ ...user.toObject(), userType: 'tourGuide' }));
+            // Fetch users created within this month
+            const admins = await adminModel.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
+            const advertisers = await advertiserModel.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
+            const tourists = await tourist.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
+            const governors = await touristGoverner.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
+            const sellers = await seller.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
+            const tourGuides = await tourGuide.find({
+                createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+            });
 
-        // Calculate total number of new users
-        const totalNewUsers =
-            allAdmins.length +
-            allAdvertisers.length +
-            allTourists.length +
-            allGovernors.length +
-            allSellers.length +
-            allTourGuides.length;
+            // Calculate total new users for this month
+            const users =
+                admins.length +
+                advertisers.length +
+                tourists.length +
+                governors.length +
+                sellers.length +
+                tourGuides.length;
 
+            // Push data for this month
+            monthlyData.push({
+                month: startOfMonth.toLocaleString("en-US", { month: "short" }),
+                users,
+            });
+        }
+
+        console.log(monthlyData);
         // Send response
-        return res.status(200).json({ totalNewUsers });
+        return res.status(200).json({ monthlyData });
     } catch (error) {
         // Handle errors
         return res.status(500).json({ message: error.message });
     }
 };
+
 
 
 export const deletePromoCode = async (req, res) => {
