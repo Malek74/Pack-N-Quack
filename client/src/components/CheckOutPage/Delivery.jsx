@@ -7,6 +7,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import CreateDialog from "../shared/CreateDialog";
 import DeliveryForm from "../forms/DeliveryForm";
 import axios from "axios";
@@ -31,36 +39,46 @@ export default function AddressFormWithLayout() {
   }, []);
 
   return (
-    <>
-      <CreateDialog
-        title="Delivery"
-        form={<DeliveryForm onRefresh={handleViewAddress} />}
-      />
-      <Table>
-        <TableCaption>A list of addresses.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Address</TableHead>
-            <TableHead>Postal Code</TableHead>
-            <TableHead>Town</TableHead>
-            <TableHead>Country</TableHead>
-            <TableHead>Default</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {addresses.map((address) => (
-            <TableRow key={address.id}>
-              <TableCell>{address.address}</TableCell>
-              <TableCell>{address.postcode}</TableCell>
-              <TableCell>{address.town}</TableCell>
-              <TableCell>{address.country}</TableCell>
-              <TableCell>
-                <input type="radio" name="address" value={address.address} />
-              </TableCell>
+    <Card x-chunk="dashboard-06-chunk-0 " className="flex flex-col flex-1">
+      <CardHeader className="flex flex-row justify-between">
+        <div>
+          <CardTitle>Addresses</CardTitle>
+          <CardDescription>Manage all addresses.</CardDescription>
+        </div>
+        <div className="place-self-end">
+          <CreateDialog
+            title="Address"
+            form={<DeliveryForm onRefresh={handleViewAddress} />}
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableCaption>A list of addresses.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Address</TableHead>
+              <TableHead>Postal Code</TableHead>
+              <TableHead>Town</TableHead>
+              <TableHead>Country</TableHead>
+              <TableHead>Default</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </>
+          </TableHeader>
+          <TableBody>
+            {addresses.map((address) => (
+              <TableRow key={address.id}>
+                <TableCell>{address.address}</TableCell>
+                <TableCell>{address.postcode}</TableCell>
+                <TableCell>{address.town}</TableCell>
+                <TableCell>{address.country}</TableCell>
+                <TableCell>
+                  <input type="radio" name="address" value={address.address} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

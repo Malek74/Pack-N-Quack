@@ -55,14 +55,7 @@ export default function DeliveryForm({ onRefresh }) {
         postcode: "",
         country: "",
       },
-      extraAddresses: [
-        {
-          address: "",
-          town: "",
-          postcode: "",
-          country: "",
-        },
-      ],
+      extraAddresses: [],
     },
   });
 
@@ -108,7 +101,7 @@ export default function DeliveryForm({ onRefresh }) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 flex flex-col"
+              className="space-y-4 flex flex-col pt-4"
             >
               {/* Main Address Fields */}
               <FormLabel>Main Address</FormLabel>
@@ -250,23 +243,18 @@ export default function DeliveryForm({ onRefresh }) {
               </Button>
 
               {/* Submit Button */}
-              <DialogClose>
+              <DialogClose className="place-self-end self-end">
                 <Button
                   type="submit"
-                  className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white"
+                  className=" bg-gold hover:bg-goldhover text-white hover:text-white"
                   onClick={handleSubmit}
                 >
-                  Submit
+                  Create
                 </Button>
               </DialogClose>
             </form>
           </Form>
         </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Use the form above to add and manage your addresses.
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );
