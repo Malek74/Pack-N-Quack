@@ -50,25 +50,24 @@ export default function OrderHistory() {
     return (
       <div className="flex flex-col gap-4">
         {loading && (
-          <Loading className="place-self-center place-items-center" />
+          <Loading className="place-items-center place-self-center" />
         )}
         {!loading && products.length > 0 ? (
           products.map(({ productId }) => (
             <Card
               key={productId._id}
-              className="flex flex-col md:flex-row p-4 items-start"
+              className="flex flex-col items-start p-4 md:flex-row"
             >
-              {/* Handle multiple images */}
               <img
                 alt="Product image"
-                className="w-full md:w-48 rounded-md object-cover mb-4 md:mb-0 md:mr-4"
+                className="mb-4 w-full rounded-md object-cover md:mb-0 md:mr-4 md:w-48"
                 src={
                   productId.picture.length > 0
                     ? productId.picture[0]
                     : "https://via.placeholder.com/150"
                 }
               />
-              <div className="flex flex-col flex-grow">
+              <div className="flex flex-grow flex-col">
                 <CardHeader className="p-0">
                   <CardTitle className="text-lg font-semibold">
                     {productId.name}
@@ -82,13 +81,13 @@ export default function OrderHistory() {
                     </div>
                     {productId.description}
                     {productId.isArchived && (
-                      <div className="text-red-500 mt-2">
+                      <div className="mt-2 text-red-500">
                         (This product is archived)
                       </div>
                     )}
 
-                    <div className="flex flex-col mt-2 gap-2">
-                      <div className="text-primary text-lg font-bold">
+                    <div className="mt-2 flex flex-col gap-2">
+                      <div className="text-lg font-bold text-primary">
                         {productId.price} {prefCurrency || "USD"}
                       </div>
                       <div className="flex flex-row justify-between">
@@ -125,17 +124,22 @@ export default function OrderHistory() {
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
           <Tabs
-            defaultValue="all"
+            defaultValue="present"
             onValueChange={(value) => {
               setTab(value);
               fetchProducts(); // Fetch products when the tab changes
             }}
           >
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="present">Present Orders</TabsTrigger>
+              <TabsTrigger value="past">Past Orders</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all">
+            <TabsContent value="present">
+              <ProductCards />
+            </TabsContent>
+            
+            <TabsContent value="past">
               <ProductCards />
             </TabsContent>
           </Tabs>

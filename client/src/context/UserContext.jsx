@@ -8,8 +8,8 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
-  const [userId, setUserId] = useState(null);
-  const [userType, setUserType] = useState(null);
+  const [userId, setUserId] = useState(12331);
+  const [userType, setUserType] = useState("Tourist");
   const [isTourGuide, setIsTourGuide] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [isAdvertiser, setIsAdvertiser] = useState(false);

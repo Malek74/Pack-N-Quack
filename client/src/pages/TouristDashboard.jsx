@@ -76,7 +76,7 @@ export default function TouristDashboard() {
       path: "activity-attended",
     },
     {
-      label: "Order History",
+      label: "Orders",
       icon: Package,
       path: "order-history",
     },
@@ -115,9 +115,9 @@ export default function TouristDashboard() {
   ]);
   if (sidebarItems && userType) {
     return (
-      <div className="mx-52 border border-gray-300 rounded-xl my-8 flex">
+      <div className="mx-52 my-8 flex rounded-xl border border-gray-300">
         <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-          <div className="hidden border-r bg-muted/40 md:block px-4 py-8">
+          <div className="hidden border-r bg-muted/40 px-4 py-8 md:block">
             <div className="flex h-full max-h-screen flex-col gap-2">
               <div className="flex flex-1">
                 <nav className="flex flex-1 flex-col items-start px-2 text-sm font-medium lg:px-4">
@@ -142,7 +142,7 @@ export default function TouristDashboard() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col flex-1 h-full">
+          <div className="flex h-full flex-1 flex-col">
             <Outlet />
           </div>
         </div>

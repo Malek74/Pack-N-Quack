@@ -132,7 +132,10 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportation/:idAdv" element={<Transportation />}></Route>
     <Route path="transportation" element={<Transportation />}></Route>
-
+    <Route
+      path="product/:id"
+      element={<ProductPage />}
+    />
     <Route path="admin" element={<AdminPage />}>
       <Route path="users" element={<AccountDashboard />} />
       <Route path="tourism-governors" element={<GovernorsList />} />
