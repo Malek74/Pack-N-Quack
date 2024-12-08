@@ -5,12 +5,13 @@ import LoyaltyPointsProgress from "./LoyaltypointsProgress";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
+
 export default function PointsAndLoyalty({ profileData }) {
   const { toast } = useToast();
   const { prefCurrency, userId, usertype } = useUser();
   console.log(profileData);
-  const [walletBalance, setWalletBalance] = useState();
-  const [loyaltyPoints, setLoyaltyPoints] = useState();
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [badge, setBadge] = useState("");
   const [pointsToRedeem, setPointsToRedeem] = useState("");
   // const usertype = "tourist"; // This value will determine which component to render
@@ -20,7 +21,7 @@ export default function PointsAndLoyalty({ profileData }) {
 
   const fetchProfile = () => {
     axios
-      .get(`api/${endpoint}/${userId}`)
+      .get(`api/${endpoint}?currency=${prefCurrency}`)
       .then((response) => {
         console.log(response.data);
         setLoyaltyPoints(response.data.loyaltyPoints);
@@ -30,16 +31,35 @@ export default function PointsAndLoyalty({ profileData }) {
         console.error(error);
       });
   };
-
-  useEffect(() => {
-    fetchProfile(); // Initial fetch when component mounts
-  }, [prefCurrency]);
-
+ 
+  const redeemPoints = async () => {
+    try {
+      const response = await axios.post(
+        `api/${endpoint}/redeemPoints`,
+        {
+          points: pointsToRedeem,
+        },
+      );
+      console.log(response.data);
+      fetchProfile();
+      toast({
+        title: "Points redeemed successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error redeeming points",
+        variant: "destructive",
+      });
+  };
+  }
   const maxPoints = {
     bronze: 100000,
     silver: 500000,
     gold: Infinity,
   };
+
   const getMaxPointsForLevel = (points) => {
     if (points > maxPoints.silver) return maxPoints.gold;
     if (points > maxPoints.bronze) return maxPoints.silver;
@@ -48,68 +68,14 @@ export default function PointsAndLoyalty({ profileData }) {
 
   const currentMaxPoints = getMaxPointsForLevel(loyaltyPoints);
 
-  // Update badge based on points thresholds
+
   useEffect(() => {
+    fetchProfile(); // Initial fetch when component mounts
     if (loyaltyPoints > 500000) setBadge("Gold");
     else if (loyaltyPoints > 100000) setBadge("Silver");
     else setBadge("Bronze");
-  }, [loyaltyPoints]);
+  }, [loyaltyPoints, prefCurrency, walletBalance ]);
 
-  // Calculate points based on amount paid and level
-  const addLoyaltyPoints = (amountPaid) => {
-    let pointsToAdd;
-    if (loyaltyPoints > 500000) pointsToAdd = amountPaid * 1.5;
-    else if (loyaltyPoints > 100000) pointsToAdd = amountPaid * 1;
-    else pointsToAdd = amountPaid * 0.5;
-
-    setLoyaltyPoints(loyaltyPoints + pointsToAdd);
-  };
-
-  const renderPoints = () => {
-    return (
-      <div className="mt-4">
-        <Input
-          type="number"
-          value={pointsToRedeem}
-          placeholder="Enter points to redeem"
-          onChange={(e) => setPointsToRedeem(e.target.value)}
-          className="w-full mb-2"
-        />
-        <Button
-          onClick={redeemPoints}
-          className="w-full bg-gold text-white font-semibold"
-        >
-          Redeem Points
-        </Button>
-      </div>
-    );
-  };
-  // Redeem points to wallet balance
-  const redeemPoints = () => {
-    const pointsToRedeemNum = parseInt(pointsToRedeem, 10);
-    if (pointsToRedeemNum <= 0) {
-      toast({
-        description: "Please enter a valid number of points to redeem.",
-        variant: "destructive",
-      });
-      return;
-    }
-    const redeemableValue = (pointsToRedeemNum / 10000) * 100; // 10,000 points = 100 EGP
-    if (pointsToRedeemNum <= loyaltyPoints) {
-      setWalletBalance(walletBalance + redeemableValue);
-      setLoyaltyPoints(loyaltyPoints - pointsToRedeemNum);
-      setPointsToRedeem("");
-      toast({
-        description: `Redeemed ${pointsToRedeem} points for ${prefCurrency} ${redeemableValue} !`,
-        variant: "success",
-      });
-    } else {
-      toast({
-        description: "Invalid points to redeem.",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="px-4 pb-12">
@@ -162,8 +128,21 @@ export default function PointsAndLoyalty({ profileData }) {
           />
         </div>
 
-        {renderPoints()}
-      </div>
+        <div className="mt-4">
+        <Input
+          type="number"
+          value={pointsToRedeem}
+          placeholder="Enter points to redeem"
+          onChange={(e) => setPointsToRedeem(e.target.value)}
+          className="w-full mb-2"
+        />
+        <Button
+          onClick={redeemPoints}
+          className="w-full bg-gold text-white font-semibold"
+        >
+          Redeem Points
+        </Button>
+      </div>      </div>
     </div>
   );
 }
