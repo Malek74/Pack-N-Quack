@@ -70,6 +70,83 @@ const shareMail = async (req, res) => {
     }
 };
 
+
+
+export const sendEventBookingNotification = async (userEmail, userName, eventName, eventDate, eventLocation, bookingLink) => {
+
+    try {
+
+        // Email content
+        const mailOptions = {
+            from: '"CaptainQuackers" <captainquackers@gmail.com>',
+            to: userEmail,
+            subject: `${eventName} is Now Open for Booking!`,
+            html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h1 style="text-align: center; color: #444;">📢 ${eventName} is Now Open for Booking!</h1>
+          <p>Hello ${userName},</p>
+          <p>We’re thrilled to announce that the event you’ve been waiting for, <strong>${eventName}</strong>, is now open for booking! 🎉</p>
+          <div style="margin-bottom: 20px;">
+              <p><strong>Date:</strong> ${eventDate}</p>
+              <p><strong>Location:</strong> ${eventLocation}</p>
+          </div>
+          <p>Seats are limited, so don’t wait too long to secure your spot.</p>
+          <p style="text-align: center;">
+              <a href="${bookingLink}" style="text-decoration: none; background-color: #007BFF; color: #ffffff; padding: 10px 20px; border-radius: 5px; font-size: 16px;">Book Now</a>
+          </p>
+          <p>We look forward to seeing you there!</p>
+          <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #777;">
+              <p>Need assistance? Contact us at support@yourorganization.com or call us at (123) 456-7890.</p>
+              <p>Thank you,<br>Your Organization</p>
+          </div>
+        </div>
+        `,
+        };
+
+        const result = await transporter.sendMail(mailOptions);
+        console.log('Event booking notification sent successfully:');
+    }
+    catch (error) {
+        console.error('Error sending email:', error);
+    }
+}
+
+
+
+
+export const productOutOfStockEmail = async (sellerEmail, productName, productSKU) => {
+    try {
+
+        // Email content
+        const mailOptions = {
+            from: '"Your Business Name" <your-email@example.com>',
+            to: sellerEmail,
+            subject: "Product Out of Stock Notification",
+            html: `
+                <p>Dear Seller,</p>
+                <p>We hope this message finds you well.</p>
+                <p>We wanted to let you know that one of your products is now out of stock. Please see the details below:</p>
+                <ul>
+                    <li><strong>Product Name:</strong> ${productName}</li>
+                    <li><strong>SKU:</strong> ${productSKU}</li>
+                    <li><strong>Current Stock:</strong> 0</li>
+                </ul>
+                <p>To ensure a seamless shopping experience for your customers, we recommend restocking this product as soon as possible.</p>
+                <p>If you have already replenished the stock, kindly update the inventory through your seller dashboard or contact our support team for assistance.</p>
+                <p>Feel free to reach out if you have any questions or require further help.</p>
+                <p>Best regards,</p>
+                <p>Your Business Name</p>
+            `,
+        };
+
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Out of Stock email sent: %s", info.messageId);
+    } catch (error) {
+        console.error("Error sending Out of Stock notification:", error);
+    }
+}
+
 router.post('/:id', shareMail);
 export default router;
 

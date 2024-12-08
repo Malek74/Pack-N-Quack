@@ -19,6 +19,42 @@ const touristSchema = new Schema({
         type: String,
         required: true,
     },
+    address: [{
+        address: {
+            type: String,
+            required: true,
+        },
+        town: {
+            type: String,
+            required: true,
+        },
+        postcode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        }
+    }],
+    defaultAddress: {
+        address: {
+            type: String,
+            required: true,
+        },
+        town: {
+            type: String,
+            required: true,
+        },
+        postcode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        }
+    },
     mobile: {
         type: String,
         required: true,
@@ -84,7 +120,56 @@ const touristSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tag'
         }],
-    }
+    },
+    savedEvents: {
+        savedItineraries: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Itinerary'
+        }],
+        savedActivities: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Activity'
+        }],
+    },
+    promoCode: {
+        code: {
+            type: String,
+            default: ''
+        },
+        lastUsed: {
+            type: Date,
+            default: Date.now()
+        }
+    },
+
+    cart: {
+        type: [
+            {
+                _id: false,
+                productID: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+                },
+
+                quantity: {
+                    type: Number,
+                    default: 1
+                }
+            }
+        ],
+        default: []
+    },
+
+    wishlist: {
+        type: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+            }
+        ],
+        default: []
+    },
+
 },
     { timestamps: true }
 );
