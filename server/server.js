@@ -24,6 +24,7 @@ import cors from 'cors';
 import PasswordChangeRequest from './routes/changePass.js';
 import uploadRoutes from './routes/fileRoutes.js';
 import purchaseRoute from './routes/purchaseRoute.js';
+import orderRoutes from "./routes/orderRoutes.js"
 import shareMail from './routes/shareEmail.js';
 import flightBooking from './routes/flightBooking.js';
 import currency from './routes/currency.js';
@@ -125,6 +126,7 @@ app.use('/webhook', webhook);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/transaction', purchaseRoute);
+app.use('/api/order', orderRoutes);
 app.use('/api/complaints', complaint);
 app.use('/api/admins', admins);
 app.use('/api/transportation', transportation);
