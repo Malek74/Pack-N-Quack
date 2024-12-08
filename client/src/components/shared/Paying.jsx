@@ -4,12 +4,11 @@ import { useUser } from "@/context/UserContext";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import axios from "axios";
-export default function Paying() {
+export default function Paying(paymentMethod, setPaymentMethod, promoCode, setPromoCode) {
     const { prefCurrency } = useUser();
-    const [paymentMethod, setPaymentMethod] = useState("card")
-    const [WalletBallance, setWalletBallance] = useState(0);
-    const [promoCode, setPromoCode] = useState("");
+
     const [isLoading, setIsLoading] = useState(true);
+    const [WalletBallance, setWalletBallance] = useState(0);
 
     const fetchWallet = async () => {
         try {
