@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  MapPinHouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useUser } from "@/context/UserContext";
@@ -85,6 +86,11 @@ export default function TouristDashboard() {
       icon: Angry,
       path: "complaints",
     },
+    {
+      label: "Addresses",
+      icon: MapPinHouse,
+      path: "addresses",
+    },
   ];
   const handleSectionChange = (section, path) => {
     setActiveSection(section);
@@ -111,7 +117,6 @@ export default function TouristDashboard() {
     isAdvertiser,
     isTourist,
     isTourismGovernor,
-    sidebarItems,
   ]);
   if (sidebarItems && userType) {
     return (
