@@ -80,7 +80,6 @@ mongoose.connect(mongoURI)
     });
 
 
-
 // Define Endpoints
 app.use('/api/places', placeRoutes);
 app.use('/api/tourist', touristRoutes);

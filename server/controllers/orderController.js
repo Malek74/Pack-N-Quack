@@ -69,7 +69,7 @@ export const rateProduct = async (req, res) => {
 
 export const ReviewProduct = async (req, res) => {
     const touristID = req.user._id;
-    const {  productID, review } = req.body;
+    const { productID, review } = req.body;
     console.log(req.body);
     try {
 
@@ -90,7 +90,7 @@ export const ReviewProduct = async (req, res) => {
 
         let item = purchaseRecord.products.find(item => item.productID.toString() === productID.toString());
 
-        if (item && item.orderStatus === "Pending" ) {
+        if (item && item.orderStatus === "Pending") {
             return res.status(400).json({ message: "You cannot review a product that you haven't yet received" });
         }
 
@@ -107,14 +107,30 @@ export const ReviewProduct = async (req, res) => {
 };
 
 export const viewAllOrderDetails = async (req, res) => {
-    const touristID = req.user._id; 
+    const touristID = req.user._id;
+    const status = req.query.status;
+    const prefCurrency = req.query.currency;
+    let orderDetails;
     try {
-        const orderDetails = await Order.findOne({ touristID: touristID });
+        const conversionRate = await getConversionRate(prefCurrency);
+        //orders delivered or cancelled 
+        if (status == "old") {
+            orderDetails = await Order.find({ touristID: touristID, orderStatus: { $in: ["Delivered", "Cancelled"] } });
+        }
+        if (status == "all") {
+            orderDetails = await Order.find({ touristID: touristID });
+        }
+        if (status == "pending") {
+            orderDetails = await Order.findOne({ touristID: touristID, orderStatus: status });
+        }
 
         if (!orderDetails) {
             return res.status(404).json({ message: "No orders found for this user." });
         }
 
+        orderDetails.products.forEach((product) => {
+            product.price = product.price * conversionRate;
+        });
         return res.status(200).json(orderDetails);
     } catch (error) {
         console.error("Error retrieving order details:", error);
@@ -124,14 +140,22 @@ export const viewAllOrderDetails = async (req, res) => {
 
 export const viewSingleOrderDetails = async (req, res) => {
     const touristID = req.user._id;
-    const {orderID}=req.body;
+    const orderID = req.params.id;
+    const prefCurrency = req.query.currency;
+
     try {
+        const conversionRate = await getConversionRate(prefCurrency);
+
         const orderDetails = await Order.findOne({ touristID: touristID, _id: orderID });
-       
+
         if (!orderDetails) {
             return res.status(404).json({ message: "No orders found for this user." });
         }
 
+        orderDetails.products.forEach((product) => {
+            product.price = product.price * conversionRate;
+        });
+        
         return res.status(200).json(orderDetails);
     } catch (error) {
         console.error("Error retrieving order details:", error);
@@ -159,50 +183,30 @@ export const viewPendingOrderDetails = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
     const touristID = req.user._id;
-    const { orderID } = req.body;
+    const orderID = req.params.id;
 
     try {
-    
+
         const purchaseRecord = await Order.findOne({ touristID: touristID, _id: orderID });
         if (!purchaseRecord) {
             return res.status(404).json({ message: "Order not found." });
         }
 
         // Check if the order is eligible for cancellation
-        if (purchaseRecord.orderStatus !== "Pending") {
-            return res.status(400).json({ message: "The order cannot be canceled as it is not 'Pending'." });
+        if (purchaseRecord.orderStatus !== "Out for Delivery") {
+            return res.status(400).json({ message: "Order is not eligible for cancellation." });
         }
 
         // Process each product in the order
         for (const item of purchaseRecord.products) {
             const productID = item.productID;
+            const quantity = item.quantity;
 
-            
-            await Product.findByIdAndUpdate(
-                productID,
-                {
-                    $inc: { product_sales: -1, available_quantity: 1 },
-                },
-                { new: true }
-            );
-
-            
-            item.quantity -= 1;
-
-            // Remove the product from the order if quantity reaches 0
-            if (item.quantity <= 0) {
-                purchaseRecord.products = purchaseRecord.products.filter(
-                    (product) => product.productID.toString() !== productID.toString()
-                );
-            }
+            // Increase the stock of the product
+            await Product.findByIdAndUpdate(productID, { $inc: { available_quantity: quantity } });
         }
 
-        if (purchaseRecord.products.length === 0) {
-            purchaseRecord.orderStatus = "Cancelled";
-        }
-
-        
-        await purchaseRecord.save();
+        await Order.findByIdAndUpdate(orderID, { orderStatus: "Cancelled" });
 
         return res.status(200).json({ message: "Order has been cancelled successfully." });
     } catch (error) {
