@@ -5,6 +5,7 @@ import Banner from "@/components/shared/BannerV2";
 import SearchBar from "@/components/shared/SearchBar";
 import EditTag from "@/components/historicalPage/SelectTag";
 import axios from "axios";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 export default function Historical() {
   const [filteredTags, setFilteredTags] = useState([]);
@@ -72,6 +73,8 @@ export default function Historical() {
           />
         ))}
       </grid>
+      <GuideButton guideMessage={"Select a historical place and embark on your adventure!"} />
+
     </div>
   );
 }

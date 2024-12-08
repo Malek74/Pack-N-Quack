@@ -22,6 +22,7 @@ import ComplaintForm from "@/components/forms/ComplaintForm";
 import CreateDialog from "@/components/shared/CreateDialog";
 import { useUser } from "@/context/UserContext";
 import { Badge } from "@/components/ui/badge";
+import GuideButton from "@/components/guideComponents/popMessage"; 
 export default function Complaints() {
   const navigate = useNavigate();
   const { userId } = useUser();
@@ -65,6 +66,7 @@ export default function Complaints() {
   }
 
   return (
+    <div>
       <Card x-chunk="dashboard-06-chunk-0 " className="flex flex-col flex-1">
         <CardHeader className="flex flex-row justify-between">
           <div>
@@ -125,5 +127,8 @@ export default function Complaints() {
           </div>
         </CardFooter>
       </Card>
+
+       <GuideButton guideMessage={"Fill in your complaint and then proceed by submitting" } />
+       </div>
    );
 }

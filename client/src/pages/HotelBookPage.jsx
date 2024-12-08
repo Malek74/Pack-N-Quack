@@ -10,6 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { set } from "date-fns";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 const HotelBookingApp = () => {
     const [hotels, setHotels] = useState([]);
@@ -137,6 +138,9 @@ const HotelBookingApp = () => {
                     {/* {selectedHotel && <HotelBookingForm hotel={selectedHotel} onBook={handleBooking} />} */}
                 </CardContent>
             </Card>
+
+            <GuideButton guideMessage={"Select a city and then submit and proceed by booking a hotel" } />
+
         </div>
     );
 };

@@ -15,6 +15,7 @@ import { set } from "date-fns";
 
 import { ShareButton } from "@/components/shared/ShareButton";
 import Delivery from "@/components/CheckOutPage/Delivery";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const userID = "6732171fabc80503fd8f92a2";
@@ -70,6 +71,10 @@ export default function HomePage() {
           placeholder={"Look for something fun to do!"}
         />
       </div>
+
+      <GuideButton
+        guideMessage={"Navigate though home bar and check out our activities!"}
+      />
 
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
         {Array.isArray(filteredActivities) &&

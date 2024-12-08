@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { useLogin } from "@/hooks/useLogin";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -114,6 +115,9 @@ export default function LoginPage() {
           </Link>
         </p>
       </form>
+
+       <GuideButton guideMessage={"Enter your username and password to log in and access your account."} />
+
     </div>
   );
 }
