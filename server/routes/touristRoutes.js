@@ -13,6 +13,14 @@ import {
     viewMyTourGuides,
     viewMyItineraries,
     viewMyActivities,
+    addItemToCart,
+    removeItemFromCart,
+    updateQuantityInCart,
+    getCart,
+    viewMyWishlist,
+    addToWishlist,
+    removeFromWishlist
+    viewMyActivities,
     bookmark,
     viewBookmarks,
     AddNewAddress,
@@ -50,5 +58,12 @@ router.post('/addAddress', protect, AddNewAddress);
 router.post('/setdefault', protect, setDefaultAddress);
 router.get('/viewAddress', protect, viewAddresses);
 
+router.post('/cart/addItemToCart/:id', addItemToCart);
+router.delete('/cart/removeItemFromCart/:id/:productId', removeItemFromCart);
+router.put('/cart/updateQuantity/:id', updateQuantityInCart);
+router.get('/cart/viewCart/:id', getCart);
+router.get('/wishlist/:id', viewMyWishlist);
+router.post('/wishlist/:id', addToWishlist);
+router.delete('/wishlist/:id/:productId', removeFromWishlist);
 
 export default router;

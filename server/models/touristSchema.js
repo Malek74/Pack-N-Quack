@@ -140,7 +140,36 @@ const touristSchema = new Schema({
             type: Date,
             default: Date.now()
         }
-    }
+    },
+
+    cart: {
+        type: [
+            {
+                _id: false,
+                productID: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+                },
+
+                quantity: {
+                    type: Number,
+                    default: 1
+                }
+            }
+        ],
+        default: []
+    },
+
+    wishlist: {
+        type: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+            }
+        ],
+        default: []
+    },
+
 },
     { timestamps: true }
 );
