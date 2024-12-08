@@ -51,6 +51,7 @@ import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -104,6 +105,7 @@ const routes = createRoutesFromElements(
     <Route path="transportations" element={<Transportation />}></Route>
     <Route path="transportation/:id" element={<SingleTransportationPage />}></Route>
     <Route path="cart" element={<Cart />}></Route>
+    <Route path="checkout" element={<CheckoutPage />}></Route>
 
     <Route path="touristDashboard" element={<TouristDashboard />}>
       <Route path="profile" element={<MyProfilePage />} />

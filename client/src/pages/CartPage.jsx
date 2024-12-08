@@ -47,6 +47,7 @@ const Cart = () => {
                 <>
                     <div className="mx-16">
                         <div className="grid grid-rows-1 gap-8 mb-12 justify-start">
+                            <h1 className="text-3xl font-bold text-center my-8">Your Cart</h1>
                             {cartItems.map((item) => (
 
                                 <CartCard
@@ -62,7 +63,9 @@ const Cart = () => {
                             ))}
                         </div>
                     </div>
-                    {/* <button onClick={handleClearCart}>Clear Cart</button> */}
+                    <div className="flex justify-end ">
+                        <Button className="mr-16 mb-12 w-40 h-12 text-xl hover:bg-goldhover bg-gold" onClick={() => { window.location.href = "/checkout" }}>Checkout</Button>
+                    </div>
                 </>
             )}
         </div>

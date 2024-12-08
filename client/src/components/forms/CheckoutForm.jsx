@@ -14,6 +14,16 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
@@ -91,7 +101,35 @@ export default function CheckoutForm({ profile, onRefresh }) {
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Select onValueChange={(value) => {
+                                    field.onChange(value);
+                                }}>
+                                    <SelectTrigger className="w-[180px]" onValueChange={field.onChange}>
+                                        <SelectValue placeholder="Select a country" {...field} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Cities</SelectLabel>
+                                            {cities.map((city, index) => (
+                                                <SelectItem key={index} value={city}>{city} </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
 
+                            </FormControl>
+                            <FormDescription />
+                            <FormMessage />
+                        </FormItem>
+
+                    )}
+                />
                 {/* Website Link */}
                 <FormField
                     control={form.control}
