@@ -187,7 +187,7 @@ export const getBookingCount = async (req, res) => {
 
         // If a specific activity is provided, add it to the activity query
         if (activityId) {
-            activityIds = [activityId];
+            activityIds = activityId.split(',');
         }
 
 

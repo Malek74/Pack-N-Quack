@@ -256,7 +256,7 @@ export const getRevenue = async (req, res) => {
 
         // If a specific activity is provided, add it to the activity query
         if (itineraryId) {
-            itineraryIds = itineraryId;
+            itineraryIds = itineraryId.split(',');
         }
 
 
