@@ -23,6 +23,6 @@ router.get('/', protect, getTourGuideById);
 router.delete('/', protect, deleteTourGuide);
 router.post('/rate/:id', protect, rateTourGuide);
 router.put('/terms/', protect, acceptTerms);
-router.get("/testing", getRevenue);
+router.get("/testing",protect, getRevenue);
 
 export default router;

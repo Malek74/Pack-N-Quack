@@ -213,7 +213,7 @@ export const deleteTourGuide = async (req, res) => {
 }
 
 export const getRevenue = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
     const itineraryId = req.query.itineraryId;
@@ -266,11 +266,16 @@ export const getRevenue = async (req, res) => {
         };
 
         // Add date filtering if a specific date is provided
-        if (startDate && endDate) {
-            matchStage.date = {
-                $gte: new Date(startDate),
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
-            };
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
         }
 
         console.log(matchStage);    
@@ -335,7 +340,8 @@ export const getRevenue = async (req, res) => {
                         itineraryID: "$itineraryID",
                     },
                     count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" } 
+                    totalPrice: { $sum: "$price" },
+                    numofTickets: { $sum: "$numOfTickets" } 
                 }
             },
             {
@@ -354,7 +360,7 @@ export const getRevenue = async (req, res) => {
                     _id: 0,
                     title: '$activityDetails.name',
                     revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$count"
+                    bookings: "$numofTickets"
                 }
             },
 

@@ -19,6 +19,6 @@ router.get("/activities", protect, getAdvertiserActivities);
 router.put("/terms", protect, acceptTerms);
 router.put("/terms/:id", acceptTerms);
 
-router.get("/testing/:id",getBookingCount);
+router.get("/testing",protect,getBookingCount);
 
 export default router;

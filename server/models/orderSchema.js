@@ -22,7 +22,7 @@ const orderSchema = new Schema({
     stripeSessionID: {
         type: String,
         default: null,
-        required: true
+        required: false
     },
     orderDate: {
         type: Date,
@@ -52,13 +52,9 @@ const orderSchema = new Schema({
         default: 0,
         required: false
     },
-    payment: {
-        type: Number,
-        required: true
-    },
     deliveryAddress: {
-        type: String,
-        required: true
+        type: Object,
+        required: false
     },
 },{timestamps: true});
 
