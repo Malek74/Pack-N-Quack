@@ -20,6 +20,7 @@ import productModel from "../models/productSchema.js";
 import tourist from "../models/touristSchema.js";
 import { productOutOfStockEmail } from "../routes/shareEmail.js";
 import  adminSchema  from "../models/adminSchema.js";
+import orders from "../models/orderSchema.js"
 
 
 // Creating Tourist for Registration
@@ -835,11 +836,17 @@ export const checkoutOrder = async (req, res) => {
     const paymentMethod = req.body.paymentMethod;
     const payByWallet = req.body.payByWallet;
     const promocode = req.body.promocode;
+    const address  = req.body.address;
     const success_url = "https://www.google.com";
+
 
     const prices = [];
     try {
 
+        const tourist = await Tourist.findById(id);
+        if(!tourist){
+            return res.status(404).json({ message: "Tourist not found" });
+        }
         const cart = await Tourist.findById(id).cart;
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         let totalAmount = 0;
@@ -1004,11 +1011,13 @@ export const checkoutOrder = async (req, res) => {
         }
 
         //create order
-        const order = await Order.create({
+        const order = await orders.create({
             touristID: id,
             products: cart,
             payment: totalAmount,
+            address: address? address:tourist.defaultAddress,
         });
+        res.status(200).json(order);
 
     }
     catch (error) {

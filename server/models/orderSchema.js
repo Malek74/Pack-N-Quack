@@ -55,7 +55,11 @@ const orderSchema = new Schema({
     payment: {
         type: Number,
         required: true
-    }
+    },
+    deliveryAddress: {
+        type: String,
+        required: true
+    },
 },{timestamps: true});
 
 const Order = model("Order", orderSchema);

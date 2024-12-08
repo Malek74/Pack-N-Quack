@@ -6,6 +6,7 @@ import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '.
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+import { getUserRole } from "../utils/Helpers.js";
 
 
 //get all sellers
@@ -121,6 +122,10 @@ export const acceptTerms = async (req, res) => {
 
 export const getRevenue = async (req, res) => {
     const sellerId = req.params.id;
+    const role = getUserRole(req);
+    if (role === "Selller"){
+        query
+    }
     const productIds = await product.find({ adminSellerID: sellerId }).select("_id");
     console.log(productIds);
     const dailyRevenue = await Orders.aggregate([
@@ -141,7 +146,6 @@ export const getRevenue = async (req, res) => {
                             date: "$orderDate" // Group by the order date
                         }
                     },
-                    // productID: "$products.productID" // Group by the product ID
                 },
                 totalPrice: { $sum: { $multiply: ["$products.quantity", "$products.price"] } } // Calculate total price
             }
@@ -184,12 +188,12 @@ export const getRevenue = async (req, res) => {
 
     console.log({
         dailyRevenue,
-        totalRevenue: totalRevenue[0]?.activitiesRevenue || 0
+        totalRevenue: totalRevenue[0]?.activitiesRevenue 
     });
 
     return res.status(200).json({
         dailyRevenue,
-        totalRevenue: totalRevenue[0]?.activitiesRevenue || 0
+        totalRevenue: totalRevenue[0]?.activitiesRevenue
     });
     
 }
