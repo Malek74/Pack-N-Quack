@@ -20,7 +20,7 @@ export const handleImageUpload = async (req, res) => {
     const { userType } = req.body;
     console.log(req.body);
 
-    const userId = req.params.id;
+    const userId = req.user._id;
     let UserModel = userModels[userType];
     if (userType === 'advertisers') {
         UserModel = userModels['advertiserModel'];
@@ -101,7 +101,7 @@ export const handleDocumentUpload = async (req, res) => {
     if (userType === 'sellers') {
         UserModel = userModels['seller']
     }
-    const userID = req.params.id;
+    const userID = req.user._id;
 
     console.log(req.body.userType);
     console.log(req.files);
@@ -147,7 +147,7 @@ export const handleDocumentUpload = async (req, res) => {
                 images: userExists.uploadedFiles.images,
                 documents: uploadedURLS,
             }
-            
+
         }
             , { new: true });
 
@@ -231,7 +231,7 @@ export const handleImageUploadProduct = async (req, res) => {
 
 export const fetchUserDocuments = async (req, res) => {
     const { userType } = req.body;
-    const userId = req.params.id;
+    const userId = req.user._id;
     console.log(req.body);
     let UserModel = userModels[userType];
 
@@ -267,7 +267,7 @@ export const fetchUserDocuments = async (req, res) => {
 
 export const fetchUserImages = async (req, res) => {
     const { userType } = req.body;
-    const userId = req.params.id;
+    const userId = req.user._id;
     let UserModel = userModels[userType];
 
     if (userType === 'advertisers') {

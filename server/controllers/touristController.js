@@ -401,7 +401,7 @@ export const bookmark = async (req, res) => {
         if (!touristID) {
             return res.status(400).json({ message: "Tourist ID is required" });
         }
-        
+
         const tourist = await Tourist.findById(touristID);
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
@@ -558,7 +558,8 @@ export const AddNewAddress = async (req, res) => {
 
 
 export const setDefaultAddress = async (req, res) => {
-    const { touristID, defaultAddress } = req.body;
+    const { defaultAddress } = req.body;
+    const touristID = req.user._id;
 
     try {
         if (!touristID || !defaultAddress) {
@@ -609,7 +610,6 @@ export const viewAddresses = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
 
 
 
