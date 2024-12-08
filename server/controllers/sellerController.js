@@ -144,11 +144,16 @@ export const getRevenue = async (req, res) => {
         };
 
         // Add date filtering to the match stage if startDate and endDate are provided
-        if (startDate && endDate) {
-            matchStage.date = {
-                $gte: new Date(startDate),
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)) // Ensure end date is exclusive
-            };
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
         }
 
     const dailyRevenue = await Orders.aggregate([

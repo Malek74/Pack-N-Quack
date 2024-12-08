@@ -197,11 +197,16 @@ export const getBookingCount = async (req, res) => {
         };
 
         // Add date filtering if a specific date is provided
-        if (startDate && endDate) {
-            matchStage.date = {
-                $gte: new Date(startDate),
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
-            };
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
         }
 
         // console.log(matchStage);    
