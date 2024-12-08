@@ -233,8 +233,9 @@ export const confirmFlightPrice = async (req, res) => {
 }
 
 export const bookFlight = async (req, res) => {
-  const { price, numTickets, origin, destination, currency, date, promocode, payByWallet, paymentMethod } = req.body;
+  const { price, numTickets, origin, destination, currency, date, promocode, payByWallet } = req.body;
   const touristID = req.user._id;
+
   const conversionRate = await getConversionRate(currency);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -244,6 +245,8 @@ export const bookFlight = async (req, res) => {
   const destinationCity = cities.find(city => city.iata_code === destination).city;
 
   console.log(price, numTickets, originCity, destinationCity, date);
+  let bookedFlight = {};
+
 
   try {
     //fetch tourist
@@ -256,20 +259,13 @@ export const bookFlight = async (req, res) => {
     //convert price to USD using exchange rate api
     const priceConverted = parseInt(price * conversionRate);
 
-    //create product on stripe
-    const productStripe = await stripe.products.create({
-      name: `${originCity} to ${destinationCity}`,
-      description: 'Have a quacking flight to ${destination}',
-      default_price_data: {
-        currency: "usd",
-        unit_amount: priceConverted * 100,
-      },
-    });
+
+    let amountToPay = priceConverted * numTickets;
 
     //fetch promocode if it exists
     let promo;
     if (promocode) {
-      promo = await PromoCodes.findOne({ code: promoCode });
+      promo = await PromoCodes.findOne({ code: promocode });
 
       if (!promo) {
         res.status(400).send("Promocode does not exist");
@@ -279,8 +275,8 @@ export const bookFlight = async (req, res) => {
         res.status(400).send("Promocode has already been used");
       }
 
-      //set promocode to inactive 
-
+      //update amount to be paid
+      amountToPay -= amountToPay * (promo.discount / 100);
 
       //check if it's his birthday promo
       if (promo.code == tourist.promoCode.code) {
@@ -302,17 +298,40 @@ export const bookFlight = async (req, res) => {
 
       }
     }
+    bookedFlight.touristID = touristID;
+    bookedFlight.flightData = {
+      flight: `${originCity} to ${destinationCity}`,
+      departure: originCity,
+      arrival: destinationCity,
+      price: amountToPay,
+      date: date
+    }
 
-    //create checkout session 
-
+    //create booking
+    const booking = await AmadeusBooking.create(bookedFlight);
+    let walletAmount
     //handle payment by wallet and related transactions
     if (payByWallet) {
+      let amountLeftToPay
+      if (amountToPay > tourist.wallet) {
+        amountLeftToPay = amountToPay - tourist.wallet;
+        walletAmount = tourist.wallet;
 
-      let amountLeftToPay = amountToPay - tourist.wallet;
+      }
+      else {
+        amountLeftToPay = 0;
+        walletAmount = amountToPay;
+      }
+
+      //handle payment by wallet and related transactions
+
+      amountLeftToPay = amountToPay - tourist.wallet;
       let walletAmount = amountToPay - amountLeftToPay;
 
+      console.log("amount left to pay: ", amountLeftToPay);
+
       //create transaction for amount paid from wallet
-      if (walletAmount < 0) {
+      if (walletAmount > 0) {
 
         //create transaction for wallet deduction
         await transactionModel.create({
@@ -343,7 +362,6 @@ export const bookFlight = async (req, res) => {
           method: "card",
           incoming: false,
           description: `Wallet deduction for booking flight from ${originCity} to ${destinationCity}`
-
         });
 
         //create price to be paid after deducting wallet amount        
@@ -357,11 +375,11 @@ export const bookFlight = async (req, res) => {
           payment_method_types: ['card'],
           line_items: [{
             price: price.id,
-            quantity: numOfTickets,
+            quantity: 1,
           }],
           mode: 'payment',
           success_url: success_url,
-          discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
+
           metadata: {
             eventID: eventID,
             eventType: eventType,
@@ -377,26 +395,42 @@ export const bookFlight = async (req, res) => {
 
     }
     else {
-      if (paymentMethod == "cash") {
-        sendPaymentReceipt(tourist.email, tourist.username, `booking flight from ${originCity} to ${destinationCity}`, dateSelected, amountToPay, price.id);
-        return res.status(200).json({ message: "Payment successful" });
-      }
 
-      if (paymentMethod == "card") {
-        //create transaction for amount paid
-        await transactionModel.create({
-          userId: touristID,
-          title: "Hotel Booking",
-          amount: amountToPay,
-          date: new Date(),
-          method: "card",
-          incoming: true,
-          description: `Wallet deduction for booking flight from ${originCity} to ${destinationCity}`
-        });
-      }
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price: price.id,
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: success_url,
+
+        metadata: {
+          eventID: eventID,
+          eventType: eventType,
+          touristID: touristID,
+          type: "event",
+          price: amountToPay,
+          numOfTickets: numOfTickets,
+          date: dateSelected
+        }
+      });
+      //create transaction for amount paid
+      await transactionModel.create({
+        userId: touristID,
+        title: "Hotel Booking",
+        amount: amountToPay,
+        date: new Date(),
+        method: "card",
+        incoming: true,
+        description: `Wallet deduction for booking flight from ${originCity} to ${destinationCity}`
+      });
+      return res.status(200).json({ url: session.url });
+
+
+
     }
 
-    return res.status(200).json({ url: session.url });
 
   } catch (error) {
     console.log(error);

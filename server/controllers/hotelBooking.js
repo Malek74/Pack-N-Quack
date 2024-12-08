@@ -112,11 +112,11 @@ export const listHotelRooms = async (req, res) => {
 
 export const bookRoom = async (req, res) => {
     const { price, numOfDays, hotel, currency, room, paymentMethod, checkIn, checkOut, name, promocode, payByWallet } = req.body;
-    console.log("Parameters received:", req.body);
     const touristID = req.user._id;
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     let conversionRate = 0;
-    console.log("Parameters received:", { price, numOfDays, hotel, currency, room });
+    let hotelBooking = {};
+    hotelBooking.touristID = touristID;
 
     try {
         conversionRate = await getConversionRate(currency);
@@ -129,21 +129,12 @@ export const bookRoom = async (req, res) => {
 
         //convert price to USD using exchange rate api
         const priceConverted = parseInt(price * conversionRate);
-
-        //create product on stripe
-        const productStripe = await stripe.products.create({
-            name: `Booking in${hotel.hotel}`,
-            description: `We wish you a quacking stay in ${hotel.hotel}`,
-            default_price_data: {
-                currency: "usd",
-                unit_amount: priceConverted * 100,
-            },
-        });
+        let amountToPay = priceConverted * numOfDays;
 
         //fetch promocode if it exists
         let promo;
         if (promocode) {
-            promo = await PromoCodes.findOne({ code: promoCode });
+            promo = await PromoCodes.findOne({ code: promocode });
 
             if (!promo) {
                 res.status(400).send("Promocode does not exist");
@@ -153,8 +144,8 @@ export const bookRoom = async (req, res) => {
                 res.status(400).send("Promocode has already been used");
             }
 
-            //set promocode to inactive 
-
+            //update amount to be paid
+            amountToPay -= amountToPay * (promo.discount / 100);
 
             //check if it's his birthday promo
             if (promo.code == tourist.promoCode.code) {
@@ -176,16 +167,41 @@ export const bookRoom = async (req, res) => {
 
             }
         }
+        hotelBooking.hotelData = {
+            hotel: hotel,
+            type: room.type,
+            beds: room.beds,
+            bedType: room.bedType,
+            description: room.description,
+            price: priceConverted * numOfDays,
+            checkIn: checkIn,
+            checkOut: checkOut
+        };
+        const booking = await AmadeusBooking.create(hotelBooking);
 
 
+
+        let walletAmount;
         //handle payment by wallet and related transactions
         if (payByWallet) {
+            let amountLeftToPay
+            if (amountToPay > tourist.wallet) {
+                amountLeftToPay = amountToPay - tourist.wallet;
+                walletAmount = tourist.wallet;
 
-            let amountLeftToPay = amountToPay - tourist.wallet;
+            }
+            else {
+                amountLeftToPay = 0;
+                walletAmount = amountToPay;
+            }
+
+            amountLeftToPay = amountToPay - tourist.wallet;
             let walletAmount = amountToPay - amountLeftToPay;
 
+            console.log("amount left to pay: ", amountLeftToPay);
+
             //create transaction for amount paid from wallet
-            if (walletAmount < 0) {
+            if (walletAmount > 0) {
 
                 //create transaction for wallet deduction
                 await transactionModel.create({
@@ -198,7 +214,6 @@ export const bookRoom = async (req, res) => {
                     description: `Wallet deduction for booking a room in ${hotel.hotel}`
                 });
             }
-
             //update wallet amount
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
 
@@ -231,11 +246,10 @@ export const bookRoom = async (req, res) => {
                     payment_method_types: ['card'],
                     line_items: [{
                         price: price.id,
-                        quantity: numOfTickets,
+                        quantity: 1,
                     }],
                     mode: 'payment',
                     success_url: success_url,
-                    discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
                     metadata: {
                         eventID: eventID,
                         eventType: eventType,
@@ -251,32 +265,41 @@ export const bookRoom = async (req, res) => {
 
         }
         else {
-            if (paymentMethod == "cash") {
-                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, dateSelected, amountToPay, price.id);
-                return res.status(200).json({ message: "Payment successful" });
-            }
 
-            if (paymentMethod == "card") {
-                //create transaction for amount paid
-                await transactionModel.create({
-                    userId: touristID,
-                    title: "Hotel Booking",
-                    amount: walletAmount,
-                    date: new Date(),
-                    method: "card",
-                    incoming: false,
-                    description: `Wallet deduction for booking a room in ${hotel.hotel}`
-                });
-            }
+            //create transaction for amount paid
+            await transactionModel.create({
+                userId: touristID,
+                title: "Hotel Booking",
+                amount: walletAmount,
+                date: new Date(),
+                method: "card",
+                incoming: false,
+                description: `Wallet deduction for booking a room in ${hotel.hotel}`
+            });
+
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [{
+                    price: price.id,
+                    quantity: 1,
+                }],
+                mode: 'payment',
+                success_url: success_url,
+
+            
+            });
+
         }
-
-
-
-        return res.status(200).json({ url: session.url });
-
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error booking Hotel", error: error.message });
     }
+
+
+
+    return res.status(200).json({ url: session.url });
+
+
+} catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error booking Hotel", error: error.message });
+}
 }

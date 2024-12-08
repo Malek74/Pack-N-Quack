@@ -61,8 +61,6 @@ const shareMail = async (email, otpCode, username) => {
     }
 };
 
-
-
 export const login = async (req, res) => {
     const { username, password } = req.body;
     const role = await getUserRole(username);
