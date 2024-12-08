@@ -90,7 +90,6 @@ export const createTourist = async (req, res) => {
 // Tourist view Profile
 export const getTourist = async (req, res) => {
     return res.status(200).json(req.user);
-
 };
 
 //@desc Get all tourists
@@ -238,8 +237,6 @@ export const redeemPoints = async (req, res) => {
 
     try {
         const tourist = await Tourist.findById(touristID);
-
-
 
         //verify there are enough points to redeem
         if (points > tourist.loyaltyPoints) {
@@ -484,23 +481,13 @@ export const viewBookmarks = async (req, res) => {
     const touristID = req.user._id;
 
     try {
-
         const tourist = await Tourist.findById(touristID)
             .populate("savedEvents.savedActivities")
             .populate("savedEvents.savedItineraries");
 
+        const savedActivities = tourist.savedEvents?.savedActivities || [];
 
-        const savedActivities = tourist.savedEvents?.savedActivities?.map(activity => ({
-            id: activity._id,
-            name: activity.name,
-            category: activity.categoryID,
-        })) || [];
-
-        const savedItineraries = tourist.savedEvents?.savedItineraries?.map(itinerary => ({
-            id: itinerary._id,
-            name: itinerary.name,
-            tags: itinerary.tags,
-        })) || [];
+        const savedItineraries = tourist.savedEvents?.savedItineraries || [];
 
         return res.status(200).json({
             savedActivities,
