@@ -8,8 +8,9 @@ import axios from "axios";
 //axios.defaults.baseURL = "http://localhost:8000/";
 
 // axios.defaults.baseURL = "https://5bbbq9p8-8000.euw.devtunnels.ms/";
+axios.defaults.baseURL = "https://5bbbq9p8-3000.euw.devtunnels.ms/";
 
-axios.defaults.baseURL = "https://k0gfbwb4-8000.euw.devtunnels.ms/";
+// axios.defaults.baseURL = "https://k0gfbwb4-8000.euw.devtunnels.ms/";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
