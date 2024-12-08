@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  MapPinHouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useUser } from "@/context/UserContext";
@@ -84,6 +85,11 @@ export default function TouristDashboard() {
       label: "Complaints",
       icon: Angry,
       path: "complaints",
+    },
+    {
+      label: "Addresses",
+      icon: MapPinHouse,
+      path: "addresses",
     },
   ];
   const handleSectionChange = (section, path) => {

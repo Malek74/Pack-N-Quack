@@ -48,6 +48,7 @@ import BookItinerary from "@/components/dropdown/BookItineraries";
 import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
+import Delivery from "@/components/CheckOutPage/Delivery";
 import PaymentTransactionPage from "@/pages/PaymentTransactionPage";
 import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
@@ -120,6 +121,7 @@ const routes = createRoutesFromElements(
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
+      <Route path="addresses" element={<Delivery />} />
     </Route>
 
     <Route
