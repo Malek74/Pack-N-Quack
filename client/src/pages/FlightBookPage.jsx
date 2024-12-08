@@ -9,6 +9,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 const FlightBookingApp = () => {
     const [flights, setFlights] = useState([]);
@@ -101,6 +102,8 @@ const FlightBookingApp = () => {
                     < FlightResults flights={flights} onSelect={handleSelectFlight} handleBooking={handleBooking} />
                 </CardContent>
             </Card>
+
+            <GuideButton guideMessage={"Select origin and destination city and then pick a date and proceed by submitting." } />
         </div>
     );
 };

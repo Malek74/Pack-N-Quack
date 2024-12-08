@@ -8,6 +8,7 @@ import CartCard from "../components/cartPage/CartCard";
 import Loading from "@/components/shared/Loading";
 import Banner from "@/components/shared/Banner";
 import BannerImage from "/assets/images/Background.jpg";
+import GuideButton from "@/components/guideComponents/popMessage";
 const Cart = () => {
     const { fetchCart, cartState } = useCart();
     const { cartItems } = cartState;
@@ -65,6 +66,9 @@ const Cart = () => {
                     {/* <button onClick={handleClearCart}>Clear Cart</button> */}
                 </>
             )}
+
+            <GuideButton guideMessage={"Here's your guide to managing your cart. \n 1)Add items to your cart \n 2)Proceed with adding items then checkout" } />
+
         </div>
     );
 };

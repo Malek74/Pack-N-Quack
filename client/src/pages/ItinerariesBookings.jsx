@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/components/shared/Loading";
 import BookedItineraryCard from "@/components/ItinerariesPage/BookedItineraryCard";
+
 export default function ItineraryBookings() {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchedItineraries, setFetchedItineraries] = useState(null);
@@ -51,6 +52,7 @@ export default function ItineraryBookings() {
             bookingId={itinerary._id}
           />
         ))}
+
       </div>
     ))
   );

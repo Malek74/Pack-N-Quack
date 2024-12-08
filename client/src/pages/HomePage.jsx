@@ -71,7 +71,7 @@ export default function HomePage() {
         />
       </div>
 
-      <GuideButton guideMessage={"Navigate though home bar \n and jump" }
+      <GuideButton guideMessage={"Navigate though home bar and check out our activities!" }
       />
 
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">

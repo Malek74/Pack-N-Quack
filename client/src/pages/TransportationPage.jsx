@@ -6,6 +6,7 @@ import Banner from "@/components/shared/Banner";
 import CreateDialog from "@/components/shared/CreateDialog";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import GuideButton from "@/components/guideComponents/popMessage";
 import TransportationForm from "@/components/forms/TransportationForm";
 export default function Transportation() {
     const { idAdv } = useParams();
@@ -116,6 +117,10 @@ export default function Transportation() {
                     />
                 ))}
             </div>
+
+            <GuideButton guideMessage={"Select your transportation, review the details, and proceed to booking."} />
+
+
         </div>
     );
 }
