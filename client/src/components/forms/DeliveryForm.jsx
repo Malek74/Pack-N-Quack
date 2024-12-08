@@ -1,10 +1,11 @@
 import { useToast } from "@/hooks/use-toast";
-import { nationalities } from "../shared/nationalities";
+import { countries } from "../shared/countries";
 import { TableBody, TableHeader } from "@/components/ui/table";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import {
@@ -22,13 +23,14 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"; // Import Select component
+import PropTypes from "prop-types";
 
 // Define zod schema for main and extra addresses
 const addressSchema = z.object({
   address: z.string().min(1, "Address is required"),
   town: z.string().min(1, "Town is required"),
   postcode: z.string().min(1, "Postcode is required"),
-  nationality: z.string().min(1, "Nationality is required"),
+  country: z.string().min(1, "Country is required"),
 });
 
 const schema = z.object({
@@ -36,7 +38,11 @@ const schema = z.object({
   extraAddresses: z.array(addressSchema.optional()),
 });
 
-export default function DeliveryForm() {
+DeliveryForm.propTypes = {
+  onRefresh: PropTypes.func.isRequired,
+};
+
+export default function DeliveryForm({ onRefresh }) {
   const { toast } = useToast();
 
   // Initialize React Hook Form
@@ -47,14 +53,14 @@ export default function DeliveryForm() {
         address: "",
         town: "",
         postcode: "",
-        nationality: "",
+        country: "",
       },
       extraAddresses: [
         {
           address: "",
           town: "",
           postcode: "",
-          nationality: "",
+          country: "",
         },
       ],
     },
@@ -65,11 +71,21 @@ export default function DeliveryForm() {
     control: form.control,
     name: "extraAddresses",
   });
-
+  const handleAddAddress = async (values) => {
+    try {
+      const response = await axios.post("/api/tourist/addAddress", {
+        address: values,
+      });
+      console.log(response.data);
+      onRefresh();
+    } catch (error) {
+      console.error("Error adding address:", error);
+    }
+  };
   // Handle form submission
   const onSubmit = async (values) => {
     console.log("Submitted values:", values);
-    // Add your logic here
+    handleAddAddress(values);
   };
   const handleSubmit = () => {
     // Close the Add Address tab (implement this logic as per your UI setup)
@@ -121,22 +137,20 @@ export default function DeliveryForm() {
                 {/* Nationality Field as Select */}
                 <FormField
                   control={form.control}
-                  name="mainAddress.nationality"
+                  name="mainAddress.country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nationality</FormLabel>
+                      <FormLabel>Country</FormLabel>
                       <FormControl>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <SelectTrigger>
-                            <span>
-                              {field.value || "Select your nationality"}
-                            </span>
+                            <span>{field.value || "Select your country"}</span>
                           </SelectTrigger>
                           <SelectContent>
-                            {nationalities.map((nationality) => (
+                            {countries.map((nationality) => (
                               <SelectItem key={nationality} value={nationality}>
                                 {nationality}
                               </SelectItem>
@@ -178,10 +192,10 @@ export default function DeliveryForm() {
                   {/* Nationality Field for Extra Addresses */}
                   <FormField
                     control={form.control}
-                    name={`extraAddresses.${index}.nationality`}
+                    name={`extraAddresses.${index}.country`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nationality</FormLabel>
+                        <FormLabel>Country</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
@@ -189,11 +203,11 @@ export default function DeliveryForm() {
                           >
                             <SelectTrigger>
                               <span>
-                                {field.value || "Select your nationality"}
+                                {field.value || "Select your country"}
                               </span>
                             </SelectTrigger>
                             <SelectContent>
-                              {nationalities.map((nationality) => (
+                              {countries.map((nationality) => (
                                 <SelectItem
                                   key={nationality}
                                   value={nationality}
@@ -228,7 +242,7 @@ export default function DeliveryForm() {
                     address: "",
                     town: "",
                     postcode: "",
-                    nationality: "",
+                    country: "",
                   })
                 }
               >
