@@ -1,6 +1,6 @@
 import express from "express";
 import multer from 'multer';
-import { createTourGuide, getTourGuides, editTourGuide, deleteTourGuide,getTourGuideById, rateTourGuide, acceptTerms} from "../controllers/tourguideController.js";
+import { createTourGuide, getTourGuides, editTourGuide, deleteTourGuide,getTourGuideById, rateTourGuide, acceptTerms, getRevenue} from "../controllers/tourguideController.js";
 
 const router = express.Router();
 // const multer = require('multer');
@@ -16,5 +16,6 @@ router.get('/:id', getTourGuideById);
 router.delete('/:id', deleteTourGuide);
 router.post('/rate/:id', rateTourGuide);
 router.put('/terms/:id', acceptTerms);
+router.get("/testing/:id", getRevenue);
 
 export default router;
