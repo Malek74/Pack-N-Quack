@@ -1,38 +1,60 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 // Create a context for user data
 const UserContext = createContext();
 
 // Create a provider component
+// eslint-disable-next-line react/prop-types
 export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
-
-  //Tourist: 6725442e98359339d8b821f0
-  //Active Bookings Advertiser  670002186379370f9748adb5
-  //No Active Bookings Advertiser: 6703aff23169dedf2f7519a6
-  //tani wa7ed no active bookings
-  //tourguid with itineraries : 66fb241366ea8f57d59ec6db
-  //tourguide with no itirneraries: 6706508d6abe36408a62e701
-
-  // const [userId, setUserId] = useState("6702def62ed9e2a0d138f558");
-  // const [userType, setUserType] = useState("tourist");
-
-  // const [userId, setUserId] = useState("6725442e98359339d8b821f0");
-  // const [userId, setUserId] = useState("66fb241366ea8f57d59ec6db");
-  // const [userType, setUserType] = useState("tourGuide");
-  const [userId, setUserId] = useState("670002186379370f9748adb5");
-  const [userType, setUserType] = useState("advertisers");
-  // const [userId, setUserId] = useState("6703ba52daf9eae5ef55344c");
-  // const [userType, setUserType] = useState("seller");
-
-  // On mount, check localStorage for prefCurrency and set it if found
+  const [userId, setUserId] = useState(null);
+  const [userType, setUserType] = useState(null);
+  const [isTourGuide, setIsTourGuide] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
+  const [isAdvertiser, setIsAdvertiser] = useState(false);
+  const [isTourist, setIsTourist] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isTourismGovernor, setIsTourismGovernor] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+  // On mount, check localStorage for cached data and set it if found
   useEffect(() => {
     const cachedCurrency = localStorage.getItem("prefCurrency");
+    const cachedUserId = localStorage.getItem("userId");
+    const cachedUserType = localStorage.getItem("userType");
     if (cachedCurrency) {
       setPrefCurrency(cachedCurrency);
     }
-  }, []);
+    if (cachedUserId) {
+      setUserId(cachedUserId);
+    }
+    if (cachedUserType) {
+      setUserType(cachedUserType);
+    }
+    switch (userType) {
+      case "Admin":
+        setIsAdmin(true);
+        break;
+      case "Advertiser":
+        setIsAdvertiser(true);
+        break;
+      case "Seller":
+        setIsSeller(true);
+        break;
+      case "Tourist":
+        setIsTourist(true);
+        break;
+      case "Tour Guide":
+        setIsTourGuide(true);
+        break;
+      case "Tourism Governor":
+        setIsTourismGovernor(true);
+        break;
+      default:
+        setIsGuest(true);
+        break;
+    }
+  }, [userType]);
 
   // Function to update preferred currency
   const updatePrefCurrency = (currency) => {
@@ -42,7 +64,27 @@ export const UserProvider = ({ children }) => {
 
   const updateUserId = (id) => {
     setUserId(id);
-    localStorage.setItem("userId", id); // Cache in localStorage
+    localStorage.setItem("userId", id); // Persist userId
+  };
+
+  const updateUserType = (user_type) => {
+    setUserType(user_type);
+    localStorage.setItem("userType", user_type); // Persist userType
+  };
+  const logout = () => {
+    // Clear all relevant user data from state and localStorage
+    setPrefCurrency("EGP");
+    setUserId(null);
+    setUserType(null);
+    localStorage.removeItem("prefCurrency");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userType");
+
+    // Optionally, clear cookies where JWT might be stored
+    document.cookie.split(";").forEach((cookie) => {
+      const name = cookie.split("=")[0].trim();
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
   };
 
   return (
@@ -53,6 +95,15 @@ export const UserProvider = ({ children }) => {
         userId,
         updateUserId,
         userType,
+        updateUserType,
+        logout,
+        isAdmin,
+        isSeller,
+        isTourismGovernor,
+        isTourist,
+        isTourGuide,
+        isAdvertiser,
+        isGuest,
       }}
     >
       {children}

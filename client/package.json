@@ -57,10 +57,12 @@
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.9",
     "react-easy-crop": "^5.1.0",
+    "react-heart": "^1.0.6",
     "react-hook-form": "^7.53.0",
     "react-lottie-player": "^2.1.0",
     "react-phone-number-input": "^3.4.8",
     "react-router-dom": "^6.26.2",
+    "recharts": "^2.14.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"

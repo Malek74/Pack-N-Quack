@@ -10,16 +10,16 @@ import axios from "axios";
 import ActivityCard from "@/components/activityPage/ActivityCard";
 import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import ItineraryCard from "@/components/itinerariesPage/ItinerariesCard";
-
+import { useUser } from "@/context/UserContext";
 import { set } from "date-fns";
 
 import { ShareButton } from "@/components/shared/ShareButton";
+import Delivery from "@/components/CheckOutPage/Delivery";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const userID = "6732171fabc80503fd8f92a2";
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -113,6 +113,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
           <ShareButton />
         </div>
+        <Delivery />
       </div>
     </div>
   );
