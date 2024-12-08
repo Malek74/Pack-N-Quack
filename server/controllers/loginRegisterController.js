@@ -144,7 +144,6 @@ export const logout = (req, res) => {
 }
 
 export const forgotPassword = async (req, res) => {
-    const id = req.user._id;
     const username = req.user.username;
     let user;
 

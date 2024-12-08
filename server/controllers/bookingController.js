@@ -179,7 +179,6 @@ export const bookEvent = async (req, res) => {
                     }],
                     mode: 'payment',
                     success_url: success_url,
-                    discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
                     metadata: {
                         eventID: eventID,
                         eventType: eventType,
@@ -223,7 +222,6 @@ export const bookEvent = async (req, res) => {
             }],
             mode: 'payment',
             success_url: success_url,
-            discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
             metadata: {
                 eventID: eventID,
                 eventType: eventType,

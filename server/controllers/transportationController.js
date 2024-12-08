@@ -2,8 +2,8 @@ import Transportation from "../models/transportationSchema.js";
 import { getConversionRate } from "../utils/Helpers.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
-import product from "../models/productSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
+
 
 //@desc Get all transportation
 //@route GET /api/transportation
@@ -93,7 +93,8 @@ export const createTransportation = async (req, res) => {
 export const bookTransportation = async (req, res) => {
 
     const touristID = req.params.id;
-    const { eventID, numOfTickets, promocode,payByWallet, } = req.body;
+    const { eventID, numOfTickets, promoCode, payByWallet, date } = req.body;
+    const success_url = 'http://localhost:5173/touristDashboard/booked';
     console.log(req.body);
     let event = {}
     try {
@@ -111,11 +112,6 @@ export const bookTransportation = async (req, res) => {
             return res.status(404).json({ error: 'Tourist not found' });
         }
 
-        const price = await stripe.prices.create({
-            currency: 'usd',
-            product: product.id,
-            unit_amount: event.price * 100,
-        });
 
         //fetch promocode if it exists
         let promo;
@@ -131,7 +127,6 @@ export const bookTransportation = async (req, res) => {
             }
 
             //set promocode to inactive 
-
 
             //check if it's his birthday promo
             if (promo.code == tourist.promoCode.code) {
@@ -153,27 +148,92 @@ export const bookTransportation = async (req, res) => {
 
             }
         }
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: [{
-                price: price.id,
-                quantity: numOfTickets,
-            }],
-            mode: 'payment',
-            success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
-            cancel_url: 'https://www.amazon.com/',  //todo:add correct link
-            discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
-            metadata: {
-                eventID: eventID,
-                touristID: touristID,
-                type: "transportation",
-                price: numOfTickets * event.price,
-                date: event.date,
-                numOfTickets: numOfTickets
+
+        let walletAmount
+        //handle payment by wallet and related transactions
+        if (payByWallet) {
+            let amountLeftToPay
+            if (amountToPay > tourist.wallet) {
+                amountLeftToPay = amountToPay - tourist.wallet;
+                walletAmount = tourist.wallet;
             }
-        });
-        return res.status(200).json({ url: session.url });
+            else {
+                amountLeftToPay = 0;
+                walletAmount = amountToPay;
+            }
+
+            let transaction;
+            console.log("wallet amount: ", walletAmount);
+            //create transaction for amount paid from wallet
+            if (walletAmount > 0) {
+
+                //create transaction for wallet deduction
+                transaction = await transactionModel.create({
+                    userId: touristID,
+                    title: event.name,
+                    amount: walletAmount,
+                    date: new Date(),
+                    method: "wallet",
+                    incoming: false,
+                    description: `Wallet deduction for booking  ${event.name}`
+                });
+                console.log(transaction);
+            }
+
+            console.log("amount left to pay: ", amountLeftToPay);
+            //create a booking
+
+
+            //update wallet amount
+            await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
+            console.log("amount left to pay: ", amountLeftToPay);
+
+            if (amountLeftToPay == 0) {
+                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
+                return res.status(200).json({ message: "Payment successful", url: success_url });
+            }
+        }
+        else {
+            //create transaction for amount left to pay by card
+            await transactionModel.create({
+                userId: touristID,
+                title: event.name,
+                amount: amountToPay,
+                date: new Date(),
+                method: "card",
+                incoming: false,
+                description: `Payment for booking for ${event.name}`
+            });
+
+            //create price to be paid after deducting wallet amount        
+            const price = await stripe.prices.create({
+                currency: 'usd',
+                product: product.id,
+                unit_amount: amountLeftToPay * 100,
+            });
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [{
+                    price: price.id,
+                    quantity: 1,
+                }],
+                mode: 'payment',
+                success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
+                cancel_url: 'https://www.amazon.com/',  //todo:add correct link
+                metadata: {
+                    eventID: eventID,
+                    touristID: touristID,
+                    type: "transportation",
+                    price: numOfTickets * event.price,
+                    date: event.date,
+                    numOfTickets: numOfTickets
+                }
+            });
+            return res.status(200).json({ url: session.url });
+        }
     }
+
     catch (error) {
         console.log(error);
         return res.status(400).json({ error: error.message });
