@@ -14,12 +14,11 @@ import {
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
 
-const loginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-
 export default function LoginForm({ onForgotPassword, onSubmit }) {
+  const loginSchema = z.object({
+    username: z.string(),
+    password: z.string(),
+  });
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {

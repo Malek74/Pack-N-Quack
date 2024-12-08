@@ -13,8 +13,7 @@ const SalesReportClientPage = () => {
   const [reportFilters, setReportFilters] = useState();
   const [fetchedStats, setFetchedStats] = useState([]);
   const [loading, setIsLoading] = useState(false);
-  const isTourGuide = true;
-  const isAdvertiser = false;
+  const { isTourGuide, isAdvertiser } = useUser();
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -23,19 +22,13 @@ const SalesReportClientPage = () => {
         setIsLoading(true);
         let response;
         if (isTourGuide) {
-          response = await axios.get(
-            "/api/tourGuide/testing/6744aa1a8b14b29dbaaf1de6",
-            {
-              params: { ...reportFilters, currency: prefCurrency },
-            }
-          );
+          response = await axios.get("/api/tourGuide/testing", {
+            params: { ...reportFilters, currency: prefCurrency },
+          });
         } else if (isAdvertiser) {
-          response = await axios.get(
-            "/api/advertiser/testing/6744aa1a8b14b29dbaaf1de6",
-            {
-              params: { ...reportFilters, currency: prefCurrency },
-            }
-          );
+          response = await axios.get("/api/advertisers/testing", {
+            params: { ...reportFilters, currency: prefCurrency },
+          });
         }
         setFetchedStats(response.data);
         console.log("STATS AS FOLLOWS");
@@ -80,31 +73,44 @@ const SalesReportClientPage = () => {
     ],
   };
 
-  return (
-    //px-[5.5rem]
-    <div className="flex flex-col justify-center items-center gap-4 p-4">
-      <div className="flex justify-between w-full">
-        <h1 className="text-3xl font-semibold">Sales Report</h1>
-        <FilterButton
-          reportFilters={reportFilters}
-          setReportFilters={setReportFilters}
+  if (fetchedStats) {
+    return (
+      <div className="flex flex-col justify-center items-center gap-4 p-4">
+        <div className="flex justify-between w-full">
+          <h1 className="text-3xl font-semibold">Sales Report</h1>
+          <FilterButton
+            reportFilters={reportFilters}
+            setReportFilters={setReportFilters}
+          />
+        </div>
+
+        {/* <AreaRevenueChart revenuePerDay={fetchedStats.revenuePerDay} /> */}
+
+        <div className="flex justify-between w-full gap-4">
+          {isAdvertiser && (
+            <>
+              <PieRevenuePercentageChart
+                totalRevenue={fetchedStats.totalRevenue?.activitiesRevenue}
+              />
+              <PieBookingsPercentageChart
+                totalBookings={fetchedStats.totalBookings?.activitiesBookings}
+                type="activities"
+              />
+            </>
+          )}
+          {isTourGuide && (
+            <PieRevenuePercentageChart
+              totalRevenue={fetchedStats.totalRevenue?.itinerariesRevenue}
+            />
+          )}
+        </div>
+
+        <BarRevenuePerProductChart
+          revenueAndBookingPerEvent={dummyStats.revenueAndBookingPerEvent}
         />
       </div>
-
-      {/* <SalesReportFilters setReportFilters={setReportFilters} /> */}
-
-      {/* <AreaRevenueChart revenuePerDay={fetchedStats.revenuePerDay} /> */}
-
-      <div className="flex justify-between w-full gap-4">
-        <PieRevenuePercentageChart totalRevenue={dummyStats.totalRevenue} />
-        <PieBookingsPercentageChart totalBookings={dummyStats.totalBookings} />
-      </div>
-
-      <BarRevenuePerProductChart
-        revenueAndBookingPerEvent={dummyStats.revenueAndBookingPerEvent}
-      />
-    </div>
-  );
+    );
+  }
 };
 
 export default SalesReportClientPage;

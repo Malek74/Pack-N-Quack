@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import LoginForm from "@/components/forms/LoginForm";
 import ResetPasswordForm from "@/components/forms/ResetPasswordForm";
 import UsernameForm from "@/components/forms/UsernameForm";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "@/hooks/useLogin";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 export default function LoginPage() {
   const [step, setStep] = useState("login");
   const [username, setUsername] = useState("");
@@ -26,19 +27,53 @@ export default function LoginPage() {
       });
     }
   };
-  const handleForgotPassword = (username) => {
-    setUsername(username);
-    setStep("resetPassword");
+  const handleForgotPassword = async (username) => {
+    try {
+      setUsername(username);
+      await axios.post("/api/forgotPassword", { username });
+      toast({
+        title: "OTP Sent",
+        description: `An OTP has been sent to the email associated with ${username}.`,
+        variant: "success", // Success variant
+      });
+      setStep("resetPassword");
+    } catch (error) {
+      toast({
+        title: "Failed to Send OTP",
+        description:
+          error.response?.data?.message ||
+          "Could not send OTP. Please try again.",
+        variant: "destructive", // Error variant
+      });
+    }
   };
 
-  const handleResetPassword = (data) => {
-    console.log("Reset password data:", { username, ...data });
-    // Perform reset password logic here
-    setStep("login");
+  const handleResetPassword = async (values) => {
+    try {
+      await axios.post("/api/OTPPassword", {
+        otp: values.otp,
+        newPassword: values.newPassword,
+        username: username,
+      });
+      toast({
+        title: "Password Reset Successful",
+        description: "Your password has been updated. Please log in.",
+        variant: "success", // Success variant
+      });
+      setStep("login");
+    } catch (error) {
+      toast({
+        title: "Password Reset Failed",
+        description:
+          error.response?.data?.message ||
+          "Failed to reset password. Please check the OTP and try again.",
+        variant: "destructive", // Error variant
+      });
+    }
   };
 
   return (
-    <div className="form-wrapper flex justify-center items-center bg-[url('public/assets/images/Background.jpg')] bg-no-repeat bg-cover">
+    <div className=" flex justify-center items-center bg-[url('public/assets/images/Background.jpg')] bg-no-repeat bg-cover">
       {step === "login" && (
         <LoginForm
           onForgotPassword={() => setStep("enterUsername")}

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
 
 import {
   Card,
@@ -11,12 +11,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
 const chartConfig = {
   bookings: {
@@ -29,20 +29,17 @@ const chartConfig = {
   activities: {
     label: "Activities",
     color: "hsl(var(--chart-2))",
-  }
-} 
+  },
+};
 
-export function PieBookingsPercentageChart({totalBookings}) {
+export function PieBookingsPercentageChart({ totalBookings, type }) {
   const chartData = [
-    { type: "itineraries", bookings: totalBookings.itinerariesBookings, fill: "var(--color-itineraries)" },
-    { type: "activities", bookings: totalBookings.activitiesBookings, fill: "var(--color-activities)" },
-  
-  ]
-  
-  
-  const totalbookings = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.bookings, 0)
-  }, [])
+    {
+      type: type,
+      bookings: totalBookings,
+      fill: "var(--color-itineraries)",
+    },
+  ];
 
   return (
     <Card className="flex flex-col w-1/2">
@@ -82,7 +79,7 @@ export function PieBookingsPercentageChart({totalBookings}) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalbookings.toLocaleString()}
+                          {totalBookings}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -92,7 +89,7 @@ export function PieBookingsPercentageChart({totalBookings}) {
                           Bookings
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -109,5 +106,5 @@ export function PieBookingsPercentageChart({totalBookings}) {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

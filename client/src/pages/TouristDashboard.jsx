@@ -31,6 +31,11 @@ export default function TouristDashboard() {
       icon: UserRound,
       path: "profile",
     },
+    {
+      label: "Sales Report",
+      icon: ChartNoAxesCombined,
+      path: "sales-report",
+    },
   ];
 
   const sellerItems = [
@@ -85,11 +90,6 @@ export default function TouristDashboard() {
       label: "Complaints",
       icon: Angry,
       path: "complaints",
-    },
-    {
-      label: "Sales Report",
-      icon: ChartNoAxesCombined,
-      path: "sales-report",
     },
   ];
   const handleSectionChange = (section, path) => {

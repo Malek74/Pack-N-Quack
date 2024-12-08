@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
-
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
+import { useUser } from "@/context/UserContext";
 import {
   Card,
   CardContent,
@@ -11,13 +11,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-
+} from "@/components/ui/chart";
 
 const chartConfig = {
   revenue: {
@@ -30,17 +29,18 @@ const chartConfig = {
   activities: {
     label: "Activities",
     color: "hsl(var(--chart-2))",
-  }
-} 
+  },
+};
 
-export function PieRevenuePercentageChart({totalRevenue, prefCurrency}) {
+export function PieRevenuePercentageChart({ totalRevenue, prefCurrency }) {
+  console.log(totalRevenue);
   const chartData = [
-    { type: "itineraries", revenue: totalRevenue.itinerariesRevenue, fill: "var(--color-itineraries)" },
-    { type: "activities", revenue: totalRevenue.activitiesRevenue, fill: "var(--color-activities)" },
-  ]
-  const totalrevenue = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.revenue, 0)
-  }, [])
+    {
+      type: "activities",
+      revenue: +totalRevenue,
+      fill: "var(--color-activities)",
+    },
+  ];
 
   return (
     <Card className="flex flex-col w-1/2">
@@ -80,7 +80,7 @@ export function PieRevenuePercentageChart({totalRevenue, prefCurrency}) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalrevenue.toLocaleString()}
+                          {totalRevenue}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -90,7 +90,7 @@ export function PieRevenuePercentageChart({totalRevenue, prefCurrency}) {
                           Revenue
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -107,5 +107,5 @@ export function PieRevenuePercentageChart({totalRevenue, prefCurrency}) {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
