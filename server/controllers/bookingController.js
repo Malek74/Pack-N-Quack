@@ -21,6 +21,7 @@ export const bookEvent = async (req, res) => {
 
     console.log(req.body);
     const touristID = req.user._id;
+    const bookedEvent = {};
 
 
     let success_url = "";
@@ -30,10 +31,14 @@ export const bookEvent = async (req, res) => {
         //fetch event
         if (eventType == "activity") {
             event = await activityModel.findById(eventID);
+            bookedEvent.activityID = eventID;
         }
         else if (eventType == "itinerary") {
             event = await Itinerary.findById(eventID);
+            bookedEvent.itineraryID = eventID;
         }
+
+        bookedEvent.numOfTickets = numOfTickets;
         let product = {};
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         if (eventType == "activity") {
@@ -83,6 +88,9 @@ export const bookEvent = async (req, res) => {
             }
         }
 
+        //set booked event price
+        bookedEvent.price = amountToPay;
+
         if (eventType == "activity") {
             success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
         }
@@ -126,11 +134,23 @@ export const bookEvent = async (req, res) => {
                 console.log(transaction);
             }
 
+            console.log("amount left to pay: ", amountLeftToPay);
+
+
             //update wallet amount
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
             console.log("amount left to pay: ", amountLeftToPay);
+
             if (amountLeftToPay == 0) {
                 sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
+                await Booking.create(bookedEvent);
+
+                //create a booking
+                bookEvent.touristID = touristID;
+                bookedEvent.date = dateSelected;
+
+
+
                 return res.status(200).json({ message: "Payment successful", url: success_url });
             } else {
 
@@ -145,14 +165,12 @@ export const bookEvent = async (req, res) => {
                     description: `Payment for booking for ${event.name}`
                 });
 
-
                 //create price to be paid after deducting wallet amount        
                 const price = await stripe.prices.create({
                     currency: 'usd',
                     product: product.id,
                     unit_amount: amountLeftToPay * 100,
                 });
-
 
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
@@ -166,7 +184,7 @@ export const bookEvent = async (req, res) => {
                     metadata: {
                         eventID: eventID,
                         eventType: eventType,
-                        touristID: touristID,
+                        touristID: touristID.toString(),
                         type: "event",
                         price: amountLeftToPay,
                         numOfTickets: numOfTickets,
@@ -191,7 +209,6 @@ export const bookEvent = async (req, res) => {
 
         }
 
-
         //create price to be paid after deducting wallet amount        
         const price = await stripe.prices.create({
             currency: 'usd',
@@ -211,7 +228,7 @@ export const bookEvent = async (req, res) => {
             metadata: {
                 eventID: eventID,
                 eventType: eventType,
-                touristID: touristID,
+                touristID: touristID.toString(),
                 type: "event",
                 price: amountToPay,
                 numOfTickets: numOfTickets,
@@ -223,7 +240,7 @@ export const bookEvent = async (req, res) => {
         return res.status(200).json({ url: session.url });
     }
     catch (error) {
-        console.log(error);
+        console.log(error.message);
         return res.status(400).json({ error: error.message });
     }
 
