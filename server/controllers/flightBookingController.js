@@ -235,7 +235,8 @@ export const confirmFlightPrice = async (req, res) => {
 export const bookFlight = async (req, res) => {
   const { price, numTickets, origin, destination, currency, date, promocode, payByWallet } = req.body;
   const touristID = req.user._id;
-
+  console.log(req.body);
+  const success_url = 'http://localhost:5173/touristDashboard/booked';
   const conversionRate = await getConversionRate(currency);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -258,7 +259,7 @@ export const bookFlight = async (req, res) => {
 
     //convert price to USD using exchange rate api
     const priceConverted = parseInt(price * conversionRate);
-
+    console.log(priceConverted);
 
     let amountToPay = priceConverted * numTickets;
 
@@ -306,6 +307,17 @@ export const bookFlight = async (req, res) => {
       price: amountToPay,
       date: date
     }
+
+    //create product on stripe
+    const product = await stripe.products.create({
+      name: `${originCity} to ${destinationCity}`,
+      description: 'Have a quacking flight to ${destination}',
+      default_price_data: {
+        currency: "usd",
+        unit_amount: priceConverted * 100,
+      },
+    });
+
 
     //create booking
     const booking = await AmadeusBooking.create(bookedFlight);
@@ -380,21 +392,20 @@ export const bookFlight = async (req, res) => {
           mode: 'payment',
           success_url: success_url,
 
-          metadata: {
-            eventID: eventID,
-            eventType: eventType,
-            touristID: touristID,
-            type: "event",
-            price: amountLeftToPay,
-            numOfTickets: numOfTickets,
-            date: dateSelected
-          }
+        
         });
         return res.status(200).json({ url: session.url });
       }
 
     }
     else {
+
+      const price = await stripe.prices.create({
+        currency: 'usd',
+        product: product.id,
+        unit_amount: amountToPay * 100,
+      });
+
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -405,15 +416,6 @@ export const bookFlight = async (req, res) => {
         mode: 'payment',
         success_url: success_url,
 
-        metadata: {
-          eventID: eventID,
-          eventType: eventType,
-          touristID: touristID,
-          type: "event",
-          price: amountToPay,
-          numOfTickets: numOfTickets,
-          date: dateSelected
-        }
       });
       //create transaction for amount paid
       await transactionModel.create({

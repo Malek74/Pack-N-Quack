@@ -40,7 +40,7 @@ import cookieParser from 'cookie-parser';
 import { login, logout, forgotPassword, updatePassword } from './controllers/loginRegisterController.js';
 import { protect } from './middleware/authenticator.js';
 import cron from "node-cron";
-import { sendBirthdayPromoCode, upcomingEvent } from "./controllers/scheduledFunctions.js";
+import { sendBirthdayPromoCode, upcomingEvent, updateOrderStatus } from "./controllers/scheduledFunctions.js";
 import notificationSchema from './models/notificationSchema.js';
 
 import notifications from './routes/notification.js';
@@ -93,7 +93,7 @@ mongoose.connect(mongoURI)
 io.on('connection', async (socket) => {
     console.log('A user connected and his socket id is: ' + socket.handshake.auth.userId);
 
-
+    
     const roomID = socket.handshake.auth.userId.toString();
     socket.join(roomID);
     console.log('User joined room: ' + socket.handshake.auth.userId);
@@ -138,14 +138,20 @@ app.post('/api/forgotPassword', forgotPassword);
 app.post('/api/OTPPassword', protect, updatePassword);
 
 // Schedule the function to run at 11 PM every day
-cron.schedule("58 15 * * *", () => {
+cron.schedule("40 12 * * *", () => {
     console.log("Running task at 11:05 PM...");
     sendBirthdayPromoCode(); // Call your birthday promo code function
 });
 
 
 //schedule the function to run 2:59
-cron.schedule("20 15 * * *", () => {
+cron.schedule("50 12 * * *", () => {
     console.log("Running task at 11:05 PM...");
-    upcomingEvent(); // Call your birthday promo code function
+    upcomingEvent();
+});
+
+//schedule the function to run every 20 minutes
+cron.schedule("*/20 * * * *", () => {
+    console.log("Running task every 20 minutes...");
+    updateOrderStatus();
 });

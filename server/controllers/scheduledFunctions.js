@@ -6,6 +6,7 @@ import Booking from "../models/bookingSchema.js";
 import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
 import Tourist from "../models/touristSchema.js";
+import Order from "../models/orderSchema.js";
 
 /**
  * Sends birthday promo codes to users who have a birthday today
@@ -160,4 +161,20 @@ export const upcomingEvent = async () => {
     }
 }
 
+export const updateOrderStatus = async () => {
+    try {
+        const orders = await Order.find({ orderStatus: 'Out for Delivery' });
 
+        for (const order of orders) {
+            await Order.findByIdAndUpdate(
+                order._id,
+                { orderStatus: 'Delivered' },
+                { new: true }
+            );
+        }
+
+    }
+    catch (error) {
+        console.error('Error updating order status:', error.message);
+    }
+}
