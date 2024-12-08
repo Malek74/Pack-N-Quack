@@ -39,8 +39,8 @@ export default function MarketplacePage() {
       });
   };
 
-  26835438303
-  14215076750
+  // 26835438303
+  // 14215076750
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
@@ -165,7 +165,7 @@ export default function MarketplacePage() {
             />
           ))
         ) : (
-          <div >
+          <div>
             <Loading />
           </div>
         )}

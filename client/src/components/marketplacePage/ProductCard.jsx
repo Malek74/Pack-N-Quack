@@ -11,9 +11,10 @@ import { useCart } from "@/context/CartContext";
 import { Button } from "../ui/button";
 import { ShoppingCart } from "lucide-react";
 import { Input } from "../ui/input";
+import { useNavigate } from "react-router-dom";
+
 import QuantityInput from "@/components/shared/QuantityInput";
 export default function ProductCard(props) {
-
   const { prefCurrency } = useUser();
   const { toast } = useToast();
   const isSeller = props.userType === "seller" ? true : false;
@@ -21,6 +22,7 @@ export default function ProductCard(props) {
   const [isWishlisted, setWishlisted] = useState(false);
   const { addItemToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
 
   const handleAddToCart = () => {
     addItemToCart(touristId, props.id, quantity);
@@ -46,7 +48,7 @@ export default function ProductCard(props) {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const wishlistRemove = (id) => {
     try {
@@ -69,7 +71,7 @@ export default function ProductCard(props) {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const deleteClicked = (id) => {
     axios
@@ -93,9 +95,15 @@ export default function ProductCard(props) {
   //   checkWishlist(props.id);
   // }, [props.id, isWishlisted]);
 
+  const viewProductPage = () => {
+    navigate(`/marketplace/${props.id}`);
+  };
 
   return (
-    <div className="rounded-xl w-[20rem] h-[25rem] shadow-md relative overflow-hidden">
+    <div
+      onClick={viewProductPage}
+      className="rounded-xl w-[20rem] h-[25rem] shadow-md relative overflow-hidden"
+    >
       {/* Image Section */}
       <img
         className="w-full h-[11rem] object-cover rounded-t-lg"
@@ -104,7 +112,13 @@ export default function ProductCard(props) {
       />
       {!isSeller && (
         <div className="absolute top-4 right-4 flex gap-2">
-          <WishlistButton id={props.id} wishlistAdd={wishlistAdd} wishlistRemove={wishlistRemove} wishlisted={isWishlisted} touristId={touristId} />
+          <WishlistButton
+            id={props.id}
+            wishlistAdd={wishlistAdd}
+            wishlistRemove={wishlistRemove}
+            wishlisted={isWishlisted}
+            touristId={touristId}
+          />
         </div>
       )}
       {/* Button Section */}
@@ -152,11 +166,14 @@ export default function ProductCard(props) {
           <span className="flex items-end">
             {/* <Input className="text-center w-12 " type="number" defaultValue={1}></Input> */}
             <QuantityInput setQuantity={setQuantity} quantity={quantity} />
-            <Button className=" w-14 p-0  text-black hover:bg-gold hover:text-white bg-transparent self-end place-self-end" onClick={handleAddToCart}><ShoppingCart className="m-0 p-0 " /></Button>
-
+            <Button
+              className=" w-14 p-0  text-black hover:bg-gold hover:text-white bg-transparent self-end place-self-end"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="m-0 p-0 " />
+            </Button>
           </span>
         </h4>
-
       </div>
     </div>
   );

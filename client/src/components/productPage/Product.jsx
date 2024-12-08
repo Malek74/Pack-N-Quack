@@ -1,43 +1,33 @@
 import { Button } from "../ui/button";
-import { useToast } from "../ui/use-toast";
-import { Rating } from "./Rating";
-import { Counter } from "../ui/counter";
-import { SizeTags } from "./SizeTags";
-import { ColorTags } from "./ColorTags";
-import MyGallery from "./MyGallery";
-import facebook from "@/assets/icons/facebook.svg";
-import twitter from "@/assets/icons/twitter.svg";
-import linkedin from "@/assets/icons/linkedin.svg";
-import { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
-import { ItemsContext } from "@/components/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
+import { Rating } from "../shared/Rating";
+import Counter from "../shared/QuantityInput";
+import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { useUser } from "@/context/UserContext";
 
 export default function Product({ item }) {
-  //get the id from the params dou id is not passed in the item props
-  const { id } = useParams();
   const { toast } = useToast();
-  console.log(typeof id);
-
-  const { items, setItems, addItem } = useContext(ItemsContext);
-
-  function calculateAverageRating(data) {
-    const ratings = data.map((item) => item.attributes.rating);
-    let sum = 0;
-    ratings.forEach((num) => (sum += num));
-    const averageRating = sum / ratings.length;
-    return averageRating;
-  }
+  const { addItem } = useCart();
+  const { prefCurrency } = useUser();
+  // Helper to calculate the average rating
+  const calculateAverageRating = (reviews) => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  };
 
   const [itemQuantity, setItemQuantity] = useState(1);
 
   const itemObject = {
-    id: parseInt(id),
-    img: item.image.data.attributes.url,
+    id: item._id,
+    img: item.picture,
     product: item.name,
     price: item.price,
-    itemCount: item.count,
+    itemCount: item.available_quantity,
     quantity: itemQuantity,
   };
+
   useEffect(() => {
     itemObject.quantity = itemQuantity;
   }, [itemQuantity]);
@@ -48,53 +38,44 @@ export default function Product({ item }) {
 
   return (
     <main className="font-poppins flex flex-col gap-2 px-4 py-8 lg:flex-row lg:items-start lg:space-x-4 lg:px-14 xl:gap-20 xl:px-20">
-      <MyGallery
-        image={item.image.data.attributes}
-        sliders={item.slider.data.map((item) => {
-          const thumbnailExists =
-            item.attributes.formats && item.attributes.formats.thumbnail;
-          return {
-            photo: item.attributes.url,
-            alternativeText: item.attributes.alternativeText,
-            id: item.id,
-            ...(thumbnailExists && {
-              thumbnail: item.attributes.formats.thumbnail.url,
-            }),
-          };
-        })}
-      />
+      {/* Product Image */}
+      <section>
+        <img
+          src={item.picture}
+          alt={item.name}
+          className="rounded-lg border border-gray-200"
+        />
+      </section>
 
+      {/* Product Details */}
       <section className="mt-4 flex w-full flex-col space-y-2 lg:mt-0">
         <h1 className="text-[2rem] font-normal lg:text-[2.25rem] xl:text-[2.625rem]">
           {item.name}
         </h1>
         <h3 className="text-litegray font-poppins text-[1.5rem] font-medium">
-          Rs. {item.price.toLocaleString()}.00
+          {prefCurrency}
+          {item.price.toLocaleString()}
         </h3>
         <div className="flex items-center">
-          {item.reviews.data.length > 0 && (
-            <Rating rating={calculateAverageRating(item.reviews.data)} />
+          {item.ratings.reviews.length > 0 && (
+            <Rating rating={calculateAverageRating(item.ratings.reviews)} />
           )}
           <span className="text-litegray flex items-center text-[0.8rem] font-normal">
-            {item.reviews.data.length > 0 && (
+            {item.ratings.reviews.length > 0 && (
               <span className="mx-2 h-6 border-l border-gray-400"></span>
             )}
-            {item.reviews.data.length} Customer Reviews
+            {item.ratings.reviews.length} Customer Reviews
           </span>
         </div>
         <p className="font-poppins xl:8/12 text-[0.8rem] font-normal leading-[20px] lg:w-9/12 lg:text-[1rem] lg:leading-[25px]">
-          {item.short_desc}
+          {item.description}
         </p>
 
+        {/* Action Buttons */}
         <section className="space-y-4 pb-8 pt-2">
-          <div className="align-center flex justify-between gap-4 lg:flex-col">
-            <SizeTags size={item.size} />
-            <ColorTags color={item.color} />
-          </div>
-
           <div className="flex flex-col gap-4 lg:flex-row lg:gap-2 xl:pe-12">
             <Counter
-              maxItems={item.count}
+              maxItems={item.available_quantity}
               value={itemQuantity}
               onChange={setItemQuantity}
             />
@@ -102,8 +83,8 @@ export default function Product({ item }) {
               variant="outline"
               size="lg"
               className="flex-1 rounded-[15px] border-black p-2 text-[1.25rem] lg:p-6"
-              disabled={item.count === 0}
-              onClick={() => addToCartHandler(itemObject)}
+              disabled={item.available_quantity === 0}
+              onClick={addToCartHandler}
             >
               Add to Cart
             </Button>
@@ -115,58 +96,24 @@ export default function Product({ item }) {
               + Compare
             </Button>
           </div>
-          {item.count === 0 && (
+          {item.available_quantity === 0 && (
             <h3 className="text-Pantone">Currently out of stock!</h3>
           )}
         </section>
 
         <hr className="py-4" />
+
+        {/* Additional Information */}
         <section className="text-litegray space-y-2 text-base font-normal leading-6">
           <dl>
             <div className="flex">
-              <dt className="lg:w-16">SKU</dt>
+              <dt className="lg:w-16">Seller</dt>
               <dd className="flex items-center">
                 <span className="mx-2 lg:mx-4">:</span>
-                <span>{item.sku}</span>
-              </dd>
-            </div>
-
-            <div className="flex">
-              <dt className="lg:w-16">Category</dt>
-              <dd className="flex items-center">
-                <span className="mx-2 lg:mx-4">:</span>
-                <span>{item.category.data.attributes.name}</span>
-              </dd>
-            </div>
-
-            <div className="flex">
-              <dt className="lg:w-16">Tags</dt>
-              <dd className="flex items-center">
-                <span className="mx-2 lg:mx-4">:</span>
-                <span>
-                  {item.tags.data
-                    .map((item) => item.attributes.name)
-                    .join(", ")}
-                </span>
+                <span>{item.sellerUsername}</span>
               </dd>
             </div>
           </dl>
-
-          <article className="text-litegray flex items-center text-base font-normal leading-6">
-            <span className="lg:w-16">Share</span>
-            <span className="mx-1 lg:mx-4">:</span>
-            <div className="justify-top flex space-x-2 lg:space-x-4">
-              <a href="https://www.facebook.com/">
-                <img src={facebook} alt="Facebook" />
-              </a>
-              <a href="https://www.linkedin.com/">
-                <img src={linkedin} alt="LinkedIn" />
-              </a>
-              <a href="https://www.twitter.com/">
-                <img src={twitter} alt="Twitter" />
-              </a>
-            </div>
-          </article>
         </section>
       </section>
     </main>

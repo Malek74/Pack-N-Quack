@@ -52,6 +52,7 @@ import PaymentTransactionPage from "@/pages/PaymentTransactionPage";
 import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
+import ProductPage from "@/pages/ProductPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -132,10 +133,7 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportation/:idAdv" element={<Transportation />}></Route>
     <Route path="transportation" element={<Transportation />}></Route>
-    <Route
-      path="product/:id"
-      element={<ProductPage />}
-    />
+    <Route path="marketplace/:id" element={<ProductPage />} />
     <Route path="admin" element={<AdminPage />}>
       <Route path="users" element={<AccountDashboard />} />
       <Route path="tourism-governors" element={<GovernorsList />} />
