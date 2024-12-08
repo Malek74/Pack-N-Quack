@@ -19,7 +19,7 @@ import transactionModel from '../models/transactionsSchema.js';
 //@Body {activities,language,price}
 export const addItinerary = async (req, res) => {
     //fetch data from request body
-    const tourGuideID = req.body.tourGuideID;
+    const tourGuideID = req.user._id;
     const name = req.body.name;
     const { language, price, accessibility, tags, description, available_dates } = req.body;
     const days = JSON.parse(req.body.days);
@@ -274,7 +274,7 @@ export const getAdminItineraries = async (req, res) => {
 //@desc get all itineraries
 //@route GET api/itinerary
 export const getMyItineraries = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     const currency = req.query.currency
     let conversionRate = 0;
@@ -637,7 +637,8 @@ export const Flagg = async (req, res) => {
 };
 
 export const rateIternary = async (req, res) => {
-    const { touristId, rating, comment } = req.body;
+    const { rating, comment } = req.body;
+    const touristId = req.user._id;
     const itineraryId = req.params.id;
     if (!itineraryId) {
         return res.status(400).json({ message: "Itinerary ID is required." });

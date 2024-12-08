@@ -3,7 +3,7 @@ import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateA
 import { protect } from '../middleware/authenticator.js';
 const router = express.Router();
 
-router.post("/", protect, addAdvertiser);
+router.post("/", addAdvertiser);
 
 router.get("/allAdvertisers", getAdvertisers);
 

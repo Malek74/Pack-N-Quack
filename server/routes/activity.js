@@ -29,9 +29,9 @@ router.post("/review/:id", protect, postReview);
 router.post("/filterSort", filterAndSortActivities);
 
 // Get My activities
-router.get("/my/", getMyActivities);
+router.get("/my", protect, getMyActivities);
 
 router.put("/flag/:id", Flagg);
 router.get("/activityDetails/:id", viewSingleActivity);
-router.post("/notifyMe/:id",/*protect,*/ notifyMe); //todo: add protect
+router.post("/notifyMe/:id", protect, notifyMe); //todo: add protect
 export default router;

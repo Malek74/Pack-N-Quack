@@ -36,7 +36,7 @@ export const viewComplaints = async (req, res) => {
 }
 
 export const viewComplaintById = async (req, res) => {
-    const complaintId = req.user._id;
+    const complaintId = req.params.id;
     try {
         const complaints = await complaintModel.findById(complaintId);
         return res.status(200).json(complaints);

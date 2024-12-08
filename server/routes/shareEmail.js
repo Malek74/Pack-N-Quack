@@ -111,17 +111,6 @@ export const sendEventBookingNotification = async (userEmail, userName, eventNam
     }
 }
 
-
-
-// Example usage
-sendEventBookingNotification(
-    'user@example.com',  // User's email
-    'John Doe',          // User's name
-    'Amazing Event',     // Event name
-    'December 15, 2024', // Event date
-    'Downtown Hall',     // Event location
-    'https://example.com/book-event' // Booking link
-);
 router.post('/:id', shareMail);
 export default router;
 

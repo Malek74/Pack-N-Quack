@@ -5,7 +5,7 @@ import { getMyBookings } from "./touristController.js";
 import Booking from "../models/bookingSchema.js";
 import activityModel from "../models/activitySchema.js";
 import Itinerary from "../models/itinerarySchema.js";
-import tourist from "../models/touristSchema.js";
+import Tourist from "../models/touristSchema.js";
 
 /**
  * Sends birthday promo codes to users who have a birthday today
@@ -77,7 +77,7 @@ const sendBirthdayEmail = async (email, username, promoCode) => {
     }
 };
 
-export const sendEventReminderEmail = async (userEmail, userName, eventName, eventDate, eventTime) => {
+export const sendEventReminderEmail = async (userEmail, userName, eventName, eventDate) => {
     const mailOptions = {
         from: '"CaptainQuackers" <captainquackers@gmail.com>',
         to: userEmail, // Recipient address
@@ -134,23 +134,29 @@ export const upcomingEvent = async () => {
 
         if (Math.ceil(eventDate.getTime() - today.getTime() / (1000 * 60 * 60 * 24))) {
             const notification = await notificationSchema.create({
-                touristID,
+                title: 'Upcoming Event Reminder',
+                user: { id: touristID, role: 'Tourist' },
                 message: `You have an upcoming event: ${bookingEvent.name}`,
                 type: 'reminder',
                 read: false,
             });
 
-            const tourist = await tourist.findById(touristID);
-            //send reminder email
-            const { email, username } = tourist;
-            const { name, date } = bookingEvent;
-            const eventDate = new Date(date).toDateString();
-            const eventTime = new Date(date).toLocaleTimeString();
 
-            await sendEventReminderEmail(email, username, name, eventDate, eventTime);
+            const tourist = await Tourist.findById(touristID);
+
+            if (tourist) {
+                //send reminder email
+
+                // const email = tourist.email;
+                // const username = tourist.username;
+                // const name = bookingEvent.name;
+                const date = bookingEvent.date;
+                const eventDate = new Date(date).toDateString();
+
+                await sendEventReminderEmail(tourist.email, tourist.username, bookingEvent.name, eventDate);
+            }
         }
 
-        await notification.save();
     }
 }
 

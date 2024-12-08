@@ -4,7 +4,7 @@ import { checkUserExists } from "../utils/Helpers.js";
 
 export const requestPasswordChange = async (req, res) => {
     const { requestedPassword, oldPassword, userType } = req.body; // Make sure to extract userType
-    const userId = req.params.id;
+    const userId = req.user._id;
 
     if (!requestedPassword || !oldPassword || !userType) {
         return res.status(400).json({ message: "All fields are required" });
@@ -12,7 +12,7 @@ export const requestPasswordChange = async (req, res) => {
     try {
         // Check if the user exists
         const userExists = await checkUserExists(userId, userType);
-        
+
         if (!userExists) {
             return res.status(404).json({ message: "User not found." });
         }

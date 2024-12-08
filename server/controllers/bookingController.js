@@ -20,9 +20,9 @@ export const bookEvent = async (req, res) => {
     const { eventType, eventID, promoCode, payByWallet, numOfTickets, dateSelected } = req.body;
 
     console.log(req.body);
-    // const touristID = req.user._id;
+    const touristID = req.user._id;
 
-    const touristID = "674641df1887b9c3e11436c4"
+
     let success_url = "";
     let event = {}
     try {

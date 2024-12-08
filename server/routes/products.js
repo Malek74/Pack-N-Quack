@@ -15,7 +15,6 @@ router.get("/allSwQ", allProductSwQ);
 router.get("/eachSwQ/:name", eachProductSwQ);
 router.get("/myProducts/:id", getMyProducts);
 
-
 export default router;
 
 

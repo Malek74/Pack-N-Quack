@@ -113,7 +113,7 @@ export const listHotelRooms = async (req, res) => {
 export const bookRoom = async (req, res) => {
     const { price, numOfDays, hotel, currency, room, paymentMethod, checkIn, checkOut, name, promocode, payByWallet } = req.body;
     console.log("Parameters received:", req.body);
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     let conversionRate = 0;
     console.log("Parameters received:", { price, numOfDays, hotel, currency, room });

@@ -234,7 +234,7 @@ export const confirmFlightPrice = async (req, res) => {
 
 export const bookFlight = async (req, res) => {
   const { price, numTickets, origin, destination, currency, date, promocode, payByWallet, paymentMethod } = req.body;
-  const touristID = req.params.id;
+  const touristID = req.user._id;
   const conversionRate = await getConversionRate(currency);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
