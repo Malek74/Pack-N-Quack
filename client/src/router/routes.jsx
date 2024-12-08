@@ -36,6 +36,8 @@ import AdminsList from "@/components/adminPage/AdminsList";
 import ActivityCategory from "@/components/adminPage/ActivityCategory";
 import ActivityTags from "@/components/adminPage/ActivityTags";
 import ItineraryTags from "@/components/adminPage/ItineraryTags";
+import ManagePromoCodes from "@/components/adminPage/ManagePromoCodes"; //new
+import PromoCodeDisplayTourist from "@/pages/PromoCodeDisplayTourist"; //new
 import AdminProducts from "@/components/adminPage/AdminProducts";
 import ItinerariesView from "@/components/adminPage/ItinerariesView";
 import Complaints from "@/components/adminPage/Complaints";
@@ -54,6 +56,7 @@ import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
+import BookmarkedPage from "@/pages/BookmarkedPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -122,6 +125,7 @@ const routes = createRoutesFromElements(
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="addresses" element={<Delivery />} />
+      <Route path="bookmarked" element={<BookmarkedPage />} />
     </Route>
 
     <Route
@@ -151,6 +155,7 @@ const routes = createRoutesFromElements(
       <Route path="complaints/:complaintID" element={<OneComplain />} />
       <Route path="delete-requests" element={<DeleteRequests />} />
       <Route path="document-review" element={<DocumentReview />} />
+      <Route path="manage-promo-code" element={<ManagePromoCodes />} />
     </Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>
@@ -172,6 +177,7 @@ const routes = createRoutesFromElements(
       <Route path="rewards" element={<PointsAndLoyalty />} />
       <Route path="transactions" element={<PaymentTransactionPage />} />
       <Route path="my-products" element={<AdminProducts seller />} />
+      <Route path="promo-codes" element={<PromoCodeDisplayTourist />} />
 
       <Route path="itinerary-bookings" element={<ItineraryBookings />}></Route>
       {/* <Route path="bookings" element={<Booked />} /> */}

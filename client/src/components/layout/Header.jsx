@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import logo from "/assets/icons/logo.png";
 import DropDownMenuBook from "./components/DropDownMenuBook";
-
+import { ShoppingCart } from "lucide-react";
 import ComboboxCurrency from "./components/ComboboxCurrency";
 import { useUser } from "@/context/UserContext";
 export default function Header() {
@@ -100,6 +100,16 @@ export default function Header() {
         </ul>
 
         <ul className="flex gap-2">
+          <li>
+            <Button asChild variant="link">
+              <Link
+                to="/cart"
+                className={isActive("/cart") ? "text-yellow-500" : ""}
+              >
+                <ShoppingCart />
+              </Link>
+            </Button>
+          </li>
           <li>
             <ComboboxCurrency />
           </li>
