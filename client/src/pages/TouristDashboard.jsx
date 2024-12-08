@@ -111,7 +111,6 @@ export default function TouristDashboard() {
     isAdvertiser,
     isTourist,
     isTourismGovernor,
-    sidebarItems,
   ]);
   if (sidebarItems && userType) {
     return (

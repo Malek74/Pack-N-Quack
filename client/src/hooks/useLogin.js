@@ -17,7 +17,6 @@ export const useLogin = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true, // Ensure cookies are included
         }
       );
       updateUserId(response.data.id);

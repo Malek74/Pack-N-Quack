@@ -20,14 +20,14 @@ export default function OrderHistory() {
   const { prefCurrency, userId } = useUser();
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
-  const [tab, setTab] = useState("all");
+  const [tab, setTab] = useState("present");
   const [loading, setLoading] = useState(true);
-
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      const status = tab === "present" ? "pending" : "old";
       const response = await axios.get(
-        `/api/products/myProducts/${userId}?currency=${prefCurrency}`
+        `/api/order/viewAll?status=${status}&currency=${prefCurrency}`
       );
       setProducts(response.data);
       console.log(response.data);
@@ -45,7 +45,7 @@ export default function OrderHistory() {
 
   useEffect(() => {
     fetchProducts(); // Fetch products when the component mounts or dependencies change
-  }, [prefCurrency, userId]);
+  }, [prefCurrency, userId, tab]);
   const ProductCards = () => {
     return (
       <div className="flex flex-col gap-4">
@@ -138,7 +138,7 @@ export default function OrderHistory() {
             <TabsContent value="present">
               <ProductCards />
             </TabsContent>
-            
+
             <TabsContent value="past">
               <ProductCards />
             </TabsContent>

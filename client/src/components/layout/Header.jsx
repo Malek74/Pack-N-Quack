@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import logo from "/assets/icons/logo.png";
@@ -19,13 +19,14 @@ export default function Header() {
     isTourismGovernor,
     isGuest,
   } = useUser();
-
-  console.log("tourist " + isTourist);
-  console.log("seller " + isSeller);
-  console.log("guest " + isGuest);
-  const isLoggedIn = userId != null;
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
+  console.log(userId);
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
@@ -103,7 +104,7 @@ export default function Header() {
           <li>
             <ComboboxCurrency />
           </li>
-          {!isLoggedIn ? (
+          {userId == null ? (
             <>
               <li>
                 <Button asChild variant="ghost">
@@ -132,7 +133,7 @@ export default function Header() {
               </li>
               <li>
                 {/* THIS IS TEMPORARY */}
-                <Button variant="link" onClick={logout}>
+                <Button variant="link" onClick={handleLogout}>
                   Logout
                 </Button>
               </li>
