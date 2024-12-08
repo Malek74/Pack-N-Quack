@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Table,
   TableBody,
@@ -19,8 +20,8 @@ import CreateDialog from "../shared/CreateDialog";
 import DeliveryForm from "../forms/DeliveryForm";
 import axios from "axios";
 import { useEffect, useState } from "react";
-export default function AddressFormWithLayout() {
-  const [addresses, setAddresses] = useState([]);
+export default function AddressFormWithLayout({ addresses, setAddresses }) {
+  //const [addresses, setAddresses] = useState([]);
   const [defaultAddress, setDefaultAddress] = useState(null);
   // Initialize React Hook Form
   const handleViewAddress = async () => {

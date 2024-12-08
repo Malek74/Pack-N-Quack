@@ -12,19 +12,22 @@ import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import ItineraryCard from "@/components/itinerariesPage/ItinerariesCard";
 import { useUser } from "@/context/UserContext";
 import { set } from "date-fns";
+import Loading from "@/components/shared/Loading";
 
 import { ShareButton } from "@/components/shared/ShareButton";
 import Delivery from "@/components/CheckOutPage/Delivery";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const userID = "6732171fabc80503fd8f92a2";
+  const { userId, userType } = useUser();
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(
-          `/api/tourist/myPreferences/${userID}`
+          `/api/tourist/myPreferences/`
         );
         console.log(response.data);
         setActivities(response.data.activites);
@@ -32,6 +35,8 @@ export default function HomePage() {
         console.log(response.data.activites);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,15 +45,15 @@ export default function HomePage() {
 
   const filteredActivities = activities
     ? activities.filter((activity) =>
-        activity.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
   console.log(filteredActivities);
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
-        itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   return (
@@ -57,10 +62,10 @@ export default function HomePage() {
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-          //    alt="Hustling market"
-          //    name="Live your dream destinations."
-          //    textAlign="left"
-          //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+        //    alt="Hustling market"
+        //    name="Live your dream destinations."
+        //    textAlign="left"
+        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
@@ -70,7 +75,9 @@ export default function HomePage() {
           placeholder={"Look for something fun to do!"}
         />
       </div>
-
+      <div className="flex justify-center mt-10  ">
+        {loading && <Loading />}
+      </div>
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
         {Array.isArray(filteredActivities) &&
           filteredActivities.map((activity) => (
@@ -107,13 +114,11 @@ export default function HomePage() {
               price={itinerary.price}
               rating={itinerary.ratings.averageRating}
               numberOfReviews={itinerary.ratings.reviews.length}
-              touristClicked
+              touristClicked={true}
             />
           ))}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-          <ShareButton />
         </div>
-        <Delivery />
       </div>
     </div>
   );

@@ -8,11 +8,15 @@ import CartCard from "../components/cartPage/CartCard";
 import Loading from "@/components/shared/Loading";
 import Banner from "@/components/shared/Banner";
 import BannerImage from "/assets/images/Background.jpg";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 const Cart = () => {
     const { fetchCart, cartState } = useCart();
     const { cartItems } = cartState;
-    const userId = "674641df1887b9c3e11436c4";
+    const userId = useUser().userId;
     const prefCurrency = useUser().prefCurrency;
+    const cart = useLocation().pathname === "/cart" ? true : false;
     // const handleRemove = (productId) => {
     //     removeItemFromCart(userId, productId);
     // };
@@ -22,6 +26,7 @@ const Cart = () => {
     // const handleClearCart = () => {
     //     cartDispatch({ type: "CLEAR_CART" });
     // };
+
 
     useEffect(() => {
         fetchProducts(userId);
@@ -55,8 +60,8 @@ const Cart = () => {
                     <div className="flex justify-between">
                         <span className="text-2xl mx-16 my-8 font-bold"> Your Total:</span>
                         <span className="text-2xl mx-16 my-8 mr-20 "> {prefCurrency}{" "}{cartItems.reduce((total, item) => total + item.productID.price * item.quantity, 0)}</span></div>
-                    <div className="flex justify-end ">
-                        <Button className="mr-20 mb-12 w-40 h-12 text-xl hover:bg-goldhover bg-gold" onClick={() => { window.location.href = "/checkout" }}>Checkout</Button>
+                    <div className="flex justify-end  ">
+                        {cart && <Button className="mr-20 mb-12 w-40 h-12 text-xl hover:bg-goldhover bg-gold" onClick={() => { window.location.href = "/checkout" }}>Checkout</Button>}
                     </div>
                 </>
             )}

@@ -20,6 +20,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import Paying from "../shared/Paying";
 
 export default function FlightBookingForm({ flight, onBook, onSelect }) {
 
@@ -87,7 +88,7 @@ export default function FlightBookingForm({ flight, onBook, onSelect }) {
 
                                 )}
                             />
-
+                            <Paying />
                             <Button className="place-self-end bg-gold hover:bg-goldhover" type="submit">
                                 Confirm Booking
                             </Button>
