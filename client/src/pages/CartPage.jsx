@@ -12,7 +12,7 @@ const Cart = () => {
     const { fetchCart, cartState } = useCart();
     const { cartItems } = cartState;
     const userId = "674641df1887b9c3e11436c4";
-
+    const prefCurrency = useUser().prefCurrency;
     // const handleRemove = (productId) => {
     //     removeItemFromCart(userId, productId);
     // };
@@ -29,25 +29,14 @@ const Cart = () => {
 
     return (
         <div>
-            {/*
-             <div className="flex flex-col px-16 mt-12">
-                <div className="relative">
-                    <Banner
-                        background={BannerImage}
-                        alt="Hustling market"
-                        name="Your Cart"
-                    />
+            <h1 className="text-3xl font-bold text-center my-8">Your Cart</h1>
 
-                </div>
-            </div> 
-            */}
             {cartItems.length === 0 ? (
-                <Loading />
+                <div className="flex justify-center"> <Loading /> </div>
             ) : (
                 <>
                     <div className="mx-16">
                         <div className="grid grid-rows-1 gap-8 mb-12 justify-start">
-                            <h1 className="text-3xl font-bold text-center my-8">Your Cart</h1>
                             {cartItems.map((item) => (
 
                                 <CartCard
@@ -63,8 +52,11 @@ const Cart = () => {
                             ))}
                         </div>
                     </div>
+                    <div className="flex justify-between">
+                        <span className="text-2xl mx-16 my-8 font-bold"> Your Total:</span>
+                        <span className="text-2xl mx-16 my-8 mr-20 "> {prefCurrency}{" "}{cartItems.reduce((total, item) => total + item.productID.price * item.quantity, 0)}</span></div>
                     <div className="flex justify-end ">
-                        <Button className="mr-16 mb-12 w-40 h-12 text-xl hover:bg-goldhover bg-gold" onClick={() => { window.location.href = "/checkout" }}>Checkout</Button>
+                        <Button className="mr-20 mb-12 w-40 h-12 text-xl hover:bg-goldhover bg-gold" onClick={() => { window.location.href = "/checkout" }}>Checkout</Button>
                     </div>
                 </>
             )}

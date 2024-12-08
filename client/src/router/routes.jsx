@@ -54,6 +54,7 @@ import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
+import BookmarkedPage from "@/pages/BookmarkedPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -122,6 +123,7 @@ const routes = createRoutesFromElements(
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="addresses" element={<Delivery />} />
+      <Route path="bookmarked" element={<BookmarkedPage />} />
     </Route>
 
     <Route

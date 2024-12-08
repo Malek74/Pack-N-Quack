@@ -10,7 +10,7 @@ const WishlistButton = ({ id, wishlistAdd, wishlistRemove, wishlisted, touristId
 
         const checkWishlist = async () => {
             try {
-                const response = await axios.get(`/api/tourist/wishlist/${touristId}`);
+                const response = await axios.get(`/api/tourist/wishlist/`);
                 const isWishlisted = response.data.some((product) => product._id === id);
                 setWished(isWishlisted); // Update the state based on the check
                 console.log(isWishlisted);

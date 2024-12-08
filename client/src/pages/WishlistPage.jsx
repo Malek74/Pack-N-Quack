@@ -28,7 +28,7 @@ export default function MarketplacePage() {
     const fetchWishlist = () => {
         try {
             setLoading(true);
-            axios.get(`/api/tourist/wishlist/${touristId}`).then((response) => {
+            axios.get(`/api/tourist/wishlist`).then((response) => {
                 setProducts(response.data);
             });
         } catch (error) {
