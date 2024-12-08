@@ -291,7 +291,7 @@ export const getMyHotels = async (req, res) => {
 }
 
 export const getMyWalletBalance = async (req, res) => {
-    const id = "674641df1887b9c3e11436c4";
+    const id = req.user._id;
     const currency = req.query.currency || "USD";
     try {
         const conversionRate = await getConversionRate(currency);
@@ -307,7 +307,7 @@ export const getMyWalletBalance = async (req, res) => {
 }
 
 export const getMyPromoCodes = async (req, res) => {
-    const id = "674641df1887b9c3e11436c4";
+    const id = req.user._id;
     try {
         const tourist = await Tourist.findById(id);
         const promoCodes = await PromoCodes.findOne({ code: tourist.promoCode.code, isBirthDay: true });
