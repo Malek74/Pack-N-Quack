@@ -143,14 +143,12 @@ export const bookEvent = async (req, res) => {
 
             if (amountLeftToPay == 0) {
                 sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
-                await Booking.create(bookedEvent);
 
                 //create a booking
-                bookEvent.touristID = touristID;
+                bookedEvent.touristID = touristID;
                 bookedEvent.date = dateSelected;
 
-
-
+                await Booking.create(bookedEvent);
                 return res.status(200).json({ message: "Payment successful", url: success_url });
             } else {
 
