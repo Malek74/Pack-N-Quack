@@ -8,7 +8,7 @@ import FlightImage from '/assets/images/duckInPlane.jpg';
 import TransportationCard from '@/components/transportationPage/TransportationCard';
 import GuideButton from "@/components/guideComponents/popMessage";
 export default function Booked() {
-    const userID = "6725442e98359339d8b821f0";
+    const userID = useUser().userId;
     const [bookedFlights, setBookedFlights] = useState([])
     const [bookedHotels, setBookedHotels] = useState([])
     const [bookedTransportations, setBookedTransportations] = useState([])
@@ -17,7 +17,7 @@ export default function Booked() {
     useEffect(() => {
         const fetchBooked = async () => {
             try {
-                const response = await axios.post(`/api/tourist/myBookings/${userID}`, {
+                const response = await axios.post(`/api/tourist/myBookings`, {
                     eventType: "transportation"
                 });
 

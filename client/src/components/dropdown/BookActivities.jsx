@@ -26,14 +26,14 @@ export default function BookActivities() {
   const fetchBookedActivities = async () => {
     try {
       const response = await axios.post(
-        "/api/tourist/myBookings/674641df1887b9c3e11436c4",
+        "/api/tourist/myBookings/ ",
         { eventType: "activity" }
       );
       const allActivities = response.data.filter(activity => activity != null);
       const now = new Date();
       const upcoming = allActivities.filter(activity => isFuture(new Date(activity.activityID.date)));
       const past = allActivities.filter(activity => !isFuture(new Date(activity.activityID.date)));
-      
+
       setUpcomingActivities(upcoming);
       setPastActivities(past);
       setLoading(false);
@@ -45,7 +45,7 @@ export default function BookActivities() {
 
   const cancelBooking = async (activityID) => {
     try {
-      await axios.post(`/api/booking/cancelBooking/6725442e98359339d8b821f0`, {
+      await axios.post(`/api/booking/cancelBooking/`, {
         eventType: "activity",
         eventID: activityID,
       });
@@ -149,7 +149,7 @@ export default function BookActivities() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <motion.h1 
+      <motion.h1
         className="text-4xl font-bold text-center mb-8 text-blue-600"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -108,7 +108,7 @@ export default function Activities() {
   useEffect(() => {
     const fetchMyActivites = async () => {
       try {
-        const response = await axios.get(`/api/activity/my/${idAdv}`);
+        const response = await axios.get(`/api/activity/my/`);
         setActivities(response.data);
       } catch (error) {
         console.error(error);

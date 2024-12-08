@@ -19,7 +19,7 @@ export default function TourGuides() {
     const fetchAccounts = async () => {
       try {
         const response = await axios.get(
-          "/api/tourist/mytourguides/6725442e98359339d8b821f0"
+          "/api/tourist/mytourguides/"
         );
         setAccounts(response.data);
       } catch (error) {

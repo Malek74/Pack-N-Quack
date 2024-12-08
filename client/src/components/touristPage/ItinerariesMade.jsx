@@ -19,7 +19,7 @@ export default function ItinerariesMade() {
     const fetchAccounts = async () => {
       try {
         const response = await axios.get(
-          "/api/tourist/myitineraries/6725442e98359339d8b821f0"
+          "/api/tourist/myitineraries/"
         );
         setAccounts(response.data);
       } catch (error) {

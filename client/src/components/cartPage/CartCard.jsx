@@ -35,7 +35,7 @@ export default function CartCard(props) {
         updateCart(userId, id, quantity);
     }
 
-    return (<div className="rounded-xl w-[50rem] h-[12rem] shadow-md flex relative overflow-hidden">
+    return (<div className="rounded-xl w-[40rem] h-[10rem]  shadow-md flex relative overflow-hidden">
 
         {/* Product Image Section */}
         <div className="w-1/3 h-full bg-gray-200">

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Table,
   TableBody,
@@ -18,8 +19,8 @@ import CreateDialog from "../shared/CreateDialog";
 import DeliveryForm from "../forms/DeliveryForm";
 import axios from "axios";
 import { useEffect, useState } from "react";
-export default function AddressFormWithLayout() {
-  const [addresses, setAddresses] = useState([]);
+export default function AddressFormWithLayout({ addresses, setAddresses }) {
+  //const [addresses, setAddresses] = useState([]);
   const [defaultAddress, setDefaultAddress] = useState(null);
   // Initialize React Hook Form
   const handleViewAddress = async () => {
@@ -93,11 +94,25 @@ export default function AddressFormWithLayout() {
                     defaultChecked={address.address === defaultAddress.address}
                   />
                 </TableCell>
+
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {addresses.map((address) => (
+                <TableRow key={address.id}>
+                  <TableCell>{address.address}</TableCell>
+                  <TableCell>{address.postcode}</TableCell>
+                  <TableCell>{address.town}</TableCell>
+                  <TableCell>{address.country}</TableCell>
+                  <TableCell>
+                    <input type="radio" name="address" value={address.address} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -27,7 +27,7 @@ export default function OrderHistory() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `/api/products/myProducts/${userId}?currency=${prefCurrency}`
+        `/api/products/myProducts/`
       );
       setProducts(response.data);
       console.log(response.data);

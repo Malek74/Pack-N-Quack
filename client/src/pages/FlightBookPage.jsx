@@ -41,15 +41,18 @@ const FlightBookingApp = () => {
         }
     };
 
-    const bookFlight = async (id, flightOffer, numTickets) => {
+    const bookFlight = async (flightOffer, numTickets, paymentMethod, promoCode) => {
         try {
-            const response = await axios.post(`/api/bookFlight/book/${id}`, {
+            console.log(numTickets);
+            const response = await axios.post(`/api/bookFlight/book/`, {
                 price: flightOffer.price.total,
                 currency: flightOffer.price.currency,
                 numTickets: numTickets,
                 origin: flightOffer.itineraries[0].segments[0].departure.iataCode,
                 destination: flightOffer.itineraries[0].segments[flightOffer.itineraries[0].segments.length - 1].arrival.iataCode,
                 date: flightOffer.itineraries[0].segments[0].departure.at,
+                payByWallet: paymentMethod === "wallet",
+                promocode: promoCode
             });
             window.location.href = response.data.url;
 
@@ -81,10 +84,10 @@ const FlightBookingApp = () => {
 
 
 
-    const handleBooking = (numTickets) => {
+    const handleBooking = (numTickets, paymentMethod, promoCode) => {
         if (selectedFlight) {
 
-            bookFlight(userID, selectedFlight, numTickets); // Book the selected flight with traveler info
+            bookFlight(selectedFlight, numTickets, paymentMethod, promoCode); // Book the selected flight with traveler info
         } else {
             console.log("No flight selected.");
         }

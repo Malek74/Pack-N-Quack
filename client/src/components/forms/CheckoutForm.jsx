@@ -14,6 +14,16 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
@@ -73,130 +83,129 @@ export default function CheckoutForm({ profile, onRefresh }) {
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <>
+            <h1 className="text-3xl font-bold text-center my-8">Checkout</h1>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
 
-                {/* Email */}
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                                <Input placeholder="email@example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Website Link */}
-                <FormField
-                    control={form.control}
-                    name="counrty"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Country</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Rooma" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                {/* Hotline */}
-                <FormField
-                    control={form.control}
-                    name="mobile"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Mobile</FormLabel>
-                            <FormControl>
-                                <Input placeholder="123-456-7890" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="dob"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                            <FormLabel>Date of birth</FormLabel>
-                            <SampleDatePicker value={field.value} onChange={field.onChange} />
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="nationality"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Nationality</FormLabel>
-                            <FormControl>
-                                <Input placeholder="egyptian" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="jobStudent"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
-                            <FormLabel>Status</FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={(value) => {
-                                        setJobStudent(value);
-                                        field.onChange(value);
-                                    }}
-                                    defaultValue={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="job" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Job</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="student" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Student</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                {jobStudent != "student" && profile.jobTitle && (
+                    {/* Email */}
                     <FormField
                         control={form.control}
-                        name="jobTitle"
+                        name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Job title</FormLabel>
+                                <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="e.g engineer,doctor etc..." {...field} />
+                                    <Input placeholder="email@example.com" {...field} />
                                 </FormControl>
-                                <FormDescription>state your job.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                )}
+                    <FormField
+                        control={form.control}
+                        name="country"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Select onValueChange={(value) => {
+                                        field.onChange(value);
+                                    }}>
+                                        <SelectTrigger className="w-[180px]" onValueChange={field.onChange}>
+                                            <SelectValue placeholder="Select a country" {...field} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Cities</SelectLabel>
+                                                {/* {cities.map((city, index) => (
+                                                <SelectItem key={index} value={city}>{city} </SelectItem>
+                                            ))} */}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
 
-                <Button type="submit">Submit</Button>
-            </form>
-        </Form>
+                                </FormControl>
+                                <FormDescription />
+                                <FormMessage />
+                            </FormItem>
+
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="fname"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="John" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="lname"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Doe" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    {/* Hotline */}
+                    <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Address</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="3 street" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+
+                    <FormField
+                        control={form.control}
+                        name="appartment"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Appartment</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="appartment, suite, etc." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="appartment, suite, etc." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+
+
+                    <Button type="submit">Submit</Button>
+                </form>
+            </Form>
+        </>
     );
 }

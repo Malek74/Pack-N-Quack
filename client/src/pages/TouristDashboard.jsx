@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  Gem,
   MapPinHouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -47,6 +48,24 @@ export default function TouristDashboard() {
       label: "Rewards and Points",
       icon: Gift,
       path: "rewards",
+    },
+
+    {
+      label: "Bookmarked",
+      icon: Package,
+      path: "bookmarked",
+    },
+
+
+     {
+      label: "Promo codes",
+      icon: Gem,
+      path: "promo-codes",
+    },
+    {
+      label: "Transactions",
+      icon: Gift,
+      path: "transactions",
     },
     {
       label: "Transactions",
@@ -139,11 +158,10 @@ export default function TouristDashboard() {
                         key={label}
                         variant="ghost"
                         onClick={() => handleSectionChange(label, path)}
-                        className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                          activeSection === label
-                            ? "bg-muted text-primary"
-                            : "text-muted-foreground hover:text-primary"
-                        }`}
+                        className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${activeSection === label
+                          ? "bg-muted text-primary"
+                          : "text-muted-foreground hover:text-primary"
+                          }`}
                       >
                         <Icon className="h-4 w-4" />
                         {label}

@@ -1,9 +1,9 @@
 // eslint-disable-next-line react/prop-types
 export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
   const sizes = {
-    small: 12,
-    medium: 16,
-    large: 24,
+    small: 3,
+    medium: 4,
+    large: 6,
   };
 
   // eslint-disable-next-line react/prop-types
@@ -13,9 +13,8 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
       height={sizes[size]}
       viewBox="0 0 18 18"
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-${sizes[size]} h-${sizes[size]} ${
-        filled ? "" : "text-gray-300"
-      }`}
+      className={`w-${sizes[size]} h-${sizes[size]} ${filled ? "" : "text-gray-300"
+        }`}
     >
       <defs>
         <linearGradient
