@@ -19,8 +19,7 @@ import {
     getCart,
     viewMyWishlist,
     addToWishlist,
-    removeFromWishlist
-    viewMyActivities,
+    removeFromWishlist,
     bookmark,
     viewBookmarks,
     AddNewAddress,
