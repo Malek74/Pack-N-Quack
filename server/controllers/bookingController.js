@@ -88,8 +88,13 @@ export const bookEvent = async (req, res) => {
             }
         }
 
-        //set booked event price
+        //create booking object
         bookedEvent.price = amountToPay;
+        bookedEvent.touristID = touristID;
+        bookedEvent.date = dateSelected;
+
+        await Booking.create(bookedEvent);
+
 
         if (eventType == "activity") {
             success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
@@ -135,6 +140,7 @@ export const bookEvent = async (req, res) => {
             }
 
             console.log("amount left to pay: ", amountLeftToPay);
+            //create a booking
 
 
             //update wallet amount
@@ -144,11 +150,6 @@ export const bookEvent = async (req, res) => {
             if (amountLeftToPay == 0) {
                 sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
 
-                //create a booking
-                bookedEvent.touristID = touristID;
-                bookedEvent.date = dateSelected;
-
-                await Booking.create(bookedEvent);
                 return res.status(200).json({ message: "Payment successful", url: success_url });
             } else {
 
@@ -174,7 +175,7 @@ export const bookEvent = async (req, res) => {
                     payment_method_types: ['card'],
                     line_items: [{
                         price: price.id,
-                        quantity: numOfTickets,
+                        quantity: 1,
                     }],
                     mode: 'payment',
                     success_url: success_url,
@@ -211,14 +212,14 @@ export const bookEvent = async (req, res) => {
         const price = await stripe.prices.create({
             currency: 'usd',
             product: product.id,
-            unit_amount: event.price * numOfTickets * 100,
+            unit_amount: amountToPay * 100,
         });
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
                 price: price.id,
-                quantity: numOfTickets,
+                quantity: 1,
             }],
             mode: 'payment',
             success_url: success_url,
@@ -281,9 +282,7 @@ export const cancelBooking = async function (req, res) {
         }
 
         //fetch the session and related data from stripe
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const tourist = await Tourist.findById(touristID);
-        const paymentSession = await stripe.checkout.sessions.retrieve(booking.stripeSessionID);
 
 
         //refund money

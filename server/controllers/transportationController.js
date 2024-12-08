@@ -93,7 +93,7 @@ export const createTransportation = async (req, res) => {
 export const bookTransportation = async (req, res) => {
 
     const touristID = req.params.id;
-    const { eventID, numOfTickets, promocode } = req.body;
+    const { eventID, numOfTickets, promocode,payByWallet, } = req.body;
     console.log(req.body);
     let event = {}
     try {

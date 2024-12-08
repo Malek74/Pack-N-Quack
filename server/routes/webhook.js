@@ -3,6 +3,6 @@ import { confirmPayment } from '../controllers/webhook.js';
 
 const router = express.Router();
 
-router.post('/', confirmPayment)
+// router.post('/', confirmPayment)
 
 export default router;
