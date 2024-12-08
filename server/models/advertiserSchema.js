@@ -5,6 +5,10 @@ const advertiserSchema = new Schema({
         type: String,
         default: ""
     },
+    gender: {
+        type: String,
+        default: "male"
+    },
     email: {
         type: String,
         required: true,
@@ -35,6 +39,16 @@ const advertiserSchema = new Schema({
         default: ""
     },
     isAccepted: {
+        type: Boolean,
+        default: false
+    },
+    uploadedFiles: {
+        images: { type: [String], default: [], required: false },
+        documents: [
+            String
+        ]
+    },
+    hasAcceptedTerms: {
         type: Boolean,
         default: false
     },

@@ -12,10 +12,11 @@ import PriceSlider from "../components/shared/PriceSlider";
 import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
+import Loading from "@/components/shared/Loading";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
-  const {prefCurrency} = useUser();
+  const { prefCurrency } = useUser();
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(null); // Start as null until it's fetched
   const [priceRange, setPriceRange] = useState([0, 100000000]); // Applied price range
@@ -38,11 +39,12 @@ export default function MarketplacePage() {
       });
   };
 
-  26835438303
-  14215076750
+  // 26835438303
+  // 14215076750
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
+
       .get(`api/products/maxProductPrice?currency=${prefCurrency}`)
       .then((response) => {
         setMaxPrice(response.data + 200);
@@ -163,7 +165,9 @@ export default function MarketplacePage() {
             />
           ))
         ) : (
-          <p>Loading</p>
+          <div>
+            <Loading />
+          </div>
         )}
       </div>
     </div>

@@ -3,12 +3,31 @@ import activityModel from "../models/activitySchema.js";
 import activityTag from "../models/activityTagSchema.js";
 import activityCategory from "../models/activityCategorySchema.js";
 import { query } from "express";
+import stripe from 'stripe';
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
+import { getConversionRate } from "../utils/Helpers.js";
+import Booking from "../models/bookingSchema.js";
 
 // @desc Get all activities
 // @route GET /api/activity
 export const getActivities = async (req, res) => {
+    const prefCurrency = req.query.currency || "USD";
+    const conversionRate = await getConversionRate(prefCurrency);
+
     try {
-        const activities = await activityModel.find({}).populate('advertiserID categoryID tags');
+        let activities = await activityModel.find({ flagged: false }).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        activities = activities.map(activity => {
+            if (activity.priceType === 'fixed') {
+                activity.price = activity.price * conversionRate;
+            } else {
+                activity.minPrice = activity.minPrice * conversionRate;
+                activity.maxPrice = activity.maxPrice * conversionRate;
+            }
+            return activity;
+        });
+
         res.status(200).json(activities);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -19,6 +38,8 @@ export const getActivities = async (req, res) => {
 // @route POST /api/activity
 // @Body { advertiserID, categoryID, date, location, priceType, price, minPrice, maxPrice, tags, specialDiscounts, isBookingOpen, duration, name }
 export const addActivity = async (req, res) => {
+
+    const newActivity = req.body;
     console.log(req.body)
     if (!req.body.advertiserID) {
         req.body.advertiserID = new mongoose.Types.ObjectId("66ffe2acd9af7892d8193dad");
@@ -47,9 +68,27 @@ export const addActivity = async (req, res) => {
         req.body.categoryID = category._id
     }
     console.log(req.body)
-    const newActivity = new activityModel(req.body);
+
+    const stripeProduct = await stripeInstance.products.create({
+        name: req.body.name,
+        description: req.body.description,
+        images: [req.body.image],
+    });
+
+    const stripePrice = await stripeInstance.prices.create({
+        product: stripeProduct.id,
+        unit_amount: req.body.price * 100, //stripe uses cents
+        currency: 'usd'
+    });
+
+    //todo: change to dynamic currency
+    newActivity.stripePriceID = stripePrice.id;
+    newActivity.stripeProductID = stripeProduct.id;
+    const activityCreated = new activityModel(newActivity);
+
+
     try {
-        const a = await newActivity.save();
+        const a = await activityCreated.save();
         console.log(a)
         return res.status(200).json(a);
     } catch (error) {
@@ -104,52 +143,161 @@ export const deleteActivity = async (req, res) => {
 // @desc Search for an activity based on Name ,Category or Tag
 // @route GET /api/activity/search
 // @Body { searchBy, name, categoryID, tagID }
+// export const searchActivity = async (req, res) => {
+//     const searchBy = req.body.searchBy; // name, category, tag
+//     const name = req.body.name;
+//     const categoryID = req.body.categoryID;
+//     const tagID = req.body.tagID;
+//     let a;
+
+//     switch (searchBy) {
+//         case "name":
+//             a = await activityModel.find({ name: name });
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activity not found' });
+//             }
+//             res.status(200).json(a);
+//             break;
+//         case "category":
+//             a = await activityModel.find({ categoryID: categoryID });
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activities not found' });
+//             }
+//             res.status(200).json(a);
+//             break;
+//         case "tag":
+//             a = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
+//             if (!a) {
+//                 return res.status(404).json({ message: 'Activities not found' });
+//             }
+//             a = a.filter(activity => activity.flagged === false);
+//             res.status(200).json(a);
+//             break;
+//         default:
+//             break;
+//     }
+// }
+
 export const searchActivity = async (req, res) => {
     const searchBy = req.body.searchBy; // name, category, tag
     const name = req.body.name;
     const categoryID = req.body.categoryID;
     const tagID = req.body.tagID;
-    let a;
+    let activities;
+    const currency = req.query.currency || "USD";
+    const conversionRate = await getConversionRate(currency);
 
     switch (searchBy) {
         case "name":
-            a = await activityModel.find({ name: name });
-            if (!a) {
+            activities = await activityModel.find({ name: name });
+            if (!activities) {
                 return res.status(404).json({ message: 'Activity not found' });
             }
-            res.status(200).json(a);
+
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+
+            res.status(200).json(activities);
             break;
         case "category":
-            a = await activityModel.find({ categoryID: categoryID });
-            if (!a) {
+            activities = await activityModel.find({ categoryID: categoryID });
+            if (!activities) {
                 return res.status(404).json({ message: 'Activities not found' });
             }
-            res.status(200).json(a);
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+            res.status(200).json(activities);
             break;
         case "tag":
-            a = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
-            if (!a) {
+            activities = await activityModel.find({ tags: { $in: [tagID] } }).populate('advertiserID categoryID tags');
+            if (!activities) {
                 return res.status(404).json({ message: 'Activities not found' });
             }
-            res.status(200).json(a);
+            //change price to preferred currency
+            activities = activities.map(activity => {
+                if (activity.priceType === 'fixed') {
+                    activity.price = activity.price * conversionRate;
+                } else {
+                    activity.minPrice = activity.minPrice * conversionRate;
+                    activity.maxPrice = activity.maxPrice * conversionRate;
+                }
+                return activity;
+            });
+
+            activities = activities.filter(activity => !activity.flagged);
+
+            if (activities.length === 0) {
+                return res.status(404).json({ message: 'Activities not found' });
+            }
+
+
+            res.status(200).json(activities);
             break;
         default:
             break;
     }
 }
 
+
+
+
 // @desc Get all upcoming activities
 // @route GET /api/activity/upcoming
 export const getUpcomingActivities = async (req, res) => {
     try {
-        const today = new Date();
-        console.log(today)
-        const activities = await activityModel.find({ date: { $gte: today } }).populate('advertiserID categoryID tags');
+        const prefCurrency = req.query.currency || "USD";
+        const conversionRate = await getConversionRate(prefCurrency);
+        let today = new Date();
+        console.log("Today's date:", today);
+
+        // Use let instead of const for reassigning the activities variable
+        let activities = await activityModel.find({
+            date: { $gte: today },
+            // flagged: false,
+        }).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        activities = activities.map(activity => {
+            if (activity.priceType === 'fixed') {
+                activity.price = activity.price * conversionRate;
+            } else {
+                activity.minPrice = activity.minPrice * conversionRate;
+                activity.maxPrice = activity.maxPrice * conversionRate;
+            }
+            return activity;
+        });
+
+
+        console.log("Fetched Activities:", activities);
+
+        // Check if activities are empty
+        if (activities.length === 0) {
+            console.log("No upcoming activities found.");
+        }
+        activities = activities.filter(activity => !activity.flagged);
         res.status(200).json(activities);
     } catch (error) {
+        console.error("Error fetching upcoming activities:", error);
         res.status(404).json({ message: error.message });
     }
 }
+
 
 // @desc Post a review
 // @route POST /api/activity/review
@@ -157,13 +305,18 @@ export const getUpcomingActivities = async (req, res) => {
 // @Body { touristID, review, rating }
 export const postReview = async (req, res) => {
     const id = req.params.id;
-    const { touristID, review, rating } = req.body;
+    const { touristID, comment, rating } = req.body;
+    console.log(req.body);
+
     try {
         const activity = await activityModel.findById(id);
         if (!activity) {
             return res.status(404).json({ message: 'Activity not found' });
         }
-        activity.ratings.reviews.push({ touristID, review, rating });
+        if (activity.flagged) {
+            return res.status(404).json({ message: 'Activity is flagged' });
+        }
+        activity.ratings.reviews.push({ touristID, comment, rating });
         const reviews = activity.ratings.reviews;
         let totalRating = 0;
         for (let i = 0; i < reviews.length; i++) {
@@ -173,6 +326,7 @@ export const postReview = async (req, res) => {
         await activity.save();
         res.status(200).json(activity);
     } catch (error) {
+        console.error("Error posting review:", error);
         res.status(404).json({ message: error.message });
     }
 }
@@ -183,95 +337,94 @@ export const postReview = async (req, res) => {
 export const filterAndSortActivities = async (req, res) => {
     const { tags, name, budgetMin, budgetMax, category, sortPrice, sortRating, rating, dateMin, dateMax } = req.body;
 
-    console.log(req.body)
+    console.log("Request body:", req.body);
     let query = {};
+    const currency = req.query.currency || "USD";
+    const conversionRate = await getConversionRate(currency);
 
-    if (budgetMin && budgetMax) {
+    // Handle budget filtering
+    if (budgetMin !== undefined && budgetMax !== undefined) {
         query.$or = [
-            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin, $lte: budgetMax } }] },
-            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin, $lte: budgetMax } }] },
-            { $and: [{ priceType: 'range', maxPrice: { $gte: budgetMin, $lte: budgetMax } }] },
+            { $and: [{ priceType: 'fixed' }, { price: { $gte: budgetMin * conversionRate, $lte: budgetMax * conversionRate } }] },
+            { $and: [{ priceType: 'range', minPrice: { $gte: budgetMin * conversionRate } }, { maxPrice: { $lte: budgetMax * conversionRate } }] }
         ];
     }
+
+    // Handle date filtering
     if (dateMin && dateMax) {
         query.date = { $gte: new Date(dateMin), $lte: new Date(dateMax) };
     }
+
+    // Handle category filtering
     if (category) {
-        const categoryID = await activityCategory.findOne({ name: category })
-        query.categoryID = categoryID._id;
+        const categoryID = await activityCategory.findOne({ name: category });
+        if (categoryID) {
+            query.categoryID = categoryID._id;
+        }
     }
+
+    // Handle name filtering
     if (name) {
-        query.name = { $regex: name, $options: 'i' };
+        query.name = { $regex: name, $options: 'i' }; // Case-insensitive search
     }
+
+    // Handle rating filtering
     if (rating) {
         query['ratings.averageRating'] = { $gte: rating };
     }
-    if (tags) {
-        let tagsIDs = [];
-        let flag = false;
-        for (let i = 0; i < tags.length; i++) {
-            const tag = await activityTag.findOne({ name: tags[i] });
-            tagsIDs.push(tag._id);
-            flag = true;
-        }
-        console.log(tagsIDs)
-        if (flag)
-            query.tags = { $in: tagsIDs }; // This checks if any of the tagIDs in 'tags' array is in the 'tags' field of activity
-    }
-    try {
-        if (sortPrice || sortRating) {
-            if (sortPrice != 0 || sortRating != 0) {
-                let sortOptions = {};
-                if (sortPrice != undefined && sortPrice != 0) {
-                    sortOptions.normalizedPrice = sortPrice;
-                }
-                if (sortRating != undefined && sortRating != 0) {
-                    sortOptions['ratings.averageRating'] = sortRating;
-                }
-                console.log("dakhal sort")
-                console.log(query)
-                const activities = await activityModel.aggregate([
-                    { $match: query }, // Apply filters
 
-                    // Add a virtual field called "normalizedPrice"
-                    {
-                        $addFields: {
-                            normalizedPrice: {
-                                $cond: {
-                                    if: { $eq: ["$priceType", "fixed"] }, // If priceType is "fixed"
-                                    then: "$price", // Use the price value
-                                    else: "$minPrice"// For range, use the average of minPrice and maxPrice
-                                }
+    // Handle tag filtering
+    if (tags && tags.length > 0) {
+        const tagIDs = await Promise.all(tags.map(tag => activityTag.findOne({ name: tag }).then(tagDoc => tagDoc ? tagDoc._id : null)));
+        const filteredTagIDs = tagIDs.filter(id => id); // Remove nulls
+        if (filteredTagIDs.length > 0) {
+            query.tags = { $in: filteredTagIDs }; // Match activities with any of the tagIDs
+        }
+    }
+
+    try {
+        let activities;
+        // Sort and fetch activities based on specified criteria
+        if (sortPrice || sortRating) {
+            const sortOptions = {};
+            if (sortPrice) sortOptions.normalizedPrice = sortPrice;
+            if (sortRating) sortOptions['ratings.averageRating'] = sortRating;
+
+            activities = await activityModel.aggregate([
+                { $match: query },
+                {
+                    $addFields: {
+                        normalizedPrice: {
+                            $cond: {
+                                if: { $eq: ["$priceType", "fixed"] },
+                                then: "$price",
+                                else: { $avg: ["$minPrice", "$maxPrice"] } // Use average for range pricing
                             }
                         }
-                    },
-
-                    // Sort based on the normalized price and/or rating
-                    {
-                        $sort: sortOptions
                     }
-                ]).exec();
-                //console.log(activities);
-                console.log("dakhal sort")
-                console.log(activities)
-                return res.status(200).json(activities);
-            }
+                },
+                { $sort: sortOptions }
+            ]).exec();
+        } else {
+            activities = await activityModel.find(query).populate('advertiserID categoryID tags');
         }
-        else {
-            const activities = await activityModel.find(query).populate('advertiserID categoryID tags');
-            console.log(query)
-            //console.log(activities)
-            return res.status(200).json(activities);
-        }
+        activities = activities.filter(activity => !activity.flagged);
+        activities = activities.map(activity => {
+            activity.price = activity.price * conversionRate;
+            return activity;
+        });
+        console.log("Filtered and sorted activities:", activities);
+        return res.status(200).json(activities);
     } catch (error) {
+        console.error("Error in filtering activities:", error);
         return res.status(404).json({ message: error.message });
     }
-}
+};
 
 export const getMyActivities = async (req, res) => {
     const id = req.params.id;
     try {
-        const activities = await activityModel.find({ advertiserID: id }).populate('advertiserID categoryID tags');
+        const activities = await activityModel.find({ advertiserID: id, flagged: false }).populate('advertiserID categoryID tags');
         if (activities.lemgth === 0) {
             return res.status(404).json({ message: 'No activities found' });
         }
@@ -280,3 +433,76 @@ export const getMyActivities = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
+
+export const viewSingleActivity = async (req, res) => {
+    const id = req.params.id;
+    const prefCurrency = req.query.currency || "USD";
+    let conversionRate;
+    try {
+
+        if (prefCurrency) {
+            conversionRate = await getConversionRate(prefCurrency);
+        }
+
+        const activity = await activityModel.findById(id).populate('advertiserID categoryID tags');
+
+        //change price to preferred currency
+        if (conversionRate) {
+            activity.price = activity.price * conversionRate;
+        }
+        if (!activity) {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+
+
+        return res.status(200).json(activity);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+export const Flagg = async (req, res) => {
+    const activityID = req.params.id;
+    const flagger = req.body.flagger;
+
+
+    try {
+        let activity = await activityModel.findById(activityID);
+
+        if (!activity) {
+            return res.status(404).json({ message: "No itinerary found with ID " + activityID });
+        }
+
+        if (flagger === false && activity.flagged === true) {
+            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
+        }
+
+        //flag itinerary
+        const updatedActivity = await activityModel.findByIdAndUpdate(activityID, { $set: { flagged: flagger } }, { new: true, runValidators: true });
+
+
+        let isbooked = await Booking.find({ activityID: activity._id });
+        if (isbooked.length > 0) {
+            if (flagger == true) {
+                for (let i = 0; i < isbooked.length; i++) {
+                    const user = await Tourist.findById(isbooked[i].touristID);
+                    if (user) {
+                        //update wallet in user
+                        if (activity.priceType == 'fixed') {
+                            const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + activity.price } }, { new: true, runValidators: true });
+                        }
+
+                        if (activity.priceType == 'range') {
+                            const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + activity.minPrice } }, { new: true, runValidators: true });
+                        }
+                    }
+                }
+            }
+        }
+        return res.status(200).json(updatedActivity);
+
+    } catch (error) {
+        res.status(500).json({ message: "Error updating Activity: " + error.message });
+        console.log(error);
+    }
+};

@@ -7,6 +7,9 @@ import touristGoverner from "../models/touristGovernorScehma.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 import tourist from "../models/touristSchema.js";
 import Itinerary from "../models/itinerarySchema.js";
+import { PasswordChangeRequest } from "../models/changePassSchema.js";
+
+
 
 export const getAdmins = async (req, res) => {
     try {
@@ -122,4 +125,169 @@ export const getAllUsers = async (req, res) => {
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }
+}
+
+
+export const handlePasswordChangeRequest = async (req, res) => {
+    const { requestId, action } = req.body;
+
+    if (!requestId || !['approve', 'decline'].includes(action)) {
+        return res.status(400).json({ message: "Request ID and valid action (approve/decline) are required" });
+
+    }
+
+    try {
+        const request = await PasswordChangeRequest.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({ message: "Password change request not found" });
+        }
+
+        if (action === 'approve') {
+            let userModel;
+
+            // a use el helper or not ?
+            switch (request.userType) {
+                case 'Seller':
+                    userModel = seller;
+                    break;
+                case 'Advertiser':
+                    userModel = advertiserModel;
+                    break;
+                case 'Tourist':
+                    userModel = tourist;
+                    break;
+                case 'Tour Guide':
+                    userModel = tourGuide;
+                    break;
+                case 'Tourism Governer':
+                    userModel = touristGoverner;
+                    break;
+                default:
+                    return res.status(400).json({ message: "Invalid user type" });
+            }
+
+            await userModel.findByIdAndUpdate(request.userId, { password: request.requestedPassword });
+            request.status = 'approved';
+        } else {
+            request.status = 'declined';
+        }
+
+        await request.save();
+        res.status(200).json({ message: `Password change request ${request.status}` });
+    } catch (error) {
+        console.error("Error handling password change request:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getPendingPasswordChangeRequests = async (req, res) => {
+    try {
+        // Find all requests with status "pending"
+        const pendingRequests = await PasswordChangeRequest.find({ status: 'pending' });
+
+        // Prepare an array to store the requests with user details
+        const requestsWithUserDetails = await Promise.all(
+            pendingRequests.map(async (request) => {
+                let userModel;
+
+                // Determine the user model based on user type
+                switch (request.userType) {
+                    case 'Seller':
+                        userModel = seller;
+                        break;
+                    case 'Advertiser':
+                        userModel = advertiserModel;
+                        break;
+                    case 'Tourist':
+                        userModel = tourist;
+                        break;
+                    case 'Tour Guide':
+                        userModel = tourGuide;
+                        break;
+                    case 'Tourism Governer':
+                        userModel = touristGoverner;
+                        break;
+                    default:
+                        return null;
+                }
+
+                try {
+                    // Fetch user details from the respective model
+                    const user = await userModel.findById(request.userId).select('name email');
+                    return {
+                        requestId: request._id,
+                        userType: request.userType,
+                        userId: request.userId,
+                        userName: user ? user.name : 'Unknown',
+                        userEmail: user ? user.email : 'Unknown',
+                        requestedPassword: request.requestedPassword,
+                        status: request.status,
+                        createdAt: request.createdAt
+                    };
+                } catch (userError) {
+                    console.error(`Error fetching user details for request ${request._id}:`, userError);
+                    return {
+                        requestId: request._id,
+                        userType: request.userType,
+                        userId: request.userId,
+                        userName: 'Unknown',
+                        userEmail: 'Unknown',
+                        requestedPassword: request.requestedPassword,
+                        status: request.status,
+                        createdAt: request.createdAt
+                    };
+                }
+            })
+        );
+
+        // Filter out any null results from unmapped user types
+        const filteredRequests = requestsWithUserDetails.filter(request => request !== null);
+
+        res.status(200).json(filteredRequests);
+    } catch (error) {
+        console.error("Error retrieving pending password change requests:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const acceptOrReject = async (req, res) => {
+    const { userId, userType, flag } = req.body;
+    let userModel;
+    console.log(req.body);
+
+    switch (userType) {
+        case 'Seller':
+            userModel = seller;
+            break;
+        case 'Advertiser':
+            userModel = advertiserModel;
+            break;
+        case 'Tour Guide':
+            userModel = tourGuide;
+            break;
+        default:
+            return res.status(400).json({ message: "Invalid user type" });
+    }
+
+    try {
+        const userExist = await userModel.findById(userId);
+        if (!userExist) {
+            return res.status(404).json({ message: "User doesn't exist" });
+        }
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId, { $set: { "isAccepted": flag } }, { new: true })
+
+        if (flag) {
+            return res.status(200).json(updatedUser);
+        }
+        else {
+            await userModel.findByIdAndDelete(userId);
+            return res.status(200).json({ message: "User rejected and deleted." });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
 }
