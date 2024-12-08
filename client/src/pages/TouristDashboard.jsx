@@ -8,6 +8,7 @@ import {
   Package,
   Angry,
   Plane,
+  Gem,
   MapPinHouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -53,6 +54,12 @@ export default function TouristDashboard() {
       path: "bookmarked",
     },
 
+
+     {
+      label: "Promo codes",
+      icon: Gem,
+      path: "promo-codes",
+    },
     {
       label: "Activity Bookings",
       icon: Plane,
