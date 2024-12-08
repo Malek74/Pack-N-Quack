@@ -1,17 +1,18 @@
-/* eslint-disable react/prop-types */
-import OpeningHours from "./OpeningHours";
 import { Button } from "../ui/button";
-import { Trash2 } from "lucide-react";
-import PlaceEditForm from "../forms/PlaceEditForm";
-import ImagesScroll from "../shared/ImagesScroll";
+import { Trash2 } from 'lucide-react';
 import Maps from "../shared/Maps";
+import PlaceEditForm from "../forms/PlaceEditForm";
 import { useNavigate } from "react-router-dom";
+import { Rating } from "../shared/Rating";
+import { Label } from "../ui/label";
 import { useUser } from "@/context/UserContext";
+import OpeningHours from "./OpeningHours";
+import ImagesScroll from "../shared/ImagesScroll";
 
 export default function HistoricalCard(props) {
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
-  const date = new Date(props.time);
+  
   const openHistoricalPage = () => {
     console.log(props.name);
     navigate(`/place/${props.name}`);
@@ -19,22 +20,20 @@ export default function HistoricalCard(props) {
 
   return (
     <div
+      className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] py-4  rounded-xl"
       onClick={openHistoricalPage}
-      className="container rounded-lg w-[25rem] h-auto p-2 shadow-md"
     >
-      {" "}
-      <div className="flex place-content-end ">
-        <img
-          className=" w-[25rem] h-[15rem] rounded-lg mb-4"
-          src={props.img}
-          alt={props.alt}
-        />
-
+      <img
+        className="rounded-lg rounded-b-none h-[300px] w-full object-fill"
+        src={props.img}
+        alt={props.name}
+      />
+      <div className="flex place-content-end">
         {props.notTourist && (
           <>
             <Button
               onClick={() => props.deletePlaceFunction(props.placeID)}
-              className="w-14 absolute bg-transparent "
+              className="w-14 absolute bg-transparent"
             >
               <Trash2 />
             </Button>
@@ -51,62 +50,63 @@ export default function HistoricalCard(props) {
                 key={props.key}
                 placeID={props.placeID}
                 updatePlaceFunction={props.updatePlaceFunction}
-              ></PlaceEditForm>
+              />
             </Button>
           </>
         )}
       </div>
-      <div className="flex flex-col gap-2">
-        <h1 className=" flex">
-          {" "}
-          <span className="font-semibold text-xl mr-auto text-skyblue stroke-black ">
-            {props.name}{" "}
-          </span>
-        </h1>
-        <h4 className="text-base">{props.description}</h4>
-        <div className="flex gap-8">
-          <h4 className="text-base">
-            {" "}
-            <OpeningHours openingHours={props.openingHours}></OpeningHours>{" "}
-          </h4>
-          <h4 className="text-base">
-            {" "}
-            <ImagesScroll pictures={props.pictures}></ImagesScroll>{" "}
-          </h4>
+      <div className="p-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="flex">
+            <span className="font-semibold text-xl mr-auto">{props.name}</span>
+            <span className="text-gold drop-shadow">Historical</span>
+          </h1>
+          <p className="text-base">{props.description}</p>
+          <p className="text-base">
+            {props.location}{" "}
+            <span className="ml-2">
+              <Maps mapsSrc={props.googlemaps}></Maps>
+            </span>
+          </p>
+          <p className="text-base">
+            <OpeningHours openingHours={props.openingHours} />
+          </p>
+          <div className="flex flex-col justify-between gap-2">
+            <div className="flex justify-between">
+              <Label className="font-semibold text-lg text-skyblue">
+                Prices:
+              </Label>
+              <Rating
+                rating={props.rating}
+                numberOfReviews={props.numberOfReviews}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {Array.isArray(props.prices) &&
+                props.prices.map((price) => (
+                  <span key={price.type} className="text-base">
+                    <b>{price.type}:</b> {price.price}{prefCurrency}
+                  </span>
+                ))}
+            </div>
+            <div className="flex gap-2">
+              {Array.isArray(props.tags) &&
+                props.tags.map((tag) => (
+                  <Label
+                    key={tag._id}
+                    className="text-sm text-gray-500 border-gray-500 rounded-full border px-2"
+                  >
+                    {`#${tag.name_tag}-${tag.option}`}
+                  </Label>
+                ))}
+            </div>
+          </div>
         </div>
-        <h4 className="text-base">
-          {props.location}{" "}
-          <span className="ml-2">
-            {" "}
-            <Maps mapsSrc={props.googlemaps}></Maps>{" "}
-          </span>
-          <br />
-        </h4>
-
-        <div className="flex gap-4">
-          {Array.isArray(props.prices) &&
-            props.prices.map((price) => (
-              <span key={price.type} className="flex ">
-                <b className="mr-1">{price.type}: </b>
-
-                {price.price}
-                {prefCurrency}
-              </span>
-            ))}
-        </div>
-        <div className="flex flex-col text-right self-end ">
-          {Array.isArray(props.tags) &&
-            props.tags.map((tag) => (
-              <p
-                key={tag._id}
-                className="flex  text-gray-500 self-end text-right"
-              >
-                {" "}
-                {`#${tag.name_tag}-${tag.option}  `}{" "}
-              </p>
-            ))}
-        </div>
+      </div>
+      <div className="px-4">
+        <ImagesScroll pictures={props.pictures} />
       </div>
     </div>
   );
 }
+
