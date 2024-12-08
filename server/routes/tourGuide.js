@@ -1,7 +1,6 @@
 import express from "express";
 import multer from 'multer';
 import { createTourGuide, getTourGuides, editTourGuide, deleteTourGuide,getTourGuideById, rateTourGuide, acceptTerms, getRevenue} from "../controllers/tourguideController.js";
-import { createTourGuide, getTourGuides, editTourGuide, deleteTourGuide, getTourGuideById, rateTourGuide, acceptTerms } from "../controllers/tourguideController.js";
 import { protect } from '../middleware/authenticator.js';
 
 const router = express.Router();

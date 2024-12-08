@@ -1,5 +1,4 @@
 import express from "express";
-import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities, acceptTerms } from "../controllers/advertisersController.js";
 import { protect } from '../middleware/authenticator.js';
 import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateAdvertiser, getAdvertiserActivities, acceptTerms, getBookingCount } from "../controllers/advertisersController.js";
 

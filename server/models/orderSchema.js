@@ -31,7 +31,8 @@ const orderSchema = new Schema({
     orderStatus: {
         type: String,
         required: true,
-        default: "Pending"
+        enum: [ "Cancelled", "Out for Delivery", "Delivered"],
+        default: "Out for Delivery"
     },
     orderTotal: {
         type: Number,
@@ -44,13 +45,17 @@ const orderSchema = new Schema({
     paidByWallet:{
         type: Number,
         default: 0,
-        required: true
+        required: false
     },
     paidByCard:{
         type: Number,
         default: 0,
-        required: true
+        required: false
     },
+    payment: {
+        type: Number,
+        required: true
+    }
 },{timestamps: true});
 
 const Order = model("Order", orderSchema);

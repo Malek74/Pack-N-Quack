@@ -26,7 +26,8 @@ import {
     setDefaultAddress,
     viewAddresses,
     getMyWalletBalance,
-    getMyPromoCodes
+    getMyPromoCodes,
+    checkoutOrder
 } from '../controllers/touristController.js';
 import { createComplaint, viewMyComplaints, viewComplaintById } from '../controllers/complaintController.js';
 import { protect } from '../middleware/authenticator.js';
@@ -64,5 +65,6 @@ router.get('/cart/viewCart', protect, getCart);
 router.get('/wishlist',protect, viewMyWishlist);
 router.post('/wishlist', protect,addToWishlist);
 router.delete('/wishlist/:productId',protect, removeFromWishlist);
+router.post("/checkout", protect, checkoutOrder);
 
 export default router;

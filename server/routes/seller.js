@@ -1,5 +1,4 @@
 import express from "express";
-import { getAllSellers, createSeller, getSellerByID, updateSellerInfo, deleteSeller, acceptTerms } from "../controllers/sellerController.js";
 import { protect } from '../middleware/authenticator.js';
 import {getAllSellers,createSeller,getSellerByID,updateSellerInfo,deleteSeller, acceptTerms, getRevenue} from "../controllers/sellerController.js";
 

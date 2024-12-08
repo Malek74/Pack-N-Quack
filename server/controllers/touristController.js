@@ -2,7 +2,6 @@ import Tourist from "../models/touristSchema.js";
 import TourGuide from "../models/tourGuideSchema.js";
 import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
-import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 import { emailExists, usernameExists, createPromoCode, getConversionRate } from "../utils/Helpers.js";
 import activityModel from "../models/activitySchema.js";
@@ -20,7 +19,7 @@ import notificationSchema from "../models/notificationSchema.js";
 import productModel from "../models/productSchema.js";
 import tourist from "../models/touristSchema.js";
 import { productOutOfStockEmail } from "../routes/shareEmail.js";
-import { adminSchema } from "../models/adminSchema.js";
+import  adminSchema  from "../models/adminSchema.js";
 
 
 // Creating Tourist for Registration
@@ -843,7 +842,10 @@ export const checkoutOrder = async (req, res) => {
 
         const cart = await Tourist.findById(id).cart;
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
+        let totalAmount = 0;
+        for (item in cart){
+            totalAmount = productModel.findById(item.productID).price * item.quantity;
+        }
         if (paymentMethod === "card") {
 
             for (const item of cart) {
@@ -1000,6 +1002,13 @@ export const checkoutOrder = async (req, res) => {
 
 
         }
+
+        //create order
+        const order = await Order.create({
+            touristID: id,
+            products: cart,
+            payment: totalAmount,
+        });
 
     }
     catch (error) {

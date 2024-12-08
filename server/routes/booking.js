@@ -1,7 +1,6 @@
 import express from "express";
 import { bookEvent, cancelBooking, flaggedEvents, requestDeleteAccount,viewUpcomingBooking,viewPastBooking } from "../controllers/bookingController.js";
 import { protect } from "../middleware/authenticator.js";
-import { bookEvent, cancelBooking, flaggedEvents, requestDeleteAccount, test } from "../controllers/bookingController.js";
 
 const router = express.Router();
 
@@ -15,7 +14,6 @@ router.get("/viewPast",protect, viewPastBooking);
 
 
 router.post("/delete", requestDeleteAccount);
-router.get("/test",test);
 
 export default router;
 
