@@ -3,6 +3,9 @@ import Orders from "../models/orderSchema.js";
 import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
 
 
 //get all sellers
@@ -15,7 +18,7 @@ export const getAllSellers = async (req, res) => {
     }
 }
 
-//@desc create seller 
+//@desc create seller
 //@route
 export const createSeller = async (req, res) => {
     const { email, username, password } = req.body;
@@ -28,8 +31,17 @@ export const createSeller = async (req, res) => {
         if (await usernameExists(username)) {
             return res.status(400).json({ message: "Username already exists" });
         }
+        const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newSeller = await seller.create({ email, username, password });
+        const newSeller = await seller.create({ email, username, password: hashedPassword });
+
+        //create a token for the user
+        const token = createToken(username, newSeller._id, "Seller");
+
+        //send the token in the response
+        res.cookie("jwt", token, { httpOnly: true });
+
         return res.status(200).json(newSeller);
 
     } catch (error) {
@@ -39,7 +51,7 @@ export const createSeller = async (req, res) => {
 
 //read using ID
 export const getSellerByID = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     if (!id) {
         return res.status(400).json({ message: "Please provide a Seller ID" });
     }
@@ -53,7 +65,7 @@ export const getSellerByID = async (req, res) => {
 
 //update by ID
 export const updateSellerInfo = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const { email, oldEmail, username, password, name, description, isAccepted } = req.body;
 
     const oldSeller = await seller.findById(id);
@@ -86,11 +98,11 @@ export const updateSellerInfo = async (req, res) => {
 //TODO: Add cascade deleting for items that belong to the seller
 //delete by ID
 export const deleteSeller = async (req, res) => {
-    
+
 }
 
 export const acceptTerms = async (req, res) => {
-    const sellerId = req.params.id;
+    const sellerId = req.user._id;
     if (!sellerId) {
         return res.status(400).json({ message: "Seller ID is required." });
     }

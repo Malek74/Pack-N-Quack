@@ -1,5 +1,6 @@
 import express from "express";
-import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities, viewSingleActivity, Flagg } from "../controllers/activityController.js";
+import { getActivities, addActivity, updateActivity, deleteActivity, searchActivity, getUpcomingActivities, postReview, filterAndSortActivities, getMyActivities, viewSingleActivity, Flagg, notifyMe } from "../controllers/activityController.js";
+import { protect } from "../middleware/authenticator.js";
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ const router = express.Router();
 router.get("/", getActivities);
 
 // Add an activity
-router.post("/", addActivity);
+router.post("/", protect, addActivity);
 
 // Edit an activity
 router.put("/update/:id", updateActivity);
@@ -22,14 +23,15 @@ router.get("/search", searchActivity);
 router.get("/upcoming", getUpcomingActivities);
 
 // Post a review
-router.post("/review/:id", postReview);
+router.post("/review/:id", protect, postReview);
 
 // Get filtered activities
 router.post("/filterSort", filterAndSortActivities);
 
 // Get My activities
-router.get("/my/:id", getMyActivities);
+router.get("/my/", getMyActivities);
 
 router.put("/flag/:id", Flagg);
 router.get("/activityDetails/:id", viewSingleActivity);
+router.post("/notifyMe/:id",/*protect,*/ notifyMe); //todo: add protect
 export default router;

@@ -7,9 +7,11 @@ import Stripe from 'stripe';
 import Booking from "../models/bookingSchema.js";
 import { uploadImages } from '../utils/Helpers.js';
 import activityTag from '../models/activityTagSchema.js';
-import { getConversionRate } from '../utils/Helpers.js';
+import { getConversionRate, sendEventFlaggedEmail } from '../utils/Helpers.js';
 import cloudinary from '../utils/cloudinary.js';
-
+import { io } from '../server.js';
+import notificationSchema from '../models/notificationSchema.js';
+import transactionModel from '../models/transactionsSchema.js';
 
 
 //@desc create a new itinerary
@@ -587,13 +589,9 @@ export const Flagg = async (req, res) => {
             return res.status(404).json({ message: "No itinerary found with ID " + itineraryID });
         }
 
-        if (flag === false && itinerary.flagged === true) {
-            return res.status(400).json({ message: "Cannot unflag an already flagged itinerary" });
-        }
 
         //flag itinerary
         const updatedItinerary = await Itinerary.findByIdAndUpdate(itineraryID, { $set: { flagged: flag } }, { new: true, runValidators: true });
-
 
         let isbooked = await Booking.find({ itineraryID: itineraryID });
         if (isbooked.length > 0) {
@@ -603,10 +601,33 @@ export const Flagg = async (req, res) => {
                     if (user) {
                         //update wallet in user
                         const updatedUser = await Tourist.findByIdAndUpdate(user._id, { $set: { wallet: user.wallet + itinerary.price } }, { new: true, runValidators: true });
+
+                        //create a transaction 
+                        const transaction = new transactionModel({
+                            amount: itinerary.price,
+                            incoming: true,
+                            userId: user._id,
+                            title: "Itinerary Refund",
+                            description: "Refund for flagged itinerary",
+                            method: "wallet"
+                        });
+
                     }
                 }
             }
         }
+
+        let notification;
+        if (flag) {
+            notification = await notificationSchema.create({ title: 'Activity Flagged', message: `${activity.name} has been flagged inappropriate`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+        }
+        else {
+            notification = await notificationSchema.create({ title: 'Activity Unflagged', message: `${activity.name} has been unflagged`, user: { id: activity.advertiserID, role: 'Advertiser' }, type: 'flag' });
+        }
+
+        const roomID = (itinerary.tourGuideID.toString())
+        io.to(roomID).emit('newNotification', notification)
+
         return res.status(200).json(updatedItinerary);
 
     } catch (error) {
