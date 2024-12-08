@@ -213,7 +213,7 @@ export const deleteTourGuide = async (req, res) => {
 }
 
 export const getRevenue = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
     const itineraryId = req.query.itineraryId;
@@ -335,7 +335,8 @@ export const getRevenue = async (req, res) => {
                         itineraryID: "$itineraryID",
                     },
                     count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" } 
+                    totalPrice: { $sum: "$price" },
+                    numofTickets: { $sum: "$numOfTickets" } 
                 }
             },
             {
@@ -354,7 +355,7 @@ export const getRevenue = async (req, res) => {
                     _id: 0,
                     title: '$activityDetails.name',
                     revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$count"
+                    bookings: "$numofTickets"
                 }
             },
 

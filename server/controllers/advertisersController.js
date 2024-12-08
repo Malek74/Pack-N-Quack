@@ -144,7 +144,8 @@ export const acceptTerms = async (req, res) => {
 }
 
 export const getBookingCount = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
+    // const id = req.params.id;
     const  startDate = req.query.startDate;
     const  endDate = req.query.endDate || new Date();
     const activityId = req.query.activityId;
@@ -226,8 +227,9 @@ export const getBookingCount = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    Date: "$_id.creationDay",
+                    date: "$_id.creationDay",
                     revenue: { $multiply: ["$totalPrice", 0.9] }
+
                 }
             },
             {
@@ -265,7 +267,8 @@ export const getBookingCount = async (req, res) => {
                         activityID: "$activityID",
                     },
                     count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" } 
+                    totalPrice: { $sum: "$price" },
+                    numberOfTickets: { $sum: "$numOfTickets"} 
                 }
             },
             {
@@ -284,7 +287,7 @@ export const getBookingCount = async (req, res) => {
                     _id: 0,
                     title: '$activityDetails.name',
                     revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$count"
+                    bookings: "$numberOfTickets"
                 }
             },
             {

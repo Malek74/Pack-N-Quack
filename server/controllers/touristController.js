@@ -837,7 +837,7 @@ export const checkoutOrder = async (req, res) => {
     const payByWallet = req.body.payByWallet;
     const promocode = req.body.promocode;
     const address  = req.body.address;
-    const success_url = "https://www.google.com";
+    const success_url = "http://localhost:5173/touristDashboard/order-history";
 
 
     const prices = [];
@@ -847,16 +847,21 @@ export const checkoutOrder = async (req, res) => {
         if(!tourist){
             return res.status(404).json({ message: "Tourist not found" });
         }
-        const cart = await Tourist.findById(id).cart;
+        const cart = (await Tourist.findById(id)).cart;
+        console.log(cart);
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         let totalAmount = 0;
-        for (item in cart){
-            totalAmount = productModel.findById(item.productID).price * item.quantity;
-        }
-        if (paymentMethod === "card") {
+        for (let i = 0; i< cart.length; i++){
+            totalAmount += (await productModel.findById(cart[i].productID)).price * cart[i].quantity;
 
+        }
+        console.log(totalAmount);
+        let amountLeftToPay = totalAmount;
+        if (paymentMethod === "card") {
+            console.log("payment card");
             for (const item of cart) {
-                const product = await productModel.findById(item.productID);
+                const product = await productModel.findById(item.productID)
+                console.log(product.stripeID);
                 const price = await stripe.prices.create({
                     currency: 'usd',
                     product: product.stripeID,
@@ -871,8 +876,16 @@ export const checkoutOrder = async (req, res) => {
                 mode: 'payment',
                 success_url: success_url,
             });
+            const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
+            const order = await orders.create({
+            touristID: id,
+            products: cart,
+            orderTotal: totalAmount,
+            deliveryAddress: address? address:tourist.defaultAddress,
+        });
             return res.status(200).json({ url: session.url });
         } else {
+            console.log("da5al else")
             if (tourist.wallet < totalAmount) {
                 let amountToPay = totalAmount;
                 let promo;
@@ -911,7 +924,6 @@ export const checkoutOrder = async (req, res) => {
                     }
                 }
                 if (payByWallet) {
-                    let amountLeftToPay
                     let walletAmount
                     if (amountToPay > tourist.wallet) {
                         amountLeftToPay = amountToPay - tourist.wallet;
@@ -959,23 +971,20 @@ export const checkoutOrder = async (req, res) => {
                         );
                     }
 
-                } else {
-
-                    return res.status(200).json(updatedTourist);
-                }
+                    }
             }
         }
 
         //update stock
-        for (item in cart) {
-            // const product = await productModel.findById(item.productID);
+        for (let item of cart) {
+            const product = await productModel.findById(item.productID);
             // if (product.available_quantity < item.quantity) {
             //     return res.status(400).json({ message: "Not enough stock for product: " + product.name });
             // }
             // await productModel.findByIdAndUpdate(item.productID, { stock: product.stock - item.quantity });
 
 
-            const updatedProduct = await productModel.findByIdAndUpdate(item.productID, { stock: product.stock - item.quantity }, { new: true });
+            const updatedProduct = await productModel.findByIdAndUpdate(item.productID, { stock: product.available_quantity - item.quantity }, { new: true });
 
             //check if we are out of stock
             if (updatedProduct.stock == 0) {
@@ -1009,18 +1018,21 @@ export const checkoutOrder = async (req, res) => {
 
 
         }
-
+        const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
+        
         //create order
         const order = await orders.create({
             touristID: id,
             products: cart,
-            payment: totalAmount,
-            address: address? address:tourist.defaultAddress,
+            orderTotal: totalAmount,
+            deliveryAddress: address? address:tourist.defaultAddress,
         });
         res.status(200).json(order);
 
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message });
+        
     }
 }
