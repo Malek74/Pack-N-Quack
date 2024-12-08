@@ -102,10 +102,11 @@ export default function Header() {
             </li>
           </Button>
         </ul>
-        <div className="px-4">
-          <Notifications />
-        </div>
-
+        {isLoggedIn && (
+          <div className="px-4">
+            <Notifications />
+          </div>
+        )}
         <ul className="flex gap-2">
           <li>
             <ComboboxCurrency />

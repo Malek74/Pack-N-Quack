@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Activity, FlagOff, Bookmark } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
+import axios from "axios";
 
 ItinerariesCard.propTypes = {
   id: PropTypes.string,
@@ -49,11 +50,21 @@ export default function ItinerariesCard({
 
   const { prefCurrency } = useUser();
   const [isBookmarked, setIsBookmarked] = useState(false);
-
-  const handleBookmark = (e) => {
+  const handleBookmark = async (e) => {
     e.stopPropagation();
     console.log("Bookmark clicked");
     setIsBookmarked(!isBookmarked);
+
+    try {
+      const response = await axios.post("/api/tourist/save", {
+        eventID: id,
+        bookmark: !isBookmarked,
+        eventType: "itinerary",
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <Card

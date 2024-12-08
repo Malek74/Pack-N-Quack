@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const userId = '670002186379370f9748adb5'; // Replace with dynamic user ID
+const userId = localStorage.getItem('userId');
 
 // Initialize Socket.IO client
 const socket = io('https://dqbw8hmb-8000.uks1.devtunnels.ms/', {

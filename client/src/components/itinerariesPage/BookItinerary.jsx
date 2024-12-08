@@ -1,14 +1,14 @@
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import BookItineraryForm from "@/components/ItinerariesPage/BookItineraryForm";
 import PropTypes from "prop-types";
+import { DialogContent } from "@mui/material";
 
 BookItinerary.propTypes = {
   name: PropTypes.string,
@@ -16,25 +16,24 @@ BookItinerary.propTypes = {
   available_dates: PropTypes.array,
   price: PropTypes.number,
 };
+
 export default function BookItinerary({ name, id, available_dates, price }) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger>
+    <Dialog>
+      <DialogTrigger>
         <Button variant="outline">Book Itinerary</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Book {name} ?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Please fill out the booking form!
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+      </DialogTrigger>
+      <DialogHeader>
+        <DialogTitle>Book {name}?</DialogTitle>
+        <DialogDescription>Please fill out the booking form!</DialogDescription>
+      </DialogHeader>
+      <DialogContent>
         <BookItineraryForm
           itineraryId={id}
           available_dates={available_dates}
           price={price}
         />
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
