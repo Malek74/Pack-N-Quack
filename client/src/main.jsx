@@ -5,8 +5,7 @@ import "./style/main.css";
 import axios from "axios";
 
 //axios.defaults.baseURL = "https://dqbw8hmb-8000.uks1.devtunnels.ms/";
-//axios.defaults.baseURL = "http://localhost:8000/";
-
+axios.defaults.baseURL = "http://localhost:8000/";
 
 //axios.defaults.baseURL = "https://5bbbq9p8-8000.euw.devtunnels.ms/";
 
@@ -16,7 +15,6 @@ import axios from "axios";
 axios.defaults.withCredentials = true; // Ensure cookies are sent with every request
 // DO NOT REMOVE THIS LINE ^ YA MARINAAAA
 
-
 //https://dqbw8hmb-8000.uks1.devtunnels.ms/
 
 //axios.defaults.baseURL = "http://localhost:8000/";
@@ -24,7 +22,7 @@ axios.defaults.withCredentials = true; // Ensure cookies are sent with every req
 // axios.defaults.baseURL = "https://5bbbq9p8-8000.euw.devtunnels.ms/";
 //axios.defaults.baseURL = "https://dqbw8hmb-8000.uks1.devtunnels.ms/";
 //axios.defaults.baseURL = "https://k0gfbwb4-8000.euw.devtunnels.ms/";
-axios.defaults.baseURL = "https://dqbw8hmb-8000.uks1.devtunnels.ms/";
+//axios.defaults.baseURL = "https://dqbw8hmb-8000.uks1.devtunnels.ms/";
 
 //axios.defaults.baseURL = "https://t18zlb13-8000.uks1.devtunnels.ms/";
 

@@ -94,25 +94,11 @@ export default function AddressFormWithLayout({ addresses, setAddresses }) {
                     defaultChecked={address.address === defaultAddress.address}
                   />
                 </TableCell>
-
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {addresses.map((address) => (
-                <TableRow key={address.id}>
-                  <TableCell>{address.address}</TableCell>
-                  <TableCell>{address.postcode}</TableCell>
-                  <TableCell>{address.town}</TableCell>
-                  <TableCell>{address.country}</TableCell>
-                  <TableCell>
-                    <input type="radio" name="address" value={address.address} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
