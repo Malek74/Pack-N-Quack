@@ -155,7 +155,7 @@ export const viewSingleOrderDetails = async (req, res) => {
         orderDetails.products.forEach((product) => {
             product.price = product.price * conversionRate;
         });
-        
+
         return res.status(200).json(orderDetails);
     } catch (error) {
         console.error("Error retrieving order details:", error);
@@ -207,6 +207,14 @@ export const cancelOrder = async (req, res) => {
         }
 
         await Order.findByIdAndUpdate(orderID, { orderStatus: "Cancelled" });
+
+        //update tourist wallet
+        const refundAmount = purchaseRecord.orderTotal;
+        const updatedTourist = await Tourist.findOneAndUpdate(
+            { _id: touristID },
+            { $inc: { wallet: refundAmount } },
+            { new: true }
+        );  
 
         return res.status(200).json({ message: "Order has been cancelled successfully." });
     } catch (error) {
