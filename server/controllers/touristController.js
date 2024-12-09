@@ -2,7 +2,6 @@ import Tourist from "../models/touristSchema.js";
 import TourGuide from "../models/tourGuideSchema.js";
 import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
-import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 import { emailExists, usernameExists, createPromoCode, getConversionRate } from "../utils/Helpers.js";
 import activityModel from "../models/activitySchema.js";
@@ -14,11 +13,13 @@ import AmadeusBooking from "../models/amadeusBooking.js";
 import DeleteRequest from "../models/deleteRequests.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
-import jwt from "jsonwebtoken";
 import transactionModel from "../models/transactionsSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
-
+import notificationSchema from "../models/notificationSchema.js";
 import productModel from "../models/productSchema.js";
+import tourist from "../models/touristSchema.js";
+import { productOutOfStockEmail } from "../routes/shareEmail.js";
+import  adminSchema  from "../models/adminSchema.js";
 
 
 // Creating Tourist for Registration
@@ -618,26 +619,39 @@ export const getCart = async (req, res) => {
 export const addItemToCart = async (req, res) => {
     const productId = req.body.productID;
     const touristId = req.user._id;
+    const touristId = req.user._id;
     const quantity = req.body.quantity;
 
+    if (!productId) {
+        return res.status(400).json({ message: "Product ID is required" });
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }
 
     if (!touristId) {
         return res.status(400).json({ message: "Tourist ID is required" });
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required" });
     }
 
     if (!quantity || quantity <= 0) {
         return res.status(400).json({ message: "Quantity is required" });
+    if (!quantity || quantity <= 0) {
+        return res.status(400).json({ message: "Quantity is required" });
     }
     try {
+    try {
         const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
         }
 
         const product = await productModel.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
@@ -648,15 +662,25 @@ export const addItemToCart = async (req, res) => {
 
         const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
         if (wishlistIndex !== -1) {
+        if (wishlistIndex !== -1) {
             await Tourist.findOneAndUpdate(
+                { _id: touristId },
+                { $pull: { wishlist: productId } },
+                { new: true }
                 { _id: touristId },
                 { $pull: { wishlist: productId } },
                 { new: true }
             );
         }
+        }
+
 
         if (productIndex !== -1) {
             // Product exists in the cart - Update its quantity
+            if (product.available_quantity < quantity + oldQuantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
+            }
+
             const updatedCart = await Tourist.findOneAndUpdate(
                 { _id: touristId, "cart.productID": productId },
                 { $set: { "cart.$.quantity": quantity + oldQuantity } },
@@ -666,6 +690,9 @@ export const addItemToCart = async (req, res) => {
             return res.status(200).json(updatedCart.cart);
         } else {
             // Product does not exist - Add it to the cart
+            if (product.available_quantity < quantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
+            }
             const updatedCart = await Tourist.findByIdAndUpdate(
                 touristId,
                 { $push: { cart: { productID: productId, quantity: quantity } } },
@@ -845,5 +872,191 @@ export const removeFromWishlist = async (req, res) => {
         return res.status(200).json(newWishlist.wishlist);
     } catch (err) {
         return res.status(500).json({ message: err.message });
+    }
+}
+
+export const checkoutOrder = async (req, res) => {
+    const id = req.user._id;
+    const paymentMethod = req.body.paymentMethod;
+    const payByWallet = req.body.payByWallet;
+    const promocode = req.body.promocode;
+    const success_url = "https://www.google.com";
+
+    const prices = [];
+    try {
+
+        const cart = await Tourist.findById(id).cart;
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        let totalAmount = 0;
+        for (item in cart){
+            totalAmount = productModel.findById(item.productID).price * item.quantity;
+        }
+        if (paymentMethod === "card") {
+
+            for (const item of cart) {
+                const product = await productModel.findById(item.productID);
+                const price = await stripe.prices.create({
+                    currency: 'usd',
+                    product: product.stripeID,
+                    unit_amount: amountLeftToPay * 100,
+                });
+                prices.push({ price: price.id, quantity: item.quantity });
+            }
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: prices,
+                discounts: [{ coupon: promocode }],
+                mode: 'payment',
+                success_url: success_url,
+            });
+            return res.status(200).json({ url: session.url });
+        } else {
+            if (tourist.wallet < totalAmount) {
+                let amountToPay = totalAmount;
+                let promo;
+                if (promocode) {
+                    promo = await PromoCodes.findOne({ code: promocode });
+
+                    if (!promo) {
+                        res.status(400).send("Promocode does not exist");
+                    }
+
+                    if (!promo.isActive) {
+                        res.status(400).send("Promocode has already been used");
+                    }
+
+                    //update amount to be paid
+                    amountToPay -= amountToPay * (promo.discount / 100);
+
+                    //check if it's his birthday promo
+                    if (promo.code == tourist.promoCode.code) {
+                        //today is birthday
+                        const today = new Date();
+                        const birthDate = new Date(tourist.dob);
+                        const lastUsed = new Date(tourist.promoCode.lastUsed);
+
+                        if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
+                            res.status(400).json({ message: "Promocode has already been used" });
+                        }
+
+                        if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
+                            res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                        }
+                    }
+                    else {
+                        await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+
+                    }
+                }
+                if (payByWallet) {
+                    let amountLeftToPay
+                    let walletAmount
+                    if (amountToPay > tourist.wallet) {
+                        amountLeftToPay = amountToPay - tourist.wallet;
+                        walletAmount = tourist.wallet;
+                        if (amountLeftToPay !== 0) {
+                            //create price to be paid after deducting wallet amount  
+                            const stripeId = await productModel.findById(cart[0].productID).stripeID;
+                            const price = await stripe.prices.create({
+                                currency: 'usd',
+                                product: stripeId,
+                                unit_amount: amountLeftToPay * 100,
+                            });
+
+                            const session = await stripe.checkout.sessions.create({
+                                payment_method_types: ['card'],
+                                line_items: [{
+                                    price: price.id,
+                                    quantity: 1,
+                                }],
+                                mode: 'payment',
+                                success_url: success_url,
+                            })
+                        }
+                    } else {
+                        amountLeftToPay = 0;
+                        walletAmount = amountToPay;
+                    }
+
+                    let transaction;
+                    //create transaction for amount paid from wallet
+                    if (walletAmount > 0) {
+                        //create transaction for wallet deduction
+                        transaction = await transactionModel.create({
+                            userId: id,
+                            amount: walletAmount,
+                            date: new Date(),
+                            method: "wallet",
+                            incoming: false,
+                            description: "Wallet deduction for purchase"
+                        });
+                        const updatedTourist = await Tourist.findOneAndUpdate(
+                            { _id: id },
+                            { wallet: tourist.wallet - walletAmount },
+                            { new: true }
+                        );
+                    }
+
+                } else {
+
+                    return res.status(200).json(updatedTourist);
+                }
+            }
+        }
+
+        //update stock
+        for (item in cart) {
+            // const product = await productModel.findById(item.productID);
+            // if (product.available_quantity < item.quantity) {
+            //     return res.status(400).json({ message: "Not enough stock for product: " + product.name });
+            // }
+            // await productModel.findByIdAndUpdate(item.productID, { stock: product.stock - item.quantity });
+
+
+            const updatedProduct = await productModel.findByIdAndUpdate(item.productID, { stock: product.stock - item.quantity }, { new: true });
+
+            //check if we are out of stock
+            if (updatedProduct.stock == 0) {
+                const user = {
+                    id: updatedProduct.sellerUsername == "Pack N Quack" ? updatedProduct.adminSellerID : updatedProduct.seller_id,
+                    role: updatedProduct.sellerUsername == "Pack N Quack" ? "Admin" : "Seller"
+                }
+                //create notification 
+                const notification = await notificationSchema.create({
+                    title: "Product out of stock",
+                    message: `${updatedProduct.name} is out of stock`,
+                    user: user,
+                    type: "outOfStock"
+                });
+
+                //send notification to seller
+                io.to(user.id).emit("notification", notification);
+
+                let receiver = {};
+                if (user.role == "Seller") {
+                    //send mail to seller
+                    receiver = await Seller.findById(user.id);
+                } else {
+                    //send mail to admin
+                    receiver = await adminSchema.findById(user.id);
+                }
+
+                //send mail to seller
+                await productOutOfStockEmail(receiver.email, updatedProduct.name, updatedProduct._id);
+            }
+
+
+        }
+
+        //create order
+        const order = await Order.create({
+            touristID: id,
+            products: cart,
+            payment: totalAmount,
+        });
+
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }

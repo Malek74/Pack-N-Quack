@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/", createTouristGovernor);
 router.get("/allTouristGovernors", protect, getTouristGovernor);
-router.get("/", protect, getTourGuideById);
+router.get("/:id",  getTourGuideById);
 router.put("/", protect, updateTouristGovernor);
 router.delete("/", protect, deleteTouristGovernor);
 

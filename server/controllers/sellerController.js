@@ -1,4 +1,6 @@
 
+import Orders from "../models/orderSchema.js";
+import product from "../models/productSchema.js";
 import seller from "../models/sellerSchema.js";
 import { usernameExists, deleteProducts, deleteActivities, refundMoney } from '../utils/Helpers.js';
 import bcrypt from "bcrypt";
@@ -100,7 +102,7 @@ export const deleteSeller = async (req, res) => {
 }
 
 export const acceptTerms = async (req, res) => {
-    const sellerId = req.params.id;
+    const sellerId = req.user._id;
     if (!sellerId) {
         return res.status(400).json({ message: "Seller ID is required." });
     }
@@ -116,3 +118,79 @@ export const acceptTerms = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
+
+export const getRevenue = async (req, res) => {
+    const sellerId = req.params.id;
+    const productIds = await product.find({ adminSellerID: sellerId }).select("_id");
+    console.log(productIds);
+    const dailyRevenue = await Orders.aggregate([
+        {
+            $unwind: "$products" // Break down the `products` array
+        },
+        {
+            $match: {
+                "products.productID": { $in: productIds } // Match products sold by the seller
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    creationDay: {
+                        $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$orderDate" // Group by the order date
+                        }
+                    },
+                    // productID: "$products.productID" // Group by the product ID
+                },
+                totalPrice: { $sum: { $multiply: ["$products.quantity", "$products.price"] } } // Calculate total price
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                // productId: "$_id.productID",
+                Date: "$_id.creationDay",
+                activitiesRevenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
+            }
+        },
+        {
+            $sort: { Date: 1 } // Sort by date
+        }
+    ]);
+
+    const totalRevenue = await Orders.aggregate([
+        {
+            $unwind: "$products" // Break down the `products` array
+        },
+        {
+            $match: {
+                "products.productID": { $in: productIds } // Match products sold by the seller
+            }
+        },
+        {
+            $group: {
+                _id: null, // Single group for total revenue
+                totalPrice: { $sum: { $multiply: ["$products.quantity", "$products.price"] } } // Sum total prices
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                activitiesRevenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
+            }
+        }
+    ]);
+
+    console.log({
+        dailyRevenue,
+        totalRevenue: totalRevenue[0]?.activitiesRevenue || 0
+    });
+
+    return res.status(200).json({
+        dailyRevenue,
+        totalRevenue: totalRevenue[0]?.activitiesRevenue || 0
+    });
+    
+}
+
