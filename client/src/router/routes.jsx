@@ -78,10 +78,7 @@ const routes = createRoutesFromElements(
       path="itinerariesTourists/:id"
       element={<SingleItineraryTouristsPage />}
     ></Route>
-    <Route
-      path="itineraries/:id"
-      element={<ItinerariesTourGuidePage />}
-    ></Route>
+    <Route path="itineraries" element={<ItinerariesTourGuidePage />}></Route>
     <Route
       path="itinerariesTourGuide/:id"
       element={<SingleItineraryTourGuidePage />}

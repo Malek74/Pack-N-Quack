@@ -1,20 +1,23 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Calendar, MapPin, Clock, Loader2, Users, Ticket, Star, DollarSign } from 'lucide-react';
+  Calendar,
+  MapPin,
+  Clock,
+  Loader2,
+  Users,
+  Ticket,
+  Star,
+  DollarSign,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, isFuture } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import DeleteButton from "../shared/DeleteButton";
 
 export default function BookActivities() {
   const [upcomingActivities, setUpcomingActivities] = useState([]);
@@ -25,14 +28,20 @@ export default function BookActivities() {
 
   const fetchBookedActivities = async () => {
     try {
-      const response = await axios.post(
-        "/api/tourist/myBookings/ ",
-        { eventType: "activity" }
+
+      const response = await axios.post("/api/tourist/myBookings/ ", {
+        eventType: "activity",
+      });
+      const allActivities = response.data.filter(
+        (activity) => activity != null
       );
-      const allActivities = response.data.filter(activity => activity != null);
       const now = new Date();
-      const upcoming = allActivities.filter(activity => isFuture(new Date(activity.activityID.date)));
-      const past = allActivities.filter(activity => !isFuture(new Date(activity.activityID.date)));
+      const upcoming = allActivities.filter((activity) =>
+        isFuture(new Date(activity.activityID.date))
+      );
+      const past = allActivities.filter(
+        (activity) => !isFuture(new Date(activity.activityID.date))
+      );
 
       setUpcomingActivities(upcoming);
       setPastActivities(past);
@@ -93,18 +102,24 @@ export default function BookActivities() {
                   {activity.name}
                 </CardTitle>
                 <Badge className="absolute top-2 right-2 bg-yellow-400 text-blue-900">
-                  {isFuture(new Date(activity.activityID.date)) ? "Upcoming" : "Past"}
+                  {isFuture(new Date(activity.activityID.date))
+                    ? "Upcoming"
+                    : "Past"}
                 </Badge>
               </div>
               <CardContent className="flex-grow p-4">
                 <div className="space-y-2">
                   <div className="flex items-center text-sm">
                     <Calendar className="mr-2 h-4 w-4 text-blue-500" />
-                    <span>Booked: {format(new Date(activity.createdAt), "PPP")}</span>
+                    <span>
+                      Booked: {format(new Date(activity.createdAt), "PPP")}
+                    </span>
                   </div>
                   <div className="flex items-center text-sm">
                     <Calendar className="mr-2 h-4 w-4 text-green-500" />
-                    <span>Event: {format(new Date(activity.activityID.date), "PPP")}</span>
+                    <span>
+                      Event: {format(new Date(activity.activityID.date), "PPP")}
+                    </span>
                   </div>
                   <div className="flex items-center text-sm">
                     <MapPin className="mr-2 h-4 w-4 text-red-500" />
@@ -118,26 +133,32 @@ export default function BookActivities() {
                     <Ticket className="mr-2 h-4 w-4 text-purple-500" />
                     <span>{activity.numOfTickets} Tickets</span>
                   </div>
-                  {activity.specialDiscounts && activity.specialDiscounts.length > 0 && (
-                    <div className="bg-green-100 text-green-800 p-2 rounded-md text-sm mt-2">
-                      <Star className="inline-block mr-2 h-4 w-4" />
-                      Special Discounts: {activity.specialDiscounts.join(", ")}
-                    </div>
-                  )}
+                  {activity.specialDiscounts &&
+                    activity.specialDiscounts.length > 0 && (
+                      <div className="bg-green-100 text-green-800 p-2 rounded-md text-sm mt-2">
+                        <Star className="inline-block mr-2 h-4 w-4" />
+                        Special Discounts:{" "}
+                        {activity.specialDiscounts.join(", ")}
+                      </div>
+                    )}
                 </div>
               </CardContent>
               {isFuture(new Date(activity.activityID.date)) && (
                 <CardFooter className="bg-gray-50 p-4">
-                  <Button
-                    variant={isCancellable(activity.activityID.date) ? "destructive" : "secondary"}
+                  <DeleteButton
+                    variant={
+                      isCancellable(activity.activityID.date)
+                        ? "destructive"
+                        : "secondary"
+                    }
                     className="w-full transition-all duration-300 hover:shadow-md"
-                    onClick={() => cancelBooking(activity._id)}
+                    onConfirm={() => cancelBooking(activity._id)}
                     disabled={!isCancellable(activity.activityID.date)}
                   >
                     {isCancellable(activity.activityID.date)
                       ? "Cancel Booking"
                       : "Cannot Cancel Within 48 Hours"}
-                  </Button>
+                  </DeleteButton>
                 </CardFooter>
               )}
             </Card>
@@ -178,8 +199,12 @@ export default function BookActivities() {
       ) : (
         <Tabs defaultValue="upcoming" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="upcoming" className="text-lg">Upcoming Quack-tivities</TabsTrigger>
-            <TabsTrigger value="past" className="text-lg">Past Quack-ventures</TabsTrigger>
+            <TabsTrigger value="upcoming" className="text-lg">
+              Upcoming Quack-tivities
+            </TabsTrigger>
+            <TabsTrigger value="past" className="text-lg">
+              Past Quack-ventures
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="upcoming">
             {upcomingActivities.length === 0 ? (
@@ -212,4 +237,3 @@ export default function BookActivities() {
     </div>
   );
 }
-

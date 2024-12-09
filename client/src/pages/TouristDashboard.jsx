@@ -10,6 +10,7 @@ import {
   Plane,
   Gem,
   MapPinHouse,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useUser } from "@/context/UserContext";
@@ -56,8 +57,7 @@ export default function TouristDashboard() {
       path: "bookmarked",
     },
 
-
-     {
+    {
       label: "Promo codes",
       icon: Gem,
       path: "promo-codes",
@@ -68,18 +68,13 @@ export default function TouristDashboard() {
       path: "transactions",
     },
     {
-      label: "Transactions",
-      icon: Gift,
-      path: "transactions",
-    },
-    {
       label: "Activity Bookings",
-      icon: Plane,
+      icon: Calendar,
       path: "activitiy-bookings",
     },
     {
       label: "Itinerary Bookings",
-      icon: Plane,
+      icon: Calendar,
       path: "itinerary-bookings",
     },
     {
@@ -88,17 +83,17 @@ export default function TouristDashboard() {
       path: "booked",
     },
     {
-      label: "Tour Guides",
+      label: "Rate Tour Guides",
       icon: UserRoundPen,
       path: "tour-guides",
     },
     {
-      label: "Itineraries made",
+      label: "Rate Itineraries attended",
       icon: UserRoundPlus,
       path: "itineraries-made",
     },
     {
-      label: "Event/Activity attended",
+      label: "Rate Event/Activity attended",
       icon: UserRoundPlus,
       path: "activity-attended",
     },
@@ -158,10 +153,11 @@ export default function TouristDashboard() {
                         key={label}
                         variant="ghost"
                         onClick={() => handleSectionChange(label, path)}
-                        className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${activeSection === label
-                          ? "bg-muted text-primary"
-                          : "text-muted-foreground hover:text-primary"
-                          }`}
+                        className={`flex justify-start items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                          activeSection === label
+                            ? "bg-muted text-primary"
+                            : "text-muted-foreground hover:text-primary"
+                        }`}
                       >
                         <Icon className="h-4 w-4" />
                         {label}
@@ -177,8 +173,7 @@ export default function TouristDashboard() {
           </div>
         </div>
 
-        <GuideButton guideMessage={"Navigating the webiste" } />
-
+        <GuideButton guideMessage={"Navigating the webiste"} />
       </div>
     );
   }

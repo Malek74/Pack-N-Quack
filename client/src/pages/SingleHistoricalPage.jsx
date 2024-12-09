@@ -42,9 +42,9 @@ export default function SingleHistoricalPage() {
     description,
     pictures,
     location,
-    googlemaps,
-    openingHours,
-    prices,
+    googleMapLink,
+    opening_hour,
+    tickets,
     tags,
   } = historicalPlace;
 
@@ -88,7 +88,7 @@ export default function SingleHistoricalPage() {
         </AnimatePresence>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <motion.div 
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-md"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -97,10 +97,10 @@ export default function SingleHistoricalPage() {
               <Clock className="mr-2 h-6 w-6 text-gray-600" />
               Opening Hours
             </h2>
-            <OpeningHours openingHours={openingHours} />
+            <OpeningHours openingHours={opening_hour} />
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-md"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -110,10 +110,10 @@ export default function SingleHistoricalPage() {
               Admission Prices
             </h2>
             <div className="space-y-3">
-            {Array.isArray(prices) &&
-                prices.map((price) => (
+              {Array.isArray(tickets) &&
+                tickets.map((price) => (
                   <span key={price.type} className="text-base">
-                    <b>{price.type}:</b> {price.price}{prefCurrency}
+                    <b>{price.type}:</b> {price.price}{prefCurrency} {" "}
                   </span>
                 ))}
             </div>
@@ -141,7 +141,7 @@ export default function SingleHistoricalPage() {
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Location</h2>
           <div className="rounded-xl overflow-hidden shadow-md">
-            <Maps mapsSrc={googlemaps} />
+            <Maps mapsSrc={googleMapLink} />
           </div>
         </div>
       </div>
