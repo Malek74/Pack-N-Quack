@@ -196,31 +196,36 @@ export const getMyBookings = async (req, res) => {
 //@desc Get my preferences
 //@route GET /api/tourist/preference/:id
 export const getMyprefernces = async (req, res) => {
-    const id = req.user._id;
 
     try {
-        const tourist = await Tourist.findById(id);
-        const prefereredActivities = tourist.preferences.preferredActivities;
-        const prefereredItineraries = tourist.preferences.preferredItineraries;
-
-        if (prefereredActivities.length === 0 && prefereredItineraries.length === 0) {
-            //get activities based on tags
-            activities.push(... await activityModel.find({}).populate('tags categoryID'));
-
-            //get itineraries based on tags
-            itineraries.push(... await Itinerary.find({}).populate('tags'));
-
-
-            const result = {
-                activites: activities,
-                itineraries: itineraries,
-                //    places: places
-            };
-            console.log(result);
-
-            return res.status(200).json(result);
-
+        try {
+            const id = req.user._id;
         }
+        catch (error) {
+            const tourist = await Tourist.findById(id);
+            const prefereredActivities = tourist.preferences.preferredActivities;
+            const prefereredItineraries = tourist.preferences.preferredItineraries;
+
+            if (prefereredActivities.length === 0 && prefereredItineraries.length === 0) {
+                //get activities based on tags
+                activities.push(... await activityModel.find({}).populate('tags categoryID'));
+
+                //get itineraries based on tags
+                itineraries.push(... await Itinerary.find({}).populate('tags'));
+
+
+                const result = {
+                    activites: activities,
+                    itineraries: itineraries,
+                    //    places: places
+                };
+                console.log(result);
+
+                return res.status(200).json(result);
+
+            }
+        }
+
         let activities = [];
         let itineraries = [];
 
