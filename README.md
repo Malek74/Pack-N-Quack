@@ -502,7 +502,7 @@ Follow these steps to contribute to DuckTourism:
    ```
 4. **Make Your Changes**
 
-  Implement your feature or fix the bug. Ensure that your code adheres to the project’s code style and guidelines.
+   Implement your feature or fix the bug. Ensure that your code adheres to the project’s code style and guidelines.
   
 5. **Commit Your Changes**
 
@@ -521,4 +521,58 @@ Follow these steps to contribute to DuckTourism:
 
 7. **Create a Pull Request**
 
- Go to the original Pack-N-Quack repository and click the Compare & pull request button. Provide a detailed description of your changes and submit the pull request.
+  Go to the original Pack-N-Quack repository and click the Compare & pull request button. Provide a detailed description of your changes and submit the pull request.
+
+## Credits
+
+Building **Pack N Quack** was a collaborative effort that benefited greatly from various open-source projects, libraries, tools, and the support of the developer community. We would like to extend our heartfelt thanks to the following:
+
+### 🛠️ Libraries and Frameworks
+
+- **[Tailwind CSS](https://tailwindcss.com/)**  
+  A utility-first CSS framework that enabled us to rapidly build a responsive and modern user interface with minimal custom CSS.
+
+- **[Shadcn/UI](https://shadcn.com/ui)**  
+  Provided a collection of accessible and reusable React components, streamlining the development process and ensuring a cohesive design system.
+
+- **[Socket.io](https://socket.io/)**  
+  Facilitated real-time, bi-directional communication between clients and servers, making it possible to implement real-time notifications seamlessly.
+
+- **[Stripe](https://stripe.com/)**  
+  Simplified payment processing, allowing us to integrate secure and reliable payment methods into DuckTourism.
+
+- **[Express.js](https://expressjs.com/)**  
+  Served as the backbone for our server-side logic, providing a robust and flexible framework for building our API endpoints.
+
+- **[MongoDB](https://www.mongodb.com/)**  
+  Our choice for a NoSQL database, enabling flexible data storage and rapid development cycles.
+
+### 🌟 Inspiration and Resources
+
+- **[Pack-N-Quack Postman Collection](https://www.postman.com/supply-cosmologist-23527190/packnquack/collection/6uu2arn/pack-n-quack?action=share&creator=38675775)**  
+  Provided a comprehensive API reference that inspired the structure and documentation style of our own API.
+
+- **[OpenAI's ChatGPT](https://openai.com/chatgpt)**  
+  Assisted in drafting and refining various sections of this README, enhancing clarity and professionalism.
+
+### 👥 Special Thanks
+
+- **Our Project Manager**  
+  A big thank you to Hadwa who contributed their time and expertise to guide us with Pack N Quack.
+  
+- **Our Contributors**  
+  A big thank you to all the developers, designers, and testers who contributed their time and expertise to make Pack N Quack a reality.
+
+### 🎨 Design and Assets
+
+- **[Lucide]([https://fontawesome.com/](https://lucide.dev/icons/categories#time))**  
+  For the wide range of icons that added clarity and functionality to our user interface.
+
+### 🔗 Acknowledgements
+
+- **[GitHub](https://github.com/)**  
+  For hosting our repository and providing tools that facilitated version control and collaboration.
+---
+
+We are grateful to everyone and everything that played a role in the creation of DuckTourism. Your support, resources, and inspiration were instrumental in bringing this project to life. Thank you!
+
