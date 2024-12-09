@@ -10,8 +10,30 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import HotelBookingForm from "../forms/hotelBookingForm";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+
 
 const HotelResults = ({ hotels, onSelect, onBook, selectedHotelDetails, handleShowDetails, loading }) => {
+
+    const [walletBallance, setWalletBallance] = useState(0);
+
+    const fetchWallet = async () => {
+        try {
+            const response = await axios.get(`/api/tourist/walletBalance`);
+            setWalletBallance(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchWallet();
+
+    }, []);
+
+
     if (!hotels || hotels.length === 0) {
         return <p>No hotels available.</p>;
     }
@@ -38,7 +60,7 @@ const HotelResults = ({ hotels, onSelect, onBook, selectedHotelDetails, handleSh
                                 {/* <Button className="bg-skyblue hover:bg-sky-800 h-min"
                                     onClick={() => onSelect(flight)}
                                 >Select Flight</Button> */}
-                                <HotelBookingForm hotel={hotel} onBook={onBook} onSelect={onSelect} selectedHotelDetails={selectedHotelDetails} handleShowDetails={handleShowDetails} loading={loading} />
+                                <HotelBookingForm hotel={hotel} onBook={onBook} onSelect={onSelect} selectedHotelDetails={selectedHotelDetails} handleShowDetails={handleShowDetails} loading={loading} walletBallance={walletBallance} />
 
 
                             </TableCell>

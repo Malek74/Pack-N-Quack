@@ -26,31 +26,13 @@ import { useUser } from "@/context/UserContext";
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
-export default function FlightBookingForm({ flight, onBook, onSelect }) {
+export default function FlightBookingForm({ flight, onBook, onSelect, walletBallance }) {
 
     const [paymentMethod, setPaymentMethod] = useState("card");
     const [promoCode, setPromoCode] = useState("");
-    const [walletBallance, setWalletBallance] = useState(0);
     const { prefCurrency } = useUser();
-    const [numOfTickets, setNumOfTickets] = useState(0);
 
-    const fetchWallet = async () => {
-        try {
-            const response = await axios.get(
-                `/api/tourist/walletBalance`
-            );
-            console.log(response.data)
-            setWalletBallance(response.data);
-            console.log(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
-    useEffect(() => {
-        //      fetchWallet();
-        console.log(flight, onBook, onSelect);
-    }, []);
 
     const formSchema = z.object({
         numTickets: z.preprocess((val) => Number(val), z.number()),
@@ -87,6 +69,10 @@ export default function FlightBookingForm({ flight, onBook, onSelect }) {
                         <h3 className="font-semibold mr-2">Base Price: </h3>
                         <p>{flight.price.currency} {flight.price.base}</p>
                     </div>
+                    <div className="flex">
+                        <h3 className="font-semibold mr-2">Total Price:</h3>
+                        <p>{flight.price.currency} {flight.price.grandTotal}</p>
+                    </div>
 
 
                     <Form {...form}>
@@ -117,10 +103,7 @@ export default function FlightBookingForm({ flight, onBook, onSelect }) {
                             />
 
                             <>
-                                <div className="flex">
-                                    <h3 className="font-semibold mr-2">Total Price:</h3>
-                                    <p>{flight.price.currency} {flight.price.grandTotal * numOfTickets}</p>
-                                </div>
+
                                 <div className="flex justify-between items-center mt-10">
                                     <Label className="text-lg font-semibold">Wallet Balance:</Label>
                                     <p className="text-3xl font-bold text-green-600">{prefCurrency}{" "}{walletBallance}</p>
