@@ -266,7 +266,7 @@ export default function SingleItineraryAdminPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <Label className="text-3xl font-bold">Helwa el Ayam</Label>
+          <Label className="text-3xl font-bold">Daily Activities</Label>
         </div>
         <div className="grid grid-cols-2 gap-8 px-28">
           {fetchedItinerary.days.map((activity) => (
