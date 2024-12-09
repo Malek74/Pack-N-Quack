@@ -65,8 +65,8 @@ const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
     <Route index element={<HomePage />} />
     <Route path="profile" element={<MyProfilePage />} />
-    <Route path="activities/:idAdv" element={<ActivitiesPage />} />
-    <Route path="historical/:idTG" element={<HistoricalPage />} />
+    <Route path="activitiesADV" element={<ActivitiesPage />} />
+    <Route path="historical" element={<HistoricalPage />} />
     <Route path="marketplace" element={<MarketplacePage />} />
     <Route path="register" element={<RegistrationPage />} />
     <Route path="login" element={<LoginPage />} />

@@ -45,7 +45,7 @@ export default function Historical() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await axios.get(`/api/places/my/`);
+        const response = await axios.get(`/api/places/myPlaces`);
         setPlaces(response.data);
         console.log(response.data);
       } catch (error) {

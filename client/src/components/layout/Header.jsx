@@ -22,13 +22,14 @@ export default function Header() {
     isTourist,
     isTourismGovernor,
     isGuest,
-    isLoggedIn
+    isLoggedIn,
   } = useUser();
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
     navigate("/");
   };
+
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
   console.log(userId);
@@ -59,6 +60,20 @@ export default function Header() {
                   className={isActive("/marketplace") ? "text-yellow-500" : ""}
                 >
                   Marketplace
+                </Link>
+              </Button>
+            </li>
+          )}
+          {isAdvertiser && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/activitiesADV"
+                  className={
+                    isActive("/activitiesADV") ? "text-yellow-500" : ""
+                  }
+                >
+                  Activities
                 </Link>
               </Button>
             </li>
