@@ -91,6 +91,9 @@ mongoose.connect(mongoURI)
 
 //upon connection, join the user's room as he sends the 
 io.on('connection', async (socket) => {
+    if (socket.handshake.auth.userId === undefined || socket.handshake.auth.userId === null) {
+        return;
+    }
     console.log('A user connected and his socket id is: ' + socket.handshake.auth.userId);
 
 
