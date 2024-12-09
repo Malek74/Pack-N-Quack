@@ -434,7 +434,7 @@ export const deletePromoCode = async (req, res) => {
 export const getRevenue = async (req, res) => {
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
-    const productIDs = req.query.selectedProducts;
+    const productIDs = req.query.products;
     try{
 
         const matchStage = {
@@ -453,6 +453,7 @@ export const getRevenue = async (req, res) => {
             }
         }
 
+        console.log(matchStage);
     const dailyActivityRevenue = await Bookings.aggregate([
         {
             $match: matchStage
@@ -559,6 +560,7 @@ export const getRevenue = async (req, res) => {
     if(productIDs){
         newMatchStage['products.productID'] = { $in: productIDs };
     }
+    console.log(newMatchStage);
             
 
     const dailyProductsRevenue = await Orders.aggregate([
