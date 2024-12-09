@@ -19,9 +19,16 @@ import CreateDialog from "../shared/CreateDialog";
 import DeliveryForm from "../forms/DeliveryForm";
 import axios from "axios";
 import { useEffect, useState } from "react";
-export default function AddressFormWithLayout({ addresses, setAddresses }) {
-  //const [addresses, setAddresses] = useState([]);
+export default function AddressFormWithLayout({
+  addresses: propsAddresses,
+  setAddresses: propsSetAddresses,
+}) {
+  // Fallback to internal state if props are not provided
+  const [internalAddresses, setInternalAddresses] = useState([]);
+  const addresses = propsAddresses ?? internalAddresses;
+  const setAddresses = propsSetAddresses ?? setInternalAddresses;
   const [defaultAddress, setDefaultAddress] = useState(null);
+
   // Initialize React Hook Form
   const handleViewAddress = async () => {
     try {
@@ -77,7 +84,7 @@ export default function AddressFormWithLayout({ addresses, setAddresses }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {addresses.map((address) => (
+            {addresses?.map((address) => (
               <TableRow key={address.id}>
                 <TableCell>{address.address}</TableCell>
                 <TableCell>{address.postcode}</TableCell>
@@ -94,25 +101,11 @@ export default function AddressFormWithLayout({ addresses, setAddresses }) {
                     defaultChecked={address.address === defaultAddress.address}
                   />
                 </TableCell>
-
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {addresses.map((address) => (
-                <TableRow key={address.id}>
-                  <TableCell>{address.address}</TableCell>
-                  <TableCell>{address.postcode}</TableCell>
-                  <TableCell>{address.town}</TableCell>
-                  <TableCell>{address.country}</TableCell>
-                  <TableCell>
-                    <input type="radio" name="address" value={address.address} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

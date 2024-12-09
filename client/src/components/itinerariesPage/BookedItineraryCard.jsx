@@ -26,6 +26,8 @@ BookedItineraryCard.propTypes = {
   eventDate: PropTypes.string,
   numOfTickets: PropTypes.number,
   bookingId: PropTypes.string,
+  past: PropTypes.bool,
+  onCancel: PropTypes.func,
 };
 export default function BookedItineraryCard({
   id,
@@ -41,6 +43,8 @@ export default function BookedItineraryCard({
   eventDate,
   numOfTickets,
   small = false,
+  past = false,
+  onCancel,
 }) {
   const cardClassName = small
     ? "shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[400px]"
@@ -52,13 +56,10 @@ export default function BookedItineraryCard({
   const { toast } = useToast();
   const handleCancelBooking = async () => {
     try {
-      const response = await axios.post(
-        "/api/booking/cancelBooking/6725442e98359339d8b821f0",
-        {
-          eventType: "itinerary",
-          eventID: bookingId,
-        }
-      );
+      const response = await axios.post("/api/booking/cancelBooking/", {
+        eventType: "itinerary",
+        eventID: bookingId,
+      });
       console.log(response.data);
       toast({
         variant: "success",
@@ -73,6 +74,7 @@ export default function BookedItineraryCard({
         description: error.response.data.error,
       });
     }
+    onCancel();
   };
   return (
     <Card
@@ -92,15 +94,17 @@ export default function BookedItineraryCard({
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
             <Label className="text-lg font-semibold">{name}</Label>
-            <Button
-              className="text-md bg-red-500 text-white hover:bg-red-600 hover:text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCancelBooking();
-              }}
-            >
-              Cancel Booking
-            </Button>
+            {!past && (
+              <Button
+                className="text-md bg-red-500 text-white hover:bg-red-600 hover:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancelBooking();
+                }}
+              >
+                Cancel Booking
+              </Button>
+            )}
           </div>
           <p className="text-sm text-neutral-400 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
             {description}
