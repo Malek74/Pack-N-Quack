@@ -3,21 +3,21 @@ Pack N Quack is an innovative solution that empowers travelers to create unforge
 
 ## Motivation
 
-In today's rapidly evolving travel landscape, tourists seek seamless and personalized experiences that cater to their diverse needs and preferences. However, existing platforms often fall short in providing a comprehensive, user-centric solution that bridges the gap between various stakeholders in the tourism industry. This is where **DuckTourism** comes into play.
+In today's rapidly evolving travel landscape, tourists seek seamless and personalized experiences that cater to their diverse needs and preferences. However, existing platforms often fall short in providing a comprehensive, user-centric solution that bridges the gap between various stakeholders in the tourism industry. This is where **Pack-N-Quack** comes into play.
 
 ### Identifying the Gaps
 
 1. **Fragmented Services**:
    - **Issue**: Travelers frequently navigate multiple websites and applications to book flights, accommodations, activities, and transportation, leading to a disjointed and time-consuming planning process.
-   - **Solution**: DuckTourism consolidates all essential travel services into a single, unified platform, offering a one-stop solution for all booking needs.
+   - **Solution**: Pack-N-Quack consolidates all essential travel services into a single, unified platform, offering a one-stop solution for all booking needs.
 
 2. **Lack of Personalization**:
    - **Issue**: Many tourism platforms offer generic recommendations, failing to tailor experiences based on individual preferences, interests, and special occasions.
-   - **Solution**: By leveraging user roles and personalized data, DuckTourism provides customized itineraries, activities, and promotions, enhancing the overall travel experience.
+   - **Solution**: By leveraging user roles and personalized data, Pack-N-Quack provides customized itineraries, activities, and promotions, enhancing the overall travel experience.
 
 3. **Inefficient Communication**:
    - **Issue**: Real-time updates and notifications are often missing, leaving users uninformed about important changes, confirmations, and opportunities.
-   - **Solution**: DuckTourism integrates real-time notifications, ensuring users stay informed and engaged throughout their journey.
+   - **Solution**: Pack-N-Quack integrates real-time notifications, ensuring users stay informed and engaged throughout their journey.
 
 4. **Limited Marketplace Integration**:
    - **Issue**: Tourists and local sellers have limited avenues to interact, buy, and sell tourism-related goods, restricting the economic potential of the tourism ecosystem.
@@ -127,7 +127,7 @@ With these features, our project aims to create a dynamic and user-centric platf
 
 ## API Reference
 
-Unlock the full potential of our DuckTourism platform with our comprehensive API. Whether you're looking to integrate user management, activity bookings, payments, or marketplace functionalities, our API has you covered.
+Unlock the full potential of our Pack-N-Quack platform with our comprehensive API. Whether you're looking to integrate user management, activity bookings, payments, or marketplace functionalities, our API has you covered.
 
 ### 📘 Explore the API with Postman
 
@@ -344,7 +344,7 @@ export default function ItinerariesCard({
 ```
 ## Tests
 
-Ensuring the reliability and stability of DuckTourism is a top priority. Currently, all functionalities have been thoroughly tested manually to verify that they work as expected. While automated tests are not yet implemented, we recognize their importance and plan to incorporate them in future updates.
+Ensuring the reliability and stability of Pack-N-Quack is a top priority. Currently, all functionalities have been thoroughly tested manually to verify that they work as expected. While automated tests are not yet implemented, we recognize their importance and plan to incorporate them in future updates.
 
 ### Manual Testing Process
 
@@ -373,7 +373,7 @@ Our manual testing process involves the following steps to ensure each feature o
 
 ### Future Testing Plans
 
-To further enhance the quality and maintainability of DuckTourism, we plan to implement automated testing in the following areas:
+To further enhance the quality and maintainability of Pack-N-Quack, we plan to implement automated testing in the following areas:
 
 1. **Unit Tests**
    - **Purpose**: Test individual components and functions to ensure they work as intended.
@@ -393,7 +393,7 @@ To further enhance the quality and maintainability of DuckTourism, we plan to im
 
 ### How You Can Help
 
-We welcome contributions to build a robust automated testing suite for DuckTourism. Here's how you can get involved:
+We welcome contributions to build a robust automated testing suite for Pack-N-Quack. Here's how you can get involved:
 
 1. **Choose a Testing Framework**
    - If you’re familiar with Jest, Mocha, Chai, or Cypress, feel free to start integrating tests using these tools.
@@ -475,15 +475,15 @@ BIRTHDAY_COUPON_ID="l4KcArGy"
 
 ## Contributing
 
-We’re thrilled that you’re interested in contributing to **DuckTourism**! Your contributions help make this project better for everyone. Whether you’re fixing bugs, improving documentation, or suggesting new features, your support is greatly appreciated.
+We’re thrilled that you’re interested in contributing to **Pack-N-Quack**! Your contributions help make this project better for everyone. Whether you’re fixing bugs, improving documentation, or suggesting new features, your support is greatly appreciated.
 
 ### How to Contribute
 
-Follow these steps to contribute to DuckTourism:
+Follow these steps to contribute to Pack-N-Quack:
 
 1. **Fork the Repository**
 
-   Click the **Fork** button at the top right of this repository’s page to create your own copy of DuckTourism.
+   Click the **Fork** button at the top right of this repository’s page to create your own copy of Pack-N-Quack.
 
 2. **Clone Your Fork**
 
@@ -539,7 +539,7 @@ Building **Pack N Quack** was a collaborative effort that benefited greatly from
   Facilitated real-time, bi-directional communication between clients and servers, making it possible to implement real-time notifications seamlessly.
 
 - **[Stripe](https://stripe.com/)**  
-  Simplified payment processing, allowing us to integrate secure and reliable payment methods into DuckTourism.
+  Simplified payment processing, allowing us to integrate secure and reliable payment methods into Pack-N-Quack.
 
 - **[Express.js](https://expressjs.com/)**  
   Served as the backbone for our server-side logic, providing a robust and flexible framework for building our API endpoints.
@@ -574,5 +574,5 @@ Building **Pack N Quack** was a collaborative effort that benefited greatly from
   For hosting our repository and providing tools that facilitated version control and collaboration.
 ---
 
-We are grateful to everyone and everything that played a role in the creation of DuckTourism. Your support, resources, and inspiration were instrumental in bringing this project to life. Thank you!
+We are grateful to everyone and everything that played a role in the creation of Pack-N-Quack. Your support, resources, and inspiration were instrumental in bringing this project to life. Thank you!
 
