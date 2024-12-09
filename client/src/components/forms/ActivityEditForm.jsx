@@ -122,7 +122,7 @@ export default function ActivityEditForm(props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button onClick={() => fetchData()} className="bg-transparent" ><Pencil /></Button>
+                <Button onClick={() => fetchData()} className="bg-transparent text-black hover:text-white hover:bg-black" ><Pencil /></Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
