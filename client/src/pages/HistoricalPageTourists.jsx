@@ -43,8 +43,8 @@ export default function Historical() {
 
     <div className="flex flex-col justify-center w-screen px-14 my-8">
       <div className="relative mb-6">
-     
-      {/* Banner Section */}
+
+        {/* Banner Section */}
         <Banner
           background={Historicalbackground}
           alt="Historical Background"
@@ -82,7 +82,7 @@ export default function Historical() {
           />
         ))}
 
-      </grid>
+      </div>
       <GuideButton guideMessage={"Select a historical place and embark on your adventure!"} />
 
     </div>

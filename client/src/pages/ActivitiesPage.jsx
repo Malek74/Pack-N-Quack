@@ -14,8 +14,9 @@ import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/shared/Loading";
 import GuideButton from "@/components/guideComponents/popMessage";
+import { useUser } from "@/context/UserContext";
 export default function Activities() {
-  const { idAdv } = useParams();
+  const { userId, userType } = useUser();
   const [activities, setActivities] = useState([]);
   const [activityDeleted, setActivityDeleted] = useState();
   const [activityUpdated, setActivityUpdated] = useState();
@@ -71,12 +72,12 @@ export default function Activities() {
 
   let tourist = true;
   {
-    idAdv ? (tourist = false) : (tourist = true);
+    userType === "Tourist" ? (tourist = true) : (tourist = false);
   }
 
   const addActivity = async (values) => {
     try {
-      values.advertiserID = idAdv;
+      values.advertiserID = userId;
       const response = await axios.post(`/api/activity`, values);
       console.log("Created successfully:", response.data);
       setActivityCreated(response.data);
@@ -164,7 +165,7 @@ export default function Activities() {
     };
 
     {
-      idAdv ? fetchMyActivites() : fetchActivites();
+      userType === "Advertiser" ? fetchMyActivites() : fetchActivites();
     }
     fetchData();
   }, [
@@ -308,7 +309,7 @@ export default function Activities() {
       </div>
 
 
-<GuideButton guideMessage={"Choose an activity card to explore your next adventure!"} />
+      <GuideButton guideMessage={"Choose an activity card to explore your next adventure!"} />
 
 
     </div>

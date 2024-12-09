@@ -21,7 +21,7 @@ export default function CheckoutPage() {
         try {
             const response = await axios.post(`/api/tourist/checkout`, {
                 paymentMethod: paymentMethod,
-                promoCode: promoCode,
+                promocode: promoCode,
                 payByWallet: (paymentMethod === "wallet"),
                 addresses: addresses
 
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
                     </div>
                 </div>
 
- <GuideButton guideMessage={"Ensure the quantities and items are correct, then proceed to payment"} />
+                <GuideButton guideMessage={"Ensure the quantities and items are correct, then proceed to payment"} />
 
 
             </div>
