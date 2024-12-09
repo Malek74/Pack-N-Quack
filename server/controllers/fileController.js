@@ -28,6 +28,15 @@ export const handleImageUpload = async (req, res) => {
     if (userType === 'sellers') {
         UserModel = userModels['seller']
     }
+
+    if (userType === 'tourist') {
+        UserModel = userModels['tourist']
+    }
+
+    if (userType === 'tourGuide') {
+        UserModel = userModels['tourGuide']
+    }
+
     console.log(UserModel);
     console.log(userId);
 
@@ -277,6 +286,15 @@ export const fetchUserImages = async (req, res) => {
     if (userType === 'sellers') {
         UserModel = userModels['seller']
     }
+
+    if (userType === 'tourist') {
+        UserModel = userModels['tourist']
+    }
+
+    if (userType === 'tourGuide') {
+        UserModel = userModels['tourGuide']
+    }
+
 
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
