@@ -47,7 +47,7 @@ export const UserProvider = ({ children }) => {
       case "Tour Guide":
         setIsTourGuide(true);
         break;
-      case "Tourism Governor":
+      case "Tourism Governer":
         setIsTourismGovernor(true);
         break;
       default:
