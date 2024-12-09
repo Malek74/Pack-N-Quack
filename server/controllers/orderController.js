@@ -113,26 +113,32 @@ export const viewAllOrderDetails = async (req, res) => {
     let orderDetails;
     try {
         const conversionRate = await getConversionRate(prefCurrency);
+        console.log(conversionRate);
         //orders delivered or cancelled 
         if (status == "old") {
-            orderDetails = await Order.find({ touristID: touristID, orderStatus: { $in: ["Delivered", "Cancelled"] } });
+            orderDetails = await Order.find({ touristID: touristID, orderStatus: { $in: ["Delivered", "Cancelled"] } }).populate("products.productID");
         }
         if (status == "all") {
-            orderDetails = await Order.find({ touristID: touristID });
+            orderDetails = await Order.find({ touristID: touristID }).populate("products.productID");
         }
         if (status == "pending") {
-            orderDetails = await Order.findOne({ touristID: touristID, orderStatus: "Out for Delivery" });
+            orderDetails = await Order.find({ touristID: touristID, orderStatus: "Out for Delivery" }).populate("products.productID");
         }
 
         if (!orderDetails) {
             return res.status(404).json({ message: "No orders found for this user." });
         }
 
-        if (orderDetails.length > 0) {
-            orderDetails.products.forEach((product) => {
+        for (let i = 0; i < orderDetails.length; i++) {
+            orderDetails[i].orderTotal = orderDetails[i].orderTotal * conversionRate;
+            orderDetails[i].products.forEach((product) => {
                 product.price = product.price * conversionRate;
             });
         }
+
+     
+
+
         return res.status(200).json(orderDetails);
     } catch (error) {
         console.error("Error retrieving order details:", error);
@@ -148,15 +154,19 @@ export const viewSingleOrderDetails = async (req, res) => {
     try {
         const conversionRate = await getConversionRate(prefCurrency);
 
-        const orderDetails = await Order.findOne({ touristID: touristID, _id: orderID });
+        const orderDetails = await Order.findOne({ touristID: touristID, _id: orderID }).populate("products.productID");
 
         if (!orderDetails) {
-            return res.status(404).json({ message: "No orders found for this user." });
+            return res.status(404).json({ message: "No orders found for this user." }).populate("products.productID");
         }
 
-        orderDetails.products.forEach((product) => {
-            product.price = product.price * conversionRate;
-        });
+        for (let i = 0; i < orderDetails.length; i++) {
+            orderDetails[i].orderTotal = orderDetails[i].orderTotal * conversionRate;
+            orderDetails[i].products.forEach((product) => {
+                product.price = product.price * conversionRate;
+            });
+            console.log(orderDetails[i].products);
+        }
 
         return res.status(200).json(orderDetails);
     } catch (error) {

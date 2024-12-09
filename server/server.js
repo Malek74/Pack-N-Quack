@@ -93,7 +93,7 @@ mongoose.connect(mongoURI)
 io.on('connection', async (socket) => {
     console.log('A user connected and his socket id is: ' + socket.handshake.auth.userId);
 
-    
+
     const roomID = socket.handshake.auth.userId.toString();
     socket.join(roomID);
     console.log('User joined room: ' + socket.handshake.auth.userId);
@@ -151,7 +151,7 @@ cron.schedule("50 12 * * *", () => {
 });
 
 //schedule the function to run every 20 minutes
-cron.schedule("*/20 * * * *", () => {
-    console.log("Running task every 20 minutes...");
-    updateOrderStatus();
-});
+// cron.schedule("*/20 * * * *", () => {
+//     console.log("Running task every 20 minutes...");
+//     updateOrderStatus();
+// });

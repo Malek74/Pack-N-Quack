@@ -8,19 +8,22 @@ const orderSchema = new Schema({
         ref: 'Tourist',
         required: true
     },
-    products: [{
-        productID: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
-        },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        rating: { type: Number },
-        review: { type: String },
-    }],
+    products:
+    {
+        type: [{
+            productID: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+                required: true
+            },
+            quantity: {
+                type: Number,
+                required: true
+            },
+            rating: { type: Number },
+            review: { type: String },
+        }]
+    },
     stripeSessionID: {
         type: String,
         default: null,
@@ -33,7 +36,7 @@ const orderSchema = new Schema({
     orderStatus: {
         type: String,
         required: true,
-        enum: [ "Cancelled", "Out for Delivery", "Delivered"],
+        enum: ["Cancelled", "Out for Delivery", "Delivered"],
         default: "Out for Delivery"
     },
     orderTotal: {
@@ -44,17 +47,17 @@ const orderSchema = new Schema({
         type: Date,
         required: false
     },
-    paidByWallet:{
+    paidByWallet: {
         type: Number,
         default: 0,
         required: true
     },
-    paidByCard:{
+    paidByCard: {
         type: Number,
         default: 0,
         required: true
     },
-},{timestamps: true});
+}, { timestamps: true });
 
 const Order = model("Order", orderSchema);
 

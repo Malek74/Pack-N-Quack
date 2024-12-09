@@ -5,6 +5,7 @@ import { convertPrice, getConversionRate } from '../utils/Helpers.js';
 import AmadeusBooking from '../models/amadeusBooking.js';
 import PromoCodes from "../models/promoCodesSchema.js"
 import { sendPaymentReceipt } from "../controllers/webhook.js"
+import transactionModel from "../models/transactionsSchema.js";
 
 const cities = [
   { "city": "New York", "iata_code": "JFK" },
@@ -262,6 +263,7 @@ export const bookFlight = async (req, res) => {
     console.log(priceConverted);
 
     let amountToPay = priceConverted * numTickets;
+    console.log("THis is the amount to pay", amountToPay);
 
     //fetch promocode if it exists
     let promo;
@@ -276,8 +278,10 @@ export const bookFlight = async (req, res) => {
         res.status(400).send("Promocode has already been used");
       }
 
-      //update amount to be paid
-      amountToPay -= amountToPay * (promo.discount / 100);
+      if (!(promo.isBirthday)) {
+        amountToPay -= amountToPay * (promo.discount / 100);
+
+      }
 
       //check if it's his birthday promo
       if (promo.code == tourist.promoCode.code) {
@@ -296,6 +300,8 @@ export const bookFlight = async (req, res) => {
       }
       else {
         await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+        amountToPay -= amountToPay * (promo.discount / 100);
+
 
       }
     }
@@ -321,7 +327,7 @@ export const bookFlight = async (req, res) => {
 
     //create booking
     const booking = await AmadeusBooking.create(bookedFlight);
-    let walletAmount
+    let walletAmount;
     //handle payment by wallet and related transactions
     if (payByWallet) {
       let amountLeftToPay
@@ -337,8 +343,7 @@ export const bookFlight = async (req, res) => {
 
       //handle payment by wallet and related transactions
 
-      amountLeftToPay = amountToPay - tourist.wallet;
-      let walletAmount = amountToPay - amountLeftToPay;
+
 
       console.log("amount left to pay: ", amountLeftToPay);
 
@@ -361,8 +366,9 @@ export const bookFlight = async (req, res) => {
       await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
 
       if (amountLeftToPay == 0) {
-        sendPaymentReceipt(tourist.email, tourist.username, `booking flight from ${originCity} to ${destinationCity}`, dateSelected, amountToPay, price.id);
-        return res.status(200).json({ message: "Payment successful" });
+        sendPaymentReceipt(tourist.email, tourist.username, `booking flight from ${originCity} to ${destinationCity}`, date, amountToPay, tourist._id);
+
+        return res.status(200).json({ url: success_url });
       } else {
 
         //create transaction for amount left to pay by card
@@ -392,8 +398,10 @@ export const bookFlight = async (req, res) => {
           mode: 'payment',
           success_url: success_url,
 
-        
+
         });
+        sendPaymentReceipt(tourist.email, tourist.username, `booking flight from ${originCity} to ${destinationCity}`, date, amountToPay, tourist._id);
+
         return res.status(200).json({ url: session.url });
       }
 
@@ -427,6 +435,8 @@ export const bookFlight = async (req, res) => {
         incoming: true,
         description: `Wallet deduction for booking flight from ${originCity} to ${destinationCity}`
       });
+      sendPaymentReceipt(tourist.email, tourist.username, `booking flight from ${originCity} to ${destinationCity}`, date, amountToPay, tourist._id);
+
       return res.status(200).json({ url: session.url });
 
 

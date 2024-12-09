@@ -4,7 +4,8 @@ import { getConversionRate } from "../utils/Helpers.js";
 import Tourist from "../models/touristSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
 import { sendPaymentReceipt } from "../controllers/webhook.js";
-
+import AmadeusBooking from "../models/amadeusBooking.js";
+import transactionModel from "../models/transactionsSchema.js";
 const cities = [
     { "city": "New York", "iata_code": "JFK" },
     { "city": "Los Angeles", "iata_code": "LAX" },
@@ -117,6 +118,8 @@ export const bookRoom = async (req, res) => {
     let conversionRate = 0;
     let hotelBooking = {};
     hotelBooking.touristID = touristID;
+    const success_url = 'http://localhost:5173/touristDashboard/booked';
+    console.log(req.body)
 
     try {
         conversionRate = await getConversionRate(currency);
@@ -127,6 +130,7 @@ export const bookRoom = async (req, res) => {
             return res.status(404).json({ message: "Tourist not found" });
         }
 
+
         //convert price to USD using exchange rate api
         const priceConverted = parseInt(price * conversionRate);
         let amountToPay = priceConverted * numOfDays;
@@ -135,6 +139,7 @@ export const bookRoom = async (req, res) => {
         let promo;
         if (promocode) {
             promo = await PromoCodes.findOne({ code: promocode });
+            console.log(promo);
 
             if (!promo) {
                 res.status(400).send("Promocode does not exist");
@@ -145,8 +150,10 @@ export const bookRoom = async (req, res) => {
             }
 
             //update amount to be paid
-            amountToPay -= amountToPay * (promo.discount / 100);
+            if (!(promo.isBirthday)) {
+                amountToPay -= amountToPay * (promo.discount / 100);
 
+            }
             //check if it's his birthday promo
             if (promo.code == tourist.promoCode.code) {
                 //today is birthday
@@ -163,22 +170,23 @@ export const bookRoom = async (req, res) => {
                 }
             }
             else {
+                amountToPay -= amountToPay * (promo.discount / 100);
+
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
 
             }
         }
         hotelBooking.hotelData = {
-            hotel: hotel,
-            type: room.type,
-            beds: room.beds,
-            bedType: room.bedType,
-            description: room.description,
-            price: priceConverted * numOfDays,
+            hotel: hotel.hotel,
+            type: hotel.type,
+            beds: hotel.beds,
+            bedType: hotel.bedType,
+            description: hotel.description.text,
+            price: amountToPay,
             checkIn: checkIn,
             checkOut: checkOut
         };
-        const booking = await AmadeusBooking.create(hotelBooking);
-
+        await AmadeusBooking.create(hotelBooking);
 
 
         let walletAmount;
@@ -195,10 +203,10 @@ export const bookRoom = async (req, res) => {
                 walletAmount = amountToPay;
             }
 
-            amountLeftToPay = amountToPay - tourist.wallet;
-            let walletAmount = amountToPay - amountLeftToPay;
+            console.log("Amount left to pay", amountLeftToPay);
+            console.log("Wallet amount", walletAmount);
 
-            console.log("amount left to pay: ", amountLeftToPay);
+
 
             //create transaction for amount paid from wallet
             if (walletAmount > 0) {
@@ -218,9 +226,10 @@ export const bookRoom = async (req, res) => {
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
 
             if (amountLeftToPay == 0) {
-                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, dateSelected, amountToPay, price.id);
+                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, checkIn, amountToPay, tourist._id);
                 return res.status(200).json({ message: "Payment successful" });
             } else {
+
 
                 //create transaction for amount left to pay by card
                 await transactionModel.create({
@@ -243,22 +252,24 @@ export const bookRoom = async (req, res) => {
 
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
-                    line_items: [{
-                        price: price.id,
-                        quantity: 1,
-                    }],
+                    line_items: [
+                        {
+                            price_data: {
+                                currency: "usd",
+                                unit_amount: amountLeftToPay * 100,
+                                product_data: {
+                                    name: `Booking in${hotel.hotel}`,
+                                    description: `We wish you a quacking stay in ${hotel.hotel}`,
+                                }
+                            },
+                            quantity: 1,
+                        },
+                    ],
                     mode: 'payment',
                     success_url: success_url,
-                    metadata: {
-                        eventID: eventID,
-                        eventType: eventType,
-                        touristID: touristID,
-                        type: "event",
-                        price: amountLeftToPay,
-                        numOfTickets: numOfTickets,
-                        date: dateSelected
-                    }
+
                 });
+                sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, checkIn, amountToPay, tourist._id);
                 return res.status(200).json({ url: session.url });
             }
 
@@ -269,7 +280,7 @@ export const bookRoom = async (req, res) => {
             await transactionModel.create({
                 userId: touristID,
                 title: "Hotel Booking",
-                amount: walletAmount,
+                amount: amountToPay,
                 date: new Date(),
                 method: "card",
                 incoming: false,
@@ -279,15 +290,26 @@ export const bookRoom = async (req, res) => {
 
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
-                line_items: [{
-                    price: price.id,
-                    quantity: 1,
-                }],
+                line_items: [
+                    {
+                        price_data: {
+                            currency: "usd",
+                            unit_amount: amountToPay * 100,
+                            product_data: {
+                                name: `Booking in${hotel.hotel}`,
+                                description: `We wish you a quacking stay in ${hotel.hotel}`,
+                            }
+                        },
+                        quantity: 1,
+                    },
+                ],
                 mode: 'payment',
                 success_url: success_url,
 
 
             });
+            sendPaymentReceipt(tourist.email, tourist.username, `booking a room in ${hotel.hotel}`, checkIn, amountToPay, tourist._id);
+
             return res.status(200).json({ url: session.url });
 
 

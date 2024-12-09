@@ -3,7 +3,8 @@ import { getConversionRate } from "../utils/Helpers.js";
 import Stripe from "stripe";
 import Tourist from "../models/touristSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
-
+import transactionModel from "../models/transactionsSchema.js";
+import { sendPaymentReceipt } from "../controllers/webhook.js"
 
 //@desc Get all transportation
 //@route GET /api/transportation
@@ -51,7 +52,7 @@ export const getTransportationById = async (req, res) => {
 //@desc create transportation
 //@route POST /api/transportation
 export const createTransportation = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     const { name, price, type, available, origin, destination, date } = req.body;
 
@@ -92,7 +93,7 @@ export const createTransportation = async (req, res) => {
 //@route POST /api/transportation/book/:id
 export const bookTransportation = async (req, res) => {
 
-    const touristID = req.params.id;
+    const touristID = req.user._id;
     const { eventID, numOfTickets, promoCode, payByWallet, date } = req.body;
     const success_url = 'http://localhost:5173/touristDashboard/booked';
     console.log(req.body);
@@ -114,9 +115,11 @@ export const bookTransportation = async (req, res) => {
 
 
         //fetch promocode if it exists
+        let amountToPay = event.price * numOfTickets;
         let promo;
         if (promoCode) {
             promo = await PromoCodes.findOne({ code: promoCode });
+            console.log(promo);
 
             if (!promo) {
                 res.status(400).send("Promocode does not exist");
@@ -125,6 +128,10 @@ export const bookTransportation = async (req, res) => {
             if (!promo.isActive) {
                 res.status(400).send("Promocode has already been used");
             }
+            if (!(promo.isBirthday)) {
+                amountToPay -= amountToPay * (promo.discount / 100);
+            }
+
 
             //set promocode to inactive 
 
@@ -145,6 +152,9 @@ export const bookTransportation = async (req, res) => {
             }
             else {
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+                amountToPay -= amountToPay * (promo.discount / 100);
+
+
 
             }
         }
@@ -189,8 +199,30 @@ export const bookTransportation = async (req, res) => {
             console.log("amount left to pay: ", amountLeftToPay);
 
             if (amountLeftToPay == 0) {
-                sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
+                sendPaymentReceipt(tourist.email, tourist.username, `${event.name}`, event.date, amountToPay, tourist._id);
                 return res.status(200).json({ message: "Payment successful", url: success_url });
+            }
+            else {
+                sendPaymentReceipt(tourist.email, tourist.username, `${event.name}`, event.date, amountToPay, tourist._id);
+
+                //create price to be paid after deducting wallet amount        
+                const price = await stripe.prices.create({
+                    currency: 'usd',
+                    product: product.id,
+                    unit_amount: amountLeftToPay * 100,
+                });
+
+                const session = await stripe.checkout.sessions.create({
+                    payment_method_types: ['card'],
+                    line_items: [{
+                        price: price.id,
+                        quantity: 1,
+                    }],
+                    mode: 'payment',
+                    success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
+                    cancel_url: 'https://www.amazon.com/',  //todo:add correct link
+
+                });
             }
         }
         else {
@@ -209,7 +241,7 @@ export const bookTransportation = async (req, res) => {
             const price = await stripe.prices.create({
                 currency: 'usd',
                 product: product.id,
-                unit_amount: amountLeftToPay * 100,
+                unit_amount: amountToPay * 100,
             });
 
             const session = await stripe.checkout.sessions.create({
@@ -221,15 +253,9 @@ export const bookTransportation = async (req, res) => {
                 mode: 'payment',
                 success_url: 'http://localhost:5173/touristDashboard/booked', //todo:add correct link
                 cancel_url: 'https://www.amazon.com/',  //todo:add correct link
-                metadata: {
-                    eventID: eventID,
-                    touristID: touristID,
-                    type: "transportation",
-                    price: numOfTickets * event.price,
-                    date: event.date,
-                    numOfTickets: numOfTickets
-                }
+
             });
+            sendPaymentReceipt(tourist.email, tourist.username, `${event.name}`, event.date, amountToPay, tourist._id);
             return res.status(200).json({ url: session.url });
         }
     }
