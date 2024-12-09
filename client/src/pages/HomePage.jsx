@@ -17,6 +17,8 @@ import Loading from "@/components/shared/Loading";
 import { ShareButton } from "@/components/shared/ShareButton";
 import Delivery from "@/components/CheckOutPage/Delivery";
 import GuideButton from "@/components/guideComponents/popMessage";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { userId, userType } = useUser();
@@ -27,9 +29,7 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `/api/tourist/myPreferences/`
-        );
+        const response = await axios.get(`/api/tourist/myPreferences/`);
         console.log(response.data);
         setActivities(response.data.activites);
         setItineraries(response.data.itineraries);
@@ -46,15 +46,15 @@ export default function HomePage() {
 
   const filteredActivities = activities
     ? activities.filter((activity) =>
-      activity.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        activity.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
   console.log(filteredActivities);
 
   const filteredItineraries = itineraries
     ? itineraries.filter((itinerary) =>
-      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   return (
@@ -63,10 +63,10 @@ export default function HomePage() {
         {/* Banner Section */}
         <Banner
           background={BannerImage}
-        //    alt="Hustling market"
-        //    name="Live your dream destinations."
-        //    textAlign="left"
-        //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
+          //    alt="Hustling market"
+          //    name="Live your dream destinations."
+          //    textAlign="left"
+          //    description="Odio eu consectetur ornare congue non enim pellentesque eleifend ipsum."
         />
 
         {/* Search Bar Section - Positioned on top of the banner */}
@@ -83,6 +83,19 @@ export default function HomePage() {
 
       <div className="flex justify-center mt-10  ">
         {loading && <Loading />}
+        {Array.isArray(filteredActivities) &&
+          filteredActivities.length === 0 &&
+          Array.isArray(filteredItineraries) &&
+          filteredItineraries.length === 0 && (
+            <Card>
+              <CardContent className="flex justify-center items-center p-7">
+                <Label className="text-2xl font-semibold">
+                  There are no activities or itineraries that match your
+                  preferences.
+                </Label>
+              </CardContent>
+            </Card>
+          )}
       </div>
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
         {Array.isArray(filteredActivities) &&
@@ -123,8 +136,7 @@ export default function HomePage() {
               touristClicked={true}
             />
           ))}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center"></div>
       </div>
     </div>
   );
