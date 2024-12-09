@@ -115,7 +115,7 @@ export default function MarketplacePage() {
       </div>
 
       <div className="mt-8 flex">
-        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} />
+        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} marketplace />
         {maxPrice !== null && (
           <div className="flex items-center justify-center">
             <PriceSlider

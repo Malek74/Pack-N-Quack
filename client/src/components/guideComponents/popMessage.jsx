@@ -27,7 +27,7 @@ ${guideMessage}`;
        <div
   style={{
     position: "fixed",
-    top: "40px",
+    bottom: "120px",
     right: "325px",
     width: "80px",
     height: "80px",
@@ -56,7 +56,7 @@ ${guideMessage}`;
         <div
           style={{
             position: "fixed",
-            top: "69px",
+            bottom: "69px",
             right: "50px", // Adjust position
             // zIndex: 1001,
             // boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Subtle shadow for the entire component
@@ -68,7 +68,7 @@ ${guideMessage}`;
           {messageLines.map((line, index) => (
            <div
   key={index}
-  className="mb-[0.09px] h-auto w-80 bg-cover bg-center p-2 text-center font-serif font-semibold text-white shadow-md"
+  className="mb-[0.09px] h-auto w-80 bg-cover bg-center p-2 px-4 text-center font-serif font-semibold text-white shadow-md"
   style={{
     backgroundImage: `url(${woodPlank})`, // Dynamically set the background image
   }}
