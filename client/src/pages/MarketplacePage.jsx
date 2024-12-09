@@ -40,8 +40,8 @@ export default function MarketplacePage() {
       });
   };
 
-  26835438303
-  14215076750
+  26835438303;
+  14215076750;
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
@@ -115,7 +115,13 @@ export default function MarketplacePage() {
       </div>
 
       <div className="mt-8 flex">
-        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} marketplace />
+        <div className="flex w-full justify-between">
+          <FilterButton
+            buttons={buttons}
+            onFilterChange={handleFilterChange}
+            marketplace
+          />
+        </div>
         {maxPrice !== null && (
           <div className="flex items-center justify-center">
             <PriceSlider
@@ -146,8 +152,11 @@ export default function MarketplacePage() {
         />
       )}
 
-     <GuideButton guideMessage={"Search and select items in the marketplace, then add them to your cart and proceed with checkout."} />
-
+      <GuideButton
+        guideMessage={
+          "Search and select items in the marketplace, then add them to your cart and proceed with checkout."
+        }
+      />
 
       <div className="grid grid-cols-1 place-items-center justify-center gap-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.length > 0 ? (
@@ -169,7 +178,7 @@ export default function MarketplacePage() {
             />
           ))
         ) : (
-          <div >
+          <div>
             <Loading />
           </div>
         )}

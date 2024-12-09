@@ -42,9 +42,9 @@ export function PieBookingsPercentageChart({ totalBookings, type }) {
   ];
 
   return (
-    <Card className="flex flex-col w-1/2">
+    <Card className="flex w-1/2 flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Total Bookings</CardTitle>
+        <CardTitle>Total Tourists</CardTitle>
         <CardDescription>Bookings Stats</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -86,7 +86,7 @@ export function PieBookingsPercentageChart({ totalBookings, type }) {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground text-lg font-semibold"
                         >
-                          Bookings
+                          Tourists
                         </tspan>
                       </text>
                     );

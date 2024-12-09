@@ -12,7 +12,7 @@ export default function FilterButtons({
   buttons = [],
   categories,
   onFilterChange,
-  marketplace
+  marketplace,
 }) {
   const handleSelectChange = (type, value) => {
     if (onFilterChange) {
@@ -21,7 +21,11 @@ export default function FilterButtons({
   };
 
   return (
-    <section className={`mb-20 flex gap-2 ${marketplace? "justify-between" : ""}`}>
+    <section
+      className={`${marketplace ? " " : "mb-20"} flex gap-2 ${
+        marketplace ? "justify-between" : ""
+      }`}
+    >
       {buttons.length > 0 ? (
         buttons.map((button, index) => (
           <Select

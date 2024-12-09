@@ -30,9 +30,17 @@ const chartConfig = {
     label: "Activities",
     color: "hsl(var(--chart-2))",
   },
+  products: {
+    label: "Activities",
+    color: "hsl(var(--chart-2))",
+  },
 };
 
-export function PieRevenuePercentageChart({ totalRevenue, prefCurrency }) {
+export function PieRevenuePercentageChart({
+  totalRevenue,
+  prefCurrency,
+  seller,
+}) {
   console.log(totalRevenue);
   const chartData = [
     {
@@ -43,7 +51,7 @@ export function PieRevenuePercentageChart({ totalRevenue, prefCurrency }) {
   ];
 
   return (
-    <Card className="flex w-1/2 flex-col">
+    <Card className={`flex ${seller ? "w-full" : "w-1/2"} flex-col`}>
       <CardHeader className="items-center pb-0">
         <CardTitle>Total Revenue</CardTitle>
         <CardDescription>Revenue Stats in {prefCurrency}</CardDescription>

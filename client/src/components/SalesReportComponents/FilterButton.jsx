@@ -12,7 +12,7 @@ import {
 import SalesReportFilters from "./SalesReportFilters";
   
 
-export function FilterButton({setReportFilters}) {
+export function FilterButton({setReportFilters, revenueAndBookingsPerEvent }) {
   return (
     <Dialog>
         <DialogTrigger><Button variant="outline" size="icon">
@@ -26,7 +26,7 @@ export function FilterButton({setReportFilters}) {
                 Hey quackers, use these filters to zero in on your perfect stats—your sales report, tailored just for you!
                 </DialogDescription>
         </DialogHeader>
-        <SalesReportFilters setReportFilters={setReportFilters}/>
+        <SalesReportFilters setReportFilters={setReportFilters} revenueAndBookingsPerEvent={revenueAndBookingsPerEvent} />
         </DialogContent>
     </Dialog>
 

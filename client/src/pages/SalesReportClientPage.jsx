@@ -28,7 +28,6 @@ const SalesReportClientPage = () => {
 
   const fetchStats = async () => {
     try {
-      console.log("filtersss->", reportFilters);
       console.log("FETCHING");
       setIsLoading(true);
       let response;
@@ -46,15 +45,31 @@ const SalesReportClientPage = () => {
           params: { ...reportFilters, currency: prefCurrency },
         });
       }
-      setFetchedStats(response.data);
-      const calculatedTransactions =
-        response.data.revenueAndBookingsPerEvent.map((event) => ({
-          title: event.activityName,
-          description: `${event.numOfTickets} tickets sold`,
-          date: new Date(event.date).toISOString(), // Convert event.date to ISO string
-          incoming: true,
-          amount: event.price, // Use the price directly from the event
-        }));
+      const totalTourists = response.data?.revenueAndBookingsPerEvent?.reduce(
+        (sum, event) => sum + (event.numOfTickets || 0),
+        0
+      );
+      setFetchedStats({...response?.data, totalTourists });
+      const calculatedTransactions = isSeller
+        ? response.data?.salesAndRevenuePerProduct?.map((event) => ({
+            title: event.productName,
+            description: `${event.quantity} sold`,
+            incoming: true,
+
+            date: new Date(event.orderDate).toISOString(), // Convert event.date to ISO string
+            amount: event.price, // Use the price directly from the event
+          }))
+        : response.data?.revenueAndBookingsPerEvent?.map((event) => ({
+            title: isAdvertiser
+              ? event.activityName
+              : isTourGuide
+              ? event.title
+              : event.name,
+            description: `${event.numOfTickets} tickets sold`,
+            date: new Date(event.date).toISOString(), // Convert event.date to ISO string
+            incoming: true,
+            amount: event.price, // Use the price directly from the event
+          }));
 
       setTransactions(calculatedTransactions);
       console.log("STATS AS FOLLOWS");
@@ -100,7 +115,7 @@ const SalesReportClientPage = () => {
     return (
       <Card
         x-chunk="dashboard-06-chunk-0 "
-        className="flex flex-col items-center justify-center gap-4 p-4"
+        className="flex w-full flex-col items-center justify-center gap-4 p-4"
       >
         <CardHeader className="flex w-full flex-row justify-between">
           <div>
@@ -110,9 +125,12 @@ const SalesReportClientPage = () => {
           <FilterButton
             reportFilters={reportFilters}
             setReportFilters={setReportFilters}
+            revenueAndBookingsPerEvent={
+              fetchedStats?.revenueAndBookingsPerEvent || []
+            }
           />
         </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center gap-4 p-4">
+        <CardContent className="flex w-full flex-col items-center justify-center gap-4 p-4">
           {loading ? (
             <Loading className="place-items-center place-self-center" />
           ) : (
@@ -135,10 +153,23 @@ const SalesReportClientPage = () => {
                     {fetchedStats.totalBookings?.activitiesBookings > 0 && (
                       <PieBookingsPercentageChart
                         totalBookings={
-                          fetchedStats.totalBookings?.activitiesBookings
+                          fetchedStats.totalTourists
                         }
                         type="activities"
                       />
+                    )}
+                  </>
+                )}
+                {isSeller && (
+                  <>
+                    {fetchedStats?.totalRevenue > 0 && (
+                      <>
+                        <PieRevenuePercentageChart
+                          totalRevenue={fetchedStats?.totalRevenue}
+                          seller
+                        />
+                    
+                      </>
                     )}
                   </>
                 )}
@@ -154,7 +185,7 @@ const SalesReportClientPage = () => {
                     {fetchedStats.totalBookings?.itinerariesBookings > 0 && (
                       <PieBookingsPercentageChart
                         totalBookings={
-                          fetchedStats.totalBookings?.itinerariesBookings
+                          fetchedStats?.totalTourists
                         }
                         type="itineraries"
                       />
@@ -176,7 +207,7 @@ const SalesReportClientPage = () => {
                       <TabsTrigger value="all">All Transactions</TabsTrigger>
                     </TabsList>
                     <TabsContent value="all" className="w-full">
-                      <ScrollArea className="h-[500px]">
+                      <ScrollArea className="min-h-[200px]">
                         {renderTransactions(transactions)}
                       </ScrollArea>
                     </TabsContent>
