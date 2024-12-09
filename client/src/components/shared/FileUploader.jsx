@@ -136,13 +136,12 @@ export default function FileUploader({
   return (
     <Dropzone multiple={false} onDrop={handleDrop}>
       {({ getRootProps, getInputProps }) => (
-        <div className="flex flex-col gap-4 justify-center items-center">
-          <div className="flex gap-4 justify-between items-center w-full">
-            <span className="text-xl">{`Upload ${fileToUpload}: `}</span>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex w-full items-center justify-between gap-4">
             {filesUploaded.length == 0 ? (
               <div
                 {...getRootProps()}
-                className="border-dashed border-2 p-8 flex flex-col items-center justify-center hover:cursor-pointer hover:bg-slate-50"
+                className="flex flex-col items-center justify-center border-2 border-dashed p-8 hover:cursor-pointer hover:bg-slate-50"
               >
                 <Input
                   {...getInputProps()}
@@ -159,12 +158,12 @@ export default function FileUploader({
               filesUploaded.map((file, index) => (
                 <div
                   key={index}
-                  className="basis-1/2 w-[250px] h-[200px] flex justify-center items-center"
+                  className="flex h-[200px] w-[250px] basis-1/2 items-center justify-center"
                 >
-                  <div className="p-1 relative w-full h-full overflow-hidden">
+                  <div className="relative h-full w-full overflow-hidden p-1">
                     <AlertDialog>
-                      <AlertDialogTrigger className="absolute top-1 right-1">
-                        <FileX2 className="absolute top-1 right-1 bg-neutral-900 text-red-500 p-1 hover:cursor-pointer hover:bg-neutral-800 rounded-lg" />
+                      <AlertDialogTrigger className="absolute right-1 top-1">
+                        <FileX2 className="absolute right-1 top-1 rounded-lg bg-neutral-900 p-1 text-red-500 hover:cursor-pointer hover:bg-neutral-800" />
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -198,7 +197,7 @@ export default function FileUploader({
                     <Card>
                       <CardContent className="flex flex-col items-center justify-center p-4">
                         {getFileIcon(file.name.split(".").pop().toLowerCase())}
-                        <p className="w-full text-center text-ellipsis overflow-hidden whitespace-nowrap">
+                        <p className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center">
                           {file.name}
                         </p>
                       </CardContent>

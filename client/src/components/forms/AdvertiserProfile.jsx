@@ -47,7 +47,7 @@ export default function AdvertiserProfile({ profile, onRefresh }) {
   // Define a submit handler
   function onSubmit(values) {
     axios
-      .put(`api/advertisers/update/${profile._id}`, {
+      .put(`api/advertisers/update/`, {
         oldEmail: profile.email,
         email: values.email,
         website: values.websiteLink,
@@ -56,7 +56,7 @@ export default function AdvertiserProfile({ profile, onRefresh }) {
       })
       .then(() => {
         toast({
-          title: "Product updated succesfully!",
+          title: "Profile updated succesfully!",
         });
         onRefresh();
         // onCategoryUpdate();
@@ -64,7 +64,7 @@ export default function AdvertiserProfile({ profile, onRefresh }) {
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Product could not be updated",
+          title: "Profile could not be updated",
           // description: error.response.data.message,
         });
         console.log(error);
@@ -142,7 +142,7 @@ export default function AdvertiserProfile({ profile, onRefresh }) {
                 <textarea
                   placeholder="Write a brief description of your company..."
                   {...field}
-                  className="w-full h-28 p-2 border rounded-md"
+                  className="h-28 w-full rounded-md border p-2"
                 />
               </FormControl>
               <FormMessage />

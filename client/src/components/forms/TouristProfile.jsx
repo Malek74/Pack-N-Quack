@@ -51,7 +51,7 @@ export default function TouristProfile({ profile, onRefresh }) {
   function onSubmit(values) {
     console.log(values);
     axios
-      .put(`api/tourist/${profile._id}`, {
+      .put(`api/tourist/`, {
         oldEmail: profile.email,
         email: values.email,
         password: values.password,
@@ -69,7 +69,7 @@ export default function TouristProfile({ profile, onRefresh }) {
       })
       .then(() => {
         toast({
-          title: "Product updated succesfully!",
+          title: "Profile updated succesfully!",
         });
         onRefresh();
         // onCategoryUpdate();
@@ -77,7 +77,7 @@ export default function TouristProfile({ profile, onRefresh }) {
       .catch((error) => {
         toast({
           variant: "destructive",
-          title: "Product could not be updated",
+          title: "Profile could not be updated",
           // description: error.response.data.message,
         });
         console.log(error);

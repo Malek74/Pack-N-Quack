@@ -9,26 +9,20 @@ import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import getCroppedImg from "@/utilities/getCroppedImg"; // Helper function to get cropped image
 import axios from "axios";
-
+import { useUser } from "@/context/UserContext";
 AvatarUploader.propTypes = {
-  userType: PropTypes.string,
   userId: PropTypes.string,
   croppedImage: PropTypes.instanceOf(File),
   setCroppedImage: PropTypes.func,
   croppedImageUrl: PropTypes.string,
 };
 
-// TODO: Add naming like image uploaded
-// TODO: get userType and userId dynamically
-// TODO: Add avatar viewing
 export default function AvatarUploader({
-  userType,
-  userId,
   croppedImage,
   setCroppedImage,
   croppedImageUrl,
 }) {
-  const divClassName = `border-2 aspect-square flex flex-col items-center justify-center rounded-full hover:cursor-pointer hover:bg-slate-50 w-28`;
+  const divClassName = `flex aspect-square w-20 flex-col items-center justify-center rounded-full border-2 hover:cursor-pointer hover:bg-slate-50`;
   const imgClassName = `rounded-full object-cover`;
 
   const { toast } = useToast();
@@ -37,7 +31,25 @@ export default function AvatarUploader({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const { userType } = useUser();
+  const user = (userType) => {
+    switch (userType) {
+      case "Admin":
+        return "admins";
 
+      case "Advertiser":
+        return "advertisers";
+
+      case "Seller":
+        return "sellers";
+
+      case "Tourist":
+        return "tourist";
+
+      case "Tour Guide":
+        return "tourGuide";
+    }
+  };
   const imageFileSchema = z.object({
     type: z.string().refine((type) => type.startsWith("image/"), {
       message: "Only image files are allowed.",
@@ -73,6 +85,7 @@ export default function AvatarUploader({
 
       setCroppedImage(croppedImageFile); // Store the File for upload
       console.log("Updated", croppedImageFile); // Create and store the URL for display
+      handleApiCall(croppedImageFile);
       toast({
         description: "Cropped avatar saved successfully!",
         variant: "success",
@@ -87,13 +100,13 @@ export default function AvatarUploader({
     }
   };
 
-  const handleApiCall = async () => {
+  const handleApiCall = async (croppedImageFile) => {
     try {
       const formData = new FormData();
-      formData.append("images", croppedImage); // Now `croppedImage` is a File
-      formData.append("userType", userType);
+      formData.append("images", croppedImageFile); // Now `croppedImage` is a File
+      formData.append("userType", user(userType));
       console.log(croppedImage);
-      await axios.post(`/api/upload/images/${userId}`, formData);
+      await axios.post(`/api/upload/images`, formData);
       toast({
         description: "Avatar uploaded successfully!",
         variant: "success",
@@ -147,9 +160,9 @@ export default function AvatarUploader({
       {/* Cropping Modal */}
       {isCropping && (
         <Dialog open={isCropping} onOpenChange={setIsCropping}>
-          <DialogContent className="w-full h-auto max-w-lg">
+          <DialogContent className="h-auto w-full max-w-lg">
             <DialogTitle>Crop your avatar</DialogTitle>
-            <div className="relative w-full h-64 bg-gray-200">
+            <div className="relative h-64 w-full bg-gray-200">
               {avatarUploaded && (
                 <Cropper
                   image={avatarUploaded}
@@ -166,16 +179,16 @@ export default function AvatarUploader({
                 />
               )}
             </div>
-            <div className="flex justify-end mt-4 space-x-2">
+            <div className="mt-4 flex justify-end space-x-2">
               <Button onClick={() => setIsCropping(false)}>Cancel</Button>
               <Button onClick={handleCropSave}>Save</Button>
             </div>
           </DialogContent>
         </Dialog>
       )}
-      <Button type="button" onClick={() => handleApiCall()}>
+      {/* <Button type="button" onClick={() => handleApiCall()}>
         Upload Avatar
-      </Button>
+      </Button> */}
     </div>
   );
 }

@@ -16,12 +16,14 @@ DateRangePickerV2.propTypes = {
   endDate: PropTypes.instanceOf(Date),
   setStartDate: PropTypes.func,
   setEndDate: PropTypes.func,
+  report: PropTypes.bool,
 };
 export default function DateRangePickerV2({
   startDate,
   endDate,
   setStartDate,
   setEndDate,
+  report,
 }) {
   const [startMonth, setStartMonth] = useState(new Date());
   const [endMonth, setEndMonth] = useState(new Date());
@@ -101,8 +103,12 @@ export default function DateRangePickerV2({
             onSelect={handleEndDateSelect}
             month={endMonth}
             onMonthChange={setEndMonth}
-            disabled={(date) =>
-              date < new Date() || (startDate ? date < startDate : false)
+            disabled={
+              report
+                ? (date) =>
+                  date > new Date() || (startDate ? date < startDate : false)
+                : (date) =>
+                    date < new Date() || (startDate ? date < startDate : false)
             }
             initialFocus
           />

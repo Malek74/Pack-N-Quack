@@ -89,7 +89,7 @@ export default function TourGuideProfile({ profile, onRefresh }) {
 
     // Make the PUT request to update the tour guide's profile
     axios
-      .put(`api/tourGuide/${profile._id}`, {
+      .put(`api/tourGuide/`, {
         oldEmail: profile.email,
         userName: values.userName,
         email: values.email,

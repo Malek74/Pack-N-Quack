@@ -33,7 +33,7 @@ export default function SellerProfileDialog({ profile, onRefresh }) {
   // Define a submit handler
   function onSubmit(values) {
     axios
-      .put(`api/sellers/${profile._id}`, {
+      .put(`api/sellers`, {
         oldEmail: profile.email,
         email: values.email,
         description: values.description,

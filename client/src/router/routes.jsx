@@ -50,11 +50,14 @@ import BookItinerary from "@/components/dropdown/BookItineraries";
 import DocumentReview from "@/components/adminPage/DocumentReview";
 import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
+import SalesReportClientPage from "@/pages/SalesReportClientPage";
+import SalesReport from "@/components/adminPage/SalesReport";
 import Delivery from "@/components/CheckOutPage/Delivery";
 import PaymentTransactionPage from "@/pages/PaymentTransactionPage";
 import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
+import ProductPage from "@/pages/ProductPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import BookmarkedPage from "@/pages/BookmarkedPage";
 
@@ -69,6 +72,7 @@ const routes = createRoutesFromElements(
     <Route path="login" element={<LoginPage />} />
     <Route path="activities" element={<ActivitiesPage />} />
     <Route path="historicalTourists" element={<HistoricalTourists />} />
+    <Route path="sales-report" element={<SalesReportClientPage />} />
 
     <Route
       path="itinerariesTourists"
@@ -121,6 +125,7 @@ const routes = createRoutesFromElements(
       <Route path="itineraries-made" element={<ItinerariesMade />} />
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
+      <Route path="sales-report" element={<SalesReportClientPage />} />
       <Route path="addresses" element={<Delivery />} />
       <Route path="bookmarked" element={<BookmarkedPage />} />
     </Route>
@@ -138,7 +143,7 @@ const routes = createRoutesFromElements(
     <Route path="bookingHotel" element={<HotelBookingApp />}></Route>
     <Route path="transportation/:idAdv" element={<Transportation />}></Route>
     <Route path="transportation" element={<Transportation />}></Route>
-
+    <Route path="marketplace/:id" element={<ProductPage />} />
     <Route path="admin" element={<AdminPage />}>
       <Route path="users" element={<AccountDashboard />} />
       <Route path="tourism-governors" element={<GovernorsList />} />
@@ -152,6 +157,7 @@ const routes = createRoutesFromElements(
       <Route path="complaints/:complaintID" element={<OneComplain />} />
       <Route path="delete-requests" element={<DeleteRequests />} />
       <Route path="document-review" element={<DocumentReview />} />
+      <Route path="sales-report" element={<SalesReport />} />
       <Route path="manage-promo-code" element={<ManagePromoCodes />} />
     </Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>

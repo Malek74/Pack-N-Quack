@@ -115,7 +115,7 @@ export default function MarketplacePage() {
       </div>
 
       <div className="mt-8 flex">
-        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} />
+        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} marketplace />
         {maxPrice !== null && (
           <div className="flex items-center justify-center">
             <PriceSlider
@@ -127,7 +127,7 @@ export default function MarketplacePage() {
             <Button
               size="sm"
               onClick={applyPriceRange} // Apply the price range on click
-              className="ml-2 px-4 py-2 rounded-md"
+              className="ml-2 rounded-md px-4 py-2"
             >
               Apply
             </Button>
@@ -149,7 +149,7 @@ export default function MarketplacePage() {
      <GuideButton guideMessage={"Search and select items in the marketplace, then add them to your cart and proceed with checkout."} />
 
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
+      <div className="grid grid-cols-1 place-items-center justify-center gap-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.length > 0 ? (
           products.map((product) => (
             <ProductCard
