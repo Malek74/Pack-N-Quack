@@ -26,7 +26,10 @@ export default function Stats() {
   const fetchStats = () => {
     setLoading(true);
     axios
-      .get(`/api/admins/adminRevenue`) // Replace with actual API endpoint
+      .get(`/api/admins/adminRevenue`, {
+        params: { ...reportFilters, currency: prefCurrency },
+      })
+
       .then((response) => {
         setStats(response.data);
         console.log("STATS AS FOLLOWS");
@@ -51,7 +54,6 @@ export default function Stats() {
         setLoading(false);
       });
   };
-  
 
   const renderTransactions = (transactions) => {
     return transactions.map((transaction, index) => (

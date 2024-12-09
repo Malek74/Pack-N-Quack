@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
+import ComboboxCurrency from "@/components/layout/components/ComboboxCurrency";
 
 const sidebarItems = [
   {
@@ -201,6 +202,8 @@ export default function AdminPage() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex gap-4">
+          <ComboboxCurrency />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -213,6 +216,7 @@ export default function AdminPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+
                 <DropdownMenuItem>
                   <Button
                     variant="ghost"
