@@ -19,7 +19,7 @@ import notificationSchema from "../models/notificationSchema.js";
 import productModel from "../models/productSchema.js";
 import tourist from "../models/touristSchema.js";
 import { productOutOfStockEmail } from "../routes/shareEmail.js";
-import  adminSchema  from "../models/adminSchema.js";
+import adminSchema from "../models/adminSchema.js";
 import orders from "../models/orderSchema.js"
 
 
@@ -196,12 +196,35 @@ export const getMyBookings = async (req, res) => {
 //@desc Get my preferences
 //@route GET /api/tourist/preference/:id
 export const getMyprefernces = async (req, res) => {
-    const id = req.user._id;
 
     try {
-        const tourist = await Tourist.findById(id);
-        const prefereredActivities = tourist.preferences.preferredActivities;
-        const prefereredItineraries = tourist.preferences.preferredItineraries;
+        try {
+            const id = req.user._id;
+        }
+        catch (error) {
+            const tourist = await Tourist.findById(id);
+            const prefereredActivities = tourist.preferences.preferredActivities;
+            const prefereredItineraries = tourist.preferences.preferredItineraries;
+
+            if (prefereredActivities.length === 0 && prefereredItineraries.length === 0) {
+                //get activities based on tags
+                activities.push(... await activityModel.find({}).populate('tags categoryID'));
+
+                //get itineraries based on tags
+                itineraries.push(... await Itinerary.find({}).populate('tags'));
+
+
+                const result = {
+                    activites: activities,
+                    itineraries: itineraries,
+                    //    places: places
+                };
+                console.log(result);
+
+                return res.status(200).json(result);
+
+            }
+        }
 
         let activities = [];
         let itineraries = [];
@@ -632,95 +655,137 @@ export const addItemToCart = async (req, res) => {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
 
-   
-        if (!quantity || quantity <= 0) {
-            return res.status(400).json({ message: "Quantity is required" });
-        }
-        try {
-            const tourist = await Tourist.findById(touristId);
-            if (!tourist) {
-                return res.status(404).json({ message: "Tourist not found" });
-            }
-            const product = await productModel.findById(productId);
 
-            if (!product) {
-                return res.status(404).json({ message: "Product not found" });
-            }
-
-
-            const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
-            const oldQuantity = productIndex !== -1 ? tourist.cart[productIndex].quantity : 0;
-
-            const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
-            if (wishlistIndex !== -1) {
-                if (wishlistIndex !== -1) {
-                    await Tourist.findOneAndUpdate(
-                        { _id: touristId },
-                        { $pull: { wishlist: productId } },
-                        { new: true },
-                        { _id: touristId },
-                        { $pull: { wishlist: productId } },
-                        { new: true }
-                    );
-                }
-            }
-
-
-            if (productIndex !== -1) {
-                // Product exists in the cart - Update its quantity
-                if (product.available_quantity < quantity + oldQuantity) {
-                    return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
-                }
-
-                const updatedCart = await Tourist.findOneAndUpdate(
-                    { _id: touristId, "cart.productID": productId },
-                    { $set: { "cart.$.quantity": quantity + oldQuantity } },
-                    { new: true }
-                ).populate('cart.productID');
-
-                return res.status(200).json(updatedCart.cart);
-            } else {
-                // Product does not exist - Add it to the cart
-                if (product.available_quantity < quantity) {
-                    return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
-                }
-                const updatedCart = await Tourist.findByIdAndUpdate(
-                    touristId,
-                    { $push: { cart: { productID: productId, quantity: quantity } } },
-                    { new: true }
-                ).populate('cart.productID');
-
-                return res.status(200).json(updatedCart.cart);
-            }
-        }
-        catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: error.message });
-        }
-
+    if (!quantity || quantity <= 0) {
+        return res.status(400).json({ message: "Quantity is required" });
     }
-    export const removeItemFromCart = async (req, res) => {
-        const productId = req.params.productId;
-        const touristId = req.user._id;
+    try {
+        const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+        const product = await productModel.findById(productId);
 
-        if (!productId) {
-            return res.status(400).json({ message: "Product ID is required" });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        if (!touristId) {
-            return res.status(400).json({ message: "Tourist ID is required" });
+
+        const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
+        const oldQuantity = productIndex !== -1 ? tourist.cart[productIndex].quantity : 0;
+
+        const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
+        if (wishlistIndex !== -1) {
+            if (wishlistIndex !== -1) {
+                await Tourist.findOneAndUpdate(
+                    { _id: touristId },
+                    { $pull: { wishlist: productId } },
+                    { new: true },
+                    { _id: touristId },
+                    { $pull: { wishlist: productId } },
+                    { new: true }
+                );
+            }
         }
 
-        try {
-            const tourist = await Tourist.findById(touristId);
-            if (!tourist) {
-                return res.status(404).json({ message: "Tourist not found" });
+
+        if (productIndex !== -1) {
+            // Product exists in the cart - Update its quantity
+            if (product.available_quantity < quantity + oldQuantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
             }
 
-            const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
+            const updatedCart = await Tourist.findOneAndUpdate(
+                { _id: touristId, "cart.productID": productId },
+                { $set: { "cart.$.quantity": quantity + oldQuantity } },
+                { new: true }
+            ).populate('cart.productID');
 
-            if (productIndex !== -1) {
-                // Product exists in the cart - Remove it
+            return res.status(200).json(updatedCart.cart);
+        } else {
+            // Product does not exist - Add it to the cart
+            if (product.available_quantity < quantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
+            }
+            const updatedCart = await Tourist.findByIdAndUpdate(
+                touristId,
+                { $push: { cart: { productID: productId, quantity: quantity } } },
+                { new: true }
+            ).populate('cart.productID');
+
+            return res.status(200).json(updatedCart.cart);
+        }
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+
+}
+export const removeItemFromCart = async (req, res) => {
+    const productId = req.params.productId;
+    const touristId = req.user._id;
+
+    if (!productId) {
+        return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+    }
+
+    try {
+        const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+
+        const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
+
+        if (productIndex !== -1) {
+            // Product exists in the cart - Remove it
+            const updatedCart = await Tourist.findByIdAndUpdate(
+                touristId,
+                { $pull: { cart: { productID: productId } } },
+                { new: true }
+            ).populate('cart.productID');
+
+            return res.status(200).json(updatedCart.cart);
+        } else {
+            return res.status(404).json({ message: "Product not found in cart" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateQuantityInCart = async (req, res) => {
+    const productId = req.body.productID;
+    const touristId = req.user._id;
+
+    if (!productId) {
+        return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+    }
+
+    try {
+        const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+
+        const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
+
+        if (productIndex !== -1) {
+            if (req.body.quantity < 0) {
+                return res.status(400).json({ message: "Quantity cannot be negative" });
+            }
+            if (req.body.quantity === 0) {
+                // Quantity is 0 - Remove the item from the cart
                 const updatedCart = await Tourist.findByIdAndUpdate(
                     touristId,
                     { $pull: { cart: { productID: productId } } },
@@ -728,179 +793,137 @@ export const addItemToCart = async (req, res) => {
                 ).populate('cart.productID');
 
                 return res.status(200).json(updatedCart.cart);
-            } else {
-                return res.status(404).json({ message: "Product not found in cart" });
             }
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: error.message });
+            // Product exists in the cart - Update its quantity
+            const updatedCart = await Tourist.findOneAndUpdate(
+                { _id: touristId, "cart.productID": productId },
+                { $set: { "cart.$.quantity": req.body.quantity } },
+                { new: true }
+            ).populate('cart.productID');
+
+            return res.status(200).json(updatedCart.cart);
+        } else {
+            return res.status(404).json({ message: "Product not found in cart" });
         }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+
+
+
+export const viewMyWishlist = async (req, res) => {
+    const touristID = req.user._id;
+    if (!touristID) {
+        return res.status(400).json({ message: "Tourist ID is required" });
+    }
+    try {
+        const tourist = await Tourist.findById(touristID).populate('wishlist');
+        const wishlist = tourist.wishlist;
+        return res.status(200).json(wishlist);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const addToWishlist = async (req, res) => {
+    const productId = req.body.productID;
+    const touristId = req.user._id;
+    if (!productId) {
+        return res.status(400).json({ message: "Product ID is required" });
+    }
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required" });
     }
 
-    export const updateQuantityInCart = async (req, res) => {
-        const productId = req.body.productID;
-        const touristId = req.user._id;
-
-        if (!productId) {
-            return res.status(400).json({ message: "Product ID is required" });
+    try {
+        const product = await productModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
-
-        if (!touristId) {
-            return res.status(400).json({ message: "Tourist ID is required" });
+        const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
         }
-
-        try {
-            const tourist = await Tourist.findById(touristId);
-            if (!tourist) {
-                return res.status(404).json({ message: "Tourist not found" });
-            }
-
-            const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
-
-            if (productIndex !== -1) {
-                if (req.body.quantity < 0) {
-                    return res.status(400).json({ message: "Quantity cannot be negative" });
-                }
-                if (req.body.quantity === 0) {
-                    // Quantity is 0 - Remove the item from the cart
-                    const updatedCart = await Tourist.findByIdAndUpdate(
-                        touristId,
-                        { $pull: { cart: { productID: productId } } },
-                        { new: true }
-                    ).populate('cart.productID');
-
-                    return res.status(200).json(updatedCart.cart);
-                }
-                // Product exists in the cart - Update its quantity
-                const updatedCart = await Tourist.findOneAndUpdate(
-                    { _id: touristId, "cart.productID": productId },
-                    { $set: { "cart.$.quantity": req.body.quantity } },
-                    { new: true }
-                ).populate('cart.productID');
-
-                return res.status(200).json(updatedCart.cart);
-            } else {
-                return res.status(404).json({ message: "Product not found in cart" });
-            }
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: error.message });
+        const touristWishlist = tourist.wishlist;
+        if (touristWishlist.includes(productId)) {
+            return res.status(400).json({ message: "Product already in wishlist" });
         }
+        await Tourist.findByIdAndUpdate(touristId, { $push: { wishlist: productId } }, { new: true });
+        const newWishlist = await Tourist.findById(touristId).populate('wishlist');
+        return res.status(200).json(newWishlist.wishlist);
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+
+export const removeFromWishlist = async (req, res) => {
+    const productId = req.params.productId;
+    const touristId = req.user._id;
+    if (!productId) {
+        return res.status(400).json({ message: "Product ID is required" });
+    }
+    if (!touristId) {
+        return res.status(400).json({ message: "Tourist ID is required" });
     }
 
-
-
-
-    export const viewMyWishlist = async (req, res) => {
-        const touristID = req.user._id;
-        if (!touristID) {
-            return res.status(400).json({ message: "Tourist ID is required" });
+    try {
+        const product = await productModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
-        try {
-            const tourist = await Tourist.findById(touristID).populate('wishlist');
-            const wishlist = tourist.wishlist;
-            return res.status(200).json(wishlist);
-        } catch (error) {
-            return res.status(500).json({ message: error.message });
+        const tourist = await Tourist.findById(touristId);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
         }
+        const touristWishlist = tourist.wishlist;
+        if (!touristWishlist.includes(productId)) {
+            return res.status(400).json({ message: "Product not in wishlist" });
+        }
+        await Tourist.findByIdAndUpdate(touristId, { $pull: { wishlist: productId } }, { new: true });
+        const newWishlist = await Tourist.findById(touristId).populate('wishlist');
+        return res.status(200).json(newWishlist.wishlist);
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
     }
-
-    export const addToWishlist = async (req, res) => {
-        const productId = req.body.productID;
-        const touristId = req.user._id;
-        if (!productId) {
-            return res.status(400).json({ message: "Product ID is required" });
-        }
-        if (!touristId) {
-            return res.status(400).json({ message: "Tourist ID is required" });
-        }
-
-        try {
-            const product = await productModel.findById(productId);
-            if (!product) {
-                return res.status(404).json({ message: "Product not found" });
-            }
-            const tourist = await Tourist.findById(touristId);
-            if (!tourist) {
-                return res.status(404).json({ message: "Tourist not found" });
-            }
-            const touristWishlist = tourist.wishlist;
-            if (touristWishlist.includes(productId)) {
-                return res.status(400).json({ message: "Product already in wishlist" });
-            }
-            await Tourist.findByIdAndUpdate(touristId, { $push: { wishlist: productId } }, { new: true });
-            const newWishlist = await Tourist.findById(touristId).populate('wishlist');
-            return res.status(200).json(newWishlist.wishlist);
-        } catch (err) {
-            return res.status(500).json({ message: err.message });
-        }
-    }
-
-    export const removeFromWishlist = async (req, res) => {
-        const productId = req.params.productId;
-        const touristId = req.user._id;
-        if (!productId) {
-            return res.status(400).json({ message: "Product ID is required" });
-        }
-        if (!touristId) {
-            return res.status(400).json({ message: "Tourist ID is required" });
-        }
-
-        try {
-            const product = await productModel.findById(productId);
-            if (!product) {
-                return res.status(404).json({ message: "Product not found" });
-            }
-            const tourist = await Tourist.findById(touristId);
-            if (!tourist) {
-                return res.status(404).json({ message: "Tourist not found" });
-            }
-            const touristWishlist = tourist.wishlist;
-            if (!touristWishlist.includes(productId)) {
-                return res.status(400).json({ message: "Product not in wishlist" });
-            }
-            await Tourist.findByIdAndUpdate(touristId, { $pull: { wishlist: productId } }, { new: true });
-            const newWishlist = await Tourist.findById(touristId).populate('wishlist');
-            return res.status(200).json(newWishlist.wishlist);
-        } catch (err) {
-            return res.status(500).json({ message: err.message });
-        }
-    }
+}
 
 export const checkoutOrder = async (req, res) => {
     const id = req.user._id;
     const paymentMethod = req.body.paymentMethod;
     const payByWallet = req.body.payByWallet;
     const promocode = req.body.promocode;
-    const address  = req.body.address;
+    const address = req.body.address;
     const success_url = "http://localhost:5173/touristDashboard/order-history";
 
 
-        const prices = [];
-        try {
+    const prices = [];
+    try {
 
         const tourist = await Tourist.findById(id);
-        if(!tourist){
+        if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
         }
         const cart = (await Tourist.findById(id)).cart;
-        if(cart.length === 0){
+        if (cart.length === 0) {
             return res.status(400).json({ message: "Cart is empty" });
         }
         console.log(cart);
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         let totalAmount = 0;
-        for (let i = 0; i< cart.length; i++){
+        for (let i = 0; i < cart.length; i++) {
             totalAmount += (await productModel.findById(cart[i].productID)).price * cart[i].quantity;
 
         }
-        console.log("total amount",totalAmount);
+        console.log("total amount", totalAmount);
         let amountLeftToPay = totalAmount;
         let amountToPay = totalAmount;
         let promo;
         if (promocode) {
             promo = await PromoCodes.findOne({ code: promocode });
-            console.log("promocode: ",promo);
+            console.log("promocode: ", promo);
 
             if (!promo) {
                 res.status(400).send("Promocode does not exist");
@@ -910,11 +933,11 @@ export const checkoutOrder = async (req, res) => {
                 res.status(400).send("Promocode has already been used");
             }
 
-            if(!promo.isBirthDay){  
+            if (!promo.isBirthDay) {
                 console.log("Not birthday promo");
-            //update amount to be paid
-            amountToPay -= amountToPay * (promo.discount / 100);
-            console.log("amount to pay", amountToPay);
+                //update amount to be paid
+                amountToPay -= amountToPay * (promo.discount / 100);
+                console.log("amount to pay", amountToPay);
             }
 
             //check if it's his birthday promo
@@ -934,7 +957,7 @@ export const checkoutOrder = async (req, res) => {
                 amountToPay -= amountToPay * (promo.discount / 100);
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
 
-            }
+            }
             else {
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
             }
@@ -959,11 +982,11 @@ export const checkoutOrder = async (req, res) => {
             });
             const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
             const order = await orders.create({
-            touristID: id,
-            products: cart,
-            orderTotal: totalAmount,
-            deliveryAddress: address? address:tourist.defaultAddress,
-        });
+                touristID: id,
+                products: cart,
+                orderTotal: totalAmount,
+                deliveryAddress: address ? address : tourist.defaultAddress,
+            });
             return res.status(200).json({ url: session.url });
         } else {
             console.log("da5al else")
@@ -983,41 +1006,41 @@ export const checkoutOrder = async (req, res) => {
                                 unit_amount: promo ? parseInt(Product.price * (1 - promo.discount / 100) * 100) : parseInt(Product.price * 100),
                             });
 
-                                const session = await stripe.checkout.sessions.create({
-                                    payment_method_types: ['card'],
-                                    line_items: [{
-                                        price: price.id,
-                                        quantity: 1,
-                                    }],
-                                    mode: 'payment',
-                                    success_url: success_url,
-                                })
-                            }
-                        } else {
-                            amountLeftToPay = 0;
-                            walletAmount = amountToPay;
+                            const session = await stripe.checkout.sessions.create({
+                                payment_method_types: ['card'],
+                                line_items: [{
+                                    price: price.id,
+                                    quantity: 1,
+                                }],
+                                mode: 'payment',
+                                success_url: success_url,
+                            })
                         }
-
-                        let transaction;
-                        //create transaction for amount paid from wallet
-                        if (walletAmount > 0) {
-                            //create transaction for wallet deduction
-                            transaction = await transactionModel.create({
-                                userId: id,
-                                amount: walletAmount,
-                                date: new Date(),
-                                method: "wallet",
-                                incoming: false,
-                                description: "Wallet deduction for purchase"
-                            });
-                            const updatedTourist = await Tourist.findOneAndUpdate(
-                                { _id: id },
-                                { wallet: tourist.wallet - walletAmount },
-                                { new: true }
-                            );
-                        }
-
+                    } else {
+                        amountLeftToPay = 0;
+                        walletAmount = amountToPay;
                     }
+
+                    let transaction;
+                    //create transaction for amount paid from wallet
+                    if (walletAmount > 0) {
+                        //create transaction for wallet deduction
+                        transaction = await transactionModel.create({
+                            userId: id,
+                            amount: walletAmount,
+                            date: new Date(),
+                            method: "wallet",
+                            incoming: false,
+                            description: "Wallet deduction for purchase"
+                        });
+                        const updatedTourist = await Tourist.findOneAndUpdate(
+                            { _id: id },
+                            { wallet: tourist.wallet - walletAmount },
+                            { new: true }
+                        );
+                    }
+
+                }
             }
         }
 
@@ -1032,51 +1055,51 @@ export const checkoutOrder = async (req, res) => {
 
             const updatedProduct = await productModel.findByIdAndUpdate(item.productID, { stock: product.available_quantity - item.quantity }, { new: true });
 
-                //check if we are out of stock
-                if (updatedProduct.stock == 0) {
-                    const user = {
-                        id: updatedProduct.sellerUsername == "Pack N Quack" ? updatedProduct.adminSellerID : updatedProduct.seller_id,
-                        role: updatedProduct.sellerUsername == "Pack N Quack" ? "Admin" : "Seller"
-                    }
-                    //create notification 
-                    const notification = await notificationSchema.create({
-                        title: "Product out of stock",
-                        message: `${updatedProduct.name} is out of stock`,
-                        user: user,
-                        type: "outOfStock"
-                    });
-
-                    //send notification to seller
-                    io.to(user.id).emit("notification", notification);
-
-                    let receiver = {};
-                    if (user.role == "Seller") {
-                        //send mail to seller
-                        receiver = await Seller.findById(user.id);
-                    } else {
-                        //send mail to admin
-                        receiver = await adminSchema.findById(user.id);
-                    }
-
-                    //send mail to seller
-                    await productOutOfStockEmail(receiver.email, updatedProduct.name, updatedProduct._id);
+            //check if we are out of stock
+            if (updatedProduct.stock == 0) {
+                const user = {
+                    id: updatedProduct.sellerUsername == "Pack N Quack" ? updatedProduct.adminSellerID : updatedProduct.seller_id,
+                    role: updatedProduct.sellerUsername == "Pack N Quack" ? "Admin" : "Seller"
                 }
+                //create notification 
+                const notification = await notificationSchema.create({
+                    title: "Product out of stock",
+                    message: `${updatedProduct.name} is out of stock`,
+                    user: user,
+                    type: "outOfStock"
+                });
+
+                //send notification to seller
+                io.to(user.id).emit("notification", notification);
+
+                let receiver = {};
+                if (user.role == "Seller") {
+                    //send mail to seller
+                    receiver = await Seller.findById(user.id);
+                } else {
+                    //send mail to admin
+                    receiver = await adminSchema.findById(user.id);
+                }
+
+                //send mail to seller
+                await productOutOfStockEmail(receiver.email, updatedProduct.name, updatedProduct._id);
+            }
 
 
         }
         const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
-        
+
         //create order
         const order = await orders.create({
             touristID: id,
             products: cart,
             orderTotal: totalAmount,
-            deliveryAddress: address? address:tourist.defaultAddress,
+            deliveryAddress: address ? address : tourist.defaultAddress,
         });
         res.status(200).json(order);
 
-        }
-        catch (error) {
-            return res.status(500).json({ message: error.message });
-        }
     }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}

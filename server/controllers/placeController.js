@@ -31,6 +31,7 @@ const convertOpeningHours = (openingHourObj) => {
 export const createPlace = async (req, res) => {
 
     try {
+        const tgID = req.user._id;
         if (!req.body.tickets) {
             return res.status(400).json({ message: "Please add a price" });
         }
@@ -56,7 +57,10 @@ export const createPlace = async (req, res) => {
         }
         console.log(req.body)
         const newPlace = await Places.create(
-            req.body
+            {
+                ...req.body,
+                touristGovenorID: tgID
+            }
         );
         return res.status(201).json(newPlace);
     } catch (error) {
