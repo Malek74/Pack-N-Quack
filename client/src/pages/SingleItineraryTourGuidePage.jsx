@@ -8,7 +8,7 @@ import { Rating } from "@/components/shared/Rating";
 import { format } from "date-fns";
 import ItineraryActivitySlideShow from "@/components/ItinerariesPage/ItineraryActivitySlideShow";
 import Maps from "@/components/shared/Maps";
-import { Activity, Pencil, Trash2 } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Pencil, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipProvider,
@@ -132,17 +132,32 @@ export default function SingleItineraryTourGuidePage() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Activity
-                          size={42}
-                          className={
-                            itineraryActive
-                              ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
-                              : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
-                          }
-                          onClick={() => {
-                            handleToggleActive();
-                          }}
-                        />
+                        {itineraryActive && (
+                          <ShieldCheck
+                            size={42}
+                            className={
+                              itineraryActive
+                                ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
+                                : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                            }
+                            onClick={() => {
+                              handleToggleActive();
+                            }}
+                          />
+                        )}
+                        {!itineraryActive && (
+                          <ShieldAlert
+                            size={42}
+                            className={
+                              itineraryActive
+                                ? "border border-green-500 rounded-full bg-green-500 text-white p-1 hover:bg-green-600 hover:border-green-600"
+                                : "border border-red-600 rounded-full bg-red-600 text-white p-1 hover:bg-red-700 hover:border-red-700"
+                            }
+                            onClick={() => {
+                              handleToggleActive();
+                            }}
+                          />
+                        )}
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="text-lg">
