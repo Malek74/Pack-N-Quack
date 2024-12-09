@@ -1,6 +1,9 @@
 
 import touristGoverner from '../models/touristGovernorScehma.js';
 import { usernameExists } from '../utils/Helpers.js';
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/Helpers.js";
+import jwt from "jsonwebtoken";
 
 
 export const createTouristGovernor = async (req, res) => {
@@ -17,7 +20,11 @@ export const createTouristGovernor = async (req, res) => {
     }
 
     try {
-        const newTouristGovernor = await touristGoverner.create({ username, password, });
+        //hash password
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newTouristGovernor = await touristGoverner.create({ username, password: hashedPassword });
         console.log(newTouristGovernor)
         return res.status(201).json(newTouristGovernor);
     } catch (error) {
@@ -36,13 +43,18 @@ export const getTouristGovernor = async (req, res) => {
 
 export const updateTouristGovernor = async (req, res) => {
     const { username, password } = req.body;
+    const id = req.user._id;
 
     if (!username || !password) {
         return res.status(400).json({ message: "Username, and password are required." });
     }
 
     try {
-        const updatedTouristGovernor = await touristGoverner.findOneAndUpdate({}, { username, password }, { new: true });
+        //hash password
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const updatedTouristGovernor = await touristGoverner.findByIdAndUpdate(id, { username, password: hashedPassword }, { new: true });
         res.status(200).json(updatedTouristGovernor);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -50,8 +62,10 @@ export const updateTouristGovernor = async (req, res) => {
 }
 
 export const deleteTouristGovernor = async (req, res) => {
+    const name = req.body.username;
+
     try {
-        await touristGoverner.findOneAndDelete({});
+        await touristGoverner.findOneAndDelete({ username: name });
         res.status(200).json({ message: "Tourist Governor deleted successfully" });
     } catch (error) {
         res.status(404).json({ message: error.message });

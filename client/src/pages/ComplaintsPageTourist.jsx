@@ -22,14 +22,14 @@ import ComplaintForm from "@/components/forms/ComplaintForm";
 import CreateDialog from "@/components/shared/CreateDialog";
 import { useUser } from "@/context/UserContext";
 import { Badge } from "@/components/ui/badge";
-import GuideButton from "@/components/guideComponents/popMessage"; 
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function Complaints() {
   const navigate = useNavigate();
   const { userId } = useUser();
   const [complaints, setComplaints] = useState([]);
   const fetchComplaints = () => {
     axios
-      .get(`api/tourist/complaints/${userId}`) //get id from context here
+      .get(`api/tourist/complaints`) //get id from context here
       .then((response) => {
         setComplaints(response.data);
         console.log(response.data);
@@ -76,7 +76,9 @@ export default function Complaints() {
           <div className="place-self-end">
             <CreateDialog
               title="Complaint"
-              form={<ComplaintForm onRefresh={setOnRefresh} issuerID={userId} />}
+              form={
+                <ComplaintForm onRefresh={setOnRefresh} issuerID={userId} />
+              }
             />
           </div>
         </CardHeader>
@@ -104,7 +106,8 @@ export default function Complaints() {
                     <TableCell>{complaint.title}</TableCell>
                     <TableCell>{formatDate(complaint.date)}</TableCell>
                     <TableCell>
-                      <Badge variant="complaint"
+                      <Badge
+                        variant="complaint"
                         className={`place-self-start ${
                           complaint.status === "resolved"
                             ? "bg-green-500 border-green-500"
@@ -128,7 +131,9 @@ export default function Complaints() {
         </CardFooter>
       </Card>
 
-       <GuideButton guideMessage={"Fill in your complaint and then proceed by submitting" } />
-       </div>
-   );
+      <GuideButton
+        guideMessage={"Fill in your complaint and then proceed by submitting"}
+      />
+    </div>
+  );
 }

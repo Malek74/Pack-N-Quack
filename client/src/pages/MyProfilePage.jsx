@@ -15,6 +15,7 @@ import AvatarUploader from "@/components/shared/AvatarUploader";
 import FileUploader from "@/components/shared/FileUploader";
 import { Button } from "@/components/ui/button";
 import DialogTerms from "@/components/shared/DialogTerms";
+import { Mail, Phone } from "lucide-react";
 export default function MyProfilePage() {
   const { toast } = useToast();
   const {
@@ -182,52 +183,80 @@ export default function MyProfilePage() {
         uploadedFiles,
         hasAcceptedTerms,
       } = profile;
-      console.log("asdaiosdad", hasAcceptedTerms);
-      console.log("asdaiosdad2", isAccepted);
+
       return (
-        <div className="flex gap-2">
-          <Card className="max-w-md mx-auto shadow-md rounded-lg">
-            {/* Company Name */}
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                {companyName}
-              </CardTitle>
-              <Badge
-                variant={isAccepted ? "success" : "destructive"}
-                className="mt-2"
-              >
-                {isAccepted ? "Accepted" : "Pending"}
-              </Badge>
-            </CardHeader>
-
-            {/* Content */}
-            <CardContent className="space-y-4">
-              {/* Description */}
+        <Card className="overflow-hidden rounded-xl border border-gray-200 px-0 shadow-lg">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-500 to-teal-400 p-6 text-white">
+            <div className="flex items-center space-x-4">
+              {/* Badge */}
+              {uploadedFiles.images.length > 0 ? (
+                <img
+                  src={uploadedFiles?.images[0]}
+                  alt="profile photo"
+                  className="w-20 rounded-full"
+                />
+              ) : (
+                <div className="flex-shrink-0">
+                  <AvatarUploader
+                    croppedImage={croppedImage}
+                    setCroppedImage={setCroppedImage}
+                    croppedImageUrl={croppedImageUrl}
+                  />
+                </div>
+              )}
+              {/* Company Name */}
               <div>
-                <h3 className="text-sm font-semibold">Description</h3>
-                <p className="text-sm text-muted-foreground">{description}</p>
+                <h1 className="text-3xl font-bold">{username}</h1>
+                <p className="text-sm text-gray-200">{companyName}</p>
+                <Badge
+                  variant={isAccepted ? "success" : "destructive"}
+                  className="px-4 py-1"
+                >
+                  {isAccepted ? "Accepted" : "Pending"}
+                </Badge>
               </div>
+            </div>
+          </div>
 
-              {/* Establishment Date */}
-              <div>
-                <h3 className="text-sm font-semibold">Established</h3>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(establishmentDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
+          {/* Main Content */}
+          <CardContent className="space-y-6 p-6">
+            {/* About Section */}
+            <div>
+              <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                About
+              </h3>
+              <div className="text-sm text-gray-600">
+                <p>{description}</p>
               </div>
+            </div>
 
-              {/* Contact Information */}
-              <div>
-                <h3 className="text-sm font-semibold">Contact Information</h3>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Hotline:</strong> {hotline}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Website:</strong>{" "}
+            {/* Establishment Date */}
+            <div className="flex items-center space-x-2">
+              <h3 className="font-medium text-gray-700">Established:</h3>
+              <p className="text-sm text-gray-700">
+                {new Date(establishmentDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+
+            {/* Divider */}
+            <hr className="border-gray-300" />
+
+            {/* Contact Section */}
+            <div>
+              <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 gap-4 text-sm text-gray-600 sm:grid-cols-2">
+                <div className="flex items-center space-x-2">
+                  <strong>Hotline:</strong> <span>{hotline}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <strong>Website:</strong>
                   <a
                     href={website}
                     target="_blank"
@@ -236,344 +265,378 @@ export default function MyProfilePage() {
                   >
                     {website.replace("https://", "").replace("www.", "")}
                   </a>
-                </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <strong>Email:</strong> <span>{email}</span>
+                </div>
               </div>
-
-              {/* Email */}
-              <div>
-                <h3 className="text-sm font-semibold">Email</h3>
-                <p className="text-sm text-muted-foreground">{email}</p>
-              </div>
-
-              {/* Username */}
-              <div>
-                <h3 className="text-sm font-semibold">Username</h3>
-                <p className="text-sm text-muted-foreground">{username}</p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex space-x-2">
-                <CreateDialog
-                  form={
-                    <AdvertiserProfile
-                      profile={profile}
-                      onRefresh={fetchProfile}
-                    />
-                  }
-                />
-              </div>
-              {renderDeleteAccountChangePassword()}
-            </CardContent>
-          </Card>
-          <div className="flex flex-col items-end gap-4">
-            <div className="self-center">
-              <AvatarUploader
-                croppedImage={croppedImage}
-                setCroppedImage={setCroppedImage}
-                croppedImageUrl={croppedImageUrl}
-              />
             </div>
-            {(uploadedFiles.documents.length > 0 && (
-              <h1>You already uploaded ur documents</h1>
-            )) || (
-              <div className="flex flex-col items-end gap-4">
-                <FileUploader
-                  filesUploaded={file1}
-                  setFilesUploaded={setFile1}
-                  fileToUpload="ID"
-                />
 
-                <FileUploader
-                  filesUploaded={file2}
-                  setFilesUploaded={setFile2}
-                  fileToUpload="Taxation Registery Card"
-                />
-                <Button
-                  className="self-center"
-                  type="button"
-                  onClick={() => {
-                    handleFileUpload();
-                  }}
-                >
-                  Upload Files
-                </Button>
-              </div>
-            )}
-          </div>
+            {/* File Upload Section */}
+            <div className="flex flex-col space-y-4">
+              {uploadedFiles.documents.length > 0 ? (
+                <h2 className="text-sm text-gray-600">
+                  You already uploaded your documents
+                </h2>
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                    Upload ID
+                  </h3>
+                  <FileUploader
+                    filesUploaded={file1}
+                    setFilesUploaded={setFile1}
+                    fileToUpload="ID"
+                  />
+                  <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                    Upload Taxation Registry Card
+                  </h3>
+                  <FileUploader
+                    filesUploaded={file2}
+                    setFilesUploaded={setFile2}
+                    fileToUpload="Taxation Registry Card"
+                  />
+                  <Button
+                    className="self-center"
+                    type="button"
+                    onClick={handleFileUpload}
+                  >
+                    Upload Files
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <CreateDialog
+                form={
+                  <AdvertiserProfile
+                    profile={profile}
+                    onRefresh={fetchProfile}
+                  />
+                }
+              />
+              {renderDeleteAccountChangePassword()}
+            </div>
+          </CardContent>
+
+          {/* Terms and Conditions Section */}
           {isAccepted && !hasAcceptedTerms && (
-            <div className="flex flex-col justify-center items-center  p-4">
+            <div className="flex flex-col items-center justify-center p-4">
               <DialogTerms />
-              <Button
-                type="button"
-                onClick={() => handleAcceptTermsAdvertiser()}
-              >
+              <Button type="button" onClick={handleAcceptTermsAdvertiser}>
                 Accept Terms
               </Button>
             </div>
           )}
-        </div>
+        </Card>
       );
     }
+
     return null;
   }
 
   // Tour Guide Profile Card (TourGuideCard)
   function TourGuideCard() {
-    if (profile) {
-      const {
-        previousWork,
-        experienceYears,
-        email,
-        username,
-        mobile,
-        isAccepted,
-        hasAcceptedTerms,
-        uploadedFiles,
-      } = profile;
+    if (!profile) return null;
 
-      return (
-        <div className="flex gap-2">
-          <Card className="max-w-md mx-auto shadow-md rounded-lg">
-            {/* Tour Guide Info */}
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                {username}
-              </CardTitle>
+    const {
+      previousWork,
+      experienceYears,
+      email,
+      username,
+      mobile,
+      isAccepted,
+      hasAcceptedTerms,
+      uploadedFiles,
+    } = profile;
+
+    return (
+      <Card className="overflow-hidden rounded-xl border border-gray-200 px-0 shadow-lg">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-500 p-6 text-white">
+          <div className="flex items-center space-x-4">
+            {/* Badge */}
+            {uploadedFiles.images.length > 0 ? (
+              <img
+                src={uploadedFiles?.images[0]}
+                alt="profile photo"
+                className="w-20 rounded-full"
+              />
+            ) : (
+              <div className="flex-shrink-0">
+                <AvatarUploader
+                  croppedImage={croppedImage}
+                  setCroppedImage={setCroppedImage}
+                  croppedImageUrl={croppedImageUrl}
+                />
+              </div>
+            )}
+            {/* Username */}
+            <div>
+              <h1 className="text-3xl font-bold">{username}</h1>
               <Badge
                 variant={isAccepted ? "success" : "destructive"}
-                className="mt-2"
+                className="px-4 py-1"
               >
                 {isAccepted ? "Accepted" : "Pending"}
               </Badge>
-            </CardHeader>
-
-            {/* Content */}
-            <CardContent className="space-y-4">
-              {/* Experience Years */}
-              <div>
-                <h3 className="text-sm font-semibold">Experience</h3>
-                <p className="text-sm text-muted-foreground">
-                  {experienceYears} years of experience
-                </p>
-              </div>
-
-              {/* Previous Work Section */}
-              <div>
-                <h3 className="text-sm font-semibold">Previous Work</h3>
-                <div className="space-y-2">
-                  {Array.isArray(previousWork) && previousWork.length > 0 ? (
-                    previousWork.map((work, index) => (
-                      <div key={index} className="border p-2 rounded-lg">
-                        <p className="font-semibold text-sm">{work.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          <strong>Company:</strong> {work.company}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          <strong>Duration:</strong>{" "}
-                          {work.duration.length > 0
-                            ? `${new Date(
-                                work.duration[0]
-                              ).toLocaleDateString()} - ${new Date(
-                                work.duration[1]
-                              ).toLocaleDateString()}`
-                            : "Duration not available"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {work.description}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No previous work data available.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div>
-                <h3 className="text-sm font-semibold">Contact Information</h3>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Email:</strong> {email}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Mobile:</strong> {mobile}
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex space-x-2">
-                <CreateDialog
-                  form={
-                    <TourGuideProfile
-                      profile={profile}
-                      onRefresh={fetchProfile}
-                    />
-                  }
-                />
-              </div>
-              {renderDeleteAccountChangePassword()}
-            </CardContent>
-          </Card>
-          <div className="flex flex-col items-end gap-4">
-            <div className="self-center">
-              <AvatarUploader
-                croppedImage={croppedImage}
-                setCroppedImage={setCroppedImage}
-                croppedImageUrl={croppedImageUrl}
-              />
             </div>
-            {(uploadedFiles.documents.length > 0 && (
-              <h1>You already uploaded ur documents</h1>
-            )) || (
-              <div className="flex flex-col items-end gap-4">
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <CardContent className="space-y-6 p-6">
+          {/* Experience Section */}
+          <div>
+            <h3 className="mb-3 text-xl font-semibold text-gray-700">
+              Experience
+            </h3>
+            <p className="text-sm text-gray-600">
+              {experienceYears} years of experience
+            </p>
+          </div>
+
+          {/* Previous Work Section */}
+          <div>
+            <h3 className="mb-3 text-xl font-semibold text-gray-700">
+              Previous Work
+            </h3>
+            <div className="space-y-2">
+              {Array.isArray(previousWork) && previousWork.length > 0 ? (
+                previousWork.map((work, index) => (
+                  <div key={index} className="rounded-lg border p-2">
+                    <p className="text-sm font-semibold">{work.title}</p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Company:</strong> {work.company}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Duration:</strong>{" "}
+                      {work.duration.length > 0
+                        ? `${new Date(
+                            work.duration[0]
+                          ).toLocaleDateString()} - ${new Date(
+                            work.duration[1]
+                          ).toLocaleDateString()}`
+                        : "Duration not available"}
+                    </p>
+                    <p className="text-sm text-gray-600">{work.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-600">
+                  No previous work data available.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <h3 className="mb-3 text-xl font-semibold text-gray-700">
+              Contact Information
+            </h3>
+            <div className="grid grid-cols-1 gap-4 text-sm text-gray-600 sm:grid-cols-2">
+              <div>
+                <strong>Email:</strong> {email}
+              </div>
+              <div>
+                <strong>Mobile:</strong> {mobile}
+              </div>
+            </div>
+          </div>
+
+          {/* File Upload Section */}
+          <div className="space-y-4">
+            {uploadedFiles.documents.length > 0 ? (
+              <h3 className="text-sm text-gray-600">
+                You already uploaded your documents
+              </h3>
+            ) : (
+              <div className="space-y-4">
+                <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                  Upload ID
+                </h3>
                 <FileUploader
                   filesUploaded={file1}
                   setFilesUploaded={setFile1}
                   fileToUpload="ID"
                 />
-
+                <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                  Upload Taxation Registry Card
+                </h3>
                 <FileUploader
                   filesUploaded={file2}
                   setFilesUploaded={setFile2}
-                  fileToUpload="Taxation Registery Card"
+                  fileToUpload="Taxation Registry Card"
                 />
                 <Button
                   className="self-center"
                   type="button"
-                  onClick={() => {
-                    handleFileUpload();
-                  }}
+                  onClick={handleFileUpload}
                 >
                   Upload Files
                 </Button>
               </div>
             )}
           </div>
-          {isAccepted && !hasAcceptedTerms && (
-            <div className="flex flex-col justify-center items-center  p-4">
-              <DialogTerms />
-              <Button
-                type="button"
-                onClick={() => handleAcceptTermsTourGuide()}
-              >
-                Accept Terms
-              </Button>
-            </div>
-          )}
-        </div>
-      );
-    }
-    return null;
+
+          {/* Action Buttons */}
+          <div className="flex space-x-2">
+            <CreateDialog
+              form={
+                <TourGuideProfile profile={profile} onRefresh={fetchProfile} />
+              }
+            />
+            {renderDeleteAccountChangePassword()}
+          </div>
+        </CardContent>
+
+        {/* Terms and Conditions */}
+        {isAccepted && !hasAcceptedTerms && (
+          <div className="flex flex-col items-center justify-center p-4">
+            <DialogTerms />
+            <Button type="button" onClick={handleAcceptTermsTourGuide}>
+              Accept Terms
+            </Button>
+          </div>
+        )}
+      </Card>
+    );
   }
 
   function SellerCard() {
-    if (profile) {
-      const {
-        email,
-        username,
-        isAccepted,
-        description,
-        uploadedFiles,
-        hasAcceptedTerms,
-      } = profile;
-      return (
-        <div className="flex gap-2">
-          <Card className="max-w-md mx-auto shadow-md rounded-lg">
-            {/* Company Name */}
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                {username}
-              </CardTitle>
+    if (!profile) return null;
+
+    const {
+      email,
+      username,
+      isAccepted,
+      description,
+      uploadedFiles,
+      hasAcceptedTerms,
+    } = profile;
+
+    return (
+      <Card className="overflow-hidden rounded-xl border border-gray-200 px-0 shadow-lg">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-green-500 to-teal-500 p-6 text-white">
+          <div className="flex items-center space-x-4">
+            {/* Profile Picture */}
+            <div className="h-20 w-20 overflow-hidden rounded-full bg-white">
+              {uploadedFiles.images.length > 0 ? (
+                <img
+                  src={uploadedFiles?.images[0]}
+                  alt="profile photo"
+                  className="w-20 rounded-full"
+                />
+              ) : (
+                <div className="flex-shrink-0">
+                  <AvatarUploader
+                    croppedImage={croppedImage}
+                    setCroppedImage={setCroppedImage}
+                    croppedImageUrl={croppedImageUrl}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Username and Status */}
+            <div>
+              <h1 className="text-3xl font-bold">{username}</h1>
               <Badge
                 variant={isAccepted ? "success" : "destructive"}
-                className="mt-2"
+                className="mt-2 px-4 py-1"
               >
                 {isAccepted ? "Accepted" : "Pending"}
               </Badge>
-            </CardHeader>
-
-            {/* Content */}
-            <CardContent className="space-y-4">
-              {/* Description */}
-              <div>
-                <h3 className="text-sm font-semibold">Description</h3>
-                <p className="text-sm text-muted-foreground">{description}</p>
-              </div>
-
-              {/* Email */}
-              <div>
-                <h3 className="text-sm font-semibold">Email</h3>
-                <p className="text-sm text-muted-foreground">{email}</p>
-              </div>
-
-              {/* Username */}
-              <div>
-                <h3 className="text-sm font-semibold">Username</h3>
-                <p className="text-sm text-muted-foreground">{username}</p>
-              </div>
-
-              {/* Edit profile action Buttons */}
-              <div className="flex space-x-2">
-                <CreateDialog
-                  form={
-                    <SellerProfileDialog
-                      profile={profile}
-                      onRefresh={fetchProfile}
-                    />
-                  }
-                />
-              </div>
-              {renderDeleteAccountChangePassword()}
-            </CardContent>
-          </Card>
-          <div className="flex flex-col items-end gap-4">
-            <div className="self-center">
-              <AvatarUploader
-                croppedImage={croppedImage}
-                setCroppedImage={setCroppedImage}
-                croppedImageUrl={croppedImageUrl}
-              />
             </div>
-            {(uploadedFiles.documents.length > 0 && (
-              <h1>You already uploaded ur documents</h1>
-            )) || (
-              <div className="flex flex-col items-end gap-4">
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <CardContent className="space-y-6 p-6">
+          {/* Description */}
+          <div>
+            <h3 className="mb-3 text-xl font-semibold text-gray-700">
+              Description
+            </h3>
+            <p className="text-sm text-gray-600">{description}</p>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <h3 className="mb-3 text-xl font-semibold text-gray-700">
+              Contact Information
+            </h3>
+            <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
+              <div>
+                <strong>Email:</strong> {email}
+              </div>
+            </div>
+          </div>
+
+          {/* File Upload Section */}
+          <div className="space-y-4">
+            {uploadedFiles.documents.length > 0 ? (
+              <h3 className="text-sm text-gray-600">
+                You already uploaded your documents
+              </h3>
+            ) : (
+              <div className="space-y-4">
+                <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                  Upload ID
+                </h3>
                 <FileUploader
                   filesUploaded={file1}
                   setFilesUploaded={setFile1}
                   fileToUpload="ID"
                 />
-
+                <h3 className="mb-3 text-xl font-semibold text-gray-700">
+                  Upload Taxation Registry Card
+                </h3>
                 <FileUploader
                   filesUploaded={file2}
                   setFilesUploaded={setFile2}
-                  fileToUpload="Taxation Registery Card"
+                  fileToUpload="Taxation Registry Card"
                 />
                 <Button
                   className="self-center"
                   type="button"
-                  onClick={() => {
-                    handleFileUpload();
-                  }}
+                  onClick={handleFileUpload}
                 >
                   Upload Files
                 </Button>
               </div>
             )}
           </div>
-          {isAccepted && !hasAcceptedTerms && (
-            <div className="flex flex-col justify-center items-center  p-4">
-              <DialogTerms />
-              <Button type="button" onClick={() => handleAcceptTermsSeller()}>
-                Accept Terms
-              </Button>
-            </div>
-          )}
-        </div>
-      );
-    }
+
+          {/* Action Buttons */}
+          <div className="flex space-x-2">
+            <CreateDialog
+              form={
+                <SellerProfileDialog
+                  profile={profile}
+                  onRefresh={fetchProfile}
+                />
+              }
+            />
+            {renderDeleteAccountChangePassword()}
+          </div>
+        </CardContent>
+
+        {/* Terms and Conditions */}
+        {isAccepted && !hasAcceptedTerms && (
+          <div className="flex flex-col items-center justify-center p-4">
+            <DialogTerms />
+            <Button type="button" onClick={handleAcceptTermsSeller}>
+              Accept Terms
+            </Button>
+          </div>
+        )}
+      </Card>
+    );
   }
   function TouristCard() {
     if (profile) {
@@ -581,16 +644,16 @@ export default function MyProfilePage() {
         profile;
 
       return (
-        <Card className="px-0 shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+        <Card className="h-full overflow-hidden rounded-xl border border-gray-200 px-0 shadow-lg">
           {/* Header */}
-          <div className="p-6 bg-gradient-to-r from-blue-500 to-skyblue text-white">
+          <div className="bg-gradient-to-r from-blue-500 to-skyblue p-6 text-white">
             <div className="flex items-center space-x-4">
               {/* Profile Picture */}
-              <div className="w-24 h-24 bg-white rounded-full flex-shrink-0">
+              <div className="h-24 w-24 flex-shrink-0 rounded-full bg-white">
                 <img
                   src={`https://ui-avatars.com/api/?name=${name}&background=random`}
                   alt={`${name}'s profile`}
-                  className="rounded-full object-cover w-full h-full"
+                  className="h-full w-full rounded-full object-cover"
                 />
               </div>
 
@@ -604,13 +667,13 @@ export default function MyProfilePage() {
           </div>
 
           {/* Main Content */}
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="space-y-6 p-6">
             {/* About Section */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-3">
+              <h3 className="mb-3 text-xl font-semibold text-gray-700">
                 About
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="grid grid-cols-1 gap-4 text-sm text-gray-600 sm:grid-cols-2">
                 <div className="flex items-center space-x-2">
                   <span className="font-medium">Nationality:</span>
                   <span>{nationality}</span>
@@ -633,42 +696,16 @@ export default function MyProfilePage() {
 
             {/* Contact Section */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-3">
+              <h3 className="mb-3 text-xl font-semibold text-gray-700">
                 Contact Information
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="grid grid-cols-1 gap-4 text-sm text-gray-600 sm:grid-cols-2">
                 <div className="flex items-center space-x-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 12h2a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2h2m4-6v6m4-6v6m-8 0h4"
-                    />
-                  </svg>
+                  <Mail />
                   <span>{email}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8h4l2-2h6l2 2h4v11H3V8z"
-                    />
-                  </svg>
+                  <Phone />
                   <span>{mobile}</span>
                 </div>
               </div>
@@ -681,9 +718,8 @@ export default function MyProfilePage() {
                   <TouristProfile profile={profile} onRefresh={fetchProfile} />
                 }
               />
+              {renderDeleteAccountChangePassword()}
             </div>
-
-            {renderDeleteAccountChangePassword()}
           </CardContent>
         </Card>
       );
@@ -693,7 +729,7 @@ export default function MyProfilePage() {
 
   function renderDeleteAccountChangePassword() {
     return (
-      <div>
+      <div className="flex flex-row space-x-2">
         {/* Edit password action Button */}
         <div className="flex space-x-2">
           <CreateDialog
@@ -711,11 +747,11 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div>
-      {isTourGuide && <div>{profile && <TourGuideCard />}</div>}
-      {isAdvertiser && <div>{profile && <AdvCard />}</div>}
-      {isSeller && <div>{profile && <SellerCard />}</div>}
-      {isTourist && <div>{profile && <TouristCard />}</div>}
+    <div className="h-full">
+      {isTourGuide && profile && <TourGuideCard />}
+      {isAdvertiser && profile && <AdvCard />}
+      {isSeller && profile && <SellerCard />}
+      {isTourist && profile && <TouristCard />}
     </div>
   );
 }

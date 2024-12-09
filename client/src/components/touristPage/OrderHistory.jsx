@@ -16,26 +16,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import RateForm from "../forms/RateForm";
 import Loading from "../shared/Loading";
+import DeleteButton from "../shared/DeleteButton";
+import { AlertDialog, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { Button } from "../ui/button";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 export default function OrderHistory() {
   const { prefCurrency, userId } = useUser();
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
-  const [tab, setTab] = useState("all");
+  const [tab, setTab] = useState("present");
   const [loading, setLoading] = useState(true);
-
   const fetchProducts = async () => {
     setLoading(true);
+    setProducts([]);
     try {
+      const status = tab === "present" ? "pending" : "old";
       const response = await axios.get(
-        `/api/products/myProducts/`
+        `/api/order/viewAll?status=${status}&currency=${prefCurrency}`
       );
-      setProducts(response.data);
+      setProducts(response.data); // No need to flatten; pass orders directly
       console.log(response.data);
     } catch (error) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Failed to fetch products.",
+        description: "Failed to fetch orders.",
         variant: "destructive",
       });
     } finally {
@@ -43,78 +57,155 @@ export default function OrderHistory() {
     }
   };
 
+  const cancelOrder = async (id) => {
+    setLoading(true);
+    try {
+      await axios.put(`/api/order/cancel/${id}`);
+      toast({
+        title: "Order cancelled",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch orders.",
+        variant: "destructive",
+      });
+    }
+  };
+  const CancelButton = ({
+    onConfirm,
+    title = "Are you absolutely sure?",
+    description = "This action cannot be undone. This will permanently delete the data forever.",
+  }) => {
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger>
+          <Button size="sm" className="h-8 gap-2" variant="destructive">
+            <Trash2 className="h-4 w-4" /> Cancel Order
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  };
+
   useEffect(() => {
-    fetchProducts(); // Fetch products when the component mounts or dependencies change
-  }, [prefCurrency, userId]);
-  const ProductCards = () => {
+    fetchProducts();
+  }, [prefCurrency, tab]);
+
+  const deleteClicked = () => {
+    console.log("yo");
+  };
+  const ProductCards = ({ active }) => {
     return (
       <div className="flex flex-col gap-4">
         {loading && (
-          <Loading className="place-self-center place-items-center" />
+          <Loading className="place-items-center place-self-center" />
         )}
         {!loading && products.length > 0 ? (
-          products.map(({ productId }) => (
-            <Card
-              key={productId._id}
-              className="flex flex-col md:flex-row p-4 items-start"
-            >
-              {/* Handle multiple images */}
-              <img
-                alt="Product image"
-                className="w-full md:w-48 rounded-md object-cover mb-4 md:mb-0 md:mr-4"
-                src={
-                  productId.picture.length > 0
-                    ? productId.picture[0]
-                    : "https://via.placeholder.com/150"
-                }
-              />
-              <div className="flex flex-col flex-grow">
-                <CardHeader className="p-0">
-                  <CardTitle className="text-lg font-semibold">
-                    {productId.name}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    <div className="mb-2">
-                      <Rating
-                        rating={productId.ratings.averageRating}
-                        numberOfReviews={productId.ratings.reviews.length}
-                      />
-                    </div>
-                    {productId.description}
-                    {productId.isArchived && (
-                      <div className="text-red-500 mt-2">
-                        (This product is archived)
-                      </div>
-                    )}
+          products.map((order) => (
+            <Card key={order._id} className="p-4">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  Order ID: {order._id}
+                </CardTitle>
+                <CardDescription>
+                  <div className="text-sm">
+                    Order Date:{" "}
+                    {new Date(order.orderDate).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </div>
+                  <div className="text-sm">
+                    Order Status: {order.orderStatus}
+                  </div>
+                  <div className="text-sm">
+                    Order Total: {order.orderTotal} {prefCurrency || "USD"}
+                  </div>
+                  {/* <div className="text-sm">
+                    Delivery Address: {order.deliveryAddress}
+                  </div> */}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  {order.products.length > 0 ? (
+                    order.products.map((product) =>
+                      product.productID ? (
+                        <div
+                          key={product._id}
+                          className="flex flex-col items-start gap-4 md:flex-row"
+                        >
+                          <img
+                            alt="Product image"
+                            className="h-24 w-24 rounded-md object-cover"
+                            src={
+                              product.productID.picture.length > 0
+                                ? product.productID.picture[0]
+                                : "https://via.placeholder.com/150"
+                            }
+                          />
+                          <div className="flex flex-grow flex-col">
+                            <div className="text-lg font-semibold">
+                              {product.productID.name}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {product.productID.description}
+                            </div>
+                            <div className="text-sm">
+                              Price: {product.productID.price}{" "}
+                              {prefCurrency || "USD"}
+                            </div>
+                            <div className="text-sm">
+                              Quantity: {product.quantity}
+                            </div>
+                            <div className="text-sm">
+                              Seller: {product.productID.sellerUsername}
+                            </div>
+                            {product.productID.isArchived && (
+                              <div className="text-red-500">
+                                (This product is archived)
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div key={product._id} className="text-red-500">
+                          This product is unavailable.
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <div>No products in this order.</div>
+                  )}
+                </div>
+              </CardContent>
+             
+                <CardFooter>
+                {active && (
+                  <CancelButton
+                    onConfirm={() => cancelOrder(order._id) + fetchProducts()}
+                  />
+                )}
 
-                    <div className="flex flex-col mt-2 gap-2">
-                      <div className="text-primary text-lg font-bold">
-                        {productId.price} {prefCurrency || "USD"}
-                      </div>
-                      <div className="flex flex-row justify-between">
-                        <Badge variant="outline">
-                          {productId.sellerUsername}
-                        </Badge>
-                        <RateComment
-                          form={
-                            <RateForm
-                              type="products"
-                              userId={userId}
-                              productId={productId._id}
-                              onRefresh={fetchProducts}
-                            />
-                          }
-                          title={productId.name}
-                        />
-                      </div>
-                    </div>
-                  </CardDescription>
-                </CardHeader>
-              </div>
+                </CardFooter>
             </Card>
           ))
         ) : (
-          <div>No purchases yet D:</div>
+          <div>No orders yet D:</div>
         )}
       </div>
     );
@@ -125,17 +216,21 @@ export default function OrderHistory() {
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
           <Tabs
-            defaultValue="all"
+            defaultValue="present"
             onValueChange={(value) => {
               setTab(value);
-              fetchProducts(); // Fetch products when the tab changes
             }}
           >
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="present">Present Orders</TabsTrigger>
+              <TabsTrigger value="past">Past Orders</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all">
+            <TabsContent value="present">
+              <ProductCards active />
+            </TabsContent>
+
+            <TabsContent value="past">
               <ProductCards />
             </TabsContent>
           </Tabs>

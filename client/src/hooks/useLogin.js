@@ -17,12 +17,12 @@ export const useLogin = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true, // Ensure cookies are included
         }
       );
       updateUserId(response.data.id);
       updateUserType(response.data.role);
-      return true;
+      const objec = {success:true, role:response.data.role};
+      return objec;
     } catch (err) {
       setError(err.response?.data?.message || "Login failed"); // Capture error details
       throw err; // Re-throw the error for handling in the component

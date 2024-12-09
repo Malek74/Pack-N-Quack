@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 const userId = localStorage.getItem('userId');
 
 // Initialize Socket.IO client
-const socket = io('https://dqbw8hmb-8000.uks1.devtunnels.ms/', {
+const socket = io("http://localhost:8000/", {
     transports: ['websocket'], // Optional: Specify transport mechanism
     auth: {
         userId: userId, // Send the user ID during connection

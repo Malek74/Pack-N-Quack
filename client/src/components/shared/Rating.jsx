@@ -1,5 +1,5 @@
 // eslint-disable-next-line react/prop-types
-export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
+export const Rating = ({ rating, numberOfReviews = 0, size = "large" }) => {
   const sizes = {
     small: 3,
     medium: 4,
@@ -48,7 +48,7 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "medium" }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="inline-flex gap-1 align-center rating">
+      <div className="align-center rating inline-flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <StarIcon key={star} {...getStarType(star)} />
         ))}

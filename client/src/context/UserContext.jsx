@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
 // Create a context for user data
 const UserContext = createContext();
 
@@ -8,8 +7,8 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
-  const [userId, setUserId] = useState(null);
-  const [userType, setUserType] = useState(null);
+  const [userId, setUserId] = useState();
+  const [userType, setUserType] = useState();
   const [isTourGuide, setIsTourGuide] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [isAdvertiser, setIsAdvertiser] = useState(false);
@@ -17,6 +16,7 @@ export const UserProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTourismGovernor, setIsTourismGovernor] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
+
   // On mount, check localStorage for cached data and set it if found
   useEffect(() => {
     const cachedCurrency = localStorage.getItem("prefCurrency");
@@ -79,6 +79,14 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("prefCurrency");
     localStorage.removeItem("userId");
     localStorage.removeItem("userType");
+
+    setIsAdmin(false);
+    setIsAdvertiser(false);
+    setIsSeller(false);
+    setIsTourist(false);
+    setIsTourGuide(false);
+    setIsTourismGovernor(false);
+    setIsGuest(true);
 
     // Optionally, clear cookies where JWT might be stored
     document.cookie.split(";").forEach((cookie) => {

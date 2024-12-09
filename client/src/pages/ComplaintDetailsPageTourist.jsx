@@ -18,7 +18,6 @@ import GuideButton from "@/components/guideComponents/popMessage";
 
 const ComplaintDetailsPageTourist = () => {
   const [complaint, setComplaint] = useState();
-  const { id } = useParams();
   function formatDate(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -42,7 +41,7 @@ const ComplaintDetailsPageTourist = () => {
   const fetchComplaint = () => {
     console.log("we are fetching noww");
     axios
-      .get(`api/tourist/myComplaints/${id}`)
+      .get(`api/tourist/myComplaints`)
       .then((response) => {
         setComplaint(response.data);
         console.log("Just got fetchedd -> ", response.data);
@@ -57,61 +56,60 @@ const ComplaintDetailsPageTourist = () => {
   }, []);
 
   return complaint ? (
-      <Card x-chunk="dashboard-06-chunk-0" className="flex flex-col flex-1">
-        <CardHeader>
-          <div className="flex justify-between">
-            <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
-            <div className="flex flex-col items-center gap-2">
-              <Button
-                variant="ghost"
-                className="p-0 h-1"
-                onClick={() => window.window.history.back()}
-              >
-                <CircleArrowLeft />
-              </Button>
-            </div>
+    <Card x-chunk="dashboard-06-chunk-0" className="flex flex-col flex-1">
+      <CardHeader>
+        <div className="flex justify-between">
+          <CardTitle>{`Complaints > "${complaint.title}"`}</CardTitle>
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              variant="ghost"
+              className="p-0 h-1"
+              onClick={() => window.window.history.back()}
+            >
+              <CircleArrowLeft />
+            </Button>
           </div>
-          <CardDescription >
-            <div className="flex flex-col gap-2">
-              {formatDate(complaint.date)}
-              <Badge variant="complaint"
-                className={`place-self-start ${
-                  complaint.status === "resolved"
-                    ? "bg-green-500 border-green-500"
-                    : "bg-orange-500 border-orange-500"
-                }`}
-              >
-                {complaint.status.toUpperCase().slice(0, 1)}
-                {complaint.status.slice(1)}
-              </Badge>
-              </div>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {" "}
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col">
-              <ChatMessage message={complaint.body} direction={"right"} />
-              {complaint.reply &&
-                complaint.reply.map((reply) => (
-                  <ChatMessage message={reply} direction={"left"} />
-                ))}
-            </div>
+        </div>
+        <CardDescription>
+          <div className="flex flex-col gap-2">
+            {formatDate(complaint.date)}
+            <Badge
+              variant="complaint"
+              className={`place-self-start ${
+                complaint.status === "resolved"
+                  ? "bg-green-500 border-green-500"
+                  : "bg-orange-500 border-orange-500"
+              }`}
+            >
+              {complaint.status.toUpperCase().slice(0, 1)}
+              {complaint.status.slice(1)}
+            </Badge>
           </div>
-        </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing <strong>{1}</strong> complaint
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {" "}
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col">
+            <ChatMessage message={complaint.body} direction={"right"} />
+            {complaint.reply &&
+              complaint.reply.map((reply) => (
+                <ChatMessage message={reply} direction={"left"} />
+              ))}
           </div>
-        </CardFooter>
-      </Card>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <div className="text-xs text-muted-foreground">
+          Showing <strong>{1}</strong> complaint
+        </div>
+      </CardFooter>
+    </Card>
   ) : (
     <div className="flex justify-center items-center flex-1">
       <Loading />
     </div>
-  
-  
-);
+  );
 };
 
 export default ComplaintDetailsPageTourist;

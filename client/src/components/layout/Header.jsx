@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import DropDownMenuTourist from "./components/DropDownMenuTourists";
 import logo from "/assets/icons/logo.png";
@@ -22,25 +22,27 @@ export default function Header() {
     isTourist,
     isTourismGovernor,
     isGuest,
+    isLoggedIn
   } = useUser();
-
-  console.log("tourist " + isTourist);
-  console.log("seller " + isSeller);
-  console.log("guest " + isGuest);
-  const isLoggedIn = userId != null;
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
   // Function to determine if the current path matches the link's path
   const isActive = (path) => location.pathname === path;
+  console.log(userId);
   return (
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
         {/* Logo on the left */}
-        <Link to="/" className="text-xl font-bold flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3 text-xl font-bold">
           <img src={logo} className="w-8" />
           Pack n' Quack
         </Link>
 
         {/* Centered Navigation Links */}
-        <ul className="flex justify-center mx-auto">
+        <ul className="mx-auto flex justify-center">
           <li>
             <Button asChild variant="link">
               <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>
@@ -107,21 +109,25 @@ export default function Header() {
             <Notifications />
           </div>
         )}
+
         <ul className="flex gap-2">
-          <li>
-            <Button asChild variant="link">
-              <Link
-                to="/cart"
-                className={isActive("/cart") ? "text-yellow-500" : ""}
-              >
-                <ShoppingCart />
-              </Link>
-            </Button>
-          </li>
+          {isTourist && isLoggedIn && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/cart"
+                  className={isActive("/cart") ? "text-yellow-500" : ""}
+                >
+                  <ShoppingCart />
+                </Link>
+              </Button>
+            </li>
+          )}
+
           <li>
             <ComboboxCurrency />
           </li>
-          {!isLoggedIn ? (
+          {userId == null ? (
             <>
               <li>
                 <Button asChild variant="ghost">
@@ -150,7 +156,7 @@ export default function Header() {
               </li>
               <li>
                 {/* THIS IS TEMPORARY */}
-                <Button variant="link" onClick={logout}>
+                <Button variant="link" onClick={handleLogout}>
                   Logout
                 </Button>
               </li>
