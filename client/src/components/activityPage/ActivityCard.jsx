@@ -15,7 +15,7 @@ import axios from "axios";
 export default function ActivityCard(props) {
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
-  const { userId } = useUser();
+  const { userId, userType } = useUser();
   const date = new Date(props.time);
   const openActivityPage = () => {
     console.log(props.activityID);
@@ -47,20 +47,16 @@ export default function ActivityCard(props) {
         props.booking && openActivityPage();
       }}
     >
-      <img
-        className=" rounded-lg rounded-b-none h-[300px] w-full object-fill"
-        src={props.img}
-      />
-      <div className="flex place-content-end ">
+      <div className="flex place-content-end  ">
         {props.notTourist && (
           <>
             <Button
               onClick={() => props.deleteActivityFunction(props.activityID)}
-              className="w-14 absolute bg-transparent "
+              className="w-14 absolute bg-transparent text-red-700 hover:bg-red-700 hover:text-white"
             >
               <Trash2 />
             </Button>
-            <Button className="w-14 mx-10 absolute bg-transparent ">
+            <Button className="w-14 mx-10 absolute bg-transparent hover:bg-black hover:text-white ">
               <ActivityEditForm
                 type="act"
                 name={props.name}
@@ -82,6 +78,11 @@ export default function ActivityCard(props) {
           </>
         )}
       </div>
+      <img
+        className=" rounded-lg rounded-b-none h-[300px] w-full object-fill"
+        src={props.img}
+      />
+
       <div className="p-4">
         <div className="flex flex-col gap-2">
           <h1 className=" flex items-center">
@@ -94,12 +95,12 @@ export default function ActivityCard(props) {
               />
             )} */}
             <span className="text-gold drop-shadow">{props.category}</span>
-            <Bookmark
+            {userType == "Tourist" && <Bookmark
               fill={isBookmarked ? "gold" : "white"}
               size={36}
               className="text-gold hover:text-goldhover ml-4"
               onClick={(e) => handleBookmark(e, props.activityID)}
-            />
+            />}
           </h1>
 
           <p className="text-base">
@@ -153,6 +154,6 @@ export default function ActivityCard(props) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
