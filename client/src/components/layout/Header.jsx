@@ -107,17 +107,21 @@ export default function Header() {
             <Notifications />
           </div>
         )}
+
         <ul className="flex gap-2">
-          <li>
-            <Button asChild variant="link">
-              <Link
-                to="/cart"
-                className={isActive("/cart") ? "text-yellow-500" : ""}
-              >
-                <ShoppingCart />
-              </Link>
-            </Button>
-          </li>
+          {isTourist && isLoggedIn && (
+            <li>
+              <Button asChild variant="link">
+                <Link
+                  to="/cart"
+                  className={isActive("/cart") ? "text-yellow-500" : ""}
+                >
+                  <ShoppingCart />
+                </Link>
+              </Button>
+            </li>
+          )}
+
           <li>
             <ComboboxCurrency />
           </li>
