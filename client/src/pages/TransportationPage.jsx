@@ -5,22 +5,21 @@ import Transportationsbackground2 from "/assets/images/Tram.jpg";
 import Banner from "@/components/shared/Banner";
 import CreateDialog from "@/components/shared/CreateDialog";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 import GuideButton from "@/components/guideComponents/popMessage";
 import TransportationForm from "@/components/forms/TransportationForm";
+import { useUser } from "@/context/UserContext";
+import Loading from "@/components/shared/Loading";
 export default function Transportation() {
-    const { idAdv } = useParams();
     const [transportations, setTransportations] = useState([]);
     const [transportationDeleted, setTransportationDeleted] = useState();
     const [transportationUpdated, setTransportationUpdated] = useState();
     const [transportationCreated, setTransportationCreated] = useState();
-    let tourist = true;
-    { idAdv ? tourist = false : tourist = true }
-
+    const { userId, userType, prefCurrency } = useUser();
+    const [loading, setLoading] = useState(true);
     const addTransportation = async (values) => {
         try {
             const { advertiserName, date, type, from, to, price, isBookingOpen, specialDiscounts } = values;
-            const response = await axios.post(`/api/transportation/${idAdv}`, {
+            const response = await axios.post(`/api/transportation/`, {
                 price: price,
                 type: type,
                 name: advertiserName + " from " + from + " to " + to,
@@ -59,17 +58,14 @@ export default function Transportation() {
     useEffect(() => {
         const fetchTransportation = async () => {
             try {
-
-                const response = await axios.get('/api/transportation', {
-                    params: {
-                        currency: 'USD',
-                        ...(idAdv && { advertiserID: idAdv }), // Only adds advertiserID if idAdv is truthy (not null or undefined)                    },
-                    }
-                });
+                setLoading(true);
+                const response = await axios.get('/api/transportation');
 
                 setTransportations(response.data);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -77,12 +73,14 @@ export default function Transportation() {
     }, [transportationDeleted, transportationUpdated, transportationCreated]);
 
     return (
+
         <div className="flex flex-col px-16 my-8">
             <Banner
                 background={Transportationsbackground}
                 alt="Transportations Background"
                 name="TRANSPORTATION"
-            />{!tourist &&
+            />
+            {!userType === "Tourist" &&
                 <div className="flex place-content-end mr-8">
                     <CreateDialog
                         title="an Transportation"
@@ -96,7 +94,9 @@ export default function Transportation() {
             <h1 className="text-5xl text-skyblue stroke-2 stroke-black font-bold mb-24 self-center">
                 Upcoming Transportations
             </h1>
-
+            <div className="flex justify-center">
+                {loading && <Loading size="lg" />}
+            </div>
             <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
                 {transportations.map((transportation) => (
                     <TransportationCard
@@ -108,7 +108,7 @@ export default function Transportation() {
                         from={transportation.origin}
                         to={transportation.destination}
                         price={transportation.price}
-                        notTourist={!tourist}
+                        notTourist={!userType === "Tourist"}
                         booking={transportation.available}
                         discounts={transportation.specialDiscounts}
                         transportationID={transportation._id}

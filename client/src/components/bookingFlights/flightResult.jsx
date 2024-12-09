@@ -9,8 +9,8 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import FlightBookingForm from "../forms/flightBookingForm";
-
-
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 
 const formatDuration = (duration) => {
@@ -33,11 +33,27 @@ const formatDateTime = (dateTime) => {
 
 
 
-const FlightResults = ({ flights, onSelect, handleBooking }) => {
+export default function FlightResults({ flights, onSelect, handleBooking }) {
+
+    const [walletBallance, setWalletBallance] = useState(0);
+
+    const fetchWallet = async () => {
+        try {
+            const response = await axios.get(`/api/tourist/walletBalance`);
+            setWalletBallance(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchWallet();
+
+    }, []);
+
     if (!flights || flights.length === 0) {
         return <p>No Flights Available.</p>;
     }
-
 
     return (
         <div className="m-5 justify-center">
@@ -86,7 +102,7 @@ const FlightResults = ({ flights, onSelect, handleBooking }) => {
                             }
                             <TableCell className="text-right">
 
-                                <FlightBookingForm flight={flight} onBook={handleBooking} onSelect={onSelect} />
+                                <FlightBookingForm flight={flight} onBook={handleBooking} onSelect={onSelect} walletBallance={walletBallance} />
 
                             </TableCell>
                         </TableRow>
@@ -96,6 +112,4 @@ const FlightResults = ({ flights, onSelect, handleBooking }) => {
 
         </div >
     );
-};
-
-export default FlightResults;
+}
