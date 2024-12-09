@@ -12,7 +12,9 @@ import bcrypt from "bcrypt";
 import { createToken, createPromoCode } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
 import PromoCodes from "../models/promoCodesSchema.js";
-
+import Orders from "../models/orderSchema.js";
+import Bookings from "../models/bookingSchema.js";
+import mongoose from "mongoose";
 
 
 export const getAdmins = async (req, res) => {
@@ -444,6 +446,190 @@ export const deletePromoCode = async (req, res) => {
     try {
         await PromoCodes.findByIdAndDelete(id);
         return res.status(200).json({ message: "Promocode deleted successfully" });
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+export const getRevenue = async (req, res) => {
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate || new Date();
+    const productIDs = req.query.products;
+    try{
+
+        const matchStage = {
+            date: { $lte : new Date() }
+        };
+
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
+        }
+
+        console.log(matchStage);
+    const dailyActivityRevenue = await Bookings.aggregate([
+        {
+            $match: matchStage
+        },
+        {
+            $lookup: {
+                from: "activities", // Name of the activities collection
+                localField: "activityID", // Field in bookings to match
+                foreignField: "_id", // Field in activities to match
+                as: "activityDetails" // Alias for the joined data
+            }
+        },
+        {
+            $unwind: "$activityDetails" // Unwind the joined activity details
+        },
+        {
+            $group: {
+                _id: {
+                    creationDay: {
+                        $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$date" // Group by the booking date
+                        }
+                    },
+                    activityID: "$activityID"
+                },
+                totalPrice: { $sum: "$price" },
+                activityName: { $first: "$activityDetails.name" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                title: "$activityName",
+                type: "Activity",
+                // productId: "$_id.activityID",
+                date: "$_id.creationDay",
+                revenue: { $multiply: ["$totalPrice", 0.1] } // Apply 90% revenue calculation
+            }
+        },
+        {
+            $sort: { Date: 1 } // Sort by date
+        }
+    ]);
+
+    const dailyItenararyRevenue = await Bookings.aggregate([
+        {
+            $match: matchStage
+        },
+        {
+            $lookup: {
+                from: "itineraries", // Name of the itineraries collection
+                localField: "itineraryID", // Field in bookings to match
+                foreignField: "_id", // Field in itineraries to match
+                as: "itineraryDetails" // Alias for the joined data
+            }
+        },
+        {
+            $unwind: "$itineraryDetails" // Unwind the joined itinerary details
+        },
+        {
+            $group: {
+                _id: {
+                    creationDay: {
+                        $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$date" // Group by the booking date
+                        }
+                    },
+                    itineraryID: "$itineraryID"
+                },
+                totalPrice: { $sum: "$price" },
+                itineraryName: { $first: "$itineraryDetails.name" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                title: "$itineraryName",
+                type: "Itinerary",
+                // productId: "$_id.itineraryID",
+                date: "$_id.creationDay",
+                revenue: { $multiply: ["$totalPrice", 0.1] } // Apply 90% revenue calculation
+            }
+        },
+        {
+            $sort: { Date: 1 } // Sort by date
+        }
+    ]);
+
+
+    
+    const newMatchStage = {
+        orderDate: { $lte : new Date() },
+    }
+    if(startDate){
+        if(new Date(startDate) < new Date(endDate)){
+            if(new Date(endDate) <= new Date()){
+                newMatchStage.orderDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                console.log(newMatchStage.orderDate);
+            }
+        }
+    }
+    if(productIDs){
+        newMatchStage['products.productID'] = { $in: productIDs.map(id => new mongoose.Types.ObjectId(id))};
+    }
+    console.log(newMatchStage);
+            
+
+    const dailyProductsRevenue = await Orders.aggregate([
+        // Unwind the products array
+        {
+            $unwind: "$products"
+        },
+        {
+            $match : newMatchStage
+        },
+        // Lookup product details from the products collection
+        {
+            $lookup: {
+                from: "products", // Name of the products collection
+                localField: "products.productID", // Field in orders to match
+                foreignField: "_id", // Field in products to match
+                as: "productDetails" // Alias for the joined data
+            }
+        },
+        // Unwind the joined product details
+        {
+            $unwind: "$productDetails"
+        },
+        // Project the revenue calculation and retain necessary fields
+        {
+            $project: {
+                _id: 0, // Keep the order ID
+                orderDate: 1, // Keep the order date
+                type: "Product", // Type of the product
+                productName: "$productDetails.name", // Name of the product
+                quantity: "$products.quantity", // Quantity of the product in the order
+                revenue: { $multiply: ["$products.quantity", "$productDetails.price", 0.1] } // Revenue per product in the order
+            }
+        },
+        // Optionally sort by orderDate
+        {
+            $sort: { orderDate: 1 }
+        }
+    ]);
+    
+    // console.log(salesAndRevenuePerOrder);
+    
+
+    const combinedRevenue = [...dailyProductsRevenue, ...dailyActivityRevenue, ...dailyItenararyRevenue];
+
+    // Sort the combined array by the 'date' field
+    combinedRevenue.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    return res.status(200).json(productIDs? dailyProductsRevenue: combinedRevenue);
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }

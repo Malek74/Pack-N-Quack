@@ -13,6 +13,7 @@ router.get("/viewUp",protect, viewUpcomingBooking);
 router.get("/viewPast",protect, viewPastBooking);
 
 
+router.post("/delete", requestDeleteAccount);
 
 export default router;
 

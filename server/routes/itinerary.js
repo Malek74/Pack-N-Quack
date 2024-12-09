@@ -10,7 +10,7 @@ router.get("/", getItinerary);
 router.get("/admin", getAdminItineraries);
 router.delete("/:id", deleteItinerary);
 router.put("/:id", upload.fields([{ name: 'images', maxCount: 20 }, { name: 'coverImage', maxCount: 1 }, { name: "activityImages", maxcount: 10 }]), updateItinerary);
-router.get("/myItineraries/:id", protect, getMyItineraries);
+router.get("/myItineraries",protect, getMyItineraries);
 router.get("/viewItinerary/:id", getItineraryById);
 router.get("/maxPrice", getMaxPrice);
 router.get("/languages", getAllLanguages);

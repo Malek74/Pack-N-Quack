@@ -20,7 +20,7 @@ const router = express.Router();
 // router.put('/places/:placeId', isTourismGovernor, updatePlace); // Update Place
 // router.delete('/places/:placeId', isTourismGovernor, deletePlace); // Delete Place
 // router.get('/places', listAllPlaces);
-router.post('/', createPlace); // Create Place
+router.post('/', protect, createPlace); // Create Place
 router.get('/:name', readPlace); // Read Place
 router.put('/:id', updatePlace); // Update Place
 router.delete('/:name', deletePlace); // Delete Place

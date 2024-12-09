@@ -2,7 +2,6 @@ import Tourist from "../models/touristSchema.js";
 import TourGuide from "../models/tourGuideSchema.js";
 import TouristGovernor from "../models/touristGovernorScehma.js";
 import Seller from "../models/sellerSchema.js";
-import Admin from "../models/adminSchema.js";
 import Advertiser from "../models/advertiserSchema.js";
 import { emailExists, usernameExists, createPromoCode, getConversionRate } from "../utils/Helpers.js";
 import activityModel from "../models/activitySchema.js";
@@ -14,11 +13,14 @@ import AmadeusBooking from "../models/amadeusBooking.js";
 import DeleteRequest from "../models/deleteRequests.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
-import jwt from "jsonwebtoken";
 import transactionModel from "../models/transactionsSchema.js";
 import PromoCodes from "../models/promoCodesSchema.js";
-
+import notificationSchema from "../models/notificationSchema.js";
 import productModel from "../models/productSchema.js";
+import tourist from "../models/touristSchema.js";
+import { productOutOfStockEmail } from "../routes/shareEmail.js";
+import adminSchema from "../models/adminSchema.js";
+import orders from "../models/orderSchema.js"
 
 
 // Creating Tourist for Registration
@@ -194,12 +196,35 @@ export const getMyBookings = async (req, res) => {
 //@desc Get my preferences
 //@route GET /api/tourist/preference/:id
 export const getMyprefernces = async (req, res) => {
-    const id = req.user._id;
 
     try {
-        const tourist = await Tourist.findById(id);
-        const prefereredActivities = tourist.preferences.preferredActivities;
-        const prefereredItineraries = tourist.preferences.preferredItineraries;
+        try {
+            const id = req.user._id;
+        }
+        catch (error) {
+            const tourist = await Tourist.findById(id);
+            const prefereredActivities = tourist.preferences.preferredActivities;
+            const prefereredItineraries = tourist.preferences.preferredItineraries;
+
+            if (prefereredActivities.length === 0 && prefereredItineraries.length === 0) {
+                //get activities based on tags
+                activities.push(... await activityModel.find({}).populate('tags categoryID'));
+
+                //get itineraries based on tags
+                itineraries.push(... await Itinerary.find({}).populate('tags'));
+
+
+                const result = {
+                    activites: activities,
+                    itineraries: itineraries,
+                    //    places: places
+                };
+                console.log(result);
+
+                return res.status(200).json(result);
+
+            }
+        }
 
         let activities = [];
         let itineraries = [];
@@ -620,13 +645,16 @@ export const addItemToCart = async (req, res) => {
     const touristId = req.user._id;
     const quantity = req.body.quantity;
 
+
     if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
     }
 
+
     if (!touristId) {
         return res.status(400).json({ message: "Tourist ID is required" });
     }
+
 
     if (!quantity || quantity <= 0) {
         return res.status(400).json({ message: "Quantity is required" });
@@ -636,27 +664,37 @@ export const addItemToCart = async (req, res) => {
         if (!tourist) {
             return res.status(404).json({ message: "Tourist not found" });
         }
-
         const product = await productModel.findById(productId);
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
 
+
         const productIndex = tourist.cart.findIndex(item => item.productID.toString() === productId);
         const oldQuantity = productIndex !== -1 ? tourist.cart[productIndex].quantity : 0;
 
         const wishlistIndex = tourist.wishlist.findIndex(item => item.toString() === productId);
         if (wishlistIndex !== -1) {
-            await Tourist.findOneAndUpdate(
-                { _id: touristId },
-                { $pull: { wishlist: productId } },
-                { new: true }
-            );
+            if (wishlistIndex !== -1) {
+                await Tourist.findOneAndUpdate(
+                    { _id: touristId },
+                    { $pull: { wishlist: productId } },
+                    { new: true },
+                    { _id: touristId },
+                    { $pull: { wishlist: productId } },
+                    { new: true }
+                );
+            }
         }
+
 
         if (productIndex !== -1) {
             // Product exists in the cart - Update its quantity
+            if (product.available_quantity < quantity + oldQuantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
+            }
+
             const updatedCart = await Tourist.findOneAndUpdate(
                 { _id: touristId, "cart.productID": productId },
                 { $set: { "cart.$.quantity": quantity + oldQuantity } },
@@ -666,6 +704,9 @@ export const addItemToCart = async (req, res) => {
             return res.status(200).json(updatedCart.cart);
         } else {
             // Product does not exist - Add it to the cart
+            if (product.available_quantity < quantity) {
+                return res.status(400).json({ message: "Not enough stock, only " + product.available_quantity + " left" });
+            }
             const updatedCart = await Tourist.findByIdAndUpdate(
                 touristId,
                 { $push: { cart: { productID: productId, quantity: quantity } } },
@@ -674,12 +715,13 @@ export const addItemToCart = async (req, res) => {
 
             return res.status(200).json(updatedCart.cart);
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error);
         return res.status(500).json({ message: error.message });
     }
-}
 
+}
 export const removeItemFromCart = async (req, res) => {
     const productId = req.params.productId;
     const touristId = req.user._id;
@@ -845,5 +887,219 @@ export const removeFromWishlist = async (req, res) => {
         return res.status(200).json(newWishlist.wishlist);
     } catch (err) {
         return res.status(500).json({ message: err.message });
+    }
+}
+
+export const checkoutOrder = async (req, res) => {
+    const id = req.user._id;
+    const paymentMethod = req.body.paymentMethod;
+    const payByWallet = req.body.payByWallet;
+    const promocode = req.body.promocode;
+    const address = req.body.address;
+    const success_url = "http://localhost:5173/touristDashboard/order-history";
+
+
+    const prices = [];
+    try {
+
+        const tourist = await Tourist.findById(id);
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+        const cart = (await Tourist.findById(id)).cart;
+        if (cart.length === 0) {
+            return res.status(400).json({ message: "Cart is empty" });
+        }
+        console.log(cart);
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        let totalAmount = 0;
+        for (let i = 0; i < cart.length; i++) {
+            totalAmount += (await productModel.findById(cart[i].productID)).price * cart[i].quantity;
+
+        }
+        console.log("total amount", totalAmount);
+        let amountLeftToPay = totalAmount;
+        let amountToPay = totalAmount;
+        let promo;
+        if (promocode) {
+            promo = await PromoCodes.findOne({ code: promocode });
+            console.log("promocode: ", promo);
+
+            if (!promo) {
+                res.status(400).send("Promocode does not exist");
+            }
+
+            if (!promo.isActive) {
+                res.status(400).send("Promocode has already been used");
+            }
+
+            if (!promo.isBirthDay) {
+                console.log("Not birthday promo");
+                //update amount to be paid
+                amountToPay -= amountToPay * (promo.discount / 100);
+                console.log("amount to pay", amountToPay);
+            }
+
+            //check if it's his birthday promo
+            if (promo.code == tourist.promoCode.code) {
+                //today is birthday
+                const today = new Date();
+                const birthDate = new Date(tourist.dob);
+                const lastUsed = new Date(tourist.promoCode.lastUsed);
+
+                if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
+                    return res.status(400).json({ message: "Promocode has already been used" });
+                }
+
+                if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
+                    return res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                }
+                amountToPay -= amountToPay * (promo.discount / 100);
+                await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+
+            }
+            else {
+                await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+            }
+        }
+        if (paymentMethod === "card") {
+            console.log("payment card");
+            for (const item of cart) {
+                const product = await productModel.findById(item.productID)
+                console.log(product.stripeID);
+                const price = await stripe.prices.create({
+                    currency: 'usd',
+                    product: product.stripeID,
+                    unit_amount: promo ? parseInt(product.price * (1 - promo.discount / 100) * 100) : parseInt(product.price * 100),
+                });
+                prices.push({ price: price.id, quantity: item.quantity });
+            }
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: prices,
+                mode: 'payment',
+                success_url: success_url,
+            });
+            const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
+            const order = await orders.create({
+                touristID: id,
+                products: cart,
+                orderTotal: totalAmount,
+                deliveryAddress: address ? address : tourist.defaultAddress,
+            });
+            return res.status(200).json({ url: session.url });
+        } else {
+            console.log("da5al else")
+            if (tourist.wallet < totalAmount) {
+
+                if (payByWallet) {
+                    let walletAmount
+                    if (amountToPay > tourist.wallet) {
+                        amountLeftToPay = amountToPay - tourist.wallet;
+                        walletAmount = tourist.wallet;
+                        if (amountLeftToPay !== 0) {
+                            //create price to be paid after deducting wallet amount  
+                            const Product = await productModel.findById(cart[0].productID);
+                            const price = await stripe.prices.create({
+                                currency: 'usd',
+                                product: Product.stripeID,
+                                unit_amount: promo ? parseInt(Product.price * (1 - promo.discount / 100) * 100) : parseInt(Product.price * 100),
+                            });
+
+                            const session = await stripe.checkout.sessions.create({
+                                payment_method_types: ['card'],
+                                line_items: [{
+                                    price: price.id,
+                                    quantity: 1,
+                                }],
+                                mode: 'payment',
+                                success_url: success_url,
+                            })
+                        }
+                    } else {
+                        amountLeftToPay = 0;
+                        walletAmount = amountToPay;
+                    }
+
+                    let transaction;
+                    //create transaction for amount paid from wallet
+                    if (walletAmount > 0) {
+                        //create transaction for wallet deduction
+                        transaction = await transactionModel.create({
+                            userId: id,
+                            amount: walletAmount,
+                            date: new Date(),
+                            method: "wallet",
+                            incoming: false,
+                            description: "Wallet deduction for purchase"
+                        });
+                        const updatedTourist = await Tourist.findOneAndUpdate(
+                            { _id: id },
+                            { wallet: tourist.wallet - walletAmount },
+                            { new: true }
+                        );
+                    }
+
+                }
+            }
+        }
+
+        //update stock
+        for (let item of cart) {
+            const product = await productModel.findById(item.productID);
+            // if (product.available_quantity < item.quantity) {
+            //     return res.status(400).json({ message: "Not enough stock for product: " + product.name });
+            // }
+            // await productModel.findByIdAndUpdate(item.productID, { stock: product.stock - item.quantity });
+
+
+            const updatedProduct = await productModel.findByIdAndUpdate(item.productID, { stock: product.available_quantity - item.quantity }, { new: true });
+
+            //check if we are out of stock
+            if (updatedProduct.stock == 0) {
+                const user = {
+                    id: updatedProduct.sellerUsername == "Pack N Quack" ? updatedProduct.adminSellerID : updatedProduct.seller_id,
+                    role: updatedProduct.sellerUsername == "Pack N Quack" ? "Admin" : "Seller"
+                }
+                //create notification 
+                const notification = await notificationSchema.create({
+                    title: "Product out of stock",
+                    message: `${updatedProduct.name} is out of stock`,
+                    user: user,
+                    type: "outOfStock"
+                });
+
+                //send notification to seller
+                io.to(user.id).emit("notification", notification);
+
+                let receiver = {};
+                if (user.role == "Seller") {
+                    //send mail to seller
+                    receiver = await Seller.findById(user.id);
+                } else {
+                    //send mail to admin
+                    receiver = await adminSchema.findById(user.id);
+                }
+
+                //send mail to seller
+                await productOutOfStockEmail(receiver.email, updatedProduct.name, updatedProduct._id);
+            }
+
+
+        }
+        const updateUser = await Tourist.findByIdAndUpdate(id, { cart: [] }, { new: true });
+
+        //create order
+        const order = await orders.create({
+            touristID: id,
+            products: cart,
+            orderTotal: totalAmount,
+            deliveryAddress: address ? address : tourist.defaultAddress,
+        });
+        res.status(200).json(order);
+
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }

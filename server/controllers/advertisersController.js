@@ -6,6 +6,8 @@ import Booking from "../models/bookingSchema.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/Helpers.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import { getRevenue } from "./tourguideController.js";
 
 export const addAdvertiser = async (req, res) => {
     const { email, username, password } = req.body;
@@ -135,5 +137,162 @@ export const acceptTerms = async (req, res) => {
     }
     catch (error) {
         return res.status(404).json({ message: error.message });
+    }
+}
+
+export const getBookingCount = async (req, res) => {
+    const id = req.user._id;
+    // const id = req.params.id;
+    const  startDate = req.query.startDate;
+    const  endDate = req.query.endDate || new Date();
+    const activityId = req.query.activities;
+
+    if(!id) {
+        return res.status(400).json({ message: "Advertiser ID is required." });
+    }
+
+    if (startDate && !Date.parse(startDate)) {
+        return res.status(400).json({ message: "Invalid start date." });
+    }
+
+    if(endDate && !Date.parse(endDate)) {
+        return res.status(400).json({ message: "Invalid end date." });
+    }
+
+    // if(activityId && !mongoose.Types.ObjectId.isValid(activityId)) {
+    //     return res.status(400).json({ message: "Invalid activity ID." });
+    // }
+
+
+
+    try {
+
+        if(activityId && !(await activityModel.findById(activityId))){
+            return res.status(400).json({ message: "Activity not found." });
+        }
+
+        if(!await advertiserModel.findById(id)) {
+            return res.status(400).json({ message: "Advertiser not found." });
+        }
+    
+        let activityIds = (await activityModel.find({ advertiserID: id, date: { $lte: new Date() } })).map(activity => activity._id.toString());
+
+        let activityQuery = { 
+            advertiserID: id, 
+            date: { $lte: new Date() } 
+        };
+
+        // If a specific activity is provided, add it to the activity query
+        console.log(activityId);
+        if (activityId) {
+            activityIds = activityId;
+        }
+
+
+        // Prepare the match stage for bookings
+        const matchStage = {
+            activityID: { $in: activityIds.map(id => new mongoose.Types.ObjectId(id)) }
+        };
+
+        // Add date filtering if a specific date is provided
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
+        }
+
+        // console.log(matchStage);    
+
+        const bookings = await Booking.find({ activityID: { $in: activityIds } }).select('_id activityID date');
+
+        const revenuePerDay = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: {
+                        creationDay: { $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$date"
+                        } }
+                    },
+                    count: { $sum: 1 },
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id.creationDay",
+                    revenue: { $multiply: ["$totalPrice", 0.9] }
+
+                }
+            },
+            {
+                $sort: { creationDay: 1 }
+            }
+        ]);
+
+        const totalRevenue = await Booking.aggregate([
+            {
+                $match: matchStage 
+            },
+            {
+                $group: {
+                    _id: null, 
+                    totalPrice: { $sum: "$price" } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    activitiesRevenue: { $multiply: ["$totalPrice", 0.9] }
+                }
+            },
+        ]);
+
+        const totalBookings = await Booking.countDocuments(matchStage);
+
+        const bookingsWithActivityDetails = await Booking.aggregate([
+            {
+                $match: matchStage // Filter bookings based on conditions in matchStage
+            },
+            {
+                $lookup: {
+                    from: "activities", // Reference the activities collection
+                    localField: "activityID", // Field in bookings to match
+                    foreignField: "_id", // Field in activities to match
+                    as: "activityDetails" // Alias for the joined data
+                }
+            },
+            {
+                $unwind: "$activityDetails" // Unwind the activity details array
+            },
+            {
+                $project: {
+                    // _id: 1, // Keep the booking ID
+                    price: 1, // Include the price of the booking
+                    numOfTickets: 1, // Include the number of tickets (if needed)
+                    activityName: "$activityDetails.name", // Include the activity name
+                    date: 1 // Include the booking date (optional)
+                }
+            },
+            {
+                $sort: { date: 1 } // Optional: Sort by booking date
+            }
+        ]);
+        
+
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: bookingsWithActivityDetails});
+    
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 }

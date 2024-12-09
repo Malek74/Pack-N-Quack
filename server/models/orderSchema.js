@@ -27,7 +27,7 @@ const orderSchema = new Schema({
     stripeSessionID: {
         type: String,
         default: null,
-        required: true
+        required: false
     },
     orderDate: {
         type: Date,
@@ -55,10 +55,13 @@ const orderSchema = new Schema({
     paidByCard: {
         type: Number,
         default: 0,
-        required: true
+        required: false
     },
-}, { timestamps: true });
+    deliveryAddress: {
+        type: Object,
+        required: false
+    },
+},{timestamps: true});
 
 const Order = model("Order", orderSchema);
-
 export default Order;
