@@ -145,7 +145,7 @@ export const getBookingCount = async (req, res) => {
     // const id = req.params.id;
     const  startDate = req.query.startDate;
     const  endDate = req.query.endDate || new Date();
-    const activityId = req.query.activityId;
+    const activityId = req.query.activities;
 
     if(!id) {
         return res.status(400).json({ message: "Advertiser ID is required." });
@@ -159,9 +159,9 @@ export const getBookingCount = async (req, res) => {
         return res.status(400).json({ message: "Invalid end date." });
     }
 
-    if(activityId && !mongoose.Types.ObjectId.isValid(activityId)) {
-        return res.status(400).json({ message: "Invalid activity ID." });
-    }
+    // if(activityId && !mongoose.Types.ObjectId.isValid(activityId)) {
+    //     return res.status(400).json({ message: "Invalid activity ID." });
+    // }
 
 
 
@@ -183,8 +183,9 @@ export const getBookingCount = async (req, res) => {
         };
 
         // If a specific activity is provided, add it to the activity query
+        console.log(activityId);
         if (activityId) {
-            activityIds = activityId.split(',');
+            activityIds = activityId;
         }
 
 

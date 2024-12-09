@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from '../middleware/authenticator.js';
-import {getAllSellers,createSeller,getSellerByID,updateSellerInfo,deleteSeller, acceptTerms, getRevenue} from "../controllers/sellerController.js";
+import {getAllSellers,createSeller,getSellerByID,updateSellerInfo,deleteSeller, acceptTerms, getRevenue, getProducts} from "../controllers/sellerController.js";
 
 const router = express.Router();
 
@@ -15,5 +15,6 @@ router.get('/:id', getSellerByID);
 router.delete('/:id', deleteSeller);
 router.put('/terms/:id', acceptTerms);
 router.get("/revenue/reports", protect,getRevenue);
+router.get("/my/products", protect, getProducts);
 
 export default router;

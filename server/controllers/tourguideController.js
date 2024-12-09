@@ -216,7 +216,7 @@ export const getRevenue = async (req, res) => {
     const id = req.user._id;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
-    const itineraryId = req.query.itineraryId;
+    const itineraryId = req.query.activities;
 
     if(!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
@@ -230,9 +230,9 @@ export const getRevenue = async (req, res) => {
         return res.status(400).json({ message: "Invalid end date." });
     }
 
-    if(itineraryId && !mongoose.Types.ObjectId.isValid(itineraryId)) {
-        return res.status(400).json({ message: "Invalid itinerary ID." });
-    }
+    // if(itineraryId && !mongoose.Types.ObjectId.isValid(itineraryId)) {
+    //     return res.status(400).json({ message: "Invalid itinerary ID." });
+    // }
 
 
 
@@ -256,7 +256,7 @@ export const getRevenue = async (req, res) => {
 
         // If a specific activity is provided, add it to the activity query
         if (itineraryId) {
-            itineraryIds = itineraryId.split(',');
+            itineraryIds = itineraryId;
         }
 
 
@@ -375,4 +375,21 @@ export const getRevenue = async (req, res) => {
     }
 }
 
+
+export const getTourguideItineraries = async (req, res) => {
+    const id = req.user._id;
+    if (!id) {
+        return res.status(400).json({ message: "Tour Guide ID is required." });
+    }
+
+    try {
+        const myItineraries = await Itinerary.find({ tourGuideID: id });
+        if (!myItineraries) {
+            return res.status(404).json({ message: "Tour Guide has no itineraries." });
+        }
+        return res.status(200).json(myItineraries);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
 

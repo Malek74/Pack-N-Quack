@@ -122,7 +122,8 @@ export const acceptTerms = async (req, res) => {
 }
 
 export const getRevenue = async (req, res) => {
-    const sellerId = req.params.id;
+    // const sellerId = req.params.id;
+    const sellerId = req.user._id;
     const productIDs = req.query.selectedProducts;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
@@ -131,10 +132,10 @@ export const getRevenue = async (req, res) => {
     }
     try{
         let productIds = (await product.find({ seller_id: sellerId }).select("_id")).map((product) => product._id);
-        console.log(productIds);
+        // console.log(productIds);
 
         if (productIDs) {
-            productIds = productIDs.split(",");
+            productIds = productIDs;
             console.log(productIDs);
         }
 
@@ -291,90 +292,90 @@ export const getRevenue = async (req, res) => {
 //     }
 // ]);
 
-const totalRevenue = await Orders.aggregate([
-    // Unwind the products array
-    {
-        $unwind: "$products"
-    },
-    // Match products by dynamic conditions
-    {
-        $match: matchStage // Ensure matchStage is correctly defined
-    },
-    // Lookup product details from the products collection
-    {
-        $lookup: {
-            from: "products", // Name of the products collection
-            localField: "products.productID", // Field in orders to match
-            foreignField: "_id", // Field in products to match
-            as: "productDetails" // Alias for the joined data
-        }
-    },
-    // Unwind the joined product details
-    {
-        $unwind: "$productDetails"
-    },
-    // Group by null to calculate total revenue
-    {
-        $group: {
-            _id: null, // Single group for total revenue
-            totalPrice: {
-                $sum: {
-                    $multiply: ["$products.quantity", "$productDetails.price"]
+    const totalRevenue = await Orders.aggregate([
+        // Unwind the products array
+        {
+            $unwind: "$products"
+        },
+        // Match products by dynamic conditions
+        {
+            $match: matchStage // Ensure matchStage is correctly defined
+        },
+        // Lookup product details from the products collection
+        {
+            $lookup: {
+                from: "products", // Name of the products collection
+                localField: "products.productID", // Field in orders to match
+                foreignField: "_id", // Field in products to match
+                as: "productDetails" // Alias for the joined data
+            }
+        },
+        // Unwind the joined product details
+        {
+            $unwind: "$productDetails"
+        },
+        // Group by null to calculate total revenue
+        {
+            $group: {
+                _id: null, // Single group for total revenue
+                totalPrice: {
+                    $sum: {
+                        $multiply: ["$products.quantity", "$productDetails.price"]
+                    }
                 }
             }
+        },
+        // Project the final revenue with 90% calculation
+        {
+            $project: {
+                _id: 0,
+                productsRevenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
+            }
         }
-    },
-    // Project the final revenue with 90% calculation
-    {
-        $project: {
-            _id: 0,
-            productsRevenue: { $multiply: ["$totalPrice", 0.9] } // Apply 90% revenue calculation
+    ]);
+
+
+    const salesAndRevenuePerProduct = await Orders.aggregate([
+        // Unwind the products array
+        {
+            $unwind: "$products"
+        },
+        // Match products by dynamic conditions
+        {
+            $match: matchStage // Ensure `matchStage` is defined outside the pipeline
+        },
+        // Lookup product details from the products collection
+        {
+            $lookup: {
+                from: "products", // Name of the products collection
+                localField: "products.productID", // Field in orders to match
+                foreignField: "_id", // Field in products to match
+                as: "productDetails" // Alias for the joined data
+            }
+        },
+        // Unwind the joined product details
+        {
+            $unwind: "$productDetails"
+        },
+        // Project the final result
+        {
+            $project: {
+                _id: 0,
+                productName: "$productDetails.name", // Name of the product
+                price: { $multiply: ["$products.quantity", "$productDetails.price", 0.9] }, // Revenue with 90% calculation
+                quantity: "$products.quantity", // Include quantity for each product
+                orderDate: "$orderDate" // Optionally include the order date
+            }
         }
-    }
-]);
-
-
-const salesAndRevenuePerProduct = await Orders.aggregate([
-    // Unwind the products array
-    {
-        $unwind: "$products"
-    },
-    // Match products by dynamic conditions
-    {
-        $match: matchStage // Ensure `matchStage` is defined outside the pipeline
-    },
-    // Lookup product details from the products collection
-    {
-        $lookup: {
-            from: "products", // Name of the products collection
-            localField: "products.productID", // Field in orders to match
-            foreignField: "_id", // Field in products to match
-            as: "productDetails" // Alias for the joined data
-        }
-    },
-    // Unwind the joined product details
-    {
-        $unwind: "$productDetails"
-    },
-    // Project the final result
-    {
-        $project: {
-            _id: 0,
-            productName: "$productDetails.name", // Name of the product
-            price: { $multiply: ["$products.quantity", "$productDetails.price", 0.9] }, // Revenue with 90% calculation
-            quantity: "$products.quantity", // Include quantity for each product
-            orderDate: "$orderDate" // Optionally include the order date
-        }
-    }
-]);
+    ]);
 
 
 
-    console.log({
-        dailyRevenue,
-        totalRevenue: totalRevenue[0]?.activitiesRevenue,
-        salesAndRevenuePerProduct 
-    });
+    //console.log({
+    //     dailyRevenue,
+    //     totalRevenue: totalRevenue[0]?.activitiesRevenue,
+    //     salesAndRevenuePerProduct 
+    // });
 
     return res.status(200).json({
         revenuePerDay: dailyRevenue,
@@ -388,3 +389,15 @@ const salesAndRevenuePerProduct = await Orders.aggregate([
     
 }
 
+export const getProducts = async (req, res) => {
+    const sellerId = req.user._id;
+    if (!sellerId) {
+        return res.status(400).json({ message: "Seller ID is required." });
+    }
+    try {
+        const products = await product.find({ seller_id: sellerId });
+        return res.status(200).json(products);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
