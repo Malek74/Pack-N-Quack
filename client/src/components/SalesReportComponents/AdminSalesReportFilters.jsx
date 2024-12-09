@@ -30,7 +30,7 @@ export default function AdminSalesReportFilters({setReportFilters }) {
 
   useEffect(() => {
     setReportFilters({
-      products: selectedProducts.map((product) => product._id).join(','),
+      products: selectedProducts.map((product) => product._id),
 
       startDate: startDate,
       endDate: endDate,
