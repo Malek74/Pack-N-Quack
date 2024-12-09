@@ -126,8 +126,10 @@ export default function NewTouristForm(props) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 grid grid-cols-2"
+        className="space-y-8 bg-white px-4"
       >
+        <h1 className="text-2xl">Sign up</h1>
+
         {/* Name Field */}
         <FormField
           control={form.control}
@@ -360,309 +362,288 @@ export default function NewTouristForm(props) {
             )}
           />
         )}
-        {/* First Category Field */}
-        <FormField
-          control={form.control}
-          name="preferedFirstCategory"
-          render={({ field }) => {
-            const [selectedCategoryName, setSelectedCategoryName] =
-              useState("");
+        <div>
+          {/* First Category Field */}
+          <FormField
+            control={form.control}
+            name="preferedFirstCategory"
+            render={({ field }) => {
+              return (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Preferred Category</FormLabel>
+                  <FormDescription>
+                    Select your two preferred categories
+                  </FormDescription>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-[200px] justify-between")}
+                        >
+                          {"Select category"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search category..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup>
+                            {Array.isArray(categories) &&
+                              categories.map((category, index) => (
+                                <CommandItem
+                                  value={category.name}
+                                  key={index}
+                                  onSelect={() => {
+                                    // Update the form with category ID
+                                    form.setValue(
+                                      "preferedFirstCategory",
+                                      category._id,
+                                      {
+                                        shouldValidate: true,
+                                      }
+                                    );
+                                    form.trigger("preferedFirstCategory");
 
-            return (
-              <FormItem className="flex flex-col">
-                <FormLabel>Preferred Category</FormLabel>
-                <FormDescription>
-                  Select your two preferred categories
-                </FormDescription>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !selectedCategoryName && "text-muted-foreground"
-                        )}
-                      >
-                        {selectedCategoryName || "Select category"}
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search category..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No category found.</CommandEmpty>
-                        <CommandGroup>
-                          {Array.isArray(categories) &&
-                            categories.map((category, index) => (
-                              <CommandItem
-                                value={category.name}
-                                key={index}
-                                onSelect={() => {
-                                  // Update the form with category ID
-                                  form.setValue(
-                                    "preferedFirstCategory",
-                                    category._id,
-                                    {
+                                    // Set the selected category name to display
+                                  }}
+                                >
+                                  {category.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      category._id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+
+          {/* Second Category Field */}
+          <FormField
+            control={form.control}
+            name="preferedSecondCategory"
+            render={({ field }) => {
+              return (
+                <FormItem className="flex flex-col">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-[200px] justify-between")}
+                        >
+                          {"Select category"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search category..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup>
+                            {Array.isArray(categories) &&
+                              categories.map((category, index) => (
+                                <CommandItem
+                                  value={category.name}
+                                  key={index}
+                                  onSelect={() => {
+                                    // Update the form with category ID
+                                    form.setValue(
+                                      "preferedSecondCategory",
+                                      category._id,
+                                      {
+                                        shouldValidate: true,
+                                      }
+                                    );
+                                    form.trigger("preferedSecondCategory");
+                                  }}
+                                >
+                                  {category.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      category._id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+        </div>
+        <div>
+          {/* First Tag Field */}
+          <FormField
+            control={form.control}
+            name="preferedFirstTag"
+            render={({ field }) => {
+              return (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Preferred Tag</FormLabel>
+                  <FormDescription>
+                    Select your two preferred tags
+                  </FormDescription>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-[200px] justify-between")}
+                        >
+                          {"Select tag"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search tag..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No tag found.</CommandEmpty>
+                          <CommandGroup>
+                            {Array.isArray(tags) &&
+                              tags.map((tag) => (
+                                <CommandItem
+                                  value={tag.name || tag.tag}
+                                  key={tag._id}
+                                  onSelect={() => {
+                                    // Set the form value with the tag's _id or name/tag for submission
+                                    form.setValue("preferedFirstTag", tag._id, {
                                       shouldValidate: true,
-                                    }
-                                  );
-                                  form.trigger("preferedFirstCategory");
+                                    });
+                                    form.trigger("preferedFirstTag");
 
-                                  // Set the selected category name to display
-                                  setSelectedCategoryName(category.name);
-                                }}
-                              >
-                                {category.name}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    category._id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
+                                    // Set selected tag name to display in the button
+                                  }}
+                                >
+                                  {tag.name || tag.tag}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      tag._id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
 
-        {/* Second Category Field */}
-        <FormField
-          control={form.control}
-          name="preferedSecondCategory"
-          render={({ field }) => {
-            const [selectedCategoryName2, setSelectedCategoryName2] =
-              useState("");
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
 
-            return (
-              <FormItem className="flex flex-col">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !selectedCategoryName2 && "text-muted-foreground"
-                        )}
-                      >
-                        {selectedCategoryName2 || "Select category"}
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search category..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No category found.</CommandEmpty>
-                        <CommandGroup>
-                          {Array.isArray(categories) &&
-                            categories.map((category, index) => (
-                              <CommandItem
-                                value={category.name}
-                                key={index}
-                                onSelect={() => {
-                                  // Update the form with category ID
-                                  form.setValue(
-                                    "preferedSecondCategory",
-                                    category._id,
-                                    {
-                                      shouldValidate: true,
-                                    }
-                                  );
-                                  form.trigger("preferedSecondCategory");
+          {/* Second Tag Field */}
+          <FormField
+            control={form.control}
+            name="preferedSecondTag"
+            render={({ field }) => {
+              return (
+                <FormItem className="flex flex-col">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-[200px] justify-between")}
+                        >
+                          {"Select tag"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search tag..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No tag found.</CommandEmpty>
+                          <CommandGroup>
+                            {Array.isArray(tags) &&
+                              tags.map((tag) => (
+                                <CommandItem
+                                  value={tag.name || tag.tag}
+                                  key={tag._id}
+                                  onSelect={() => {
+                                    // Set the form value with the tag's _id or name/tag for submission
+                                    form.setValue(
+                                      "preferedSecondTag",
+                                      tag._id,
+                                      {
+                                        shouldValidate: true,
+                                      }
+                                    );
+                                    form.trigger("preferedSecondTag");
 
-                                  // Set the selected category name to display
-                                  setSelectedCategoryName2(category.name);
-                                }}
-                              >
-                                {category.name}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    category._id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
+                                    // Set selected tag name to display in the button
+                                  }}
+                                >
+                                  {tag.name || tag.tag}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      tag._id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
 
-        {/* First Tag Field */}
-        <FormField
-          control={form.control}
-          name="preferedFirstTag"
-          render={({ field }) => {
-            const [selectedTagName, setSelectedTagName] = useState("");
-
-            return (
-              <FormItem className="flex flex-col">
-                <FormLabel>Preferred Tag</FormLabel>
-                <FormDescription>
-                  Select your two preferred tags
-                </FormDescription>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !selectedTagName && "text-muted-foreground"
-                        )}
-                      >
-                        {selectedTagName || "Select tag"}
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search tag..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No tag found.</CommandEmpty>
-                        <CommandGroup>
-                          {Array.isArray(tags) &&
-                            tags.map((tag) => (
-                              <CommandItem
-                                value={tag.name || tag.tag}
-                                key={tag._id}
-                                onSelect={() => {
-                                  // Set the form value with the tag's _id or name/tag for submission
-                                  form.setValue("preferedFirstTag", tag._id, {
-                                    shouldValidate: true,
-                                  });
-                                  form.trigger("preferedFirstTag");
-
-                                  // Set selected tag name to display in the button
-                                  setSelectedTagName(tag.name || tag.tag);
-                                }}
-                              >
-                                {tag.name || tag.tag}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    tag._id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-
-        {/* Second Tag Field */}
-        <FormField
-          control={form.control}
-          name="preferedSecondTag"
-          render={({ field }) => {
-            const [selectedTagName2, setSelectedTagName2] = useState("");
-
-            return (
-              <FormItem className="flex flex-col">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !selectedTagName2 && "text-muted-foreground"
-                        )}
-                      >
-                        {selectedTagName2 || "Select tag"}
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search tag..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No tag found.</CommandEmpty>
-                        <CommandGroup>
-                          {Array.isArray(tags) &&
-                            tags.map((tag) => (
-                              <CommandItem
-                                value={tag.name || tag.tag}
-                                key={tag._id}
-                                onSelect={() => {
-                                  // Set the form value with the tag's _id or name/tag for submission
-                                  form.setValue("preferedSecondTag", tag._id, {
-                                    shouldValidate: true,
-                                  });
-                                  form.trigger("preferedSecondTag");
-
-                                  // Set selected tag name to display in the button
-                                  setSelectedTagName2(tag.name || tag.tag);
-                                }}
-                              >
-                                {tag.name || tag.tag}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    tag._id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+        </div>
         {/* Terms and Conditions */}
         <FormField
           control={form.control}

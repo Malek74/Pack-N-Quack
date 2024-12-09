@@ -31,7 +31,7 @@ export default function LoginForm({ onForgotPassword, onSubmit }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col flex-1 bg-white gap-6 my-2 lg:m-8 rounded-2xl shadow-md max-w-[350px] lg:max-w-[400px] lg:py-12 px-12"
+        className="my-2 flex max-w-[350px] flex-1 flex-col gap-6 rounded-2xl bg-white px-12 shadow-md lg:m-8 lg:max-w-[400px] lg:py-12"
       >
         <h1 className="text-3xl font-medium">Sign in</h1>
         <FormField
@@ -64,15 +64,15 @@ export default function LoginForm({ onForgotPassword, onSubmit }) {
             </FormItem>
           )}
         />
-        <div className="button-wrapper">
+        <div className="self-end">
           <Button variant="link" onClick={onForgotPassword}>
             Forgot Password
           </Button>
         </div>
-        <div className="button-wrapper">
+        <div>
           <Button
             type="submit"
-            className="rounded-lg text-primary-foreground bg-primary min-h-14 w-full"
+            className="min-h-14 w-full rounded-lg bg-primary text-primary-foreground"
           >
             Sign in
           </Button>

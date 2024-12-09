@@ -1,26 +1,29 @@
 import { useState, useEffect } from "react";
 import ProductCard from "@/components/marketplacePage/ProductCard";
+import Activitiesbackground from "/assets/images/Background.jpg";
 import Banner from "../components/shared/BannerV2";
 import BannerImage from "/assets/images/homeBanner.png";
 
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
+import FilterButton from "@/components/shared/FilterButtons";
 import PriceSlider from "../components/shared/PriceSlider";
+import CreateDialog from "@/components/shared/CreateDialog";
+import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
-import { FilterDialog } from "@/components/shared/FilterDialog";
-import { FilterPanel } from "@/components/shared/FilterPanel";
-import { Filter } from "lucide-react";
 import GuideButton from "@/components/guideComponents/popMessage";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
-  const { prefCurrency, userType } = useUser();
+  const { prefCurrency } = useUser();
+  const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(null); // Start as null until it's fetched
   const [priceRange, setPriceRange] = useState([0, 100000000]); // Applied price range
   const [sliderRange, setSliderRange] = useState([0, 100000000]); // Temporary slider range
   const [selectedFilters, setSelectedFilters] = useState({});
+  const userType = "tourist";
   // Fetch products based on filters and search term
   const fetchProducts = () => {
     axios
@@ -37,8 +40,8 @@ export default function MarketplacePage() {
       });
   };
 
-  // 26835438303
-  // 14215076750
+  26835438303
+  14215076750
   // Fetch the maximum product price
   const fetchMaxPrice = () => {
     axios
@@ -65,41 +68,31 @@ export default function MarketplacePage() {
     fetchMaxPrice();
   }, [prefCurrency]);
 
-  const handleApplyFilters = (appliedFilters) => {
-    if (appliedFilters.price) {
-      setPriceRange(appliedFilters.price); // Update the price range
-    }
-    setSelectedFilters(appliedFilters); // Update other filters
+  const handleFilterChange = (type, value) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [type]: value, // Update the selected value based on the type
+    }));
+    console.log(type, value);
   };
 
-  const handleClearFilters = () => {
-    setSelectedFilters({});
-    setPriceRange([0, maxPrice]); // Reset price range to full range
-    setSliderRange([0, maxPrice]); // Reset slider range
+  // Handle price change from the slider
+  const handlePriceChange = (newRange) => {
+    setSliderRange(newRange); // Temporarily update the slider range
   };
 
-  const filterConfig = [
+  // Apply the slider range to the actual price range on clicking "Apply"
+  const applyPriceRange = () => {
+    setPriceRange(sliderRange); // Apply the selected price range
+  };
+
+  let buttons = [
     {
-      type: "dropdown",
-      key: "rating",
-      label: "Sort By Rating",
+      type: "Sort By Rating",
       options: [
-        { label: "Ratings Low to High", value: "asc" },
-        { label: "Ratings High to Low", value: "desc" },
+        { label: "Ratings Low To High", value: "asc" },
+        { label: "Ratings High To Low", value: "desc" },
       ],
-    },
-    {
-      type: "range",
-      key: "price",
-      label: "Price Range",
-      component: ({ priceRange, handlePriceChange }) => (
-        <PriceSlider
-          min={0}
-          max={maxPrice || 100000000}
-          priceRange={priceRange}
-          handlePriceChange={handlePriceChange}
-        />
-      ),
     },
   ];
 
@@ -122,21 +115,36 @@ export default function MarketplacePage() {
       </div>
 
       <div className="mt-8 flex">
-        <FilterDialog
-          triggerIcon={<Filter />}
-          title="Filter Products"
-          description="Apply filters to find the best products for you."
-        >
-          <FilterPanel
-            filters={filterConfig}
-            onApply={handleApplyFilters}
-            fetchMaxPrice={fetchMaxPrice}
-          />
-        </FilterDialog>
-        <Button onClick={handleClearFilters} variant="outline">
-          Clear Filters
-        </Button>
+        <FilterButton buttons={buttons} onFilterChange={handleFilterChange} />
+        {maxPrice !== null && (
+          <div className="flex items-center justify-center">
+            <PriceSlider
+              min={0}
+              max={maxPrice}
+              priceRange={sliderRange} // Use the temporary slider range
+              handlePriceChange={handlePriceChange} // Update slider range on change
+            />
+            <Button
+              size="sm"
+              onClick={applyPriceRange} // Apply the price range on click
+              className="ml-2 rounded-md px-4 py-2"
+            >
+              Apply
+            </Button>
+          </div>
+        )}
       </div>
+      {userType === "seller" && (
+        <CreateDialog
+          title="Product"
+          form={
+            <ProductForm
+              onRefresh={fetchProducts}
+              adderId="6703ba52daf9eae5ef55344c"
+            />
+          }
+        />
+      )}
 
      <GuideButton guideMessage={"Search and select items in the marketplace, then add them to your cart and proceed with checkout."} />
 
@@ -161,7 +169,7 @@ export default function MarketplacePage() {
             />
           ))
         ) : (
-          <div>
+          <div >
             <Loading />
           </div>
         )}

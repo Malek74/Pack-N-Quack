@@ -32,10 +32,16 @@ export default function UsernameForm({ onBack, onSubmit }) {
 
   return (
     <Form {...form}>
+
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col flex-1 bg-white gap-6 my-2 lg:m-8 rounded-2xl shadow-md max-w-[350px] lg:max-w-[400px] lg:py-12 px-12"
+        className="my-2 flex max-w-[350px] flex-1 flex-col gap-6 rounded-2xl bg-white px-12 shadow-md lg:m-8 lg:max-w-[400px] lg:py-12"
       >
+              <div className="self-start">
+        <Button variant="link" className="m-0 p-0" onClick={onBack}>
+          Back to Login
+        </Button>
+      </div>
         <h1 className="text-2xl font-medium">Forgot Password</h1>
         <FormItem>
           <FormLabel>Enter Username</FormLabel>
@@ -48,17 +54,12 @@ export default function UsernameForm({ onBack, onSubmit }) {
           </FormControl>
           <FormMessage />
         </FormItem>
-        <div className="button-wrapper">
+        <div>
           <Button
             type="submit"
-            className="rounded-lg text-primary-foreground bg-primary min-h-14 w-full"
+            className="min-h-14 w-full rounded-lg bg-primary text-primary-foreground"
           >
             Send OTP
-          </Button>
-        </div>
-        <div className="button-wrapper">
-          <Button variant="link" onClick={onBack}>
-            Back to Login
           </Button>
         </div>
       </form>

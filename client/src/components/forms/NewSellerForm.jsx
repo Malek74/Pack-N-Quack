@@ -60,6 +60,8 @@ export default function NewSellerForm(props) {
     <Form {...form2}>
       <form onSubmit={form2.handleSubmit(onSubmit2)} className="space-y-8">
         {/* Username Field */}
+        <h1 className="text-2xl">Sign up</h1>
+
         <FormField
           control={form2.control}
           name="username"

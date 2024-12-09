@@ -81,37 +81,62 @@ export default function RegistrationPage() {
       });
   };
   return (
-    <div className="flex ">
-      <img className="h-svh " src={registration2} />
-      {type == "" && (
-        <div className="flex flex-1 justify-center items-center">
-          <Button onClick={() => setType("Tourist")}>Sign up as Tourist</Button>
-          <Button onClick={() => setType("TourguideAdvertiserSeller")}>
-            Sign up as Tour Guide / Advertiser / Seller
-          </Button>
-        </div>
-      )}
-
-      {type == "Tourist" && (
-        <div className="flex flex-col justify-center">
-          <Button onClick={() => setType("")}>Back</Button>
-          <div className="py-4 px-10 border border-red-500 rounded-2xl">
-            <h1 className="text-2xl">Sign up</h1>
-            <NewTouristForm submitFunction={createNewTourist} />
+    <div className="flex h-screen min-h-max items-center justify-center bg-[url('public/assets/images/Background.jpg')] bg-cover bg-no-repeat">
+      <div className="my-4 flex rounded-3xl bg-white py-4">
+        {type == "" && (
+          <div className="flex w-full items-center justify-center gap-16 px-20 py-20">
+            <button onClick={() => setType("Tourist")} className="rounded-3xl border border-gray-400 p-8">
+              <div className="flex flex-col items-center">
+                <img
+                  className="h-32 w-32"
+                  src="/assets/images/happyDuck.png"
+                ></img>
+                <h1 className="text-2xl font-semibold">Sign up as</h1>
+                <h1 className="text-2xl font-semibold">Tourist</h1>
+              </div>
+            </button>
+            <button onClick={() => setType("TourguideAdvertiserSeller")} className="rounded-3xl border border-gray-400 p-8">
+              <div className="flex flex-col items-center">
+                <img
+                  className="h-32 w-32"
+                  src="/assets/images/neutralDuck.png"
+                ></img>
+                <h1 className="text-2xl font-semibold">Sign up as</h1>{" "}
+                <h1 className="text-2xl font-semibold">Agent</h1>
+              </div>
+            </button>
           </div>
-        </div>
-      )}
-      {type == "TourguideAdvertiserSeller" && (
-        <div>
-          <Button onClick={() => setType("")}>Back</Button>
+        )}
 
-          <NewSellerForm submitFunction={createNewTourguideSellerAdvertiser} />
-        </div>
-      )}
-      
-<GuideButton guideMessage={"Select your role as a tourist, tour guide, advertiser, or seller to sign up and get started."} />
+        {type == "Tourist" && (
+          <div className="flex flex-col gap-4 py-4">
+            <Button className="mx-10 self-start" onClick={() => setType("")}>
+              Back
+            </Button>
+            <div className="mx-10 rounded-3xl">
+              <NewTouristForm submitFunction={createNewTourist} />
+            </div>
+          </div>
+        )}
+        {type == "TourguideAdvertiserSeller" && (
+          <div className="flex flex-col gap-4 py-4">
+            <Button className="mx-10 self-start" onClick={() => setType("")}>
+              Back
+            </Button>
+            <div className="mx-10">
+              <NewSellerForm
+                submitFunction={createNewTourguideSellerAdvertiser}
+              />
+            </div>
+          </div>
+        )}
 
-
+        <GuideButton
+          guideMessage={
+            "Select your role as a tourist, tour guide, advertiser, or seller to sign up and get started."
+          }
+        />
+      </div>
     </div>
   );
 }

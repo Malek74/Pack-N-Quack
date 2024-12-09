@@ -83,7 +83,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-[url('public/assets/images/Background.jpg')] bg-cover bg-no-repeat">
+    <div className="flex h-screen items-center justify-center bg-white bg-[url('public/assets/images/Background.jpg')] bg-cover bg-no-repeat">
       {step === "login" && (
         <LoginForm
           onForgotPassword={() => setStep("enterUsername")}

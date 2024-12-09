@@ -16,7 +16,7 @@ ${guideMessage}`;
     <div>
       <button
         onClick={() => setShowMessage(!showMessage)}
-        className="fixed top-4 right-3 w-12 h-12 rounded-full bg-yellow-400 text-white text-2xl font-bold shadow-md hover:bg-yellow-500 hover:shadow-lg hover:scale-110 transition-transform duration-300"
+        className="fixed bottom-4 right-3 h-12 w-12 rounded-full bg-yellow-400 text-2xl font-bold text-white shadow-md transition-transform duration-300 hover:scale-110 hover:bg-yellow-500 hover:shadow-lg"
       >
         <logo className= "font-semibold"> ? </logo>
       </button>
@@ -68,7 +68,7 @@ ${guideMessage}`;
           {messageLines.map((line, index) => (
            <div
   key={index}
-  className="w-80 h-auto text-center font-serif font-semibold text-white p-2 shadow-md mb-[0.09px] bg-cover bg-center"
+  className="mb-[0.09px] h-auto w-80 bg-cover bg-center p-2 text-center font-serif font-semibold text-white shadow-md"
   style={{
     backgroundImage: `url(${woodPlank})`, // Dynamically set the background image
   }}

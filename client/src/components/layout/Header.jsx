@@ -22,6 +22,7 @@ export default function Header() {
     isTourist,
     isTourismGovernor,
     isGuest,
+    isLoggedIn
   } = useUser();
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -35,13 +36,13 @@ export default function Header() {
     <header className="container mx-auto flex py-4">
       <nav className="flex w-full items-center justify-between">
         {/* Logo on the left */}
-        <Link to="/" className="text-xl font-bold flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3 text-xl font-bold">
           <img src={logo} className="w-8" />
           Pack n' Quack
         </Link>
 
         {/* Centered Navigation Links */}
-        <ul className="flex justify-center mx-auto">
+        <ul className="mx-auto flex justify-center">
           <li>
             <Button asChild variant="link">
               <Link to="/" className={isActive("/") ? "text-yellow-500" : ""}>
