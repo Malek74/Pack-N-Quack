@@ -22,22 +22,26 @@ export default function Stats() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
+
   const fetchStats = () => {
     setLoading(true);
     axios
-      .get(`/api/admins/adminRevenue`)
+      .get(`/api/admins/adminRevenue`) // Replace with actual API endpoint
       .then((response) => {
         setStats(response.data);
         console.log("STATS AS FOLLOWS");
         console.log(response.data);
-        const calculatedTransactions =
-          response.data.revenueAndBookingsPerEvent.map((event) => ({
-            title: event.activityName,
-            description: `${event.numOfTickets} tickets sold`,
-            date: new Date(event.date).toISOString(), // Convert event.date to ISO string
-            incoming: true,
-            amount: event.price, // Use the price directly from the event
-          }));
+
+        // Process the response data for transactions
+        const calculatedTransactions = response.data.map((item) => ({
+          title: item.productName || item.title || "Unknown Product",
+          description: item.quantity
+            ? `${item.quantity} items sold`
+            : `${item.revenue} revenue generated`,
+          date: item.orderDate || item.date || new Date().toISOString(),
+          incoming: true, // Assuming all transactions are incoming
+          amount: item.revenue || 0, // Use revenue or fallback to 0
+        }));
 
         setTransactions(calculatedTransactions);
         setLoading(false);
@@ -47,6 +51,7 @@ export default function Stats() {
         setLoading(false);
       });
   };
+  
 
   const renderTransactions = (transactions) => {
     return transactions.map((transaction, index) => (
@@ -59,7 +64,7 @@ export default function Stats() {
                 {transaction.description}
               </p>
               <p className="text-sm text-muted-foreground">
-                {new Date(transaction.date).toLocaleString()}
+                {formatDate(transaction.date)}
               </p>
             </div>
             <span
@@ -68,14 +73,15 @@ export default function Stats() {
               } font-semibold`}
             >
               {transaction.incoming ? "+" : "-"}
-              {prefCurrency} {transaction.amount}
+              {prefCurrency} {transaction.amount.toFixed(2)}
             </span>
           </div>
         </CardContent>
       </Card>
     ));
   };
-  function formatDate(isoDateString) {
+
+  const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
 
     // Format the date
@@ -93,7 +99,7 @@ export default function Stats() {
     });
 
     return `${formattedDate}, ${formattedTime}`;
-  }
+  };
 
   useEffect(() => {
     fetchStats();
@@ -101,7 +107,7 @@ export default function Stats() {
 
   return (
     <Card
-      x-chunk="dashboard-06-chunk-0 "
+      x-chunk="dashboard-06-chunk-0"
       className="flex flex-col items-center justify-center gap-4 p-4"
     >
       <CardHeader className="flex w-full flex-row justify-between">
@@ -111,24 +117,24 @@ export default function Stats() {
         </div>
         <AdminFilterButton setReportFilters={setReportFilters} />
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4 p-4">
+      <CardContent className="flex w-full flex-col items-center justify-center gap-4 p-4">
         {loading ? (
           <Loading className="place-items-center place-self-center" />
+        ) : transactions?.length > 0 ? (
+          <div className="flex w-full">
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList>
+                <TabsTrigger value="all">All Transactions</TabsTrigger>
+              </TabsList>
+              <TabsContent value="all" className="w-full">
+                <ScrollArea className="h-[500px]">
+                  {renderTransactions(transactions)}
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
+          </div>
         ) : (
-          transactions?.length > 0 && (
-            <div className="flex w-full">
-              <Tabs defaultValue="all" className="w-full">
-                <TabsList className="">
-                  <TabsTrigger value="all">All Transactions</TabsTrigger>
-                </TabsList>
-                <TabsContent value="all" className="w-full">
-                  <ScrollArea className="h-[500px]">
-                    {renderTransactions(transactions)}
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )
+          <p>No transactions found</p>
         )}
       </CardContent>
     </Card>

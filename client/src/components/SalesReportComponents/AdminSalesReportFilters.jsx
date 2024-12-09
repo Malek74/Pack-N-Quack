@@ -58,12 +58,13 @@ export default function AdminSalesReportFilters({setReportFilters }) {
 
   return (
     !isLoading && (
-      <div className=" flex flex-col w-full gap-4">
+      <div className="flex w-full flex-col gap-4">
         <DateRangePickerV2
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
+          report
         />
 
         <AdminMultiselectProductsDropdown
