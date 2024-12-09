@@ -14,7 +14,7 @@ import jwt from "jsonwebtoken";
 import PromoCodes from "../models/promoCodesSchema.js";
 import Orders from "../models/orderSchema.js";
 import Bookings from "../models/bookingSchema.js";
-
+import mongoose from "mongoose";
 
 
 export const getAdmins = async (req, res) => {
@@ -558,7 +558,7 @@ export const getRevenue = async (req, res) => {
         }
     }
     if(productIDs){
-        newMatchStage['products.productID'] = { $in: productIDs };
+        newMatchStage['products.productID'] = { $in: productIDs.map(id => new mongoose.Types.ObjectId(id))};
     }
     console.log(newMatchStage);
             
@@ -609,7 +609,7 @@ export const getRevenue = async (req, res) => {
     // Sort the combined array by the 'date' field
     combinedRevenue.sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    return res.status(200).json(combinedRevenue);
+    return res.status(200).json(productIDs? dailyProductsRevenue: combinedRevenue);
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }
