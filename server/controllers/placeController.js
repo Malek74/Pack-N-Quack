@@ -276,8 +276,7 @@ export const FilterPlacesByTag = async (req, res) => {
 
 
 export const getMyPlaces = async (req, res) => {
-    const tgID = req.params.name
-    console.log(tgID)
+    const tgID = req.user._id;
     try {
         const conversionRate = await getConversionRate(req.query.currency || "USD");
 

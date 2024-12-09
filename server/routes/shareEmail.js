@@ -70,6 +70,47 @@ const shareMail = async (req, res) => {
     }
 };
 
+
+
+export const sendEventBookingNotification = async (userEmail, userName, eventName, eventDate, eventLocation, bookingLink) => {
+
+    try {
+
+        // Email content
+        const mailOptions = {
+            from: '"CaptainQuackers" <captainquackers@gmail.com>',
+            to: userEmail,
+            subject: `${eventName} is Now Open for Booking!`,
+            html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h1 style="text-align: center; color: #444;">📢 ${eventName} is Now Open for Booking!</h1>
+          <p>Hello ${userName},</p>
+          <p>We’re thrilled to announce that the event you’ve been waiting for, <strong>${eventName}</strong>, is now open for booking! 🎉</p>
+          <div style="margin-bottom: 20px;">
+              <p><strong>Date:</strong> ${eventDate}</p>
+              <p><strong>Location:</strong> ${eventLocation}</p>
+          </div>
+          <p>Seats are limited, so don’t wait too long to secure your spot.</p>
+          <p style="text-align: center;">
+              <a href="${bookingLink}" style="text-decoration: none; background-color: #007BFF; color: #ffffff; padding: 10px 20px; border-radius: 5px; font-size: 16px;">Book Now</a>
+          </p>
+          <p>We look forward to seeing you there!</p>
+          <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #777;">
+              <p>Need assistance? Contact us at support@yourorganization.com or call us at (123) 456-7890.</p>
+              <p>Thank you,<br>Your Organization</p>
+          </div>
+        </div>
+        `,
+        };
+
+        const result = await transporter.sendMail(mailOptions);
+        console.log('Event booking notification sent successfully:');
+    }
+    catch (error) {
+        console.error('Error sending email:', error);
+    }
+}
+
 router.post('/:id', shareMail);
 export default router;
 
