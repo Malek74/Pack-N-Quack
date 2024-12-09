@@ -63,7 +63,7 @@ export const getTourGuides = async (req, res) => {
 }
 
 export const getTourGuideById = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
@@ -213,7 +213,7 @@ export const deleteTourGuide = async (req, res) => {
 }
 
 export const getRevenue = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
     const itineraryId = req.query.itineraryId;
@@ -256,7 +256,7 @@ export const getRevenue = async (req, res) => {
 
         // If a specific activity is provided, add it to the activity query
         if (itineraryId) {
-            itineraryIds = itineraryId;
+            itineraryIds = itineraryId.split(',');
         }
 
 
@@ -266,11 +266,16 @@ export const getRevenue = async (req, res) => {
         };
 
         // Add date filtering if a specific date is provided
-        if (startDate && endDate) {
-            matchStage.date = {
-                $gte: new Date(startDate),
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
-            };
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
         }
 
         console.log(matchStage);    
@@ -296,7 +301,7 @@ export const getRevenue = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    Date: "$_id.creationDay",
+                    date: "$_id.creationDay",
                     revenue: { $multiply: ["$totalPrice", 0.9] }
                 }
             },
@@ -318,7 +323,7 @@ export const getRevenue = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    activitiesRevenue: { $multiply: ["$totalPrice", 0.9] }
+                    itinerariesRevenue: { $multiply: ["$totalPrice", 0.9] }
                 }
             },
         ]);
@@ -329,19 +334,20 @@ export const getRevenue = async (req, res) => {
             {
                 $match: matchStage 
             },
-            {
-                $group: {
-                    _id: {
-                        itineraryID: "$itineraryID",
-                    },
-                    count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" } 
-                }
-            },
+            // {
+            //     $group: {
+            //         _id: {
+            //             itineraryID: "$itineraryID",
+            //         },
+            //         count: { $sum: 1 },
+            //         totalPrice: { $sum: "$price" },
+            //         numofTickets: { $sum: "$numOfTickets" } 
+            //     }
+            // },
             {
                 $lookup: {
                     from: 'itineraries',
-                    localField: '_id.itineraryID',
+                    localField: 'itineraryID',
                     foreignField: '_id',
                     as: 'activityDetails'
                 }
@@ -353,14 +359,16 @@ export const getRevenue = async (req, res) => {
                 $project: {
                     _id: 0,
                     title: '$activityDetails.name',
-                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$count"
+                    // revenue: { $multiply: ["$totalPrice", 0.9] }, 
+                    price: 1,
+                    numOfTickets: 1,
+                    date: 1
                 }
             },
 
         ]);
 
-        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0] || {itinerariesRevenue: 0}, totalBookings: {itinerariesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
     
     } catch (error) {
         res.status(404).json({ message: error.message });

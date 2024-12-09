@@ -141,7 +141,8 @@ export const acceptTerms = async (req, res) => {
 }
 
 export const getBookingCount = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
+    // const id = req.params.id;
     const  startDate = req.query.startDate;
     const  endDate = req.query.endDate || new Date();
     const activityId = req.query.activityId;
@@ -183,7 +184,7 @@ export const getBookingCount = async (req, res) => {
 
         // If a specific activity is provided, add it to the activity query
         if (activityId) {
-            activityIds = [activityId];
+            activityIds = activityId.split(',');
         }
 
 
@@ -193,11 +194,16 @@ export const getBookingCount = async (req, res) => {
         };
 
         // Add date filtering if a specific date is provided
-        if (startDate && endDate) {
-            matchStage.date = {
-                $gte: new Date(startDate),
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1))
-            };
+        if(startDate){
+            if(new Date(startDate) < new Date(endDate)){
+                if(new Date(endDate) <= new Date()){
+                    matchStage.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                    console.log(matchStage.date);
+                }
+                else{
+                    res.status(403).json({ message: "End date cannot be later than today's date" });
+                }
+            }
         }
 
         // console.log(matchStage);    
@@ -223,8 +229,9 @@ export const getBookingCount = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    Date: "$_id.creationDay",
+                    date: "$_id.creationDay",
                     revenue: { $multiply: ["$totalPrice", 0.9] }
+
                 }
             },
             {
@@ -252,44 +259,37 @@ export const getBookingCount = async (req, res) => {
 
         const totalBookings = await Booking.countDocuments(matchStage);
 
-        const revenueAndBookingsPerEvent = await Booking.aggregate([
+        const bookingsWithActivityDetails = await Booking.aggregate([
             {
-                $match: matchStage 
-            },
-            {
-                $group: {
-                    _id: {
-                        activityID: "$activityID",
-                    },
-                    count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" } 
-                }
+                $match: matchStage // Filter bookings based on conditions in matchStage
             },
             {
                 $lookup: {
-                    from: 'activities',
-                    localField: '_id.activityID',
-                    foreignField: '_id',
-                    as: 'activityDetails'
+                    from: "activities", // Reference the activities collection
+                    localField: "activityID", // Field in bookings to match
+                    foreignField: "_id", // Field in activities to match
+                    as: "activityDetails" // Alias for the joined data
                 }
             },
             {
-                $unwind: '$activityDetails' // Deconstructs the array created by $lookup
+                $unwind: "$activityDetails" // Unwind the activity details array
             },
             {
                 $project: {
-                    _id: 0,
-                    title: '$activityDetails.name',
-                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$count"
+                    // _id: 1, // Keep the booking ID
+                    price: 1, // Include the price of the booking
+                    numOfTickets: 1, // Include the number of tickets (if needed)
+                    activityName: "$activityDetails.name", // Include the activity name
+                    date: 1 // Include the booking date (optional)
                 }
             },
             {
-                $sort: { creationDay: 1 }
+                $sort: { date: 1 } // Optional: Sort by booking date
             }
         ]);
+        
 
-        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: bookingsWithActivityDetails});
     
     } catch (error) {
         res.status(404).json({ message: error.message });

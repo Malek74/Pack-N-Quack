@@ -14,6 +14,6 @@ router.put("/:id", updateSellerInfo);
 router.get('/:id', getSellerByID);
 router.delete('/:id', deleteSeller);
 router.put('/terms/:id', acceptTerms);
-router.get("/testing/:id", getRevenue);
+router.get("/revenue/reports", protect,getRevenue);
 
 export default router;

@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { protect } from "../middleware/authenticator.js";
 import { getComplaints, viewComplaintById, markComplaintPending, markComplaintResolved, viewComplaints } from "../controllers/complaintController.js";
 import { getDeleteRequests, handleDeleteRequest } from "../controllers/deleteRequestsController.js";
+import { getRevenue } from "../controllers/adminsController.js";
 
 const router = express.Router();
 config();
@@ -32,6 +33,8 @@ router.put("/complaints/resolved/:id", markComplaintResolved);
 router.post("/createPromocode", adminCreatePromoCode);
 router.get("/promocodes", getAllPromoCodes);
 router.delete("/promocodes/:id", deletePromoCode);
+
+router.get("/adminRevenue",getRevenue);
 
 export default router;
 
