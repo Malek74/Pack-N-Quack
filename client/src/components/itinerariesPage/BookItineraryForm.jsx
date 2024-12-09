@@ -73,9 +73,8 @@ export default function BookItineraryForm({
 
     getWalletBalance();
   }, [prefCurrency]);
-  const onSubmit = async (values) => {
-    console.log(values);
 
+  const onSubmit = async (values) => {
     try {
       const response = await axios.post("/api/booking/bookEvent", {
         eventID: itineraryId,
@@ -102,7 +101,10 @@ export default function BookItineraryForm({
   };
 
   return (
-    <div className="max-w-md p-6 bg-white rounded-lg">
+    <div
+      className="max-h-[80vh] overflow-y-auto p-4 bg-white rounded-lg shadow-md"
+      style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 #e5e7eb" }} // Optional for custom scrollbar styling
+    >
       <div className="flex justify-between mb-2">
         <Label className="text-lg font-medium text-gray-700">
           Your Wallet Balance:
@@ -179,6 +181,7 @@ export default function BookItineraryForm({
               </FormItem>
             )}
           />
+
           <div className="flex flex-col gap-2">
             <Label className="text-lg font-medium text-gray-700">
               Promo Code
@@ -192,6 +195,7 @@ export default function BookItineraryForm({
               className="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+
           {/* Payment Options */}
           <PaymentOptions
             selectedOption={selectedPaymentMethod}
@@ -201,14 +205,13 @@ export default function BookItineraryForm({
           {/* Total Price Label */}
           {selectedDate && (
             <Label className="mt-4 block text-gray-800 font-semibold text-2xl text-center">
-              {`Your Total will be ${
-                selectedPaymentMethod === "card"
-                  ? price * form.getValues("numOfTickets")
-                  : Math.max(
-                      price * form.getValues("numOfTickets") - walletBalance,
-                      0
-                    )
-              } ${prefCurrency}`}
+              {`Your Total will be ${selectedPaymentMethod === "card"
+                ? price * form.getValues("numOfTickets")
+                : Math.max(
+                  price * form.getValues("numOfTickets") - walletBalance,
+                  0
+                )
+                } ${prefCurrency}`}
             </Label>
           )}
 
@@ -229,3 +232,4 @@ export default function BookItineraryForm({
     </div>
   );
 }
+

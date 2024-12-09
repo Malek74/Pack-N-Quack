@@ -265,11 +265,7 @@ export default function Activities() {
             {" "}
             <DatePickerWithRange onDateChange={handleDateChange} />
           </span>
-          <span>
-            <Button onClick={() => console.log(searchTerm)} className="">
-              Submit Filters
-            </Button>
-          </span>
+
           {/* <span className="ml-auto mr-18"><SearchComponent></SearchComponent></span> */}
         </div>
       )}
