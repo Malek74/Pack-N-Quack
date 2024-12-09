@@ -7,6 +7,8 @@ import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import DeleteButton from "../shared/DeleteButton";
+
 BookedItineraryCard.propTypes = {
   id: PropTypes.string,
   name: PropTypes.string,
@@ -77,12 +79,7 @@ export default function BookedItineraryCard({
     onCancel();
   };
   return (
-    <Card
-      className={cardClassName}
-      onClick={() => {
-        navigate(`/itinerariesTourists/${id}`);
-      }}
-    >
+    <Card className={cardClassName}>
       <img
         src={
           coverImage ||
@@ -95,15 +92,17 @@ export default function BookedItineraryCard({
           <div className="flex justify-between">
             <Label className="text-lg font-semibold">{name}</Label>
             {!past && (
-              <Button
+              <DeleteButton
                 className="text-md bg-red-500 text-white hover:bg-red-600 hover:text-white"
-                onClick={(e) => {
+                title="Are you sure you want to cancel this booking?"
+                description="This action cannot be undone. This will permanently delete the booking forever."
+                onConfirm={(e) => {
                   e.stopPropagation();
                   handleCancelBooking();
                 }}
               >
                 Cancel Booking
-              </Button>
+              </DeleteButton>
             )}
           </div>
           <p className="text-sm text-neutral-400 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
