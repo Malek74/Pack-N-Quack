@@ -434,7 +434,7 @@ export const deletePromoCode = async (req, res) => {
 export const getRevenue = async (req, res) => {
     const startDate = req.query.startDate;
     const endDate = req.query.endDate || new Date();
-    const productIDs = req.query.productIDs;
+    const productIDs = req.query.selectedProducts;
     try{
 
         const matchStage = {
@@ -543,17 +543,33 @@ export const getRevenue = async (req, res) => {
         }
     ]);
 
-    if(productIDs){
-        matchStage['products.productID'] = { $in: productIDs };
+
+    
+    const newMatchStage = {
+        orderDate: { $lte : new Date() },
     }
+    if(startDate){
+        if(new Date(startDate) < new Date(endDate)){
+            if(new Date(endDate) <= new Date()){
+                newMatchStage.orderDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+                console.log(newMatchStage.orderDate);
+            }
+        }
+    }
+    if(productIDs){
+        newMatchStage['products.productID'] = { $in: productIDs };
+    }
+            
 
     const dailyProductsRevenue = await Orders.aggregate([
+        // Unwind the products array
         {
-            $match: matchStage
+            $unwind: "$products"
         },
         {
-            $unwind: "$products" // Unwind the products array   
+            $match : newMatchStage
         },
+        // Lookup product details from the products collection
         {
             $lookup: {
                 from: "products", // Name of the products collection
@@ -562,43 +578,29 @@ export const getRevenue = async (req, res) => {
                 as: "productDetails" // Alias for the joined data
             }
         },
+        // Unwind the joined product details
         {
-            $unwind: "$productDetails" // Unwind the joined product details
+            $unwind: "$productDetails"
         },
-        {
-            
-            $group: {
-                _id: {
-                    creationDay: {
-                        $dateToString: { 
-                            format: "%Y-%m-%d", 
-                            date: "$orderDate" // Group by the order date
-                        }
-                    },
-                    productID: "$products.productID"
-                },
-                totalPrice: {
-                    $sum: {
-                        $multiply: ["$products.quantity", "$productDetails.price"] // Calculate total revenue for each product
-                    }
-                },
-                productName: { $first: "$productDetails.name" }
-            }
-        },
+        // Project the revenue calculation and retain necessary fields
         {
             $project: {
-                _id: 0,
-                title: "$productName",
-                type: "Product",
-                // productId: "$_id.productID",
-                date: "$_id.creationDay",
-                revenue: { $multiply: ["$totalPrice", 0.1] }, // Apply 90% revenue calculation
+                _id: 0, // Keep the order ID
+                orderDate: 1, // Keep the order date
+                type: "Product", // Type of the product
+                productName: "$productDetails.name", // Name of the product
+                quantity: "$products.quantity", // Quantity of the product in the order
+                revenue: { $multiply: ["$products.quantity", "$productDetails.price", 0.1] } // Revenue per product in the order
             }
         },
+        // Optionally sort by orderDate
         {
-            $sort: { Date: 1 } // Sort by date
+            $sort: { orderDate: 1 }
         }
     ]);
+    
+    // console.log(salesAndRevenuePerOrder);
+    
 
     const combinedRevenue = [...dailyProductsRevenue, ...dailyActivityRevenue, ...dailyItenararyRevenue];
 

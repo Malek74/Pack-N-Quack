@@ -848,6 +848,9 @@ export const checkoutOrder = async (req, res) => {
             return res.status(404).json({ message: "Tourist not found" });
         }
         const cart = (await Tourist.findById(id)).cart;
+        if(cart.length === 0){
+            return res.status(400).json({ message: "Cart is empty" });
+        }
         console.log(cart);
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         let totalAmount = 0;
@@ -855,8 +858,51 @@ export const checkoutOrder = async (req, res) => {
             totalAmount += (await productModel.findById(cart[i].productID)).price * cart[i].quantity;
 
         }
-        console.log(totalAmount);
+        console.log("total amount",totalAmount);
         let amountLeftToPay = totalAmount;
+        let amountToPay = totalAmount;
+        let promo;
+        if (promocode) {
+            promo = await PromoCodes.findOne({ code: promocode });
+            console.log("promocode: ",promo);
+
+            if (!promo) {
+                res.status(400).send("Promocode does not exist");
+            }
+
+            if (!promo.isActive) {
+                res.status(400).send("Promocode has already been used");
+            }
+
+            if(!promo.isBirthDay){  
+                console.log("Not birthday promo");
+            //update amount to be paid
+            amountToPay -= amountToPay * (promo.discount / 100);
+            console.log("amount to pay", amountToPay);
+            }
+
+            //check if it's his birthday promo
+            if (promo.code == tourist.promoCode.code) {
+                //today is birthday
+                const today = new Date();
+                const birthDate = new Date(tourist.dob);
+                const lastUsed = new Date(tourist.promoCode.lastUsed);
+
+                if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
+                    return res.status(400).json({ message: "Promocode has already been used" });
+                }
+
+                if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
+                    return res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                }
+                amountToPay -= amountToPay * (promo.discount / 100);
+                await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+
+            }
+            else {
+                await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
+            }
+        }
         if (paymentMethod === "card") {
             console.log("payment card");
             for (const item of cart) {
@@ -865,14 +911,13 @@ export const checkoutOrder = async (req, res) => {
                 const price = await stripe.prices.create({
                     currency: 'usd',
                     product: product.stripeID,
-                    unit_amount: amountLeftToPay * 100,
+                    unit_amount: promo ? parseInt(product.price * (1 - promo.discount / 100) * 100) : parseInt(product.price * 100),
                 });
                 prices.push({ price: price.id, quantity: item.quantity });
             }
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: prices,
-                discounts: [{ coupon: promocode }],
                 mode: 'payment',
                 success_url: success_url,
             });
@@ -887,42 +932,7 @@ export const checkoutOrder = async (req, res) => {
         } else {
             console.log("da5al else")
             if (tourist.wallet < totalAmount) {
-                let amountToPay = totalAmount;
-                let promo;
-                if (promocode) {
-                    promo = await PromoCodes.findOne({ code: promocode });
 
-                    if (!promo) {
-                        res.status(400).send("Promocode does not exist");
-                    }
-
-                    if (!promo.isActive) {
-                        res.status(400).send("Promocode has already been used");
-                    }
-
-                    //update amount to be paid
-                    amountToPay -= amountToPay * (promo.discount / 100);
-
-                    //check if it's his birthday promo
-                    if (promo.code == tourist.promoCode.code) {
-                        //today is birthday
-                        const today = new Date();
-                        const birthDate = new Date(tourist.dob);
-                        const lastUsed = new Date(tourist.promoCode.lastUsed);
-
-                        if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
-                            res.status(400).json({ message: "Promocode has already been used" });
-                        }
-
-                        if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
-                            res.status(400).json({ message: "Promocode can be used only on your birthday" });
-                        }
-                    }
-                    else {
-                        await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
-
-                    }
-                }
                 if (payByWallet) {
                     let walletAmount
                     if (amountToPay > tourist.wallet) {
@@ -930,11 +940,11 @@ export const checkoutOrder = async (req, res) => {
                         walletAmount = tourist.wallet;
                         if (amountLeftToPay !== 0) {
                             //create price to be paid after deducting wallet amount  
-                            const stripeId = await productModel.findById(cart[0].productID).stripeID;
+                            const Product = await productModel.findById(cart[0].productID);
                             const price = await stripe.prices.create({
                                 currency: 'usd',
-                                product: stripeId,
-                                unit_amount: amountLeftToPay * 100,
+                                product: Product.stripeID,
+                                unit_amount: promo ? parseInt(Product.price * (1 - promo.discount / 100) * 100) : parseInt(Product.price * 100),
                             });
 
                             const session = await stripe.checkout.sessions.create({

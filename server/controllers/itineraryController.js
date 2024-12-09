@@ -274,7 +274,7 @@ export const getAdminItineraries = async (req, res) => {
 //@desc get all itineraries
 //@route GET api/itinerary
 export const getMyItineraries = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     const currency = req.query.currency
     let conversionRate = 0;

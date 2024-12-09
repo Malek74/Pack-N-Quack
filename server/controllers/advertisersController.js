@@ -262,45 +262,37 @@ export const getBookingCount = async (req, res) => {
 
         const totalBookings = await Booking.countDocuments(matchStage);
 
-        const revenueAndBookingsPerEvent = await Booking.aggregate([
+        const bookingsWithActivityDetails = await Booking.aggregate([
             {
-                $match: matchStage 
-            },
-            {
-                $group: {
-                    _id: {
-                        activityID: "$activityID",
-                    },
-                    count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" },
-                    numberOfTickets: { $sum: "$numOfTickets"} 
-                }
+                $match: matchStage // Filter bookings based on conditions in matchStage
             },
             {
                 $lookup: {
-                    from: 'activities',
-                    localField: '_id.activityID',
-                    foreignField: '_id',
-                    as: 'activityDetails'
+                    from: "activities", // Reference the activities collection
+                    localField: "activityID", // Field in bookings to match
+                    foreignField: "_id", // Field in activities to match
+                    as: "activityDetails" // Alias for the joined data
                 }
             },
             {
-                $unwind: '$activityDetails' // Deconstructs the array created by $lookup
+                $unwind: "$activityDetails" // Unwind the activity details array
             },
             {
                 $project: {
-                    _id: 0,
-                    title: '$activityDetails.name',
-                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$numberOfTickets"
+                    // _id: 1, // Keep the booking ID
+                    price: 1, // Include the price of the booking
+                    numOfTickets: 1, // Include the number of tickets (if needed)
+                    activityName: "$activityDetails.name", // Include the activity name
+                    date: 1 // Include the booking date (optional)
                 }
             },
             {
-                $sort: { creationDay: 1 }
+                $sort: { date: 1 } // Optional: Sort by booking date
             }
         ]);
+        
 
-        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: bookingsWithActivityDetails});
     
     } catch (error) {
         res.status(404).json({ message: error.message });

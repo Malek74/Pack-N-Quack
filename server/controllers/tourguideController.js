@@ -63,7 +63,7 @@ export const getTourGuides = async (req, res) => {
 }
 
 export const getTourGuideById = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user._id;
     console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Tour Guide ID is required." });
@@ -301,7 +301,7 @@ export const getRevenue = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    Date: "$_id.creationDay",
+                    date: "$_id.creationDay",
                     revenue: { $multiply: ["$totalPrice", 0.9] }
                 }
             },
@@ -323,7 +323,7 @@ export const getRevenue = async (req, res) => {
             {
                 $project: {
                     _id: 0,
-                    activitiesRevenue: { $multiply: ["$totalPrice", 0.9] }
+                    itinerariesRevenue: { $multiply: ["$totalPrice", 0.9] }
                 }
             },
         ]);
@@ -334,20 +334,20 @@ export const getRevenue = async (req, res) => {
             {
                 $match: matchStage 
             },
-            {
-                $group: {
-                    _id: {
-                        itineraryID: "$itineraryID",
-                    },
-                    count: { $sum: 1 },
-                    totalPrice: { $sum: "$price" },
-                    numofTickets: { $sum: "$numOfTickets" } 
-                }
-            },
+            // {
+            //     $group: {
+            //         _id: {
+            //             itineraryID: "$itineraryID",
+            //         },
+            //         count: { $sum: 1 },
+            //         totalPrice: { $sum: "$price" },
+            //         numofTickets: { $sum: "$numOfTickets" } 
+            //     }
+            // },
             {
                 $lookup: {
                     from: 'itineraries',
-                    localField: '_id.itineraryID',
+                    localField: 'itineraryID',
                     foreignField: '_id',
                     as: 'activityDetails'
                 }
@@ -359,14 +359,16 @@ export const getRevenue = async (req, res) => {
                 $project: {
                     _id: 0,
                     title: '$activityDetails.name',
-                    revenue: { $multiply: ["$totalPrice", 0.9] }, 
-                    bookings: "$numofTickets"
+                    // revenue: { $multiply: ["$totalPrice", 0.9] }, 
+                    price: 1,
+                    numOfTickets: 1,
+                    date: 1
                 }
             },
 
         ]);
 
-        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0], totalBookings: {activitiesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
+        res.status(200).json({revenuePerDay: revenuePerDay, totalRevenue: totalRevenue[0] || {itinerariesRevenue: 0}, totalBookings: {itinerariesBookings: totalBookings}, revenueAndBookingsPerEvent: revenueAndBookingsPerEvent});
     
     } catch (error) {
         res.status(404).json({ message: error.message });

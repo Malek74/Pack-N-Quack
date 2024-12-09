@@ -13,7 +13,7 @@ const router = express.Router();
 router.get("/allTourGuides", getTourGuides);
 router.post("/", createTourGuide);
 router.put("/:id", editTourGuide);
-router.get('/:id', getTourGuideById);
+router.get('/', protect,getTourGuideById);
 router.delete('/:id', deleteTourGuide);
 router.post('/rate/:id', rateTourGuide);
 router.put('/terms/:id', acceptTerms);
@@ -23,6 +23,6 @@ router.get('/', protect, getTourGuideById);
 router.delete('/', protect, deleteTourGuide);
 router.post('/rate/:id', protect, rateTourGuide);
 router.put('/terms/', protect, acceptTerms);
-router.get("/testing",protect, getRevenue);
+router.get("/revenue/reports",protect, getRevenue);
 
 export default router;
