@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import PropTypes from "prop-types";
@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { AlertDialogAction, AlertDialogCancel } from "../ui/alert-dialog";
 import { Label } from "../ui/label";
 import { useUser } from "@/context/UserContext";
+import PaymentOptions from "../shared/PaymentOptions";
 
 BookItineraryForm.propTypes = {
   itineraryId: PropTypes.string,
@@ -52,23 +53,38 @@ export default function BookItineraryForm({
     },
   });
   const [selectedDate, setSelectedDate] = useState("");
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [promoCode, setPromoCode] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
   const { toast } = useToast();
   const { prefCurrency } = useUser();
 
+  useEffect(() => {
+    const getWalletBalance = async () => {
+      try {
+        const response = await axios.get(
+          `/api/tourist/walletBalance?currency=${prefCurrency}`
+        );
+        setWalletBalance(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getWalletBalance();
+  }, [prefCurrency]);
   const onSubmit = async (values) => {
     console.log(values);
 
     try {
-      const response = await axios.post(
-        "/api/booking/bookEvent/6725442e98359339d8b821f0",
-        {
-          eventID: itineraryId,
-          eventType: "itinerary",
-          numOfTickets: values.numOfTickets,
-          dateSelected: values.dateSelected,
-          payByWallet: false,
-        }
-      );
+      const response = await axios.post("/api/booking/bookEvent", {
+        eventID: itineraryId,
+        eventType: "itinerary",
+        numOfTickets: values.numOfTickets,
+        dateSelected: values.dateSelected,
+        promoCode: promoCode,
+        payByWallet: !(selectedPaymentMethod === "card"),
+      });
       window.location.href = response.data.url;
       toast({
         variant: "success",
@@ -84,82 +100,132 @@ export default function BookItineraryForm({
       });
     }
   };
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4">
-            <FormField
-              control={form.control}
-              name="dateSelected"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date</FormLabel>
-                  <FormControl>
-                    <Select
-                      {...field}
-                      value={selectedDate}
-                      onValueChange={(value) => {
-                        setSelectedDate(value);
-                        form.setValue("dateSelected", value);
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select a date" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Available Dates</SelectLabel>
-                          {available_dates.map((date, index) => (
-                            <SelectItem key={index} value={date}>
-                              {format(date, "PPP")}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="numOfTickets"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Tickets</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="Enter the number of tickets"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {selectedDate && (
-              <Label>{`Your Total will be ${
-                price * form.getValues("numOfTickets")
-              } ${prefCurrency}`}</Label>
+    <div className="max-w-md p-6 bg-white rounded-lg">
+      <div className="flex justify-between mb-2">
+        <Label className="text-lg font-medium text-gray-700">
+          Your Wallet Balance:
+        </Label>
+        <Label className="text-lg font-medium text-gray-700">
+          {walletBalance} {prefCurrency}
+        </Label>
+      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Date Selection Field */}
+          <FormField
+            control={form.control}
+            name="dateSelected"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-medium text-gray-700">
+                  Date
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    {...field}
+                    value={selectedDate}
+                    onValueChange={(value) => {
+                      setSelectedDate(value);
+                      form.setValue("dateSelected", value);
+                    }}
+                  >
+                    <SelectTrigger className="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                      <SelectValue placeholder="Select a date" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 rounded-md shadow-lg">
+                      <SelectGroup>
+                        <SelectLabel className="px-4 py-2 text-sm text-gray-500">
+                          Available Dates
+                        </SelectLabel>
+                        {available_dates.map((date, index) => (
+                          <SelectItem
+                            key={index}
+                            value={date}
+                            className="px-4 py-2 hover:bg-blue-50"
+                          >
+                            {format(new Date(date), "PPP")}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage className="text-red-500 text-sm mt-1" />
+              </FormItem>
             )}
-            <div className="flex justify-between">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-gold hover:bg-goldhover"
-                onClick={() => onSubmit(form.getValues())}
-              >
-                Book
-              </AlertDialogAction>
-            </div>
+          />
+
+          {/* Number of Tickets Field */}
+          <FormField
+            control={form.control}
+            name="numOfTickets"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-medium text-gray-700">
+                  Number of Tickets
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    placeholder="Enter the number of tickets"
+                    {...field}
+                    className="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 text-sm mt-1" />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-col gap-2">
+            <Label className="text-lg font-medium text-gray-700">
+              Promo Code
+            </Label>
+            <Input
+              type="text"
+              placeholder="If you have a promo code, enter it here"
+              onValueChange={(value) => {
+                setPromoCode(value);
+              }}
+              className="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-        </div>
-      </form>
-    </Form>
+          {/* Payment Options */}
+          <PaymentOptions
+            selectedOption={selectedPaymentMethod}
+            setSelectedOption={setSelectedPaymentMethod}
+          />
+
+          {/* Total Price Label */}
+          {selectedDate && (
+            <Label className="mt-4 block text-gray-800 font-semibold text-2xl text-center">
+              {`Your Total will be ${
+                selectedPaymentMethod === "card"
+                  ? price * form.getValues("numOfTickets")
+                  : Math.max(
+                      price * form.getValues("numOfTickets") - walletBalance,
+                      0
+                    )
+              } ${prefCurrency}`}
+            </Label>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-between mt-6">
+            <AlertDialogCancel className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              type="submit"
+              className="px-4 py-2 bg-gold text-white rounded-md hover:bg-goldhover focus:outline-none focus:ring-2 focus:ring-gold"
+            >
+              Book
+            </AlertDialogAction>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

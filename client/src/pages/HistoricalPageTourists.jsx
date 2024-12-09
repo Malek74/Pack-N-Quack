@@ -5,11 +5,14 @@ import Banner from "@/components/shared/BannerV2";
 import SearchBar from "@/components/shared/SearchBar";
 import EditTag from "@/components/historicalPage/SelectTag";
 import axios from "axios";
+
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/shared/Loading";
+
+import GuideButton from "@/components/guideComponents/popMessage";
 
 export default function Historical() {
   const [filteredTags, setFilteredTags] = useState([]);
@@ -78,7 +81,10 @@ export default function Historical() {
             googlemaps={place.googleMapLink}
           />
         ))}
-      </div>
+
+      </grid>
+      <GuideButton guideMessage={"Select a historical place and embark on your adventure!"} />
+
     </div>
   );
 }
