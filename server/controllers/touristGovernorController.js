@@ -45,7 +45,7 @@ export const getTouristGovernor = async (req, res) => {
 
 export const getAllTouristGovernor = async (req, res) => {
     try {
-        const touristGovernor = await touristGoverner.findById(req.user._id);
+        const touristGovernor = await touristGoverner.find({});
         console.log(touristGovernor)
         res.status(200).json(touristGovernor);
     } catch (error) {
