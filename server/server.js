@@ -151,7 +151,7 @@ cron.schedule("50 12 * * *", () => {
 });
 
 //schedule the function to run every 20 minutes
-// cron.schedule("*/20 * * * *", () => {
-//     console.log("Running task every 20 minutes...");
-//     updateOrderStatus();
-// });
+cron.schedule("*/20 * * * *", () => {
+    console.log("Running task every 20 minutes...");
+    updateOrderStatus();
+});
