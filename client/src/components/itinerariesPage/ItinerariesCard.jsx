@@ -3,8 +3,10 @@ import { Card } from "../ui/card";
 import { Label } from "../ui/label";
 import { Rating } from "../shared/Rating";
 import { useNavigate } from "react-router-dom";
-import { Activity, FlagOff } from "lucide-react";
+import { Activity, FlagOff, Bookmark } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useState } from "react";
+import axios from "axios";
 
 ItinerariesCard.propTypes = {
   id: PropTypes.string,
@@ -47,7 +49,23 @@ export default function ItinerariesCard({
     : "rounded-lg rounded-b-none h-[300px] w-full object-fill";
 
   const { prefCurrency } = useUser();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const handleBookmark = async (e) => {
+    e.stopPropagation();
+    console.log("Bookmark clicked");
+    setIsBookmarked(!isBookmarked);
 
+    try {
+      const response = await axios.post("/api/tourist/save", {
+        eventID: id,
+        bookmark: !isBookmarked,
+        eventType: "itinerary",
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <Card
       //  className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[450px] "
@@ -69,7 +87,16 @@ export default function ItinerariesCard({
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
             <Label className="text-lg font-semibold">{name}</Label>
+
             <div className="flex gap-2">
+              {touristClicked && (
+                <Bookmark
+                  fill={isBookmarked ? "gold" : "white"}
+                  size={36}
+                  className="text-gold hover:text-goldhover"
+                  onClick={(e) => handleBookmark(e)}
+                />
+              )}
               {isFlagged && (
                 <FlagOff
                   size={36}
@@ -104,8 +131,8 @@ export default function ItinerariesCard({
               </Label>
             ))}
           </div>
-        </div >
-      </div >
-    </Card >
+        </div>
+      </div>
+    </Card>
   );
 }

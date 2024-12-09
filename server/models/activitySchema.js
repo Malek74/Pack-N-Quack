@@ -116,6 +116,12 @@ const activitySchema = new Schema({
         required: true,
         default: false,
     },
+
+    subscribers: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Tourist',
+        default: []
+    }
 })
 
 const activityModel = model("Activity", activitySchema);

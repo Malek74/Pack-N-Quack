@@ -24,7 +24,7 @@ export default function RateComment({ title, form }) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[50vh] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Rate {title}</DialogTitle>
           <DialogDescription>

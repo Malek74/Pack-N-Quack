@@ -9,14 +9,36 @@ import { Rating } from "../shared/Rating";
 import { Label } from "../ui/label";
 //import Activity from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { Bookmark } from "lucide-react";
+import { useState } from "react";
+import axios from "axios";
 export default function ActivityCard(props) {
   const navigate = useNavigate();
   const { prefCurrency } = useUser();
+  const { userId, userType } = useUser();
   const date = new Date(props.time);
   const openActivityPage = () => {
     console.log(props.activityID);
     console.log(props.booking);
     navigate(`/activity/${props.activityID}`);
+  };
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const handleBookmark = async (e, id) => {
+    e.stopPropagation();
+    console.log("Bookmark clicked");
+    setIsBookmarked(!isBookmarked);
+
+    try {
+      const response = await axios.post("/api/tourist/save", {
+        eventID: id,
+        bookmark: !isBookmarked,
+        eventType: "activity",
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div
@@ -25,20 +47,16 @@ export default function ActivityCard(props) {
         props.booking && openActivityPage();
       }}
     >
-      <img
-        className=" rounded-lg rounded-b-none h-[300px] w-full object-fill"
-        src={props.img}
-      />
-      <div className="flex place-content-end ">
+      <div className="flex place-content-end  ">
         {props.notTourist && (
           <>
             <Button
               onClick={() => props.deleteActivityFunction(props.activityID)}
-              className="w-14 absolute bg-transparent "
+              className="w-14 absolute bg-transparent text-red-700 hover:bg-red-700 hover:text-white"
             >
               <Trash2 />
             </Button>
-            <Button className="w-14 mx-10 absolute bg-transparent ">
+            <Button className="w-14 mx-10 absolute bg-transparent hover:bg-black hover:text-white ">
               <ActivityEditForm
                 type="act"
                 name={props.name}
@@ -60,9 +78,14 @@ export default function ActivityCard(props) {
           </>
         )}
       </div>
+      <img
+        className=" rounded-lg rounded-b-none h-[300px] w-full object-fill"
+        src={props.img}
+      />
+
       <div className="p-4">
         <div className="flex flex-col gap-2">
-          <h1 className=" flex">
+          <h1 className=" flex items-center">
             {" "}
             <span className="font-semibold text-xl mr-auto">{props.name} </span>
             {/* {!props.booking && (
@@ -72,7 +95,14 @@ export default function ActivityCard(props) {
               />
             )} */}
             <span className="text-gold drop-shadow">{props.category}</span>
+            {userType == "Tourist" && <Bookmark
+              fill={isBookmarked ? "gold" : "white"}
+              size={36}
+              className="text-gold hover:text-goldhover ml-4"
+              onClick={(e) => handleBookmark(e, props.activityID)}
+            />}
           </h1>
+
           <p className="text-base">
             {date.toDateString() + " " + date.toLocaleTimeString()}
           </p>
@@ -124,6 +154,6 @@ export default function ActivityCard(props) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

@@ -213,7 +213,7 @@ export default function RateForm(props) {
                 {/* Center the RatingInput component */}
                 <div className="flex justify-center">
                   <RatingInput
-                    size="xl"
+                    size="medium"
                     initialRating={rating}
                     onRatingChange={handleRatingChange}
                   />
@@ -225,14 +225,13 @@ export default function RateForm(props) {
         />
         {/* Submit Button */}
         <DialogClose>
-        <Button
-          type="submit"
-          className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white"
-        >
-          Submit
-        </Button>
+          <Button
+            type="submit"
+            className="place-self-end bg-gold hover:bg-goldhover text-white hover:text-white"
+          >
+            Submit
+          </Button>
         </DialogClose>
-
       </form>
     </Form>
   );

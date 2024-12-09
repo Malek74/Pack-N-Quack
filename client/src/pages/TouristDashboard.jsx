@@ -9,9 +9,14 @@ import {
   Angry,
   Plane,
   ChartNoAxesCombined,
+  Gem,
+  MapPinHouse,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useUser } from "@/context/UserContext";
+import GuideButton from "@/components/guideComponents/popMessage";
+
 export default function TouristDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState();
@@ -59,14 +64,31 @@ export default function TouristDashboard() {
       icon: Gift,
       path: "rewards",
     },
+
+    {
+      label: "Bookmarked",
+      icon: Package,
+      path: "bookmarked",
+    },
+
+    {
+      label: "Promo codes",
+      icon: Gem,
+      path: "promo-codes",
+    },
+    {
+      label: "Transactions",
+      icon: Gift,
+      path: "transactions",
+    },
     {
       label: "Activity Bookings",
-      icon: Plane,
+      icon: Calendar,
       path: "activitiy-bookings",
     },
     {
       label: "Itinerary Bookings",
-      icon: Plane,
+      icon: Calendar,
       path: "itinerary-bookings",
     },
     {
@@ -75,17 +97,17 @@ export default function TouristDashboard() {
       path: "booked",
     },
     {
-      label: "Tour Guides",
+      label: "Rate Tour Guides",
       icon: UserRoundPen,
       path: "tour-guides",
     },
     {
-      label: "Itineraries made",
+      label: "Rate Itineraries attended",
       icon: UserRoundPlus,
       path: "itineraries-made",
     },
     {
-      label: "Event/Activity attended",
+      label: "Rate Event/Activity attended",
       icon: UserRoundPlus,
       path: "activity-attended",
     },
@@ -98,6 +120,11 @@ export default function TouristDashboard() {
       label: "Complaints",
       icon: Angry,
       path: "complaints",
+    },
+    {
+      label: "Addresses",
+      icon: MapPinHouse,
+      path: "addresses",
     },
   ];
   const handleSectionChange = (section, path) => {
@@ -166,6 +193,8 @@ export default function TouristDashboard() {
             <Outlet />
           </div>
         </div>
+
+        <GuideButton guideMessage={"Navigating the webiste"} />
       </div>
     );
   }

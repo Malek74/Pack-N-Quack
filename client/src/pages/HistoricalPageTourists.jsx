@@ -6,6 +6,14 @@ import SearchBar from "@/components/shared/SearchBar";
 import EditTag from "@/components/historicalPage/SelectTag";
 import axios from "axios";
 
+import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
+import { Input } from "@/components/ui/input";
+import Loading from "@/components/shared/Loading";
+
+import GuideButton from "@/components/guideComponents/popMessage";
+
 export default function Historical() {
   const [filteredTags, setFilteredTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,8 +40,10 @@ export default function Historical() {
     fetchPlaces();
   }, [searchTerm, filteredTags]);
   return (
-    <div className="flex flex-col w-screen p-14 ">
-      <div className="relative mb-10">
+
+    <div className="flex flex-col justify-center w-screen px-14 my-8">
+      <div className="relative mb-6">
+
         {/* Banner Section */}
         <Banner
           background={Historicalbackground}
@@ -54,7 +64,7 @@ export default function Historical() {
         </span>
       </div>
 
-      <grid className="grid grid-cols-2 justify-stretch w-screen self-center gap-y-10">
+      <div className="grid grid-cols-3 justify-evenly w-screen self-center gap-y-10 px-10">
         {places.map((place) => (
           <HistoricalCard
             key={place._id}
@@ -71,7 +81,10 @@ export default function Historical() {
             googlemaps={place.googleMapLink}
           />
         ))}
-      </grid>
+
+      </div>
+      <GuideButton guideMessage={"Select a historical place and embark on your adventure!"} />
+
     </div>
   );
 }

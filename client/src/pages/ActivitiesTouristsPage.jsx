@@ -11,6 +11,7 @@ import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 export default function Activities() {
   const [isLoading, setIsLoading] = useState(true);
@@ -255,6 +256,7 @@ export default function Activities() {
             />
           ))}
         </div>
+        <GuideButton guideMessage={"Book the acivity to start your next aventure!" } />
       </div>
     )
   );

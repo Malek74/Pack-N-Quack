@@ -7,6 +7,9 @@ import { useLogin } from "@/hooks/useLogin";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
+import { Link } from "react-router-dom";
+import GuideButton from "@/components/guideComponents/popMessage";
+
 export default function LoginPage() {
   const [step, setStep] = useState("login");
   const [username, setUsername] = useState("");

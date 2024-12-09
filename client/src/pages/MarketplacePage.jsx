@@ -12,6 +12,7 @@ import Loading from "@/components/shared/Loading";
 import { FilterDialog } from "@/components/shared/FilterDialog";
 import { FilterPanel } from "@/components/shared/FilterPanel";
 import { Filter } from "lucide-react";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
@@ -136,6 +137,9 @@ export default function MarketplacePage() {
           Clear Filters
         </Button>
       </div>
+
+     <GuideButton guideMessage={"Search and select items in the marketplace, then add them to your cart and proceed with checkout."} />
+
 
       <div className="grid grid-cols-1 place-items-center justify-center gap-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.length > 0 ? (

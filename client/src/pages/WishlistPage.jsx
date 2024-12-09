@@ -13,6 +13,7 @@ import CreateDialog from "@/components/shared/CreateDialog";
 import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
+import GuideButton from "@/components/guideComponents/popMessage";
 export default function MarketplacePage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [products, setProducts] = useState([]);
@@ -28,7 +29,7 @@ export default function MarketplacePage() {
     const fetchWishlist = () => {
         try {
             setLoading(true);
-            axios.get(`/api/tourist/wishlist/${touristId}`).then((response) => {
+            axios.get(`/api/tourist/wishlist`).then((response) => {
                 setProducts(response.data);
             });
         } catch (error) {
@@ -77,6 +78,10 @@ export default function MarketplacePage() {
                     ))
                 )}
             </div>
+
+            <GuideButton guideMessage={"View, add, or remove items from your wishlist to manage your preferences."} />
+
+
         </div>
     );
 }

@@ -15,9 +15,13 @@ const purchasedSchema = new Schema({
         },
         boughtNtimes: { type: Number },
         rating: { type: Number },
-        review: { type: String }
-    }]
-});
+        review: { type: String },
+        status :{ type : String, default: "pending"  }
+    }],
+    
+}, 
+{ timestamps: true }
+);
 
 const PurchasedItem = model('PurchasedItem', purchasedSchema);
 export default PurchasedItem;

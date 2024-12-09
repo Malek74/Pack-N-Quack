@@ -16,6 +16,7 @@ import {
   Trash2,
   File,
   ChartNoAxesCombined,
+  GemIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate, Outlet } from "react-router-dom";
@@ -50,6 +51,12 @@ const sidebarItems = [
     icon: Trash2,
     section: "Delete Requests",
     path: "delete-requests",
+  },
+  {
+    label: "Manage Promo code",
+    icon: GemIcon,
+    section: "Promo code",
+    path: "manage-promo-code",
   },
   {
     label: "Document Review",

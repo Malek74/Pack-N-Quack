@@ -10,6 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { set } from "date-fns";
+import GuideButton from "@/components/guideComponents/popMessage";
 
 const HotelBookingApp = () => {
     const [hotels, setHotels] = useState([]);
@@ -19,7 +20,6 @@ const HotelBookingApp = () => {
     const [loading2, setLoading2] = useState(false);
     const [checkInDate, setCheckInDate] = useState(null);
     const [checkOutDate, setCheckOutDate] = useState(null);
-    const userID = "6725442e98359339d8b821f0";
 
     const searchHotels = async (cityName) => {
         console.log(cityName);
@@ -63,12 +63,12 @@ const HotelBookingApp = () => {
         }
     }
 
-    const bookHotel = async (room, numOfDays) => {
+    const bookHotel = async (room, numOfDays, paymentMethod, promoCode) => {
         console.log(room);
         console.log(checkInDate);
         console.log(checkOutDate);
         try {
-            const response = await axios.post(`/api/hotels/bookRoom/${userID}`,
+            const response = await axios.post(`/api/hotels/bookRoom`,
                 {
                     price: room.price,
                     numOfDays: numOfDays,
@@ -76,7 +76,11 @@ const HotelBookingApp = () => {
                     hotel: room,
                     checkIn: checkInDate,
                     checkOut: checkOutDate,
-                    name: room.hotel
+                    name: room.hotel,
+                    paymentMethod: paymentMethod,
+                    promocode: promoCode,
+                    payByWallet: paymentMethod == "wallet" ? true : false
+
 
                 });
             window.location.href = response.data.url;
@@ -116,11 +120,11 @@ const HotelBookingApp = () => {
     };
 
 
-    const handleBooking = ({ room, checkInDate, checkOutDate }) => {
+    const handleBooking = ({ room, checkInDate, checkOutDate, paymentMethod, promoCode }) => {
         const timeDifference = checkOutDate - checkInDate; // Time difference in milliseconds
         const dayInMilliseconds = 1000 * 60 * 60 * 24; // Number of milliseconds in a day
         const numOfDays = timeDifference / dayInMilliseconds; // Convert to days
-        bookHotel(room, numOfDays);
+        bookHotel(room, numOfDays, paymentMethod, promoCode);
     };
     return (
         <div className=" flex justify-center m-8">
@@ -137,6 +141,9 @@ const HotelBookingApp = () => {
                     {/* {selectedHotel && <HotelBookingForm hotel={selectedHotel} onBook={handleBooking} />} */}
                 </CardContent>
             </Card>
+
+            <GuideButton guideMessage={"Select a city and then submit and proceed by booking a hotel"} />
+
         </div>
     );
 };

@@ -13,9 +13,8 @@ export const Rating = ({ rating, numberOfReviews = 0, size = "large" }) => {
       height={sizes[size]}
       viewBox="0 0 18 18"
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-${sizes[size]} h-${sizes[size]} ${
-        filled ? "" : "text-gray-300"
-      }`}
+      className={`w-${sizes[size]} h-${sizes[size]} ${filled ? "" : "text-gray-300"
+        }`}
     >
       <defs>
         <linearGradient

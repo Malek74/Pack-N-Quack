@@ -21,7 +21,6 @@ const bookingSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
-
     },
     numOfTickets: {
         type: Number,
@@ -33,7 +32,6 @@ const bookingSchema = new Schema({
     },
     stripeSessionID: {
         type: String,
-        required: true
     }
 }, { timestamps: true });
 

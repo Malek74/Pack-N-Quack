@@ -7,6 +7,8 @@ import ItinerariesCard from "@/components/ItinerariesPage/ItinerariesCard";
 import Loading from "@/components/shared/Loading";
 import ItineraryFilters from "@/components/ItinerariesPage/ItineraryFilters";
 import { useUser } from "@/context/UserContext";
+import GuideButton from "@/components/guideComponents/popMessage";
+
 export default function ItinerariesTouristsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,6 +86,9 @@ export default function ItinerariesTouristsPage() {
       {/* <Button onClick={() => navigate("/createItinerary")}>
         Create Itineraries
       </Button> */}
+
+      <GuideButton guideMessage={"Select an itinerary and start planning your journey!"} />
+
     </div>
   );
 }

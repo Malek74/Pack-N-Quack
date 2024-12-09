@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Eye,  
@@ -11,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/context/UserContext";
-
+import axios from "axios";
 export default function PaymentTransactionPage() {
   const { toast } = useToast();
   const { prefCurrency } = useUser();
@@ -25,9 +24,9 @@ export default function PaymentTransactionPage() {
     // Fetch data from the API
     const fetchWalletData = async () => {
       try {
-        const response = await fetch("/api/tourist/myTransactions");
-        const data = await response.json();
-        setWalletData(data);
+        const response = await axios.get(`/api/tourist/myTransactions?currency=${prefCurrency}`);
+        console.log(response.data);
+        setWalletData(response.data);
       } catch (error) {
         toast({
           title: "Error fetching data",
@@ -38,7 +37,7 @@ export default function PaymentTransactionPage() {
     };
 
     fetchWalletData();
-  }, [toast]);
+  }, [prefCurrency]);
 
   const renderTransactions = (transactions) => {
     return transactions.map((transaction, index) => (
@@ -69,7 +68,7 @@ export default function PaymentTransactionPage() {
                 transaction.incoming ? "text-green-500" : "text-red-500"
               }`}
             >
-              {transaction.incoming ? "+" : "-"}${transaction.amount.toFixed(2)}
+              {transaction.incoming ? "+" : "-"}{prefCurrency}{transaction.amount.toFixed(2)}
             </span>
           </div>
         </CardContent>
@@ -79,16 +78,7 @@ export default function PaymentTransactionPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between bg-white p-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Pack&Quack Wallet</h1>
-        </div>
-        <Avatar className="h-8 w-8">
-          <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Profile" />
-        </Avatar>
-      </div>
-
+    
       {/* Balance Cards */}
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <Card>
@@ -98,7 +88,7 @@ export default function PaymentTransactionPage() {
               <span className="text-sm">Available Balance</span>
             </div>
             <CardTitle className="text-4xl font-bold">
-             {prefCurrency} {walletData.wallet.toFixed(2)}
+             {prefCurrency} {walletData.wallet?.toFixed(2)}
             </CardTitle>
           </CardHeader>
         </Card>

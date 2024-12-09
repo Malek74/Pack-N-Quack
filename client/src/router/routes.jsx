@@ -36,6 +36,8 @@ import AdminsList from "@/components/adminPage/AdminsList";
 import ActivityCategory from "@/components/adminPage/ActivityCategory";
 import ActivityTags from "@/components/adminPage/ActivityTags";
 import ItineraryTags from "@/components/adminPage/ItineraryTags";
+import ManagePromoCodes from "@/components/adminPage/ManagePromoCodes"; //new
+import PromoCodeDisplayTourist from "@/pages/PromoCodeDisplayTourist"; //new
 import AdminProducts from "@/components/adminPage/AdminProducts";
 import ItinerariesView from "@/components/adminPage/ItinerariesView";
 import Complaints from "@/components/adminPage/Complaints";
@@ -50,11 +52,14 @@ import SingleTransportationPage from "@/pages/SingleTransportationPage";
 import Booked from "@/pages/BookedPage";
 import SalesReportClientPage from "@/pages/SalesReportClientPage";
 import SalesReport from "@/components/adminPage/SalesReport";
+import Delivery from "@/components/CheckOutPage/Delivery";
 import PaymentTransactionPage from "@/pages/PaymentTransactionPage";
 import LoginPage from "@/pages/LoginPage";
 import WishlistPage from "@/pages/WishlistPage";
 import Cart from "@/pages/CartPage";
 import ProductPage from "@/pages/ProductPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import BookmarkedPage from "@/pages/BookmarkedPage";
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<Layout />}>
@@ -77,10 +82,7 @@ const routes = createRoutesFromElements(
       path="itinerariesTourists/:id"
       element={<SingleItineraryTouristsPage />}
     ></Route>
-    <Route
-      path="itineraries/:id"
-      element={<ItinerariesTourGuidePage />}
-    ></Route>
+    <Route path="itineraries" element={<ItinerariesTourGuidePage />}></Route>
     <Route
       path="itinerariesTourGuide/:id"
       element={<SingleItineraryTourGuidePage />}
@@ -112,6 +114,8 @@ const routes = createRoutesFromElements(
       path="transportation/:id"
       element={<SingleTransportationPage />}
     ></Route>
+    <Route path="cart" element={<Cart />}></Route>
+    <Route path="checkout" element={<CheckoutPage />}></Route>
 
     <Route path="cart" element={<Cart />}></Route>
     <Route path="touristDashboard" element={<TouristDashboard />}>
@@ -122,6 +126,8 @@ const routes = createRoutesFromElements(
       <Route path="activity-attended" element={<ActivityAttended />} />
       <Route path="order-history" element={<OrderHistory />} />
       <Route path="sales-report" element={<SalesReportClientPage />} />
+      <Route path="addresses" element={<Delivery />} />
+      <Route path="bookmarked" element={<BookmarkedPage />} />
     </Route>
 
     <Route
@@ -152,6 +158,7 @@ const routes = createRoutesFromElements(
       <Route path="delete-requests" element={<DeleteRequests />} />
       <Route path="document-review" element={<DocumentReview />} />
       <Route path="sales-report" element={<SalesReport />} />
+      <Route path="manage-promo-code" element={<ManagePromoCodes />} />
     </Route>
     <Route path="transportations/:idAdv" element={<Transportation />}></Route>
     <Route path="transportations" element={<Transportation />}></Route>
@@ -173,6 +180,7 @@ const routes = createRoutesFromElements(
       <Route path="rewards" element={<PointsAndLoyalty />} />
       <Route path="transactions" element={<PaymentTransactionPage />} />
       <Route path="my-products" element={<AdminProducts seller />} />
+      <Route path="promo-codes" element={<PromoCodeDisplayTourist />} />
 
       <Route path="itinerary-bookings" element={<ItineraryBookings />}></Route>
       {/* <Route path="bookings" element={<Booked />} /> */}

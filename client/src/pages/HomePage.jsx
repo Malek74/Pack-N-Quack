@@ -12,25 +12,32 @@ import RamitoItinerariesCard from "@/components/layout/components/ramitoCard";
 import ItineraryCard from "@/components/itinerariesPage/ItinerariesCard";
 import { useUser } from "@/context/UserContext";
 import { set } from "date-fns";
+import Loading from "@/components/shared/Loading";
 
 import { ShareButton } from "@/components/shared/ShareButton";
+import Delivery from "@/components/CheckOutPage/Delivery";
+import GuideButton from "@/components/guideComponents/popMessage";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const userID = "6732171fabc80503fd8f92a2";
+  const { userId, userType } = useUser();
   const [activities, setActivities] = useState([]);
   const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `/api/tourist/myPreferences/${userID}`
-        );
+        setLoading(true);
+        const response = await axios.get(`/api/tourist/myPreferences/`);
         console.log(response.data);
         setActivities(response.data.activites);
         setItineraries(response.data.itineraries);
         console.log(response.data.activites);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -70,6 +77,26 @@ export default function HomePage() {
         />
       </div>
 
+      <GuideButton
+        guideMessage={"Navigate though home bar and check out our activities!"}
+      />
+
+      <div className="flex justify-center mt-10  ">
+        {loading && <Loading />}
+        {Array.isArray(filteredActivities) &&
+          filteredActivities.length === 0 &&
+          Array.isArray(filteredItineraries) &&
+          filteredItineraries.length === 0 && (
+            <Card>
+              <CardContent className="flex justify-center items-center p-7">
+                <Label className="text-2xl font-semibold">
+                  There are no activities or itineraries that match your
+                  preferences.
+                </Label>
+              </CardContent>
+            </Card>
+          )}
+      </div>
       <div className="grid grid-cols-3  place-items-center gap-8 py-8 justify-evenly">
         {Array.isArray(filteredActivities) &&
           filteredActivities.map((activity) => (
@@ -106,12 +133,10 @@ export default function HomePage() {
               price={itinerary.price}
               rating={itinerary.ratings.averageRating}
               numberOfReviews={itinerary.ratings.reviews.length}
-              touristClicked
+              touristClicked={true}
             />
           ))}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center">
-          <ShareButton />
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-8 py-8 justify-center"></div>
       </div>
     </div>
   );
