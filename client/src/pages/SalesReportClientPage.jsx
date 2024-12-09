@@ -75,8 +75,8 @@ const SalesReportClientPage = () => {
 
   if (fetchedStats) {
     return (
-      <div className="flex flex-col justify-center items-center gap-4 p-4">
-        <div className="flex justify-between w-full">
+      <div className="flex flex-col items-center justify-center gap-4 p-4">
+        <div className="flex w-full justify-between">
           <h1 className="text-3xl font-semibold">Sales Report</h1>
           <FilterButton
             reportFilters={reportFilters}
@@ -84,9 +84,9 @@ const SalesReportClientPage = () => {
           />
         </div>
 
-        {/* <AreaRevenueChart revenuePerDay={fetchedStats.revenuePerDay} /> */}
+        <AreaRevenueChart revenuePerDay={fetchedStats.revenuePerDay} />
 
-        <div className="flex justify-between w-full gap-4">
+        <div className="flex w-full justify-between gap-4">
           {isAdvertiser && (
             <>
               <PieRevenuePercentageChart
@@ -106,7 +106,7 @@ const SalesReportClientPage = () => {
         </div>
 
         <BarRevenuePerProductChart
-          revenueAndBookingPerEvent={dummyStats.revenueAndBookingPerEvent}
+          revenueAndBookingPerEvent={fetchedStats?.revenueAndBookingsPerEvent}
         />
       </div>
     );

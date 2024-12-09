@@ -38,8 +38,8 @@
 
   export function AreaRevenueChart({revenuePerDay}) {
     const [timeRange, setTimeRange] = React.useState("90d")
-
-    const filteredData = revenuePerDay.filter((item) => {
+    console.log(revenuePerDay)
+    const filteredData = revenuePerDay?.filter((item) => {
       const date = new Date(item.date)
       const referenceDate = new Date("2024-06-30")
       let daysToSubtract = 90

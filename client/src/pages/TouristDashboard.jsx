@@ -44,6 +44,18 @@ export default function TouristDashboard() {
       icon: Package,
       path: "my-products",
     },
+    {
+      label: "Sales Report",
+      icon: ChartNoAxesCombined,
+      path: "sales-report",
+    },
+  ];
+  const advertiserItems = [
+    {
+      label: "Sales Report",
+      icon: ChartNoAxesCombined,
+      path: "sales-report",
+    },
   ];
   const touristSidebarItems = [
     {
@@ -99,16 +111,24 @@ export default function TouristDashboard() {
   const [sidebarItems, setSidebarItems] = useState([]);
 
   useEffect(() => {
+    console.log("IS ADV")
+    console.log(isAdvertiser)
     setSidebarItems(commonSidebarItems);
     let items = [...commonSidebarItems]; // Start with common items
-
+    console.log(userType);
     if (isTourist) {
       items = [...items, ...touristSidebarItems];
       setSidebarItems(items);
+      console.log("SAD")
     }
     if (isSeller) {
       sidebarItems.push(sellerItems);
     }
+    if (isAdvertiser){
+      sidebarItems.push(advertiserItems);
+
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     userId,
     userType,

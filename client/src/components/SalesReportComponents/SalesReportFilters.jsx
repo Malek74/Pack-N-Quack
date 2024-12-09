@@ -1,19 +1,7 @@
-//import RamitoItinerariesCard from "@/components/ramitoItineraries/ramitoCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import PropTypes from "prop-types";
 import DateRangePickerV2 from "@/components/shared/DateRangePickerV2";
-// import MultiselectDropdown from "@/components/shared/MultiselectDropdown";
 import MultiselectEventsDropdown from "./MultiSelectEventsDropdown";
 
 SalesReportFilters.propTypes = {
@@ -31,8 +19,8 @@ export default function SalesReportFilters({setReportFilters }) {
   useEffect(() => {
     setReportFilters({
       events: selectedEvents.map((event) => event.title),
-      minDate: startDate,
-      maxDate: endDate,
+      startDate: startDate,
+      endDate: endDate,
     });
   }, [
     selectedEvents,
@@ -58,7 +46,7 @@ export default function SalesReportFilters({setReportFilters }) {
 
   return (
     !isLoading && (
-      <div className=" flex flex-col w-full gap-4">
+      <div className="flex w-full flex-col gap-4">
         <DateRangePickerV2
           startDate={startDate}
           setStartDate={setStartDate}

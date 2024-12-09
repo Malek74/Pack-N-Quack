@@ -13,8 +13,6 @@ import SalesReportFilters from "./SalesReportFilters";
   
 
 export function FilterButton({setReportFilters}) {
-    const [filtersOn, setFiltersOn] = useState(false);
-
   return (
     <Dialog>
         <DialogTrigger><Button variant="outline" size="icon">

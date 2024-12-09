@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
   // State to store user currency preference, default to "EGP"
   const [prefCurrency, setPrefCurrency] = useState("EGP");
   const [userId, setUserId] = useState();
-  const [userType, setUserType] = useState("Tourist");
+  const [userType, setUserType] = useState();
   const [isTourGuide, setIsTourGuide] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [isAdvertiser, setIsAdvertiser] = useState(false);
