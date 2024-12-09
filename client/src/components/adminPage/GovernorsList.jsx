@@ -24,7 +24,7 @@ export default function GovernorsList() {
 
   const fetchGovernors = () => {
     axios
-      .get("api/touristGovernor/")
+      .get("api/touristGovernor/allTouristGovernors")
       .then((response) => {
         setGovernors(response.data);
         console.log(response.data);
