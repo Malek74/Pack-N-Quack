@@ -162,16 +162,13 @@ export const bookRoom = async (req, res) => {
                 const lastUsed = new Date(tourist.promoCode.lastUsed);
 
                 if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
-                    res.status(400).json({ message: "Promocode has already been used" });
+                    return res.status(400).json({ message: "Promocode has already been used" });
                 }
 
                 if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
-                    res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                    return res.status(400).json({ message: "Promocode can be used only on your birthday" });
                 }
-            }
-            else {
                 amountToPay -= amountToPay * (promo.discount / 100);
-
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
 
             }

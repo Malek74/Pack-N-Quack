@@ -268,16 +268,16 @@ export const fetchUserDocuments = async (req, res) => {
 export const fetchUserImages = async (req, res) => {
     const { userType } = req.body;
     const userId = req.user._id;
+
     let UserModel = userModels[userType];
 
-    if (userType === 'advertisers') {
+    if (userType === 'Advertiser') {
         UserModel = userModels['advertiserModel'];
     }
     if (userType === 'sellers') {
         UserModel = userModels['seller']
     }
 
-    console.log(UserModel);
     if (!UserModel) {
         return res.status(400).json({ message: 'Invalid user type' });
     }
