@@ -177,7 +177,7 @@ export default function SingleItineraryTouristsPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <Label className="text-3xl font-bold">Helwa el Ayam</Label>
+          <Label className="text-3xl font-bold">Daily Activities</Label>
         </div>
         <div className="grid grid-cols-2 gap-8 px-28">
           {fetchedItinerary.days.map((activity) => (
@@ -187,8 +187,11 @@ export default function SingleItineraryTouristsPage() {
             </div>
           ))}
         </div>
-        <GuideButton guideMessage={"Explore the itinerary details, book your trip, and get ready for an unforgettable experience!"} />
-
+        <GuideButton
+          guideMessage={
+            "Explore the itinerary details, book your trip, and get ready for an unforgettable experience!"
+          }
+        />
       </div>
     )
   );
