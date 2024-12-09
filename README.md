@@ -156,7 +156,7 @@ For an interactive and detailed exploration of our API, access our [Postman Coll
 
 Here are some practical examples to help you understand how to interact with our project. These snippets demonstrate key functionalities such as user authentication, publishing activities, booking itineraries, handling payments, receiving real-time notifications, and more.
 
-### 1. Real-tine notifications
+### 1. Real-time notifications
 
 Manage different users sending them their notifications.
 
