@@ -7,7 +7,7 @@ import { protect } from '../middleware/authenticator.js';
 const router = express.Router();
 
 router.post("/", createTouristGovernor);
-router.get("/allTouristGovernors", protect, getTouristGovernor);
+router.get("/", protect, getTouristGovernor);
 router.get("/:id",  getTourGuideById);
 router.put("/", protect, updateTouristGovernor);
 router.delete("/", protect, deleteTouristGovernor);
