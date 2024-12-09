@@ -558,7 +558,7 @@ Building **Pack N Quack** was a collaborative effort that benefited greatly from
 ### 👥 Special Thanks
 
 - **Our Project Manager**  
-  A big thank you to Hadwa who contributed their time and expertise to guide us with Pack N Quack.
+  A big thank you to our beloved PM Hadwa Hassan Pasha  who contributed not only with her time but also her expertise to guide us with Pack N Quack.
   
 - **Our Contributors**  
   A big thank you to all the developers, designers, and testers who contributed their time and expertise to make Pack N Quack a reality.
