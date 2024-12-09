@@ -4,7 +4,7 @@ import { addAdvertiser, getAdvertisers, getAdvertiser, deleteAdvertiser, updateA
 
 const router = express.Router();
 
-router.post("/", protect, addAdvertiser);
+router.post("/", addAdvertiser);
 
 router.get("/allAdvertisers", getAdvertisers);
 

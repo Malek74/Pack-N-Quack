@@ -42,10 +42,10 @@ export const sendPaymentReceipt = async (email, username, itineraryName, payment
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <h1 style="color: #0D47A1;">Payment Receipt</h1>
             <p>Hi <strong>${username}</strong>,</p>
-            <p>Thank you for your payment for the itinerary/event <strong>${itineraryName}</strong>. Below are the details of your transaction:</p>
+            <p>Thank you for your payment for <strong>${itineraryName}</strong>. Below are the details of your transaction:</p>
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
                 <tr>
-                    <th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Itinerary/Event Name</th>
+                    <th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Payment Description</th>
                     <td style="padding: 8px; border: 1px solid #ddd;">${itineraryName}</td>
                 </tr>
                 <tr>

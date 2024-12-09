@@ -36,7 +36,7 @@ import { getMyTransactions } from '../controllers/bookingController.js';
 const router = express.Router();
 
 router.post('/', createTourist); // Create
-router.get('/', /*protect,*/ getTourist); // Read 
+router.get('/', protect, getTourist); // Read 
 router.put('/', protect, updateTourist); // Update 
 router.get('/allTourists', getTourists)
 router.delete('/', protect, deleteTourist);
@@ -57,6 +57,8 @@ router.get('/viewbookmark', protect, viewBookmarks);
 router.post('/addAddress', protect, AddNewAddress);
 router.post('/setdefault', protect, setDefaultAddress);
 router.get('/viewAddress', protect, viewAddresses);
+router.get('/walletBalance', protect, getMyWalletBalance);
+router.get('/myPromoCodes', protect, getMyPromoCodes);
 
 router.post('/cart/addItemToCart',protect, addItemToCart);
 router.delete('/cart/removeItemFromCart/:productId',protect, removeItemFromCart);

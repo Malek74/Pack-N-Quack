@@ -25,8 +25,6 @@ export const addAdvertiser = async (req, res) => {
     const salt = await bcrypt.genSalt(); //generate salt to randomise the password hash (distinct between users with the same password)
     const hashedPassword = await bcrypt.hash(password, salt);
 
-
-
     const newAdvertiser = new advertiserModel({ email, username, password: hashedPassword });
 
     //create a token for the user
@@ -34,7 +32,6 @@ export const addAdvertiser = async (req, res) => {
 
     //send the token in the response
     res.cookie("jwt", token, { httpOnly: true });
-
 
     try {
         const advertiser = await newAdvertiser.save();

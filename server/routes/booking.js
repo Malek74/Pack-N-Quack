@@ -4,7 +4,7 @@ import { protect } from "../middleware/authenticator.js";
 
 const router = express.Router();
 
-router.post('/bookEvent/', /*protect,*/ bookEvent);
+router.post('/bookEvent/', protect, bookEvent);
 router.post("/cancelBooking/", protect, cancelBooking);
 router.put("/flagg", flaggedEvents);
 router.post("/delete", protect, requestDeleteAccount);

@@ -15,14 +15,13 @@ export const getProductByID = async (req, res) => {
     const prefCurrency = req.body.prefCurrency;
 
 
-    console.log(id + "this is id");
     if (!id) {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
         const searchedProduct = await product.findById(id).populate('seller_id');
-        const newPrice = convertPrice(searchedProduct.price, prefCurrency);
-        searchedProduct.price = newPrice;
+        const conversionRate = await getConversionRate(prefCurrency);
+        searchedProduct.price *= conversionRate;
         return res.status(200).json(searchedProduct);
     } catch (error) {
         return res.status(400).json({ error: error.message });
@@ -102,7 +101,7 @@ export const createProduct = async (req, res) => {
         try {
             console.log("Admin Product");
             const sellerUsername = await seller.findById(userID).username;
-            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "VTP", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
+            const newproduct = (await product.create({ name, price, description, available_quantity, sellerUsername: "Pack N Quack", adminSellerID: userID, stripeID: productStripe.id, picture: imagesUrls }));
             return res.status(200).json(newproduct);
         } catch (error) {
             return res.status(400).json({ error: error.message });
@@ -361,10 +360,10 @@ export const getProducts = async (req, res) => {
             } else {
                 query.price.$lte = Number.MAX_SAFE_INTEGER * conversionRate;
             }
-            
+
         }
 
-        if(sellerID){
+        if (sellerID) {
             query.seller_id = sellerID;
         }
         if (name) {

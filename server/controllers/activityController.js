@@ -534,8 +534,8 @@ export const notifyMe = async (req, res) => {
     }
 
     // const user = req.user;
-    const user = await Tourist.findById("674641df1887b9c3e11436c4");
-    await activityModel.findByIdAndUpdate(activityID, { $addToSet: { subscribers: user._id } }, { new: true });
+
+    await activityModel.findByIdAndUpdate(activityID, { $addToSet: { subscribers: req.user._id } }, { new: true });
 
     return res.status(200).json({ message: 'Activity subscribed successfully' });
 }

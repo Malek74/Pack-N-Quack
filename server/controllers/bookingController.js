@@ -20,9 +20,10 @@ export const bookEvent = async (req, res) => {
     const { eventType, eventID, promoCode, payByWallet, numOfTickets, dateSelected } = req.body;
 
     console.log(req.body);
-    // const touristID = req.user._id;
+    const touristID = req.user._id;
+    const bookedEvent = {};
 
-    const touristID = "674641df1887b9c3e11436c4"
+
     let success_url = "";
     let event = {}
     try {
@@ -30,10 +31,14 @@ export const bookEvent = async (req, res) => {
         //fetch event
         if (eventType == "activity") {
             event = await activityModel.findById(eventID);
+            bookedEvent.activityID = eventID;
         }
         else if (eventType == "itinerary") {
             event = await Itinerary.findById(eventID);
+            bookedEvent.itineraryID = eventID;
         }
+
+        bookedEvent.numOfTickets = numOfTickets;
         let product = {};
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         if (eventType == "activity") {
@@ -61,7 +66,6 @@ export const bookEvent = async (req, res) => {
 
             //update amount to be paid
             amountToPay -= amountToPay * (promo.discount / 100);
-
             //check if it's his birthday promo
             if (promo.code == tourist.promoCode.code) {
                 //today is birthday
@@ -70,18 +74,25 @@ export const bookEvent = async (req, res) => {
                 const lastUsed = new Date(tourist.promoCode.lastUsed);
 
                 if (lastUsed.getDate() === birthDate.getDate() && lastUsed.getMonth() === birthDate.getMonth() && lastUsed.getFullYear() === birthDate.getFullYear()) {
-                    res.status(400).json({ message: "Promocode has already been used" });
+                    return res.status(400).json({ message: "Promocode has already been used" });
                 }
 
                 if (!(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth())) {
-                    res.status(400).json({ message: "Promocode can be used only on your birthday" });
+                    return res.status(400).json({ message: "Promocode can be used only on your birthday" });
                 }
-            }
-            else {
+                amountToPay -= amountToPay * (promo.discount / 100);
                 await PromoCodes.findByIdAndUpdate(promo._id, { isActive: false });
 
             }
         }
+
+        //create booking object
+        bookedEvent.price = amountToPay;
+        bookedEvent.touristID = touristID;
+        bookedEvent.date = dateSelected;
+
+        await Booking.create(bookedEvent);
+
 
         if (eventType == "activity") {
             success_url = "http://localhost:5173/touristDashboard/activitiy-bookings";
@@ -126,11 +137,17 @@ export const bookEvent = async (req, res) => {
                 console.log(transaction);
             }
 
+            console.log("amount left to pay: ", amountLeftToPay);
+            //create a booking
+
+
             //update wallet amount
             await Tourist.findByIdAndUpdate(touristID, { wallet: tourist.wallet - walletAmount });
             console.log("amount left to pay: ", amountLeftToPay);
+
             if (amountLeftToPay == 0) {
                 sendPaymentReceipt(tourist.email, tourist.username, `booking ${event.name}`, dateSelected, amountToPay, transaction._id.toString());
+
                 return res.status(200).json({ message: "Payment successful", url: success_url });
             } else {
 
@@ -145,7 +162,6 @@ export const bookEvent = async (req, res) => {
                     description: `Payment for booking for ${event.name}`
                 });
 
-
                 //create price to be paid after deducting wallet amount        
                 const price = await stripe.prices.create({
                     currency: 'usd',
@@ -153,20 +169,18 @@ export const bookEvent = async (req, res) => {
                     unit_amount: amountLeftToPay * 100,
                 });
 
-
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
                     line_items: [{
                         price: price.id,
-                        quantity: numOfTickets,
+                        quantity: 1,
                     }],
                     mode: 'payment',
                     success_url: success_url,
-                    discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
                     metadata: {
                         eventID: eventID,
                         eventType: eventType,
-                        touristID: touristID,
+                        touristID: touristID.toString(),
                         type: "event",
                         price: amountLeftToPay,
                         numOfTickets: numOfTickets,
@@ -191,27 +205,25 @@ export const bookEvent = async (req, res) => {
 
         }
 
-
         //create price to be paid after deducting wallet amount        
         const price = await stripe.prices.create({
             currency: 'usd',
             product: product.id,
-            unit_amount: event.price * numOfTickets * 100,
+            unit_amount: amountToPay * 100,
         });
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
                 price: price.id,
-                quantity: numOfTickets,
+                quantity: 1,
             }],
             mode: 'payment',
             success_url: success_url,
-            discounts: promo ? [{ promotion_code: promo.stripeID }] : [],
             metadata: {
                 eventID: eventID,
                 eventType: eventType,
-                touristID: touristID,
+                touristID: touristID.toString(),
                 type: "event",
                 price: amountToPay,
                 numOfTickets: numOfTickets,
@@ -223,7 +235,7 @@ export const bookEvent = async (req, res) => {
         return res.status(200).json({ url: session.url });
     }
     catch (error) {
-        console.log(error);
+        console.log(error.message);
         return res.status(400).json({ error: error.message });
     }
 
@@ -266,9 +278,7 @@ export const cancelBooking = async function (req, res) {
         }
 
         //fetch the session and related data from stripe
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const tourist = await Tourist.findById(touristID);
-        const paymentSession = await stripe.checkout.sessions.retrieve(booking.stripeSessionID);
 
 
         //refund money

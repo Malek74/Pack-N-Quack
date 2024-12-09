@@ -24,6 +24,7 @@ import cors from 'cors';
 import PasswordChangeRequest from './routes/changePass.js';
 import uploadRoutes from './routes/fileRoutes.js';
 import purchaseRoute from './routes/purchaseRoute.js';
+import orderRoutes from "./routes/orderRoutes.js"
 import shareMail from './routes/shareEmail.js';
 import flightBooking from './routes/flightBooking.js';
 import currency from './routes/currency.js';
@@ -39,7 +40,7 @@ import cookieParser from 'cookie-parser';
 import { login, logout, forgotPassword, updatePassword } from './controllers/loginRegisterController.js';
 import { protect } from './middleware/authenticator.js';
 import cron from "node-cron";
-import { sendBirthdayPromoCode } from "./controllers/scheduledFunctions.js";
+import { sendBirthdayPromoCode, upcomingEvent, updateOrderStatus } from "./controllers/scheduledFunctions.js";
 import notificationSchema from './models/notificationSchema.js';
 
 import notifications from './routes/notification.js';
@@ -96,7 +97,7 @@ io.on('connection', async (socket) => {
     const roomID = socket.handshake.auth.userId.toString();
     socket.join(roomID);
     console.log('User joined room: ' + socket.handshake.auth.userId);
-    const notification = await notificationSchema.find({ 'user.id': socket.handshake.auth.userId });
+    const notification = await notificationSchema.find({ 'user.id': roomID });
 
     //send the user his notifications
     io.to(roomID).emit('initialNotifications', notification);
@@ -125,6 +126,7 @@ app.use('/webhook', webhook);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/transaction', purchaseRoute);
+app.use('/api/order', orderRoutes);
 app.use('/api/complaints', complaint);
 app.use('/api/admins', admins);
 app.use('/api/transportation', transportation);
@@ -132,11 +134,24 @@ app.use('/api/itiernaryTags', tagRoutes);
 app.post('/api/login', login);
 app.get('/api/logout', logout);
 app.use('/api/notifications', notifications);
-app.get('/api/forgotPassword', protect, forgotPassword);
+app.post('/api/forgotPassword', forgotPassword);
 app.post('/api/OTPPassword', protect, updatePassword);
 
 // Schedule the function to run at 11 PM every day
-cron.schedule("38 23 * * *", () => {
+cron.schedule("40 12 * * *", () => {
     console.log("Running task at 11:05 PM...");
     sendBirthdayPromoCode(); // Call your birthday promo code function
 });
+
+
+//schedule the function to run 2:59
+cron.schedule("50 12 * * *", () => {
+    console.log("Running task at 11:05 PM...");
+    upcomingEvent();
+});
+
+//schedule the function to run every 20 minutes
+// cron.schedule("*/20 * * * *", () => {
+//     console.log("Running task every 20 minutes...");
+//     updateOrderStatus();
+// });

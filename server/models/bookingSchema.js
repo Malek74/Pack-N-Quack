@@ -32,7 +32,6 @@ const bookingSchema = new Schema({
     },
     stripeSessionID: {
         type: String,
-        required: true
     }
 }, { timestamps: true });
 

@@ -1,6 +1,7 @@
 import notificationSchema from '../models/notificationSchema.js';
 
 export const showMyNotifications = async (req, res) => {
+    console.log("ANA HENA");
     try {
         const notifications = await notificationSchema.find({ 'user.id': req.user._id });
         res.status(200).json(notifications);

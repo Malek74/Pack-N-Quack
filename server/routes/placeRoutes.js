@@ -10,6 +10,7 @@ import {
 } from '../controllers/placeController.js'; // Adjust the path as necessary
 import { isTourismGovernor } from '../middleware/auth.js'; // Middleware to check if the user is a tourism governor
 import { get } from 'mongoose';
+import { protect } from '../middleware/authenticator.js';
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.put('/:id', updatePlace); // Update Place
 router.delete('/:name', deletePlace); // Delete Place
 router.post('/filterSort', SearchForPlace);
 router.get('/', getAllPlaces);
-router.get('/my/:name', getMyPlaces);
+router.get('/my/', protect, getMyPlaces);
 
 
 export default router;
