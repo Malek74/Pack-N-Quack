@@ -14,10 +14,11 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/context/UserContext";
 
-export default function ChangePassword({ profile, onRefresh, userType }) {
+export default function ChangePassword({ profile, onRefresh }) {
   const { toast } = useToast();
-
+  const { userType } = useUser();
   const formSchema = z
     .object({
       passwordold: z
@@ -46,12 +47,11 @@ export default function ChangePassword({ profile, onRefresh, userType }) {
 
   function onSubmit(values) {
     console.log(values);
-    const user = userType === "tourist" ? "Tourist" : "Tourist";
     axios
-      .post(`api/changepass/${profile._id}`, {
+      .post(`api/changepass`, {
         oldPassword: values.passwordold,
         requestedPassword: values.passwordnew,
-        userType: user,
+        userType: userType,
       })
       .then(() => {
         toast({

@@ -52,6 +52,7 @@ export default function SalesReportFilters({setReportFilters }) {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
+          report
         />
 
         <MultiselectEventsDropdown

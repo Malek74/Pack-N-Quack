@@ -37,13 +37,13 @@ export function PieRevenuePercentageChart({ totalRevenue, prefCurrency }) {
   const chartData = [
     {
       type: "activities",
-      revenue: +totalRevenue,
+      revenue: 2,
       fill: "var(--color-activities)",
     },
   ];
 
   return (
-    <Card className="flex flex-col w-1/2">
+    <Card className="flex w-1/2 flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Total Revenue</CardTitle>
         <CardDescription>Revenue Stats in {prefCurrency}</CardDescription>

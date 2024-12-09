@@ -6,18 +6,25 @@ import { useNavigate } from "react-router-dom";
 import { useLogin } from "@/hooks/useLogin";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { useUser } from "@/context/UserContext";
 export default function LoginPage() {
   const [step, setStep] = useState("login");
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login } = useLogin();
+  const { userType } = useUser();
   const handleLogin = async (values) => {
     try {
       console.log(values);
-      const success = await login(values.username, values.password);
-      if (success) {
-        navigate("/", { replace: true });
+      const objec = await login(values.username, values.password);
+      if (objec.success) {
+        if (objec.role === "Admin") {
+          navigate("/admin", { replace: true });
+        }
+        else{
+          navigate("/", { replace: true });
+        }
       }
     } catch (error) {
       toast({
@@ -73,7 +80,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className=" flex justify-center items-center bg-[url('public/assets/images/Background.jpg')] bg-no-repeat bg-cover">
+    <div className="flex h-screen items-center justify-center bg-[url('public/assets/images/Background.jpg')] bg-cover bg-no-repeat">
       {step === "login" && (
         <LoginForm
           onForgotPassword={() => setStep("enterUsername")}

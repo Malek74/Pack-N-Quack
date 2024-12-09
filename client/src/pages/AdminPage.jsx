@@ -35,6 +35,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 const sidebarItems = [
   {
@@ -114,10 +115,14 @@ const sidebarItems = [
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("Users");
-
+  const { logout } = useUser();
   const handleSectionChange = (section, path) => {
     setActiveSection(section);
     navigate(path);
+  };
+  const logoutFunc = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -128,7 +133,7 @@ export default function AdminPage() {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link
               to="/admin"
-              className="text-lg font-bold flex items-center gap-3"
+              className="flex items-center gap-3 text-lg font-bold"
             >
               <img src={logo} className="w-6" alt="logo" />
               <h1>Pack n' Quack</h1>
@@ -178,7 +183,7 @@ export default function AdminPage() {
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           {/* Breadcrumb */}
-          <Breadcrumb className="flex-1 hidden md:flex">
+          <Breadcrumb className="hidden flex-1 md:flex">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
@@ -212,7 +217,7 @@ export default function AdminPage() {
                   <Button
                     variant="ghost"
                     size="small"
-                    onClick={() => console.log("hi")}
+                    onClick={logoutFunc}
                     className={
                       "hover:text-destructive flex items-center gap-3 justify-start rounded-lg transition-all text-[#f56f6f]"
                     }

@@ -9,7 +9,7 @@ export default function PriceSlider({
   handlePriceChange,
 }) {
   return (
-    <div className="max-w-md mx-auto">
+    <div className="mx-2">
       <PriceRangeSlider
         min={min}
         max={max}

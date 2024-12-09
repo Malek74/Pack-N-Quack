@@ -7,25 +7,19 @@ import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/shared/SearchBar";
 import axios from "axios";
 import PriceSlider from "../components/shared/PriceSlider";
-import CreateDialog from "@/components/shared/CreateDialog";
-import ProductForm from "@/components/forms/ProductForm";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/shared/Loading";
-import { FilterButton } from "@/components/SalesReportComponents/FilterButton";
 import { FilterDialog } from "@/components/shared/FilterDialog";
 import { FilterPanel } from "@/components/shared/FilterPanel";
 import { Filter } from "lucide-react";
 export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
-  const { prefCurrency } = useUser();
+  const { prefCurrency, userType } = useUser();
   const [maxPrice, setMaxPrice] = useState(null); // Start as null until it's fetched
   const [priceRange, setPriceRange] = useState([0, 100000000]); // Applied price range
   const [sliderRange, setSliderRange] = useState([0, 100000000]); // Temporary slider range
   const [selectedFilters, setSelectedFilters] = useState({});
-  const [filters, setFilters] = useState({});
-
-  const userType = "tourist";
   // Fetch products based on filters and search term
   const fetchProducts = () => {
     axios
@@ -70,33 +64,19 @@ export default function MarketplacePage() {
     fetchMaxPrice();
   }, [prefCurrency]);
 
-  const handleFilterChange = (type, value) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [type]: value, // Update the selected value based on the type
-    }));
-    console.log(type, value);
+  const handleApplyFilters = (appliedFilters) => {
+    if (appliedFilters.price) {
+      setPriceRange(appliedFilters.price); // Update the price range
+    }
+    setSelectedFilters(appliedFilters); // Update other filters
   };
 
-  // Handle price change from the slider
-  const handlePriceChange = (newRange) => {
-    setSliderRange(newRange); // Temporarily update the slider range
+  const handleClearFilters = () => {
+    setSelectedFilters({});
+    setPriceRange([0, maxPrice]); // Reset price range to full range
+    setSliderRange([0, maxPrice]); // Reset slider range
   };
 
-  // Apply the slider range to the actual price range on clicking "Apply"
-  const applyPriceRange = () => {
-    setPriceRange(sliderRange); // Apply the selected price range
-  };
-
-  let buttons = [
-    {
-      type: "Sort By Rating",
-      options: [
-        { label: "Ratings Low To High", value: "asc" },
-        { label: "Ratings High To Low", value: "desc" },
-      ],
-    },
-  ];
   const filterConfig = [
     {
       type: "dropdown",
@@ -111,19 +91,17 @@ export default function MarketplacePage() {
       type: "range",
       key: "price",
       label: "Price Range",
-      component: (
+      component: ({ priceRange, handlePriceChange }) => (
         <PriceSlider
           min={0}
-          max={1000}
-          priceRange={sliderRange}
-          handlePriceChange={(newRange) => setSliderRange(newRange)}
+          max={maxPrice || 100000000}
+          priceRange={priceRange}
+          handlePriceChange={handlePriceChange}
         />
       ),
     },
   ];
 
-
-  
   return (
     <div className="flex flex-col px-16">
       <div className="relative">
@@ -143,47 +121,21 @@ export default function MarketplacePage() {
       </div>
 
       <div className="mt-8 flex">
-        {/* <FilterButton buttons={buttons} onFilterChange={handleFilterChange} /> */}
-        {/* <FilterButton */}
         <FilterDialog
-        triggerIcon={<Filter />}
-        title="Filter Products"
-        description="Apply filters to find the best products for you."
-      >
-        <FilterPanel filters={filterConfig} setFilters={setFilters} />
-      </FilterDialog>
-
-        {/* {maxPrice !== null && (
-          <div className="flex items-center justify-center">
-            <PriceSlider
-              min={0}
-              max={maxPrice}
-              priceRange={sliderRange} // Use the temporary slider range
-              handlePriceChange={handlePriceChange} // Update slider range on change
-            />
-            <Button
-              size="sm"
-              onClick={applyPriceRange} // Apply the price range on click
-              className="ml-2 rounded-md px-4 py-2"
-            >
-              Apply
-            </Button>
-          </div>
-        )} */}
-
-        
+          triggerIcon={<Filter />}
+          title="Filter Products"
+          description="Apply filters to find the best products for you."
+        >
+          <FilterPanel
+            filters={filterConfig}
+            onApply={handleApplyFilters}
+            fetchMaxPrice={fetchMaxPrice}
+          />
+        </FilterDialog>
+        <Button onClick={handleClearFilters} variant="outline">
+          Clear Filters
+        </Button>
       </div>
-      {userType === "seller" && (
-        <CreateDialog
-          title="Product"
-          form={
-            <ProductForm
-              onRefresh={fetchProducts}
-              adderId="6703ba52daf9eae5ef55344c"
-            />
-          }
-        />
-      )}
 
       <div className="grid grid-cols-1 place-items-center justify-center gap-8 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.length > 0 ? (

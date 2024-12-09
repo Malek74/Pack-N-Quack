@@ -31,11 +31,7 @@ export default function TouristDashboard() {
       icon: UserRound,
       path: "profile",
     },
-    {
-      label: "Sales Report",
-      icon: ChartNoAxesCombined,
-      path: "sales-report",
-    },
+
   ];
 
   const sellerItems = [
@@ -111,23 +107,22 @@ export default function TouristDashboard() {
   const [sidebarItems, setSidebarItems] = useState([]);
 
   useEffect(() => {
-    console.log("IS ADV")
-    console.log(isAdvertiser)
     setSidebarItems(commonSidebarItems);
     let items = [...commonSidebarItems]; // Start with common items
     console.log(userType);
     if (isTourist) {
       items = [...items, ...touristSidebarItems];
       setSidebarItems(items);
-      console.log("SAD")
     }
     if (isSeller) {
-      sidebarItems.push(sellerItems);
+      items = [...items, ...sellerItems];
+      setSidebarItems(items);
     }
-    if (isAdvertiser){
-      sidebarItems.push(advertiserItems);
+    if (isAdvertiser || isTourGuide){
+      items = [...items, ...advertiserItems];
+      setSidebarItems(items);
+    }
 
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     userId,

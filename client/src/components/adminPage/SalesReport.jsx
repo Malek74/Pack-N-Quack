@@ -1,44 +1,80 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import Loading from "@/components/shared/Loading";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
-
 import { AdminRevenuePieChart } from "../SalesReportComponents/AdminRevenuePieChart";
 import { AdminFilterButton } from "@/components/SalesReportComponents/AdminFilterButton";
 export default function Stats() {
   const [stats, setStats] = useState([]);
   const [reportFilters, setReportFilters] = useState();
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { prefCurrency } = useUser();
   const fetchStats = () => {
+    setLoading(true);
     axios
-      .get(`/api/tourGuide/testing/6744aa1a8b14b29dbaaf1de6`)
+      .get(`/api/admins/adminRevenue`)
       .then((response) => {
         setStats(response.data);
         console.log("STATS AS FOLLOWS");
         console.log(response.data);
+        const calculatedTransactions =
+          response.data.revenueAndBookingsPerEvent.map((event) => ({
+            title: event.activityName,
+            description: `${event.numOfTickets} tickets sold`,
+            date: new Date(event.date).toISOString(), // Convert event.date to ISO string
+            incoming: true,
+            amount: event.price, // Use the price directly from the event
+          }));
+
+        setTransactions(calculatedTransactions);
+        setLoading(false);
       })
       .catch((error) => {
         console.error(error);
+        setLoading(false);
       });
   };
 
+  const renderTransactions = (transactions) => {
+    return transactions.map((transaction, index) => (
+      <Card key={index} className="mb-2">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">{transaction.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {transaction.description}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {new Date(transaction.date).toLocaleString()}
+              </p>
+            </div>
+            <span
+              className={`${
+                transaction.incoming ? "text-green-500" : "text-red-500"
+              } font-semibold`}
+            >
+              {transaction.incoming ? "+" : "-"}
+              {prefCurrency} {transaction.amount}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    ));
+  };
   function formatDate(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -63,60 +99,38 @@ export default function Stats() {
     fetchStats();
   }, []);
 
-  const dummyStats = [
-    {
-      title: "Italy Tour",
-      type: "Itinerary",
-      date: "10-10-2024",
-      revenue: 500,
-    },
-  ];
-
   return (
-    <div className="flex flex-col sm:gap-4 sm:py-4">
-      <Card x-chunk="dashboard-06-chunk-0">
-        <CardHeader>
-          <div className="flex flex-row justify-between">
-            <div className="flex flex-col">
-              <CardTitle>Salessss Report</CardTitle>
-              <CardDescription className="mt-1">Revenue Stats.</CardDescription>
+    <Card
+      x-chunk="dashboard-06-chunk-0 "
+      className="flex flex-col items-center justify-center gap-4 p-4"
+    >
+      <CardHeader className="flex w-full flex-row justify-between">
+        <div>
+          <CardTitle>Sales Report</CardTitle>
+          <CardDescription>View all your sales data here!</CardDescription>
+        </div>
+        <AdminFilterButton setReportFilters={setReportFilters} />
+      </CardHeader>
+      <CardContent className="flex flex-col items-center justify-center gap-4 p-4">
+        {loading ? (
+          <Loading className="place-items-center place-self-center" />
+        ) : (
+          transactions?.length > 0 && (
+            <div className="flex w-full">
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList className="">
+                  <TabsTrigger value="all">All Transactions</TabsTrigger>
+                </TabsList>
+                <TabsContent value="all" className="w-full">
+                  <ScrollArea className="h-[500px]">
+                    {renderTransactions(transactions)}
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
             </div>
-            <AdminFilterButton setReportFilters={setReportFilters} />
-          </div>
-        </CardHeader>
-        <CardContent>
-          {" "}
-          <div className="flex w-full justify-center mb-6">
-            <AdminRevenuePieChart totalRevenue={totalRevenue} />
-          </div>{" "}
-          <Table>
-            <TableCaption>A list of products.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Revenue</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stats?.map((stat) => (
-                <TableRow>
-                  <TableCell>{stat.title}</TableCell>
-                  <TableCell>{stat.type}</TableCell>
-                  <TableCell>{stat.date}</TableCell>
-                  <TableCell>{stat.revenue}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing <strong>{dummyStats && dummyStats.length}</strong> products
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+          )
+        )}
+      </CardContent>
+    </Card>
   );
 }
