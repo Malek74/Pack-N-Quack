@@ -170,7 +170,7 @@ export default function ItineraryFilters({ setFetchedItinerariesParams }) {
             }
           }}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-auto">
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
           <SelectContent>

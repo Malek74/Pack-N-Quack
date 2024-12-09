@@ -28,6 +28,7 @@ export default function BookActivities() {
 
   const fetchBookedActivities = async () => {
     try {
+
       const response = await axios.post("/api/tourist/myBookings/ ", {
         eventType: "activity",
       });

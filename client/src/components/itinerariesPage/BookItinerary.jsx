@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import BookItineraryForm from "@/components/ItinerariesPage/BookItineraryForm";
 import PropTypes from "prop-types";
 import { DialogContent } from "@mui/material";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 BookItinerary.propTypes = {
   name: PropTypes.string,
@@ -19,6 +20,7 @@ BookItinerary.propTypes = {
 
 export default function BookItinerary({ name, id, available_dates, price }) {
   return (
+
     <Dialog>
       <DialogTrigger>
         <Button variant="outline">Book Itinerary</Button>
@@ -27,13 +29,20 @@ export default function BookItinerary({ name, id, available_dates, price }) {
         <DialogTitle>Book {name}?</DialogTitle>
         <DialogDescription>Please fill out the booking form!</DialogDescription>
       </DialogHeader>
-      <DialogContent>
+
+      <DialogContent
+        className="sm:max-w-[425px] max-h-[60vh] overflow-y-auto"
+      >
+
         <BookItineraryForm
           itineraryId={id}
           available_dates={available_dates}
           price={price}
         />
+
       </DialogContent>
+
     </Dialog>
+
   );
 }
