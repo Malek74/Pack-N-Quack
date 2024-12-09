@@ -105,7 +105,8 @@ export default function DateRangePickerV2({
             onMonthChange={setEndMonth}
             disabled={
               report
-                ? false
+                ? (date) =>
+                  date > new Date() || (startDate ? date < startDate : false)
                 : (date) =>
                     date < new Date() || (startDate ? date < startDate : false)
             }

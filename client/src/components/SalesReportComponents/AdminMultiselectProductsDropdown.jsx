@@ -23,6 +23,7 @@ export default function AdminMultiselectProductsDropdown({
   selectedOptions,
   setSelectedOptions,
 }) {
+  console.log(options);
   const handleOptionToggle = (option) => {
     setSelectedOptions((prev) =>
       prev.some((item) => item._id === option._id)
@@ -54,25 +55,25 @@ export default function AdminMultiselectProductsDropdown({
               onCheckedChange={() => handleOptionToggle(option)}
             >
               <span key={option._id} className="flex items-center">
-                {option.event}
+                {option.name}
               </span>
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
       {selectedOptions.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-2 ">
+        <div className="mt-2 grid grid-cols-3 gap-2">
           {selectedOptions.map((option) => (
             <Badge
               variant="secondary"
               key={option._id}
-              className="pl-2 pr-1 py-1 bg-gold text-white flex justify-between items-center hover:bg-gold"
+              className="flex items-center justify-between bg-gold py-1 pl-2 pr-1 text-white hover:bg-gold"
             >
-              {option.event}
+              {option.name}
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 ml-1"
+                className="ml-1 h-auto p-0"
                 onClick={() => removeOption(option._id)}
               >
                 <X className="h-3 w-3" />
