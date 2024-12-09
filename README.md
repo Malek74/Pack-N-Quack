@@ -1,6 +1,29 @@
 # Pack-N-Quack
 Pack N Quack is an innovative solution that empowers travelers to create unforgettable experiences, discover local gems, and plan every detail of their trips with ease. With a user-friendly interface and a comprehensive suite of features, the app allows adventurers to personalize their itineraries, book accommodations and transport, and explore curated activities, all within a single, seamless platform. Designed for everyone—from solo travelers to families—our app brings the world to your fingertips, making travel planning both enjoyable and stress-free.
 
+## Motivation
+
+In today's rapidly evolving travel landscape, tourists seek seamless and personalized experiences that cater to their diverse needs and preferences. However, existing platforms often fall short in providing a comprehensive, user-centric solution that bridges the gap between various stakeholders in the tourism industry. This is where **DuckTourism** comes into play.
+
+### Identifying the Gaps
+
+1. **Fragmented Services**:
+   - **Issue**: Travelers frequently navigate multiple websites and applications to book flights, accommodations, activities, and transportation, leading to a disjointed and time-consuming planning process.
+   - **Solution**: DuckTourism consolidates all essential travel services into a single, unified platform, offering a one-stop solution for all booking needs.
+
+2. **Lack of Personalization**:
+   - **Issue**: Many tourism platforms offer generic recommendations, failing to tailor experiences based on individual preferences, interests, and special occasions.
+   - **Solution**: By leveraging user roles and personalized data, DuckTourism provides customized itineraries, activities, and promotions, enhancing the overall travel experience.
+
+3. **Inefficient Communication**:
+   - **Issue**: Real-time updates and notifications are often missing, leaving users uninformed about important changes, confirmations, and opportunities.
+   - **Solution**: DuckTourism integrates real-time notifications, ensuring users stay informed and engaged throughout their journey.
+
+4. **Limited Marketplace Integration**:
+   - **Issue**: Tourists and local sellers have limited avenues to interact, buy, and sell tourism-related goods, restricting the economic potential of the tourism ecosystem.
+   - **Solution**: Our integrated marketplace fosters direct interactions between tourists and sellers, promoting local businesses and offering travelers unique products tailored to their needs.
+
+
 ## Build Status
 The project is currently under development, we are actively creating and improving the various features of the platform.
 
@@ -129,9 +152,267 @@ For an interactive and detailed exploration of our API, access our [Postman Coll
     - Click on any request to view details, modify parameters, and send requests directly from Postman.
 
 
-## Code Snippets 
+## Code Examples
 
-## Installation
+Here are some practical examples to help you understand how to interact with our project. These snippets demonstrate key functionalities such as user authentication, publishing activities, booking itineraries, handling payments, receiving real-time notifications, and more.
+
+### 1. Real-tine notifications
+
+Manage different users sending them their notifications.
+
+```javascript
+//upon connection, join the user's room as he sends the 
+io.on('connection', async (socket) => {
+    console.log('A user connected and his socket id is: ' + socket.handshake.auth.userId);
+
+    
+    const roomID = socket.handshake.auth.userId.toString();
+    socket.join(roomID);
+    console.log('User joined room: ' + socket.handshake.auth.userId);
+    const notification = await notificationSchema.find({ 'user.id': roomID });
+
+    //send the user his notifications
+    io.to(roomID).emit('initialNotifications', notification);
+});
+```
+
+### 2. Connecting to backend
+
+Adjust the base url here to match the backend link of the project.
+
+```javascript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.jsx";
+import "./style/main.css";
+import axios from "axios";
+
+axios.defaults.baseURL = "http://localhost:8000/";
+axios.defaults.withCredentials = true; // Ensure cookies are sent with every request
+// DO NOT REMOVE THIS LINE
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+```
+
+### 3. Example Component
+
+This is a react component that renders itineraries
+
+```javascript
+import PropTypes from "prop-types";
+import { Card } from "../ui/card";
+import { Label } from "../ui/label";
+import { Rating } from "../shared/Rating";
+import { useNavigate } from "react-router-dom";
+import { Activity, FlagOff, Bookmark } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useState } from "react";
+import axios from "axios";
+
+ItinerariesCard.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string,
+  description: PropTypes.string,
+  tags: PropTypes.array,
+  price: PropTypes.number,
+  rating: PropTypes.number,
+  numberOfReviews: PropTypes.number,
+  coverImage: PropTypes.string,
+  touristClicked: PropTypes.bool,
+  isFlagged: PropTypes.bool,
+  isActive: PropTypes.bool,
+  tourGuideClicked: PropTypes.bool,
+  small: PropTypes.bool,
+  adminClicked: PropTypes.bool,
+};
+export default function ItinerariesCard({
+  id,
+  name,
+  description,
+  tags,
+  price,
+  rating,
+  numberOfReviews,
+  coverImage,
+  touristClicked,
+  tourGuideClicked,
+  adminClicked,
+  isFlagged = false,
+  isActive = true,
+  small = false,
+}) {
+  const navigate = useNavigate();
+  const cardClassName = small
+    ? "shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[350px]"
+    : "shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[550px] h-[450px]";
+  const imgClassName = small
+    ? "rounded-lg rounded-b-none h-[200px] w-full object-fill"
+    : "rounded-lg rounded-b-none h-[300px] w-full object-fill";
+
+  const { prefCurrency } = useUser();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const handleBookmark = async (e) => {
+    e.stopPropagation();
+    console.log("Bookmark clicked");
+    setIsBookmarked(!isBookmarked);
+
+    try {
+      const response = await axios.post("/api/tourist/save", {
+        eventID: id,
+        bookmark: !isBookmarked,
+        eventType: "itinerary",
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  return (
+    <Card
+      //  className="shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gray-400 hover:cursor-pointer w-[450px] h-[450px] "
+      className={cardClassName}
+      onClick={() => {
+        if (touristClicked) navigate(`/itinerariesTourists/${id}`);
+        if (tourGuideClicked) navigate(`/itinerariesTourGuide/${id}`);
+        if (adminClicked) navigate(`/itinerariesAdmin/${id}`);
+      }}
+    >
+      <img
+        src={
+          coverImage ||
+          "https://media.istockphoto.com/id/1406854851/vector/travel-time-vector-background-design-time-to-travel-text-in-blue-space-with-3d-tourist.jpg?s=612x612&w=0&k=20&c=GMlx-8LNNhoQdE4cbKwu2apsLcmmTKj5pq77ToAu8BM%3D"
+        }
+        className={imgClassName}
+      />
+      <div className="p-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between">
+            <Label className="text-lg font-semibold">{name}</Label>
+
+            <div className="flex gap-2">
+              {touristClicked && (
+                <Bookmark
+                  fill={isBookmarked ? "gold" : "white"}
+                  size={36}
+                  className="text-gold hover:text-goldhover"
+                  onClick={(e) => handleBookmark(e)}
+                />
+              )}
+              {isFlagged && (
+                <FlagOff
+                  size={36}
+                  className="border border-red-600 rounded-full bg-red-600 text-white p-1"
+                />
+              )}
+              {!isActive && (
+                <Activity
+                  size={36}
+                  className="border border-red-600 rounded-full bg-red-600 text-white p-1"
+                />
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-neutral-400 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+            {description}
+          </p>
+          <div className="flex justify-between">
+            <Label className="font-semibold text-lg text-gray-500">
+              {`Price: ${price} ${adminClicked ? "USD" : prefCurrency}`}
+            </Label>
+
+            <Rating rating={rating} numberOfReviews={numberOfReviews} />
+          </div>
+          <div className="flex gap-2">
+            {tags.map((t) => (
+              <Label
+                key={t._id}
+                className="text-sm text-gray-500 border-gray-500 rounded-full border px-2"
+              >
+                {`#${t.tag}`}
+              </Label>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+```
+## Tests
+
+Ensuring the reliability and stability of DuckTourism is a top priority. Currently, all functionalities have been thoroughly tested manually to verify that they work as expected. While automated tests are not yet implemented, we recognize their importance and plan to incorporate them in future updates.
+
+### Manual Testing Process
+
+Our manual testing process involves the following steps to ensure each feature operates correctly across different user roles and scenarios:
+
+1. **User Roles Verification**
+   - **Advertisers**: Tested the ability to create and manage advertisements, ensuring they appear correctly to target audiences.
+   - **Sellers**: Verified that sellers can list, update, and remove products in the marketplace seamlessly.
+   - **Tour Guides**: Ensured tour guides can publish, edit, and delete activities and itineraries.
+   - **Tourists**: Confirmed that tourists can browse, book activities, and make payments without issues.
+   - **Admins**: Checked that admins can oversee platform operations, manage content, and supervise user interactions effectively.
+   - **Tourism Governors**: Validated that tourism governors can coordinate and regulate activities within their regions.
+
+2. **Feature Functionality Testing**
+   - **Activity and Itinerary Management**: Created various activities and itineraries, ensuring they are accurately listed and bookable.
+   - **Booking System**: Booked activities and itineraries as a tourist, verifying the booking flow and confirmation notifications.
+   - **Payment Processing**: Tested multiple payment methods to ensure transactions are processed securely and accurately.
+   - **Real-Time Notifications**: Verified that notifications are received in real-time upon booking confirmations, payments, and other important events.
+   - **Marketplace Operations**: Added and purchased items in the marketplace, ensuring listings are correctly displayed and transactions are smooth.
+   - **Promocodes**: Applied promocodes during checkout, especially on user birthdays, to confirm that discounts are correctly applied.
+
+3. **UI/UX Consistency**
+   - **Duck-Themed Interface**: Ensured that the duck-themed design is consistent and visually appealing across all pages and components.
+   - **Responsive Design**: Tested the platform on various devices (desktop, tablet, mobile) to confirm a seamless and responsive user experience.
+   - **Accessibility**: Checked for accessibility features to ensure that the platform is usable by individuals with different abilities.
+
+### Future Testing Plans
+
+To further enhance the quality and maintainability of DuckTourism, we plan to implement automated testing in the following areas:
+
+1. **Unit Tests**
+   - **Purpose**: Test individual components and functions to ensure they work as intended.
+   - **Tools**: [Jest](https://jestjs.io/) for JavaScript/React components.
+
+2. **Integration Tests**
+   - **Purpose**: Verify that different modules and services interact correctly.
+   - **Tools**: [Mocha](https://mochajs.org/) and [Chai](https://www.chaijs.com/) for backend API integrations.
+
+3. **End-to-End (E2E) Tests**
+   - **Purpose**: Simulate real user scenarios to ensure the entire application workflow functions smoothly.
+   - **Tools**: [Cypress](https://www.cypress.io/) for comprehensive E2E testing.
+
+4. **Continuous Integration (CI)**
+   - **Purpose**: Automate the testing process to run tests on every commit and pull request.
+   - **Tools**: [GitHub Actions](https://github.com/features/actions) or [Travis CI](https://travis-ci.com/) for setting up CI pipelines.
+
+### How You Can Help
+
+We welcome contributions to build a robust automated testing suite for DuckTourism. Here's how you can get involved:
+
+1. **Choose a Testing Framework**
+   - If you’re familiar with Jest, Mocha, Chai, or Cypress, feel free to start integrating tests using these tools.
+
+2. **Write Tests for Existing Features**
+   - Begin by writing unit tests for critical components such as user authentication, booking processes, and payment handling.
+   - Develop integration tests to ensure that different parts of the application work together seamlessly.
+   - Create E2E tests to simulate user interactions and verify the overall workflow.
+
+3. **Submit Pull Requests**
+   - Fork the repository and create a new branch for your tests.
+   - Ensure your tests pass locally before submitting a pull request.
+   - Provide clear descriptions of the tests you’ve written and the features they cover.
+
+4. **Documentation**
+   - Help document the testing process and guidelines to assist other contributors in writing consistent and effective tests.
+
+
+## Installation and How to use?
 
 To set up the project and install all dependencies, run the following command in the root directory:
 
@@ -192,4 +473,52 @@ EMAIL_PASSKEY="rzos ahdu mdln pjjg"
 BIRTHDAY_COUPON_ID="l4KcArGy"
 ```
 
+## Contributing
 
+We’re thrilled that you’re interested in contributing to **DuckTourism**! Your contributions help make this project better for everyone. Whether you’re fixing bugs, improving documentation, or suggesting new features, your support is greatly appreciated.
+
+### How to Contribute
+
+Follow these steps to contribute to DuckTourism:
+
+1. **Fork the Repository**
+
+   Click the **Fork** button at the top right of this repository’s page to create your own copy of DuckTourism.
+
+2. **Clone Your Fork**
+
+   Clone your forked repository to your local machine using the following command:
+
+   ```bash
+   git clone https://github.com/yourusername/Pack-N-Quack.git
+   cd Pack-N-Quack
+   ```
+3. **Create a New Branch**
+
+   Create a new branch for your feature or bug fix to keep your work organized:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. **Make Your Changes**
+
+  Implement your feature or fix the bug. Ensure that your code adheres to the project’s code style and guidelines.
+  
+5. **Commit Your Changes**
+
+   Commit your changes with a clear and descriptive message:
+
+   ```bash
+   git commit -m "Add feature: Description of your feature"
+   ```
+6. **Push to your fork**
+
+   Push your changes to your forked repository:
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+7. **Create a Pull Request**
+
+ Go to the original Pack-N-Quack repository and click the Compare & pull request button. Provide a detailed description of your changes and submit the pull request.
