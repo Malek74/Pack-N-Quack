@@ -10,16 +10,22 @@ import Tourist from "../models/touristSchema.js";
 
 //get product by ID
 export const getProductByID = async (req, res) => {
-    const { id } = req.user._id;
-    const isAdmin = adminModel.findById(id);
+    const id  = req.params.id;
     const prefCurrency = req.body.prefCurrency;
-
-
+    console.log(id);
     if (!id) {
         return res.status(400).json({ message: "Please provide a product ID" });
     }
     try {
-        const searchedProduct = await product.findById(id).populate('seller_id');
+        const isAdmin = adminModel.findById(id);
+        let searchedProduct;
+        if(!isAdmin){
+             searchedProduct = await product.findById(id).populate('seller_id');
+        }else{
+                const isAdmin = adminModel.findById(id);
+                const searchedProduct = await product.findById(id).populate('adminSellerID');
+
+        }
         const conversionRate = await getConversionRate(prefCurrency);
         searchedProduct.price *= conversionRate;
         return res.status(200).json(searchedProduct);

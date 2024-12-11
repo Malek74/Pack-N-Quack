@@ -138,7 +138,7 @@ app.post('/api/login', login);
 app.get('/api/logout', logout);
 app.use('/api/notifications', notifications);
 app.post('/api/forgotPassword', forgotPassword);
-app.post('/api/OTPPassword', protect, updatePassword);
+app.post('/api/OTPPassword', updatePassword);
 
 // Schedule the function to run at 11 PM every day
 cron.schedule("40 12 * * *", () => {

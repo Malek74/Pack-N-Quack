@@ -4,9 +4,9 @@ import { upload } from "../middleware/multer.js";
 import { protect } from '../middleware/authenticator.js';
 
 const router = express.Router();
-router.get("/", protect, getProducts);
+router.get("/", getProducts);
 router.post("/",protect, upload.fields([{ name: 'images', maxCount: 10 }]), createProduct);
-router.get("/productDetails",protect, getProductByID);
+router.get("/productDetails", getProductByID);
 router.put("/",protect, updateProduct);
 router.get("/search", protect,searchProduct);
 router.put("/update/:id",protect, editProduct);
