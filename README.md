@@ -428,7 +428,7 @@ We welcome contributions to build a robust automated testing suite for Pack-N-Qu
    - Help document the testing process and guidelines to assist other contributors in writing consistent and effective tests.
 
 
-## Installation and How to use?
+## Installation
 
 To set up the project and install all dependencies, run the following command in the root directory:
 
@@ -488,6 +488,134 @@ EMAIL_PASSKEY="rzos ahdu mdln pjjg"
 
 BIRTHDAY_COUPON_ID="l4KcArGy"
 ```
+
+### How to use?
+
+#### Tour Guide
+A Tour Guide is a registered user who has successfully verified their account and is able to create and manage itineraries for tourists to book.
+
+**Steps to Become a Tour Guide:**
+1. **Sign Up**: Create a new account on our platform.
+2. **Agree to Terms**: Accept the terms and conditions.
+3. **Upload Required Documents**: Provide necessary identification and qualification documents.
+4. **Await Approval**: Once the admin verifies your details, your Tour Guide account will be approved.
+
+**Key Features and Actions:**
+- **Create and Manage Itineraries**: Post detailed itineraries that tourists can book.
+- **Sales Tracking**: View and track the number of bookings and overall sales performance.
+- **Activation Control**: Toggle each itinerary between active (visible to tourists) and inactive (hidden from tourists).
+- **Inappropriate Content Notifications**: Receive notifications if an itinerary is flagged as inappropriate by the admin. You can edit, remove, or revise the itinerary as needed.
+- **Edit or Delete Itineraries**: Make changes to itinerary details or remove them entirely.
+- **Account Profile Updates**: Update personal information, such as your biography, contact details, and profile image.
+- **Change Password**: Securely reset or change your account password.
+- **Account Deletion Request**: Request to have your account permanently deleted from the platform at any time.
+
+#### Advertiser
+An Advertiser is a registered user who, once verified, can create and manage activities that tourists can purchase or book.
+
+**Steps to Become an Advertiser:**
+1. **Sign Up**: Create a new account on our platform.
+2. **Agree to Terms**: Accept the terms and conditions.
+3. **Upload Required Documents**: Provide necessary identification and qualification documents.
+4. **Await Approval**: Once the admin verifies your details, your Advertiser account will be approved.
+
+**Key Features and Actions:**
+- **Create and Manage Activities**: Post detailed activities (instead of itineraries) that tourists can book.
+- **Sales Tracking**: View and track the number of bookings and overall sales performance.
+- **Activation Control**: Toggle each activity between active (visible to tourists) and inactive (hidden from tourists).
+- **Inappropriate Content Notifications**: Receive notifications if an activity is flagged as inappropriate by the admin. You can edit, remove, or revise the activity as needed.
+- **Edit or Delete Activities**: Make changes to activity details or remove them entirely.
+- **Account Profile Updates**: Update personal information, such as your biography, contact details, and profile image.
+- **Change Password**: Securely reset or change your account password.
+- **Account Deletion Request**: Request to have your account permanently deleted from the platform at any time.
+
+#### Tourist
+A Tourist is a registered user who can explore various offerings, book events, itineraries, activities, and purchase products. Tourists can also manage their accounts, preferences, and interact with other platform features. Below is a detailed list of actions a Tourist can perform:
+
+**Account & Profile Management**
+- **Login with Username & Password**: Securely access the platform.
+- **Forgot Password via OTP**: Request a one-time password sent to your email to reset your password.
+- **Read/Update Profile**: View and edit personal information including wallet balance and personal details.
+- **Change Password**: Modify your existing password at any time.
+- **Request Account Deletion**: Ask to have your account permanently removed.
+  
+**Vacation Planning & Preferences**
+- **View Vacation Guide**: Follow a step-by-step guide on how to begin your vacation.
+- **Set Vacation Preferences**: Indicate interests like historic areas, beaches, family-friendly options, shopping, budget, etc.
+- **Currency Preference**: Choose the currency in which you’d like to view prices.
+
+**Search, Filter & Sort**
+- **Search**: Find museums, historical places, activities, itineraries, or products by name, category, or tags.
+- **Filter**: Narrow down results for:
+  - Activities by budget, date, category, or ratings.
+  - Itineraries by budget, date, preferences (e.g. historic areas), and language.
+  - Historical places/museums by tag.
+  - Products by price.
+- **Sort**: Arrange:
+  - Activities/Itineraries by price or ratings.
+  - Products by ratings.
+
+**Booking & Purchasing**
+- **Book a Flight**: Use a third-party application (embedded, not just a link) to purchase flight tickets.
+- **View Upcoming Options**: See all upcoming activities, itineraries, historical places, and museums.
+- **Book a Hotel**: Use a third-party application to reserve accommodations.
+- **Book Transportation**: Purchase transportation services through transportation advertisers.
+- **Choose Activity Categories**: Browse and select desired categories of activities.
+- **Book Events/Activities/Itineraries**: Purchase tickets for desired offerings.
+- **Cancel Booking**: Cancel event/activity/itinerary bookings up to 48 hours before start.
+- **Online Payments**: Pay with credit/debit cards (via Stripe) or wallet balances for events, activities, itineraries, and products.
+- **Payment Receipts**: Receive an email receipt upon successful payment.
+- **Wallet Management**: 
+  - View refunded amounts from cancellations deposited back into your wallet.
+  - Redeem loyalty points for cash in your wallet.
+  - View updated wallet balance after transactions.
+
+**Loyalty, Ratings & Reviews**
+- **Loyalty Points**: Earn points after paying for events/itineraries.
+- **Badges**: Receive badges based on your activity level.
+- **Ratings & Reviews**:
+  - Rate and comment on Tour Guides you’ve completed tours with.
+  - Rate and comment on Itineraries you’ve followed.
+  - Rate events/activities you attended.
+  - Rate and review products you’ve purchased.
+
+**Notifications & Alerts**
+- **Event Availability Alerts**: Request notifications when an event you’re interested in starts accepting bookings.
+- **Upcoming Event Reminders**: Receive notifications (in-app and via email) about upcoming events that you booked or paid for.
+
+**Bookmarking & Sharing**
+- **Bookmark Events**: Save events to view them later.
+- **View Saved Events**: Access a list of all your bookmarked events.
+- **Share Activities/Museums/Historical Places/Itineraries**: Share via copy link or email.
+
+**Product Browsing & Shopping**
+- **View Products**: Browse products with images, prices, descriptions, sellers, and reviews.
+- **Product Search & Filter**: Search products by name, filter by price, and sort by ratings.
+- **Wishlist**:
+  - Save products to your wishlist.
+  - View and manage your wishlist.
+  - Move items from your wishlist to the cart.
+- **Cart Management**:
+  - Add items to cart (directly or from wishlist).
+  - Remove items from the cart.
+  - Change the quantity of items in the cart.
+- **Checkout**:
+  - Add multiple delivery addresses and choose one for order delivery.
+  - Pay with wallet, credit card (via Stripe), or cash on delivery.
+- **Order Management**:
+  - View current and past orders with details and status.
+  - Cancel orders and receive wallet refunds for cancellations.
+  - Rate and review purchased products.
+
+**Promo Codes & Offers**
+- **Birthday Promo Code**: Receive a promo code on your birthday via email and in the system, applicable to any purchase on the website.
+
+**Complaints & Support**
+- **File a Complaint**: Submit a complaint with a title, description, and date.
+- **Complaint Status**: View a list of all filed complaints and their statuses (pending/resolved).
+
+With these functionalities, Tourists can fully manage their travel experience, from booking and exploring to shopping and reviewing, all within the platform.
+
 
 ## Contributing
 
