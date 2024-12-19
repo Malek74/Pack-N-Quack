@@ -614,7 +614,99 @@ A Tourist is a registered user who can explore various offerings, book events, i
 - **File a Complaint**: Submit a complaint with a title, description, and date.
 - **Complaint Status**: View a list of all filed complaints and their statuses (pending/resolved).
 
-With these functionalities, Tourists can fully manage their travel experience, from booking and exploring to shopping and reviewing, all within the platform.
+
+
+#### Seller  
+A **Seller** is a registered user approved by the admin to list and manage products in the platform's gift shop.  
+
+**Steps to Become a Seller:**  
+1. **Sign Up**: Create an account on the platform.  
+2. **Agree to Terms**: Accept the terms and conditions for becoming a seller.  
+3. **Upload Required Documents**: Submit identification and other documents.  
+4. **Await Approval**: The admin reviews and approves the application.  
+
+**Key Features and Actions:**  
+
+#### **Product Management**:  
+- **Add Products**: Upload new products with details, price, available quantity, and images.  
+- **Edit Products**: Update details like price and description.  
+- **Archive/Unarchive Products**: Temporarily or permanently hide products from public view.  
+- **View Product Metrics**: Monitor available quantities, sales figures, and ratings.  
+
+#### **Sales & Reporting**:  
+- **View Sales Report**: Access a report showing revenue generated from sales.  
+- **Filter Sales Report**: Narrow results by product, date, or month.  
+
+#### **Account & Profile Management**:  
+- **Update Profile**: Add or modify profile information, including name and description.  
+- **Change Password**: Reset account credentials securely.  
+- **Request Account Deletion**: Submit a request to have the account removed from the platform.  
+
+#### **Notifications**:  
+- **Out-of-Stock Alerts**: Receive notifications and emails when a product runs out of stock.  
+
+#### **Shopping Features**:  
+- **View All Products**: Browse all listed products with details like price, description, and seller.  
+- **Search/Filter Products**: Search by name, filter by price, and sort by ratings.  
+
+
+
+#### Admin  
+The **Admin** oversees the platform, manages user roles, and ensures smooth operations for all activities and services.  
+
+**Steps to Become an Admin:**  
+1. **Existing Admin Access**: Only an admin can add another admin.  
+2. **Create Account**: An admin account is created with a unique username and password.  
+
+**Key Features and Actions:**  
+
+#### **User Management**:  
+- **Approve Users**: Review and approve/reject documents uploaded by Tour Guides, Advertisers, and Sellers.  
+- **Delete Accounts**: Remove any user account from the platform.  
+- **Add Roles**: Create accounts for Tourism Governors or other Admins.  
+
+#### **Platform Management**:  
+- **Flag Content**: Mark events or itineraries as inappropriate.  
+- **Manage Categories & Tags**: Create, read, update, or delete categories (e.g., food, concerts) and preference tags (e.g., historic areas, family-friendly).  
+
+#### **Sales & Reporting**:  
+- **View Revenue Reports**: Access total revenue from events, itineraries, and gift shop sales.  
+- **User Metrics**: Track the total number of users and new signups per month.  
+
+#### **Complaints & Support**:  
+- **View Complaints**: Access and sort complaints by date or status (pending/resolved).  
+- **Reply to Complaints**: Respond to users and update complaint statuses.  
+
+#### **Promotions**:  
+- **Create Promo Codes**: Generate promotional codes for discounts or special offers.  
+
+#### **Account Management**:  
+- **Change Password**: Securely update admin account credentials.  
+
+
+#### Tourism Governor  
+The **Tourism Governor** is responsible for managing historical places, museums, and related content on the platform.  
+
+**Steps to Become a Tourism Governor:**  
+1. **Admin Access**: The admin creates a Tourism Governor account with a unique username and password.  
+
+**Key Features and Actions:**  
+
+#### **Museum & Historical Place Management**:  
+- **Create Content**: Add museums and historical places with descriptions, images, locations, opening hours, and ticket prices.  
+- **Edit/Update Content**: Modify details of existing listings.  
+- **Delete Content**: Remove outdated or incorrect listings.  
+
+#### **Tag Management**:  
+- **Create Tags**: Add descriptive tags for historical locations (e.g., type, historical period).  
+
+#### **Activity & Itinerary Oversight**:  
+- **View Listings**: Monitor activities, itineraries, and locations created by users under their jurisdiction.  
+
+#### **Account Management**:  
+- **Change Password**: Update account credentials securely.  
+
+---
 
 
 ## Contributing
