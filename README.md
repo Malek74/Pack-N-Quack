@@ -44,6 +44,22 @@ npm run lint
 ## Screenshots
 ![image](https://github.com/user-attachments/assets/76f06b4b-d258-4b87-ba07-2871fd020b97)
 ![image](https://github.com/user-attachments/assets/d7511aa8-29b1-4f04-8910-aac6e8908783)
+![image](https://github.com/user-attachments/assets/fdad0f01-397d-4344-8252-130780cd5411)
+![image](https://github.com/user-attachments/assets/d5ab16c7-6ccd-4c42-8361-e7c1c2d07393)
+![image](https://github.com/user-attachments/assets/68a9a0eb-458e-4c95-81fb-dddaef22abbb)
+![image](https://github.com/user-attachments/assets/1c137f7f-01ed-453f-bdfa-3e3396173f66)
+![image](https://github.com/user-attachments/assets/f2affed4-6c94-4093-bab0-4f04d7d6346a)
+![image](https://github.com/user-attachments/assets/52bdf874-9518-4ce8-9cd6-d0d42090b6a0)
+![image](https://github.com/user-attachments/assets/543db672-0be7-4c01-8664-1b7c8cae8204)
+![image](https://github.com/user-attachments/assets/0042ebdc-a405-489c-9c76-6c4f7b27db7d)
+![image](https://github.com/user-attachments/assets/3e70ed48-39ae-40de-aa35-47620c53b524)
+![image](https://github.com/user-attachments/assets/25a28963-fca2-4ec9-9e5e-34d41311f72b)
+![image](https://github.com/user-attachments/assets/e006cc5d-3002-4ace-b6ea-5cbb07f0bfcd)
+![image](https://github.com/user-attachments/assets/6c94a9b2-ddec-4bf2-b15a-97d163b3c0cd)
+![image](https://github.com/user-attachments/assets/888338fb-9777-44de-837f-d122109c3113)
+![image](https://github.com/user-attachments/assets/21fc5650-404a-4de9-8f02-54f7004f1c61)
+![image](https://github.com/user-attachments/assets/38bf5f9b-101d-41f7-a648-48b7f798dcf6)
+
 
 ## Framework
 This project is built using the **MERN** stack:
