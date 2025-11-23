@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
     port: 465, // Or 587 for other providers
     secure: true, // true for 465, false for 587
     auth: {
-        user: 'captianquackerss@gmail.com', // organization's email
+        user: 'org@gmail.com', // organization's email
         pass: process.env.EMAIL_PASSKEY, // your email password
     },
 });
@@ -26,7 +26,7 @@ const shareMail = async (email, otpCode, username) => {
 
     try {
         const mailOptions = {
-            from: '"CaptainQuackers" <captianquackerss@gmail.com>',
+            from: '"CaptainQuackers" <org@gmail.com>',
             to: email,
             subject: `Your OTP for Pack N Quack Verification`,
             text: `Hello ${username}, here is your OTP for account verification: ${otpCode}. It is valid for the next 10 minutes.`,
